@@ -1,0 +1,18 @@
+{
+  "name": "api",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "motia dev -p 3001",
+    "build": "motia build",
+    "start": "motia start -p 3001"
+  },
+  "dependencies": {
+    "@erp/db": "workspace:*",
+    "motia": "latest",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "@types/node": "^20.0.0"
+  }
+}
