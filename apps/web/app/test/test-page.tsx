@@ -138,7 +138,7 @@ const treeBtnStyle: React.CSSProperties = {
 }
 
 function JsonTree({ value, depth = 0 }: { value: unknown; depth?: number }) {
-  const [open, setOpen] = useState(depth < 2)
+  const [open, setOpen] = useState(true)
 
   if (value === null) return <span style={{ color: '#abb2bf' }}>null</span>
   if (value === undefined) return <span style={{ color: '#abb2bf' }}>undefined</span>
@@ -697,7 +697,7 @@ export function TestPage({
                   try { parsed = JSON.parse(response.responseBody) } catch {}
                   return (
                     <div style={{
-                      backgroundColor: '#282c34',
+                      backgroundColor: 'var(--surface-2)',
                       borderRadius: 8,
                       padding: '14px 16px',
                       fontFamily: 'monospace',
