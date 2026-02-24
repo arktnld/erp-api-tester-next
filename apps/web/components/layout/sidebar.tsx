@@ -51,7 +51,6 @@ export function Sidebar({ erps }: { erps: SidebarERP[] }) {
 
   const onErps = pathname.startsWith('/erps')
   const onCompanies = pathname.startsWith('/companies')
-  const onTest = pathname.startsWith('/test')
 
   const allCompanies = erps.flatMap((e) => e.companies)
 
@@ -155,96 +154,6 @@ export function Sidebar({ erps }: { erps: SidebarERP[] }) {
                 </div>
               )}
 
-              {/* Testar API subtree */}
-              {href === '/test' && onTest && (
-                <div style={{ marginBottom: 4 }}>
-                  {erps.map((erp) => (
-                    <div key={erp.id}>
-                      <button
-                        onClick={() => setOpenErps((s) => toggle(s, erp.id))}
-                        style={{
-                          width: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 5,
-                          padding: '4px 10px 4px 20px',
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          textAlign: 'left',
-                        }}
-                      >
-                        <span style={{ fontSize: 9, color: 'var(--text-subtle)', flexShrink: 0 }}>
-                          {openErps.has(erp.id) ? '▾' : '▸'}
-                        </span>
-                        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>
-                          {erp.name}
-                        </span>
-                      </button>
-
-                      {openErps.has(erp.id) && erp.companies.map((c) => (
-                        <div key={c.id}>
-                          <button
-                            onClick={() => setOpenCompanies((s) => toggle(s, c.id))}
-                            style={{
-                              width: '100%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 5,
-                              padding: '3px 10px 3px 30px',
-                              background: 'none',
-                              border: 'none',
-                              cursor: 'pointer',
-                              textAlign: 'left',
-                            }}
-                          >
-                            <span style={{ fontSize: 9, color: 'var(--text-subtle)', flexShrink: 0 }}>
-                              {openCompanies.has(c.id) ? '▾' : '▸'}
-                            </span>
-                            <span style={{ fontSize: 12, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {c.name}
-                            </span>
-                          </button>
-
-                          {openCompanies.has(c.id) && erp.endpoints.map((ep) => (
-                            <Link
-                              key={ep.id}
-                              href={`/test?companyId=${c.id}&endpointId=${ep.id}`}
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 5,
-                                padding: '3px 10px 3px 42px',
-                                textDecoration: 'none',
-                              }}
-                            >
-                              <span style={{
-                                fontFamily: 'monospace',
-                                fontSize: 9,
-                                fontWeight: 700,
-                                color: methodColor[ep.method] ?? 'var(--text-muted)',
-                                flexShrink: 0,
-                                minWidth: 28,
-                              }}>
-                                {ep.method}
-                              </span>
-                              <span style={{
-                                fontSize: 11,
-                                color: 'var(--text-muted)',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                              }}>
-                                {ep.name}
-                              </span>
-                            </Link>
-                          ))}
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           )
         })}
