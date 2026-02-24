@@ -297,6 +297,7 @@ export function TestPage({
         </span>
         <Button
           variant="ghost"
+          size="sm"
           disabled={!canExecute}
           style={{ flexShrink: 0 }}
           onClick={() => {
@@ -307,17 +308,18 @@ export function TestPage({
             setTimeout(() => setCurlCopied(false), 2000)
           }}
         >
-          {curlCopied ? <Check size={13} /> : <Copy size={13} />}
+          {curlCopied ? <Check size={12} /> : <Copy size={12} />}
           curl
         </Button>
         <Button
+          size="sm"
           onClick={execute}
           disabled={!canExecute || loading}
           style={{ flexShrink: 0 }}
         >
           {loading
-            ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />Executando...</>
-            : <><Play size={13} />Executar</>
+            ? <><Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />Executando...</>
+            : <><Play size={12} />Executar</>
           }
         </Button>
       </div>
