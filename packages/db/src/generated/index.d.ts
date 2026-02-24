@@ -1418,27 +1418,18 @@ export namespace Prisma {
   export type ERPMinAggregateOutputType = {
     id: number | null
     name: string | null
-    baseUrl: string | null
-    authType: string | null
-    authConfig: string | null
     createdAt: Date | null
   }
 
   export type ERPMaxAggregateOutputType = {
     id: number | null
     name: string | null
-    baseUrl: string | null
-    authType: string | null
-    authConfig: string | null
     createdAt: Date | null
   }
 
   export type ERPCountAggregateOutputType = {
     id: number
     name: number
-    baseUrl: number
-    authType: number
-    authConfig: number
     createdAt: number
     _all: number
   }
@@ -1455,27 +1446,18 @@ export namespace Prisma {
   export type ERPMinAggregateInputType = {
     id?: true
     name?: true
-    baseUrl?: true
-    authType?: true
-    authConfig?: true
     createdAt?: true
   }
 
   export type ERPMaxAggregateInputType = {
     id?: true
     name?: true
-    baseUrl?: true
-    authType?: true
-    authConfig?: true
     createdAt?: true
   }
 
   export type ERPCountAggregateInputType = {
     id?: true
     name?: true
-    baseUrl?: true
-    authType?: true
-    authConfig?: true
     createdAt?: true
     _all?: true
   }
@@ -1569,9 +1551,6 @@ export namespace Prisma {
   export type ERPGroupByOutputType = {
     id: number
     name: string
-    baseUrl: string
-    authType: string
-    authConfig: string
     createdAt: Date
     _count: ERPCountAggregateOutputType | null
     _avg: ERPAvgAggregateOutputType | null
@@ -1597,9 +1576,6 @@ export namespace Prisma {
   export type ERPSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
-    baseUrl?: boolean
-    authType?: boolean
-    authConfig?: boolean
     createdAt?: boolean
     companies?: boolean | ERP$companiesArgs<ExtArgs>
     endpoints?: boolean | ERP$endpointsArgs<ExtArgs>
@@ -1610,31 +1586,22 @@ export namespace Prisma {
   export type ERPSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
-    baseUrl?: boolean
-    authType?: boolean
-    authConfig?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["eRP"]>
 
   export type ERPSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
-    baseUrl?: boolean
-    authType?: boolean
-    authConfig?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["eRP"]>
 
   export type ERPSelectScalar = {
     id?: boolean
     name?: boolean
-    baseUrl?: boolean
-    authType?: boolean
-    authConfig?: boolean
     createdAt?: boolean
   }
 
-  export type ERPOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "baseUrl" | "authType" | "authConfig" | "createdAt", ExtArgs["result"]["eRP"]>
+  export type ERPOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "createdAt", ExtArgs["result"]["eRP"]>
   export type ERPInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     companies?: boolean | ERP$companiesArgs<ExtArgs>
     endpoints?: boolean | ERP$endpointsArgs<ExtArgs>
@@ -1654,9 +1621,6 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: number
       name: string
-      baseUrl: string
-      authType: string
-      authConfig: string
       createdAt: Date
     }, ExtArgs["result"]["eRP"]>
     composites: {}
@@ -2086,9 +2050,6 @@ export namespace Prisma {
   interface ERPFieldRefs {
     readonly id: FieldRef<"ERP", 'Int'>
     readonly name: FieldRef<"ERP", 'String'>
-    readonly baseUrl: FieldRef<"ERP", 'String'>
-    readonly authType: FieldRef<"ERP", 'String'>
-    readonly authConfig: FieldRef<"ERP", 'String'>
     readonly createdAt: FieldRef<"ERP", 'DateTime'>
   }
     
@@ -4853,6 +4814,9 @@ export namespace Prisma {
     id: number | null
     name: string | null
     erpId: number | null
+    baseUrl: string | null
+    authType: string | null
+    authConfig: string | null
     createdAt: Date | null
   }
 
@@ -4860,6 +4824,9 @@ export namespace Prisma {
     id: number | null
     name: string | null
     erpId: number | null
+    baseUrl: string | null
+    authType: string | null
+    authConfig: string | null
     createdAt: Date | null
   }
 
@@ -4867,6 +4834,9 @@ export namespace Prisma {
     id: number
     name: number
     erpId: number
+    baseUrl: number
+    authType: number
+    authConfig: number
     createdAt: number
     _all: number
   }
@@ -4886,6 +4856,9 @@ export namespace Prisma {
     id?: true
     name?: true
     erpId?: true
+    baseUrl?: true
+    authType?: true
+    authConfig?: true
     createdAt?: true
   }
 
@@ -4893,6 +4866,9 @@ export namespace Prisma {
     id?: true
     name?: true
     erpId?: true
+    baseUrl?: true
+    authType?: true
+    authConfig?: true
     createdAt?: true
   }
 
@@ -4900,6 +4876,9 @@ export namespace Prisma {
     id?: true
     name?: true
     erpId?: true
+    baseUrl?: true
+    authType?: true
+    authConfig?: true
     createdAt?: true
     _all?: true
   }
@@ -4994,6 +4973,9 @@ export namespace Prisma {
     id: number
     name: string
     erpId: number
+    baseUrl: string
+    authType: string
+    authConfig: string
     createdAt: Date
     _count: CompanyCountAggregateOutputType | null
     _avg: CompanyAvgAggregateOutputType | null
@@ -5020,6 +5002,9 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     erpId?: boolean
+    baseUrl?: boolean
+    authType?: boolean
+    authConfig?: boolean
     createdAt?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
     testClients?: boolean | Company$testClientsArgs<ExtArgs>
@@ -5030,6 +5015,9 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     erpId?: boolean
+    baseUrl?: boolean
+    authType?: boolean
+    authConfig?: boolean
     createdAt?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["company"]>
@@ -5038,6 +5026,9 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     erpId?: boolean
+    baseUrl?: boolean
+    authType?: boolean
+    authConfig?: boolean
     createdAt?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["company"]>
@@ -5046,10 +5037,13 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     erpId?: boolean
+    baseUrl?: boolean
+    authType?: boolean
+    authConfig?: boolean
     createdAt?: boolean
   }
 
-  export type CompanyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "erpId" | "createdAt", ExtArgs["result"]["company"]>
+  export type CompanyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "erpId" | "baseUrl" | "authType" | "authConfig" | "createdAt", ExtArgs["result"]["company"]>
   export type CompanyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     erp?: boolean | ERPDefaultArgs<ExtArgs>
     testClients?: boolean | Company$testClientsArgs<ExtArgs>
@@ -5072,6 +5066,9 @@ export namespace Prisma {
       id: number
       name: string
       erpId: number
+      baseUrl: string
+      authType: string
+      authConfig: string
       createdAt: Date
     }, ExtArgs["result"]["company"]>
     composites: {}
@@ -5501,6 +5498,9 @@ export namespace Prisma {
     readonly id: FieldRef<"Company", 'Int'>
     readonly name: FieldRef<"Company", 'String'>
     readonly erpId: FieldRef<"Company", 'Int'>
+    readonly baseUrl: FieldRef<"Company", 'String'>
+    readonly authType: FieldRef<"Company", 'String'>
+    readonly authConfig: FieldRef<"Company", 'String'>
     readonly createdAt: FieldRef<"Company", 'DateTime'>
   }
     
@@ -7048,12 +7048,18 @@ export namespace Prisma {
     id: number | null
     statusCode: number | null
     durationMs: number | null
+    companyId: number | null
+    endpointId: number | null
+    testClientId: number | null
   }
 
   export type RequestHistorySumAggregateOutputType = {
     id: number | null
     statusCode: number | null
     durationMs: number | null
+    companyId: number | null
+    endpointId: number | null
+    testClientId: number | null
   }
 
   export type RequestHistoryMinAggregateOutputType = {
@@ -7070,6 +7076,9 @@ export namespace Prisma {
     responseBody: string | null
     responseHeaders: string | null
     durationMs: number | null
+    companyId: number | null
+    endpointId: number | null
+    testClientId: number | null
     createdAt: Date | null
   }
 
@@ -7087,6 +7096,9 @@ export namespace Prisma {
     responseBody: string | null
     responseHeaders: string | null
     durationMs: number | null
+    companyId: number | null
+    endpointId: number | null
+    testClientId: number | null
     createdAt: Date | null
   }
 
@@ -7104,6 +7116,9 @@ export namespace Prisma {
     responseBody: number
     responseHeaders: number
     durationMs: number
+    companyId: number
+    endpointId: number
+    testClientId: number
     createdAt: number
     _all: number
   }
@@ -7113,12 +7128,18 @@ export namespace Prisma {
     id?: true
     statusCode?: true
     durationMs?: true
+    companyId?: true
+    endpointId?: true
+    testClientId?: true
   }
 
   export type RequestHistorySumAggregateInputType = {
     id?: true
     statusCode?: true
     durationMs?: true
+    companyId?: true
+    endpointId?: true
+    testClientId?: true
   }
 
   export type RequestHistoryMinAggregateInputType = {
@@ -7135,6 +7156,9 @@ export namespace Prisma {
     responseBody?: true
     responseHeaders?: true
     durationMs?: true
+    companyId?: true
+    endpointId?: true
+    testClientId?: true
     createdAt?: true
   }
 
@@ -7152,6 +7176,9 @@ export namespace Prisma {
     responseBody?: true
     responseHeaders?: true
     durationMs?: true
+    companyId?: true
+    endpointId?: true
+    testClientId?: true
     createdAt?: true
   }
 
@@ -7169,6 +7196,9 @@ export namespace Prisma {
     responseBody?: true
     responseHeaders?: true
     durationMs?: true
+    companyId?: true
+    endpointId?: true
+    testClientId?: true
     createdAt?: true
     _all?: true
   }
@@ -7273,6 +7303,9 @@ export namespace Prisma {
     responseBody: string
     responseHeaders: string
     durationMs: number
+    companyId: number | null
+    endpointId: number | null
+    testClientId: number | null
     createdAt: Date
     _count: RequestHistoryCountAggregateOutputType | null
     _avg: RequestHistoryAvgAggregateOutputType | null
@@ -7309,6 +7342,9 @@ export namespace Prisma {
     responseBody?: boolean
     responseHeaders?: boolean
     durationMs?: boolean
+    companyId?: boolean
+    endpointId?: boolean
+    testClientId?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["requestHistory"]>
 
@@ -7326,6 +7362,9 @@ export namespace Prisma {
     responseBody?: boolean
     responseHeaders?: boolean
     durationMs?: boolean
+    companyId?: boolean
+    endpointId?: boolean
+    testClientId?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["requestHistory"]>
 
@@ -7343,6 +7382,9 @@ export namespace Prisma {
     responseBody?: boolean
     responseHeaders?: boolean
     durationMs?: boolean
+    companyId?: boolean
+    endpointId?: boolean
+    testClientId?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["requestHistory"]>
 
@@ -7360,10 +7402,13 @@ export namespace Prisma {
     responseBody?: boolean
     responseHeaders?: boolean
     durationMs?: boolean
+    companyId?: boolean
+    endpointId?: boolean
+    testClientId?: boolean
     createdAt?: boolean
   }
 
-  export type RequestHistoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "erpName" | "companyName" | "endpointName" | "clientName" | "method" | "url" | "requestBody" | "requestHeaders" | "statusCode" | "responseBody" | "responseHeaders" | "durationMs" | "createdAt", ExtArgs["result"]["requestHistory"]>
+  export type RequestHistoryOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "erpName" | "companyName" | "endpointName" | "clientName" | "method" | "url" | "requestBody" | "requestHeaders" | "statusCode" | "responseBody" | "responseHeaders" | "durationMs" | "companyId" | "endpointId" | "testClientId" | "createdAt", ExtArgs["result"]["requestHistory"]>
 
   export type $RequestHistoryPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "RequestHistory"
@@ -7382,6 +7427,9 @@ export namespace Prisma {
       responseBody: string
       responseHeaders: string
       durationMs: number
+      companyId: number | null
+      endpointId: number | null
+      testClientId: number | null
       createdAt: Date
     }, ExtArgs["result"]["requestHistory"]>
     composites: {}
@@ -7819,6 +7867,9 @@ export namespace Prisma {
     readonly responseBody: FieldRef<"RequestHistory", 'String'>
     readonly responseHeaders: FieldRef<"RequestHistory", 'String'>
     readonly durationMs: FieldRef<"RequestHistory", 'Int'>
+    readonly companyId: FieldRef<"RequestHistory", 'Int'>
+    readonly endpointId: FieldRef<"RequestHistory", 'Int'>
+    readonly testClientId: FieldRef<"RequestHistory", 'Int'>
     readonly createdAt: FieldRef<"RequestHistory", 'DateTime'>
   }
     
@@ -8198,9 +8249,6 @@ export namespace Prisma {
   export const ERPScalarFieldEnum: {
     id: 'id',
     name: 'name',
-    baseUrl: 'baseUrl',
-    authType: 'authType',
-    authConfig: 'authConfig',
     createdAt: 'createdAt'
   };
 
@@ -8238,6 +8286,9 @@ export namespace Prisma {
     id: 'id',
     name: 'name',
     erpId: 'erpId',
+    baseUrl: 'baseUrl',
+    authType: 'authType',
+    authConfig: 'authConfig',
     createdAt: 'createdAt'
   };
 
@@ -8269,6 +8320,9 @@ export namespace Prisma {
     responseBody: 'responseBody',
     responseHeaders: 'responseHeaders',
     durationMs: 'durationMs',
+    companyId: 'companyId',
+    endpointId: 'endpointId',
+    testClientId: 'testClientId',
     createdAt: 'createdAt'
   };
 
@@ -8281,6 +8335,14 @@ export namespace Prisma {
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
   /**
@@ -8332,9 +8394,6 @@ export namespace Prisma {
     NOT?: ERPWhereInput | ERPWhereInput[]
     id?: IntFilter<"ERP"> | number
     name?: StringFilter<"ERP"> | string
-    baseUrl?: StringFilter<"ERP"> | string
-    authType?: StringFilter<"ERP"> | string
-    authConfig?: StringFilter<"ERP"> | string
     createdAt?: DateTimeFilter<"ERP"> | Date | string
     companies?: CompanyListRelationFilter
     endpoints?: EndpointListRelationFilter
@@ -8344,9 +8403,6 @@ export namespace Prisma {
   export type ERPOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
-    baseUrl?: SortOrder
-    authType?: SortOrder
-    authConfig?: SortOrder
     createdAt?: SortOrder
     companies?: CompanyOrderByRelationAggregateInput
     endpoints?: EndpointOrderByRelationAggregateInput
@@ -8359,9 +8415,6 @@ export namespace Prisma {
     AND?: ERPWhereInput | ERPWhereInput[]
     OR?: ERPWhereInput[]
     NOT?: ERPWhereInput | ERPWhereInput[]
-    baseUrl?: StringFilter<"ERP"> | string
-    authType?: StringFilter<"ERP"> | string
-    authConfig?: StringFilter<"ERP"> | string
     createdAt?: DateTimeFilter<"ERP"> | Date | string
     companies?: CompanyListRelationFilter
     endpoints?: EndpointListRelationFilter
@@ -8371,9 +8424,6 @@ export namespace Prisma {
   export type ERPOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
-    baseUrl?: SortOrder
-    authType?: SortOrder
-    authConfig?: SortOrder
     createdAt?: SortOrder
     _count?: ERPCountOrderByAggregateInput
     _avg?: ERPAvgOrderByAggregateInput
@@ -8388,9 +8438,6 @@ export namespace Prisma {
     NOT?: ERPScalarWhereWithAggregatesInput | ERPScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"ERP"> | number
     name?: StringWithAggregatesFilter<"ERP"> | string
-    baseUrl?: StringWithAggregatesFilter<"ERP"> | string
-    authType?: StringWithAggregatesFilter<"ERP"> | string
-    authConfig?: StringWithAggregatesFilter<"ERP"> | string
     createdAt?: DateTimeWithAggregatesFilter<"ERP"> | Date | string
   }
 
@@ -8540,6 +8587,9 @@ export namespace Prisma {
     id?: IntFilter<"Company"> | number
     name?: StringFilter<"Company"> | string
     erpId?: IntFilter<"Company"> | number
+    baseUrl?: StringFilter<"Company"> | string
+    authType?: StringFilter<"Company"> | string
+    authConfig?: StringFilter<"Company"> | string
     createdAt?: DateTimeFilter<"Company"> | Date | string
     erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
     testClients?: TestClientListRelationFilter
@@ -8549,6 +8599,9 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     erpId?: SortOrder
+    baseUrl?: SortOrder
+    authType?: SortOrder
+    authConfig?: SortOrder
     createdAt?: SortOrder
     erp?: ERPOrderByWithRelationInput
     testClients?: TestClientOrderByRelationAggregateInput
@@ -8561,6 +8614,9 @@ export namespace Prisma {
     NOT?: CompanyWhereInput | CompanyWhereInput[]
     name?: StringFilter<"Company"> | string
     erpId?: IntFilter<"Company"> | number
+    baseUrl?: StringFilter<"Company"> | string
+    authType?: StringFilter<"Company"> | string
+    authConfig?: StringFilter<"Company"> | string
     createdAt?: DateTimeFilter<"Company"> | Date | string
     erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
     testClients?: TestClientListRelationFilter
@@ -8570,6 +8626,9 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     erpId?: SortOrder
+    baseUrl?: SortOrder
+    authType?: SortOrder
+    authConfig?: SortOrder
     createdAt?: SortOrder
     _count?: CompanyCountOrderByAggregateInput
     _avg?: CompanyAvgOrderByAggregateInput
@@ -8585,6 +8644,9 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"Company"> | number
     name?: StringWithAggregatesFilter<"Company"> | string
     erpId?: IntWithAggregatesFilter<"Company"> | number
+    baseUrl?: StringWithAggregatesFilter<"Company"> | string
+    authType?: StringWithAggregatesFilter<"Company"> | string
+    authConfig?: StringWithAggregatesFilter<"Company"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Company"> | Date | string
   }
 
@@ -8662,6 +8724,9 @@ export namespace Prisma {
     responseBody?: StringFilter<"RequestHistory"> | string
     responseHeaders?: StringFilter<"RequestHistory"> | string
     durationMs?: IntFilter<"RequestHistory"> | number
+    companyId?: IntNullableFilter<"RequestHistory"> | number | null
+    endpointId?: IntNullableFilter<"RequestHistory"> | number | null
+    testClientId?: IntNullableFilter<"RequestHistory"> | number | null
     createdAt?: DateTimeFilter<"RequestHistory"> | Date | string
   }
 
@@ -8679,6 +8744,9 @@ export namespace Prisma {
     responseBody?: SortOrder
     responseHeaders?: SortOrder
     durationMs?: SortOrder
+    companyId?: SortOrderInput | SortOrder
+    endpointId?: SortOrderInput | SortOrder
+    testClientId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
   }
 
@@ -8699,6 +8767,9 @@ export namespace Prisma {
     responseBody?: StringFilter<"RequestHistory"> | string
     responseHeaders?: StringFilter<"RequestHistory"> | string
     durationMs?: IntFilter<"RequestHistory"> | number
+    companyId?: IntNullableFilter<"RequestHistory"> | number | null
+    endpointId?: IntNullableFilter<"RequestHistory"> | number | null
+    testClientId?: IntNullableFilter<"RequestHistory"> | number | null
     createdAt?: DateTimeFilter<"RequestHistory"> | Date | string
   }, "id">
 
@@ -8716,6 +8787,9 @@ export namespace Prisma {
     responseBody?: SortOrder
     responseHeaders?: SortOrder
     durationMs?: SortOrder
+    companyId?: SortOrderInput | SortOrder
+    endpointId?: SortOrderInput | SortOrder
+    testClientId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: RequestHistoryCountOrderByAggregateInput
     _avg?: RequestHistoryAvgOrderByAggregateInput
@@ -8741,14 +8815,14 @@ export namespace Prisma {
     responseBody?: StringWithAggregatesFilter<"RequestHistory"> | string
     responseHeaders?: StringWithAggregatesFilter<"RequestHistory"> | string
     durationMs?: IntWithAggregatesFilter<"RequestHistory"> | number
+    companyId?: IntNullableWithAggregatesFilter<"RequestHistory"> | number | null
+    endpointId?: IntNullableWithAggregatesFilter<"RequestHistory"> | number | null
+    testClientId?: IntNullableWithAggregatesFilter<"RequestHistory"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"RequestHistory"> | Date | string
   }
 
   export type ERPCreateInput = {
     name: string
-    baseUrl: string
-    authType?: string
-    authConfig?: string
     createdAt?: Date | string
     companies?: CompanyCreateNestedManyWithoutErpInput
     endpoints?: EndpointCreateNestedManyWithoutErpInput
@@ -8758,9 +8832,6 @@ export namespace Prisma {
   export type ERPUncheckedCreateInput = {
     id?: number
     name: string
-    baseUrl: string
-    authType?: string
-    authConfig?: string
     createdAt?: Date | string
     companies?: CompanyUncheckedCreateNestedManyWithoutErpInput
     endpoints?: EndpointUncheckedCreateNestedManyWithoutErpInput
@@ -8769,9 +8840,6 @@ export namespace Prisma {
 
   export type ERPUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
-    baseUrl?: StringFieldUpdateOperationsInput | string
-    authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     companies?: CompanyUpdateManyWithoutErpNestedInput
     endpoints?: EndpointUpdateManyWithoutErpNestedInput
@@ -8781,9 +8849,6 @@ export namespace Prisma {
   export type ERPUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    baseUrl?: StringFieldUpdateOperationsInput | string
-    authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     companies?: CompanyUncheckedUpdateManyWithoutErpNestedInput
     endpoints?: EndpointUncheckedUpdateManyWithoutErpNestedInput
@@ -8793,26 +8858,17 @@ export namespace Prisma {
   export type ERPCreateManyInput = {
     id?: number
     name: string
-    baseUrl: string
-    authType?: string
-    authConfig?: string
     createdAt?: Date | string
   }
 
   export type ERPUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
-    baseUrl?: StringFieldUpdateOperationsInput | string
-    authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ERPUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    baseUrl?: StringFieldUpdateOperationsInput | string
-    authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -8957,6 +9013,9 @@ export namespace Prisma {
 
   export type CompanyCreateInput = {
     name: string
+    baseUrl?: string
+    authType?: string
+    authConfig?: string
     createdAt?: Date | string
     erp: ERPCreateNestedOneWithoutCompaniesInput
     testClients?: TestClientCreateNestedManyWithoutCompanyInput
@@ -8966,12 +9025,18 @@ export namespace Prisma {
     id?: number
     name: string
     erpId: number
+    baseUrl?: string
+    authType?: string
+    authConfig?: string
     createdAt?: Date | string
     testClients?: TestClientUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    authType?: StringFieldUpdateOperationsInput | string
+    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     erp?: ERPUpdateOneRequiredWithoutCompaniesNestedInput
     testClients?: TestClientUpdateManyWithoutCompanyNestedInput
@@ -8981,6 +9046,9 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     erpId?: IntFieldUpdateOperationsInput | number
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    authType?: StringFieldUpdateOperationsInput | string
+    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     testClients?: TestClientUncheckedUpdateManyWithoutCompanyNestedInput
   }
@@ -8989,11 +9057,17 @@ export namespace Prisma {
     id?: number
     name: string
     erpId: number
+    baseUrl?: string
+    authType?: string
+    authConfig?: string
     createdAt?: Date | string
   }
 
   export type CompanyUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    authType?: StringFieldUpdateOperationsInput | string
+    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -9001,6 +9075,9 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     erpId?: IntFieldUpdateOperationsInput | number
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    authType?: StringFieldUpdateOperationsInput | string
+    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -9069,6 +9146,9 @@ export namespace Prisma {
     responseBody?: string
     responseHeaders?: string
     durationMs: number
+    companyId?: number | null
+    endpointId?: number | null
+    testClientId?: number | null
     createdAt?: Date | string
   }
 
@@ -9086,6 +9166,9 @@ export namespace Prisma {
     responseBody?: string
     responseHeaders?: string
     durationMs: number
+    companyId?: number | null
+    endpointId?: number | null
+    testClientId?: number | null
     createdAt?: Date | string
   }
 
@@ -9102,6 +9185,9 @@ export namespace Prisma {
     responseBody?: StringFieldUpdateOperationsInput | string
     responseHeaders?: StringFieldUpdateOperationsInput | string
     durationMs?: IntFieldUpdateOperationsInput | number
+    companyId?: NullableIntFieldUpdateOperationsInput | number | null
+    endpointId?: NullableIntFieldUpdateOperationsInput | number | null
+    testClientId?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -9119,6 +9205,9 @@ export namespace Prisma {
     responseBody?: StringFieldUpdateOperationsInput | string
     responseHeaders?: StringFieldUpdateOperationsInput | string
     durationMs?: IntFieldUpdateOperationsInput | number
+    companyId?: NullableIntFieldUpdateOperationsInput | number | null
+    endpointId?: NullableIntFieldUpdateOperationsInput | number | null
+    testClientId?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -9136,6 +9225,9 @@ export namespace Prisma {
     responseBody?: string
     responseHeaders?: string
     durationMs: number
+    companyId?: number | null
+    endpointId?: number | null
+    testClientId?: number | null
     createdAt?: Date | string
   }
 
@@ -9152,6 +9244,9 @@ export namespace Prisma {
     responseBody?: StringFieldUpdateOperationsInput | string
     responseHeaders?: StringFieldUpdateOperationsInput | string
     durationMs?: IntFieldUpdateOperationsInput | number
+    companyId?: NullableIntFieldUpdateOperationsInput | number | null
+    endpointId?: NullableIntFieldUpdateOperationsInput | number | null
+    testClientId?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -9169,6 +9264,9 @@ export namespace Prisma {
     responseBody?: StringFieldUpdateOperationsInput | string
     responseHeaders?: StringFieldUpdateOperationsInput | string
     durationMs?: IntFieldUpdateOperationsInput | number
+    companyId?: NullableIntFieldUpdateOperationsInput | number | null
+    endpointId?: NullableIntFieldUpdateOperationsInput | number | null
+    testClientId?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -9241,9 +9339,6 @@ export namespace Prisma {
   export type ERPCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    baseUrl?: SortOrder
-    authType?: SortOrder
-    authConfig?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -9254,18 +9349,12 @@ export namespace Prisma {
   export type ERPMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    baseUrl?: SortOrder
-    authType?: SortOrder
-    authConfig?: SortOrder
     createdAt?: SortOrder
   }
 
   export type ERPMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
-    baseUrl?: SortOrder
-    authType?: SortOrder
-    authConfig?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -9439,6 +9528,9 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     erpId?: SortOrder
+    baseUrl?: SortOrder
+    authType?: SortOrder
+    authConfig?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -9451,6 +9543,9 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     erpId?: SortOrder
+    baseUrl?: SortOrder
+    authType?: SortOrder
+    authConfig?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -9458,6 +9553,9 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     erpId?: SortOrder
+    baseUrl?: SortOrder
+    authType?: SortOrder
+    authConfig?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -9505,6 +9603,22 @@ export namespace Prisma {
     companyId?: SortOrder
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
   export type RequestHistoryCountOrderByAggregateInput = {
     id?: SortOrder
     erpName?: SortOrder
@@ -9519,6 +9633,9 @@ export namespace Prisma {
     responseBody?: SortOrder
     responseHeaders?: SortOrder
     durationMs?: SortOrder
+    companyId?: SortOrder
+    endpointId?: SortOrder
+    testClientId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -9526,6 +9643,9 @@ export namespace Prisma {
     id?: SortOrder
     statusCode?: SortOrder
     durationMs?: SortOrder
+    companyId?: SortOrder
+    endpointId?: SortOrder
+    testClientId?: SortOrder
   }
 
   export type RequestHistoryMaxOrderByAggregateInput = {
@@ -9542,6 +9662,9 @@ export namespace Prisma {
     responseBody?: SortOrder
     responseHeaders?: SortOrder
     durationMs?: SortOrder
+    companyId?: SortOrder
+    endpointId?: SortOrder
+    testClientId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -9559,6 +9682,9 @@ export namespace Prisma {
     responseBody?: SortOrder
     responseHeaders?: SortOrder
     durationMs?: SortOrder
+    companyId?: SortOrder
+    endpointId?: SortOrder
+    testClientId?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -9566,6 +9692,25 @@ export namespace Prisma {
     id?: SortOrder
     statusCode?: SortOrder
     durationMs?: SortOrder
+    companyId?: SortOrder
+    endpointId?: SortOrder
+    testClientId?: SortOrder
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type CompanyCreateNestedManyWithoutErpInput = {
@@ -9812,6 +9957,14 @@ export namespace Prisma {
     update?: XOR<XOR<CompanyUpdateToOneWithWhereWithoutTestClientsInput, CompanyUpdateWithoutTestClientsInput>, CompanyUncheckedUpdateWithoutTestClientsInput>
   }
 
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[]
@@ -9919,8 +10072,49 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type CompanyCreateWithoutErpInput = {
     name: string
+    baseUrl?: string
+    authType?: string
+    authConfig?: string
     createdAt?: Date | string
     testClients?: TestClientCreateNestedManyWithoutCompanyInput
   }
@@ -9928,6 +10122,9 @@ export namespace Prisma {
   export type CompanyUncheckedCreateWithoutErpInput = {
     id?: number
     name: string
+    baseUrl?: string
+    authType?: string
+    authConfig?: string
     createdAt?: Date | string
     testClients?: TestClientUncheckedCreateNestedManyWithoutCompanyInput
   }
@@ -10018,6 +10215,9 @@ export namespace Prisma {
     id?: IntFilter<"Company"> | number
     name?: StringFilter<"Company"> | string
     erpId?: IntFilter<"Company"> | number
+    baseUrl?: StringFilter<"Company"> | string
+    authType?: StringFilter<"Company"> | string
+    authConfig?: StringFilter<"Company"> | string
     createdAt?: DateTimeFilter<"Company"> | Date | string
   }
 
@@ -10082,9 +10282,6 @@ export namespace Prisma {
 
   export type ERPCreateWithoutFieldSchemasInput = {
     name: string
-    baseUrl: string
-    authType?: string
-    authConfig?: string
     createdAt?: Date | string
     companies?: CompanyCreateNestedManyWithoutErpInput
     endpoints?: EndpointCreateNestedManyWithoutErpInput
@@ -10093,9 +10290,6 @@ export namespace Prisma {
   export type ERPUncheckedCreateWithoutFieldSchemasInput = {
     id?: number
     name: string
-    baseUrl: string
-    authType?: string
-    authConfig?: string
     createdAt?: Date | string
     companies?: CompanyUncheckedCreateNestedManyWithoutErpInput
     endpoints?: EndpointUncheckedCreateNestedManyWithoutErpInput
@@ -10119,9 +10313,6 @@ export namespace Prisma {
 
   export type ERPUpdateWithoutFieldSchemasInput = {
     name?: StringFieldUpdateOperationsInput | string
-    baseUrl?: StringFieldUpdateOperationsInput | string
-    authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     companies?: CompanyUpdateManyWithoutErpNestedInput
     endpoints?: EndpointUpdateManyWithoutErpNestedInput
@@ -10130,9 +10321,6 @@ export namespace Prisma {
   export type ERPUncheckedUpdateWithoutFieldSchemasInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    baseUrl?: StringFieldUpdateOperationsInput | string
-    authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     companies?: CompanyUncheckedUpdateManyWithoutErpNestedInput
     endpoints?: EndpointUncheckedUpdateManyWithoutErpNestedInput
@@ -10140,9 +10328,6 @@ export namespace Prisma {
 
   export type ERPCreateWithoutEndpointsInput = {
     name: string
-    baseUrl: string
-    authType?: string
-    authConfig?: string
     createdAt?: Date | string
     companies?: CompanyCreateNestedManyWithoutErpInput
     fieldSchemas?: ERPFieldSchemaCreateNestedManyWithoutErpInput
@@ -10151,9 +10336,6 @@ export namespace Prisma {
   export type ERPUncheckedCreateWithoutEndpointsInput = {
     id?: number
     name: string
-    baseUrl: string
-    authType?: string
-    authConfig?: string
     createdAt?: Date | string
     companies?: CompanyUncheckedCreateNestedManyWithoutErpInput
     fieldSchemas?: ERPFieldSchemaUncheckedCreateNestedManyWithoutErpInput
@@ -10177,9 +10359,6 @@ export namespace Prisma {
 
   export type ERPUpdateWithoutEndpointsInput = {
     name?: StringFieldUpdateOperationsInput | string
-    baseUrl?: StringFieldUpdateOperationsInput | string
-    authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     companies?: CompanyUpdateManyWithoutErpNestedInput
     fieldSchemas?: ERPFieldSchemaUpdateManyWithoutErpNestedInput
@@ -10188,9 +10367,6 @@ export namespace Prisma {
   export type ERPUncheckedUpdateWithoutEndpointsInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    baseUrl?: StringFieldUpdateOperationsInput | string
-    authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     companies?: CompanyUncheckedUpdateManyWithoutErpNestedInput
     fieldSchemas?: ERPFieldSchemaUncheckedUpdateManyWithoutErpNestedInput
@@ -10198,9 +10374,6 @@ export namespace Prisma {
 
   export type ERPCreateWithoutCompaniesInput = {
     name: string
-    baseUrl: string
-    authType?: string
-    authConfig?: string
     createdAt?: Date | string
     endpoints?: EndpointCreateNestedManyWithoutErpInput
     fieldSchemas?: ERPFieldSchemaCreateNestedManyWithoutErpInput
@@ -10209,9 +10382,6 @@ export namespace Prisma {
   export type ERPUncheckedCreateWithoutCompaniesInput = {
     id?: number
     name: string
-    baseUrl: string
-    authType?: string
-    authConfig?: string
     createdAt?: Date | string
     endpoints?: EndpointUncheckedCreateNestedManyWithoutErpInput
     fieldSchemas?: ERPFieldSchemaUncheckedCreateNestedManyWithoutErpInput
@@ -10257,9 +10427,6 @@ export namespace Prisma {
 
   export type ERPUpdateWithoutCompaniesInput = {
     name?: StringFieldUpdateOperationsInput | string
-    baseUrl?: StringFieldUpdateOperationsInput | string
-    authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endpoints?: EndpointUpdateManyWithoutErpNestedInput
     fieldSchemas?: ERPFieldSchemaUpdateManyWithoutErpNestedInput
@@ -10268,9 +10435,6 @@ export namespace Prisma {
   export type ERPUncheckedUpdateWithoutCompaniesInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    baseUrl?: StringFieldUpdateOperationsInput | string
-    authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endpoints?: EndpointUncheckedUpdateManyWithoutErpNestedInput
     fieldSchemas?: ERPFieldSchemaUncheckedUpdateManyWithoutErpNestedInput
@@ -10305,6 +10469,9 @@ export namespace Prisma {
 
   export type CompanyCreateWithoutTestClientsInput = {
     name: string
+    baseUrl?: string
+    authType?: string
+    authConfig?: string
     createdAt?: Date | string
     erp: ERPCreateNestedOneWithoutCompaniesInput
   }
@@ -10313,6 +10480,9 @@ export namespace Prisma {
     id?: number
     name: string
     erpId: number
+    baseUrl?: string
+    authType?: string
+    authConfig?: string
     createdAt?: Date | string
   }
 
@@ -10334,6 +10504,9 @@ export namespace Prisma {
 
   export type CompanyUpdateWithoutTestClientsInput = {
     name?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    authType?: StringFieldUpdateOperationsInput | string
+    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     erp?: ERPUpdateOneRequiredWithoutCompaniesNestedInput
   }
@@ -10342,12 +10515,18 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     erpId?: IntFieldUpdateOperationsInput | number
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    authType?: StringFieldUpdateOperationsInput | string
+    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type CompanyCreateManyErpInput = {
     id?: number
     name: string
+    baseUrl?: string
+    authType?: string
+    authConfig?: string
     createdAt?: Date | string
   }
 
@@ -10372,6 +10551,9 @@ export namespace Prisma {
 
   export type CompanyUpdateWithoutErpInput = {
     name?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    authType?: StringFieldUpdateOperationsInput | string
+    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     testClients?: TestClientUpdateManyWithoutCompanyNestedInput
   }
@@ -10379,6 +10561,9 @@ export namespace Prisma {
   export type CompanyUncheckedUpdateWithoutErpInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    authType?: StringFieldUpdateOperationsInput | string
+    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     testClients?: TestClientUncheckedUpdateManyWithoutCompanyNestedInput
   }
@@ -10386,6 +10571,9 @@ export namespace Prisma {
   export type CompanyUncheckedUpdateManyWithoutErpInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    authType?: StringFieldUpdateOperationsInput | string
+    authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

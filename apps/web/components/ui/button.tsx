@@ -1,13 +1,18 @@
 import { cn } from '@/lib/utils'
-import { ButtonHTMLAttributes, forwardRef } from 'react'
+import { ButtonHTMLAttributes, CSSProperties, forwardRef } from 'react'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'default' | 'ghost' | 'danger'
   size?: 'sm' | 'md'
 }
 
+const sizeStyles: Record<string, CSSProperties> = {
+  sm: { height: 28, padding: '0 10px', fontSize: 12 },
+  md: { height: 36, padding: '0 16px', fontSize: 14 },
+}
+
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'default', size = 'md', ...props }, ref) => {
+  ({ className, variant = 'default', size = 'md', style, ...props }, ref) => {
     return (
       <button
         ref={ref}
@@ -18,12 +23,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             'btn-ghost': variant === 'ghost',
             'btn-danger': variant === 'danger',
           },
-          {
-            'h-7 px-3 text-xs': size === 'sm',
-            'h-9 px-4 text-sm': size === 'md',
-          },
           className
         )}
+        style={{ ...sizeStyles[size], ...style }}
         {...props}
       />
     )

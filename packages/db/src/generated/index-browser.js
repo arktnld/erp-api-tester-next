@@ -121,9 +121,6 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.ERPScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  baseUrl: 'baseUrl',
-  authType: 'authType',
-  authConfig: 'authConfig',
   createdAt: 'createdAt'
 };
 
@@ -152,6 +149,9 @@ exports.Prisma.CompanyScalarFieldEnum = {
   id: 'id',
   name: 'name',
   erpId: 'erpId',
+  baseUrl: 'baseUrl',
+  authType: 'authType',
+  authConfig: 'authConfig',
   createdAt: 'createdAt'
 };
 
@@ -177,12 +177,20 @@ exports.Prisma.RequestHistoryScalarFieldEnum = {
   responseBody: 'responseBody',
   responseHeaders: 'responseHeaders',
   durationMs: 'durationMs',
+  companyId: 'companyId',
+  endpointId: 'endpointId',
+  testClientId: 'testClientId',
   createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
 };
 
 

@@ -57,7 +57,8 @@ function tryPrettyJson(text: string): string {
 function generateCurl(
   endpoint: Endpoint,
   company: Company,
-  fields: Record<string, string>
+  fields: Record<string, string>,
+  customBody?: string
 ): string {
   const url = `${company.baseUrl}${substitute(endpoint.pathTemplate, fields)}`
   const parts: string[] = [`curl -X ${endpoint.method} '${url}'`]
@@ -81,7 +82,7 @@ function generateCurl(
     }
   } catch {}
 
-  const body = endpoint.bodyTemplate?.trim() ? substitute(endpoint.bodyTemplate, fields) : ''
+  const body = customBody ?? (endpoint.bodyTemplate?.trim() ? substitute(endpoint.bodyTemplate, fields) : '')
   if (body) {
     parts.push(`  -H 'Content-Type: application/json'`)
     parts.push(`  -d '${body}'`)
@@ -218,9 +219,11 @@ export function TestPage({
   const [clientId, setClientId] = useState<number | null>(initialClientId ?? null)
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState<ExecuteResponse | null>(null)
-const [resTab, setResTab] = useState<'json' | 'raw' | 'headers' | 'timeline'>('json')
+  const [resTab, setResTab] = useState<'json' | 'raw' | 'headers' | 'timeline'>('json')
   const [curlCopied, setCurlCopied] = useState(false)
   const [resCopied, setResCopied] = useState(false)
+  const [bodyMode, setBodyMode] = useState<'form' | 'raw'>('form')
+  const [rawBody, setRawBody] = useState('')
 
   const erp = erps.find((e) => e.id === erpId)
   const company = erp?.companies.find((c) => c.id === companyId)
@@ -249,7 +252,11 @@ const [resTab, setResTab] = useState<'json' | 'raw' | 'headers' | 'timeline'>('j
       const res = await fetch('/api/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ endpointId, clientId }),
+        body: JSON.stringify({
+          endpointId,
+          clientId,
+          ...(bodyMode === 'raw' ? { rawBody } : {}),
+        }),
       })
       const data = await res.json()
       setResponse(data)
@@ -298,7 +305,12 @@ const [resTab, setResTab] = useState<'json' | 'raw' | 'headers' | 'timeline'>('j
           disabled={!canExecute}
           onClick={() => {
             if (!endpoint || !company) return
-            const curl = generateCurl(endpoint, company, fields)
+            const curl = generateCurl(
+              endpoint,
+              company,
+              fields,
+              bodyMode === 'raw' ? rawBody : undefined
+            )
             navigator.clipboard.writeText(curl)
             setCurlCopied(true)
             setTimeout(() => setCurlCopied(false), 2000)
@@ -483,19 +495,70 @@ const [resTab, setResTab] = useState<'json' | 'raw' | 'headers' | 'timeline'>('j
 
             {/* Body */}
             <div>
-              <p style={sectionLabel}>Body</p>
-              {resolvedBody ? (
-                <SyntaxHighlighter
-                  language="json"
-                  style={atomOneDark}
-                  customStyle={{ margin: 0, borderRadius: 8, fontSize: 12, backgroundColor: 'var(--surface-2)' }}
-                >
-                  {tryPrettyJson(resolvedBody)}
-                </SyntaxHighlighter>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, marginTop: 12 }}>
+                <p style={{ ...sectionLabel, marginBottom: 0, marginTop: 0 }}>Body</p>
+                <div style={{ display: 'flex', gap: 0, border: '1px solid var(--border)', borderRadius: 5, overflow: 'hidden' }}>
+                  {(['form', 'raw'] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => {
+                        if (mode === 'raw' && bodyMode === 'form') {
+                          setRawBody(resolvedBody ? tryPrettyJson(resolvedBody) : '')
+                        }
+                        setBodyMode(mode)
+                      }}
+                      style={{
+                        padding: '3px 10px',
+                        fontSize: 11,
+                        fontWeight: bodyMode === mode ? 500 : 400,
+                        color: bodyMode === mode ? 'var(--text)' : 'var(--text-muted)',
+                        background: bodyMode === mode ? 'var(--surface-2)' : 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textTransform: 'capitalize',
+                      }}
+                    >
+                      {mode}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {bodyMode === 'form' ? (
+                resolvedBody ? (
+                  <SyntaxHighlighter
+                    language="json"
+                    style={atomOneDark}
+                    customStyle={{ margin: 0, borderRadius: 8, fontSize: 12, backgroundColor: 'var(--surface-2)' }}
+                  >
+                    {tryPrettyJson(resolvedBody)}
+                  </SyntaxHighlighter>
+                ) : (
+                  <p style={{ fontSize: 12, color: 'var(--text-subtle)' }}>
+                    Nenhum body para este endpoint.
+                  </p>
+                )
               ) : (
-                <p style={{ fontSize: 12, color: 'var(--text-subtle)' }}>
-                  Nenhum body para este endpoint.
-                </p>
+                <textarea
+                  value={rawBody}
+                  onChange={(e) => setRawBody(e.target.value)}
+                  placeholder="{}"
+                  spellCheck={false}
+                  style={{
+                    width: '100%',
+                    minHeight: 180,
+                    fontFamily: 'monospace',
+                    fontSize: 12,
+                    lineHeight: 1.6,
+                    padding: '10px 12px',
+                    backgroundColor: 'var(--surface-2)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    color: 'var(--text)',
+                    resize: 'vertical',
+                    outline: 'none',
+                  }}
+                />
               )}
             </div>
           </div>

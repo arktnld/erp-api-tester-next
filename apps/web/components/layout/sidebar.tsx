@@ -55,7 +55,7 @@ export function Sidebar({ erps }: { erps: SidebarERP[] }) {
   const allCompanies = erps.flatMap((e) => e.companies)
 
   const nav = [
-    { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/', label: 'Home', icon: LayoutDashboard },
     { href: '/erps', label: 'ERPs', icon: Server },
     { href: '/companies', label: 'Empresas', icon: Building2 },
     { href: '/test', label: 'Testar API', icon: FlaskConical },
@@ -83,8 +83,22 @@ export function Sidebar({ erps }: { erps: SidebarERP[] }) {
         style={{
           padding: '18px 16px 16px',
           borderBottom: '1px solid var(--border)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
         }}
       >
+        <span
+          style={{
+            fontFamily: 'monospace',
+            fontSize: 15,
+            fontWeight: 700,
+            color: 'var(--accent)',
+            letterSpacing: '-1px',
+          }}
+        >
+          {'</>'}
+        </span>
         <span style={{
           fontFamily: 'var(--font-logo)',
           fontSize: 18,
@@ -168,7 +182,7 @@ export function Sidebar({ erps }: { erps: SidebarERP[] }) {
           color: 'var(--text-subtle)',
         }}
       >
-        v2.0 · Next.js + Prisma
+        © {new Date().getFullYear()} Jarbis
       </div>
     </aside>
   )

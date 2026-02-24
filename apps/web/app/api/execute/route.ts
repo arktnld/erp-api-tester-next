@@ -7,7 +7,7 @@ function substitute(template: string, fields: Record<string, string>): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { endpointId, clientId } = await req.json()
+    const { endpointId, clientId, rawBody: customBody } = await req.json()
 
     const [endpoint, client] = await Promise.all([
       prisma.endpoint.findUniqueOrThrow({ where: { id: endpointId } }),
@@ -31,9 +31,11 @@ export async function POST(req: NextRequest) {
     const fields = JSON.parse(client.fieldsData) as Record<string, string>
     const resolvedPath = substitute(endpoint.pathTemplate, fields)
     const resolvedBody =
-      endpoint.bodyTemplate && endpoint.bodyTemplate.trim()
-        ? substitute(endpoint.bodyTemplate, fields)
-        : null
+      customBody != null
+        ? customBody
+        : endpoint.bodyTemplate && endpoint.bodyTemplate.trim()
+          ? substitute(endpoint.bodyTemplate, fields)
+          : null
 
     const endpointHeaders = JSON.parse(endpoint.headers || '{}') as Record<
       string,
