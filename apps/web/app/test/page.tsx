@@ -3,7 +3,12 @@ import { TestPage } from './test-page'
 
 export const dynamic = 'force-dynamic'
 
-export default async function TestRoute() {
+export default async function TestRoute({
+  searchParams,
+}: {
+  searchParams: Promise<{ companyId?: string; endpointId?: string; clientId?: string }>
+}) {
+  const params = await searchParams
   const erps = await prisma.eRP.findMany({
     orderBy: { name: 'asc' },
     include: {
@@ -14,5 +19,12 @@ export default async function TestRoute() {
       },
     },
   })
-  return <TestPage erps={erps} />
+  return (
+    <TestPage
+      erps={erps}
+      initialCompanyId={params.companyId ? Number(params.companyId) : undefined}
+      initialEndpointId={params.endpointId ? Number(params.endpointId) : undefined}
+      initialClientId={params.clientId ? Number(params.clientId) : undefined}
+    />
+  )
 }

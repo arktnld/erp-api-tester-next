@@ -16,11 +16,10 @@ type Endpoint = {
   headers: string
 }
 type TestClient = { id: number; name: string; fieldsData: string }
-type Company = { id: number; name: string; testClients: TestClient[] }
+type Company = { id: number; name: string; baseUrl: string; testClients: TestClient[] }
 type ERP = {
   id: number
   name: string
-  baseUrl: string
   endpoints: Endpoint[]
   companies: Company[]
 }
@@ -83,11 +82,27 @@ const sectionLabel: React.CSSProperties = {
   marginTop: 12,
 }
 
-export function TestPage({ erps }: { erps: ERP[] }) {
-  const [erpId, setErpId] = useState<number | null>(null)
-  const [companyId, setCompanyId] = useState<number | null>(null)
-  const [endpointId, setEndpointId] = useState<number | null>(null)
-  const [clientId, setClientId] = useState<number | null>(null)
+function findErpIdForCompany(erps: ERP[], companyId: number): number | null {
+  return erps.find((e) => e.companies.some((c) => c.id === companyId))?.id ?? null
+}
+
+export function TestPage({
+  erps,
+  initialCompanyId,
+  initialEndpointId,
+  initialClientId,
+}: {
+  erps: ERP[]
+  initialCompanyId?: number
+  initialEndpointId?: number
+  initialClientId?: number
+}) {
+  const [erpId, setErpId] = useState<number | null>(
+    initialCompanyId ? findErpIdForCompany(erps, initialCompanyId) : null
+  )
+  const [companyId, setCompanyId] = useState<number | null>(initialCompanyId ?? null)
+  const [endpointId, setEndpointId] = useState<number | null>(initialEndpointId ?? null)
+  const [clientId, setClientId] = useState<number | null>(initialClientId ?? null)
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState<ExecuteResponse | null>(null)
   const [reqTab, setReqTab] = useState<'body' | 'headers'>('body')
@@ -102,8 +117,8 @@ export function TestPage({ erps }: { erps: ERP[] }) {
     ? (JSON.parse(client.fieldsData) as Record<string, string>)
     : {}
   const resolvedUrl =
-    endpoint && erp
-      ? `${erp.baseUrl}${substitute(endpoint.pathTemplate, fields)}`
+    endpoint && company
+      ? `${company.baseUrl}${substitute(endpoint.pathTemplate, fields)}`
       : ''
   const resolvedBody =
     endpoint?.bodyTemplate?.trim()
@@ -120,7 +135,7 @@ export function TestPage({ erps }: { erps: ERP[] }) {
       const res = await fetch('/api/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ erpId, endpointId, clientId }),
+        body: JSON.stringify({ endpointId, clientId }),
       })
       const data = await res.json()
       setResponse(data)
