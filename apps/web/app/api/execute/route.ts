@@ -7,14 +7,24 @@ function substitute(template: string, fields: Record<string, string>): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { erpId, endpointId, clientId } = await req.json()
+    const { endpointId, clientId } = await req.json()
 
-    const [erp, endpoint, client] = await Promise.all([
-      prisma.eRP.findUniqueOrThrow({ where: { id: erpId } }),
+    const [endpoint, client] = await Promise.all([
       prisma.endpoint.findUniqueOrThrow({ where: { id: endpointId } }),
       prisma.testClient.findUniqueOrThrow({
         where: { id: clientId },
-        include: { company: { select: { name: true } } },
+        include: {
+          company: {
+            select: {
+              id: true,
+              name: true,
+              baseUrl: true,
+              authType: true,
+              authConfig: true,
+              erp: { select: { name: true } },
+            },
+          },
+        },
       }),
     ])
 
@@ -29,23 +39,23 @@ export async function POST(req: NextRequest) {
       string,
       string
     >
-    const authConfig = JSON.parse(erp.authConfig || '{}') as Record<
+    const authConfig = JSON.parse(client.company.authConfig || '{}') as Record<
       string,
       string
     >
 
     // Build auth headers
     const authHeaders: Record<string, string> = {}
-    if (erp.authType === 'bearer' && authConfig.token) {
+    if (client.company.authType === 'bearer' && authConfig.token) {
       authHeaders['Authorization'] = `Bearer ${authConfig.token}`
     } else if (
-      erp.authType === 'api_key' &&
+      client.company.authType === 'api_key' &&
       authConfig.header &&
       authConfig.value
     ) {
       authHeaders[authConfig.header] = authConfig.value
     } else if (
-      erp.authType === 'basic' &&
+      client.company.authType === 'basic' &&
       authConfig.username &&
       authConfig.password
     ) {
@@ -55,7 +65,7 @@ export async function POST(req: NextRequest) {
       authHeaders['Authorization'] = `Basic ${encoded}`
     }
 
-    const url = `${erp.baseUrl}${resolvedPath}`
+    const url = `${client.company.baseUrl}${resolvedPath}`
     const requestHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
       ...endpointHeaders,
@@ -88,8 +98,11 @@ export async function POST(req: NextRequest) {
 
     await prisma.requestHistory.create({
       data: {
-        erpName: erp.name,
+        erpName: client.company.erp.name,
         companyName: client.company.name,
+        companyId: client.company.id,
+        endpointId: endpoint.id,
+        testClientId: client.id,
         endpointName: endpoint.name,
         clientName: client.name,
         method: endpoint.method,
