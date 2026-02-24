@@ -222,23 +222,6 @@ export function TestPage({
   const [resTab, setResTab] = useState<'json' | 'raw' | 'headers' | 'timeline'>('json')
   const [curlCopied, setCurlCopied] = useState(false)
   const [resCopied, setResCopied] = useState(false)
-  const [openErps, setOpenErps] = useState<Set<number>>(
-    () => new Set(erps.map((e) => e.id))
-  )
-  const [openCompanies, setOpenCompanies] = useState<Set<number>>(
-    () => new Set(erps.flatMap((e) => e.companies.map((c) => c.id)))
-  )
-
-  const toggleErp = (id: number) => setOpenErps((prev) => {
-    const next = new Set(prev)
-    next.has(id) ? next.delete(id) : next.add(id)
-    return next
-  })
-  const toggleCompany = (id: number) => setOpenCompanies((prev) => {
-    const next = new Set(prev)
-    next.has(id) ? next.delete(id) : next.add(id)
-    return next
-  })
 
   const erp = erps.find((e) => e.id === erpId)
   const company = erp?.companies.find((c) => c.id === companyId)
@@ -322,100 +305,66 @@ export function TestPage({
             overflowY: 'auto',
           }}
         >
-          {/* Tree: ERP → Empresa → Endpoint */}
-          <div style={{ margin: '0 -14px', flex: '0 0 auto' }}>
+          <p style={sectionLabel}>ERP</p>
+          <select
+            style={selectStyle}
+            value={erpId ?? ''}
+            onChange={(e) => {
+              setErpId(Number(e.target.value) || null)
+              setCompanyId(null)
+              setEndpointId(null)
+              setClientId(null)
+              setResponse(null)
+            }}
+          >
+            <option value="">Selecionar ERP</option>
             {erps.map((e) => (
-              <div key={e.id}>
-                <button
-                  onClick={() => toggleErp(e.id)}
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 5,
-                    padding: '5px 14px',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: 'var(--text)',
-                    textAlign: 'left',
-                  }}
-                >
-                  <span style={{ fontSize: 9, color: 'var(--text-subtle)', flexShrink: 0 }}>
-                    {openErps.has(e.id) ? '▾' : '▸'}
-                  </span>
-                  {e.name}
-                </button>
-
-                {openErps.has(e.id) && e.companies.map((c) => (
-                  <div key={c.id}>
-                    <button
-                      onClick={() => toggleCompany(c.id)}
-                      style={{
-                        width: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 5,
-                        padding: '4px 14px 4px 26px',
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontSize: 12,
-                        color: companyId === c.id ? 'var(--text)' : 'var(--text-muted)',
-                        textAlign: 'left',
-                      }}
-                    >
-                      <span style={{ fontSize: 9, color: 'var(--text-subtle)', flexShrink: 0 }}>
-                        {openCompanies.has(c.id) ? '▾' : '▸'}
-                      </span>
-                      {c.name}
-                    </button>
-
-                    {openCompanies.has(c.id) && e.endpoints.map((ep) => {
-                      const isSelected = endpointId === ep.id && companyId === c.id
-                      return (
-                        <button
-                          key={ep.id}
-                          onClick={() => {
-                            setErpId(e.id)
-                            if (companyId !== c.id) setClientId(null)
-                            setCompanyId(c.id)
-                            setEndpointId(ep.id)
-                          }}
-                          style={{
-                            width: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 6,
-                            padding: '4px 10px 4px 38px',
-                            backgroundColor: isSelected ? 'var(--surface-2)' : 'transparent',
-                            border: 'none',
-                            cursor: 'pointer',
-                            textAlign: 'left',
-                            borderRadius: 0,
-                          }}
-                        >
-                          <MethodBadge method={ep.method} />
-                          <span style={{
-                            fontSize: 12,
-                            color: isSelected ? 'var(--text)' : 'var(--text-muted)',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                          }}>
-                            {ep.name}
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                ))}
-              </div>
+              <option key={e.id} value={e.id}>
+                {e.name}
+              </option>
             ))}
-          </div>
-          <div style={{ height: 12 }} />
+          </select>
+
+          <p style={sectionLabel}>Empresa</p>
+          <select
+            style={{
+              ...selectStyle,
+              opacity: !erpId ? 0.4 : 1,
+            }}
+            value={companyId ?? ''}
+            onChange={(e) => {
+              setCompanyId(Number(e.target.value) || null)
+              setClientId(null)
+            }}
+            disabled={!erpId}
+          >
+            <option value="">Selecionar empresa</option>
+            {erp?.companies.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+
+          <p style={sectionLabel}>Endpoint</p>
+          <select
+            style={{
+              ...selectStyle,
+              opacity: !erpId ? 0.4 : 1,
+            }}
+            value={endpointId ?? ''}
+            onChange={(e) =>
+              setEndpointId(Number(e.target.value) || null)
+            }
+            disabled={!erpId}
+          >
+            <option value="">Selecionar endpoint</option>
+            {erp?.endpoints.map((ep) => (
+              <option key={ep.id} value={ep.id}>
+                {ep.method} — {ep.name}
+              </option>
+            ))}
+          </select>
 
           <p style={sectionLabel}>Cliente de Teste</p>
           <select
