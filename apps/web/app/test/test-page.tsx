@@ -218,8 +218,7 @@ export function TestPage({
   const [clientId, setClientId] = useState<number | null>(initialClientId ?? null)
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState<ExecuteResponse | null>(null)
-  const [reqTab, setReqTab] = useState<'body' | 'headers'>('body')
-  const [resTab, setResTab] = useState<'json' | 'raw' | 'headers' | 'timeline'>('json')
+const [resTab, setResTab] = useState<'json' | 'raw' | 'headers' | 'timeline'>('json')
   const [curlCopied, setCurlCopied] = useState(false)
   const [resCopied, setResCopied] = useState(false)
 
@@ -455,99 +454,50 @@ export function TestPage({
             overflow: 'hidden',
           }}
         >
-          {/* Tabs */}
-          <div
-            style={{
-              display: 'flex',
-              borderBottom: '1px solid var(--border)',
-              padding: '0 12px',
-              flexShrink: 0,
-            }}
-          >
-            <button
-              style={tabBtnStyle(reqTab === 'body')}
-              onClick={() => setReqTab('body')}
-            >
-              Body
-            </button>
-            <button
-              style={tabBtnStyle(reqTab === 'headers')}
-              onClick={() => setReqTab('headers')}
-            >
-              Headers
-            </button>
-          </div>
+          {/* Headers + Body stacked */}
+          <div style={{ flex: 1, overflow: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Headers */}
+            <div>
+              <p style={sectionLabel}>Headers</p>
+              {response ? (
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <tbody>
+                    {Object.entries(response.requestHeaders).map(([k, v]) => (
+                      <tr key={k} style={{ borderBottom: '1px solid var(--border)' }}>
+                        <td style={{ padding: '5px 0', fontFamily: 'monospace', fontSize: 12, color: 'var(--text-muted)', width: '40%', paddingRight: 12 }}>
+                          {k}
+                        </td>
+                        <td style={{ padding: '5px 0', fontFamily: 'monospace', fontSize: 12, wordBreak: 'break-all' }}>
+                          {v}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p style={{ fontSize: 12, color: 'var(--text-subtle)' }}>
+                  Execute para ver os headers enviados.
+                </p>
+              )}
+            </div>
 
-          {/* Content */}
-          <div style={{ flex: 1, overflow: 'auto', padding: 16 }}>
-            {reqTab === 'body' &&
-              (resolvedBody ? (
+            {/* Body */}
+            <div>
+              <p style={sectionLabel}>Body</p>
+              {resolvedBody ? (
                 <SyntaxHighlighter
                   language="json"
                   style={atomOneDark}
-                  customStyle={{
-                    margin: 0,
-                    borderRadius: 8,
-                    fontSize: 12,
-                    backgroundColor: 'var(--surface-2)',
-                  }}
+                  customStyle={{ margin: 0, borderRadius: 8, fontSize: 12, backgroundColor: 'var(--surface-2)' }}
                 >
                   {tryPrettyJson(resolvedBody)}
                 </SyntaxHighlighter>
               ) : (
-                <p
-                  style={{
-                    color: 'var(--text-subtle)',
-                    fontSize: 13,
-                  }}
-                >
+                <p style={{ fontSize: 12, color: 'var(--text-subtle)' }}>
                   Nenhum body para este endpoint.
                 </p>
-              ))}
-
-            {reqTab === 'headers' && response && (
-              <table
-                style={{ width: '100%', borderCollapse: 'collapse' }}
-              >
-                <tbody>
-                  {Object.entries(response.requestHeaders).map(([k, v]) => (
-                    <tr
-                      key={k}
-                      style={{ borderBottom: '1px solid var(--border)' }}
-                    >
-                      <td
-                        style={{
-                          padding: '6px 0',
-                          fontFamily: 'monospace',
-                          fontSize: 12,
-                          color: 'var(--text-muted)',
-                          width: '40%',
-                          paddingRight: 12,
-                        }}
-                      >
-                        {k}
-                      </td>
-                      <td
-                        style={{
-                          padding: '6px 0',
-                          fontFamily: 'monospace',
-                          fontSize: 12,
-                          wordBreak: 'break-all',
-                        }}
-                      >
-                        {v}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-
-            {reqTab === 'headers' && !response && (
-              <p style={{ color: 'var(--text-subtle)', fontSize: 13 }}>
-                Execute uma requisição para ver os headers.
-              </p>
-            )}
+              )}
+            </div>
           </div>
         </div>
 
