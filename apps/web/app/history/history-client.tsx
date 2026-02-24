@@ -39,11 +39,11 @@ const tabBtnStyle = (active: boolean): React.CSSProperties => ({
   fontSize: 12,
   fontWeight: active ? 500 : 400,
   color: active ? 'var(--text)' : 'var(--text-muted)',
-  borderBottomStyle: 'solid',
-  borderBottomWidth: 2,
-  borderBottomColor: active ? 'var(--accent)' : 'transparent',
+  borderTop: 'none',
+  borderLeft: 'none',
+  borderRight: 'none',
+  borderBottom: active ? '2px solid var(--accent)' : '2px solid transparent',
   background: 'none',
-  border: 'none',
   cursor: 'pointer',
 })
 

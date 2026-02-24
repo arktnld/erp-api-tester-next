@@ -65,11 +65,11 @@ const tabBtnStyle = (active: boolean): React.CSSProperties => ({
   fontSize: 12,
   fontWeight: active ? 500 : 400,
   color: active ? 'var(--text)' : 'var(--text-muted)',
-  borderBottomStyle: 'solid',
-  borderBottomWidth: 2,
-  borderBottomColor: active ? 'var(--accent)' : 'transparent',
+  borderTop: 'none',
+  borderLeft: 'none',
+  borderRight: 'none',
+  borderBottom: active ? '2px solid var(--accent)' : '2px solid transparent',
   background: 'none',
-  border: 'none',
   cursor: 'pointer',
 })
 
@@ -336,41 +336,57 @@ export function TestPage({
             style={{
               padding: '10px 16px',
               borderBottom: '1px solid var(--border)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
               flexShrink: 0,
             }}
           >
-            {endpoint ? (
-              <MethodBadge method={endpoint.method} />
-            ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: resolvedUrl ? 6 : 0 }}>
+              {endpoint ? (
+                <MethodBadge method={endpoint.method} />
+              ) : (
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: 'var(--text-subtle)',
+                    fontFamily: 'monospace',
+                    padding: '2px 6px',
+                    backgroundColor: 'var(--surface-2)',
+                    borderRadius: 4,
+                  }}
+                >
+                  METHOD
+                </span>
+              )}
               <span
                 style={{
-                  fontSize: 11,
-                  color: 'var(--text-subtle)',
                   fontFamily: 'monospace',
-                  padding: '2px 6px',
-                  backgroundColor: 'var(--surface-2)',
-                  borderRadius: 4,
+                  fontSize: 12,
+                  color: resolvedUrl ? 'var(--text)' : 'var(--text-subtle)',
+                  flex: 1,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
                 }}
               >
-                METHOD
+                {resolvedUrl || 'Selecione ERP, empresa e endpoint...'}
               </span>
+            </div>
+            {resolvedUrl && (
+              <div
+                style={{
+                  padding: '6px 10px',
+                  backgroundColor: 'var(--surface-2)',
+                  borderRadius: 6,
+                  border: '1px solid var(--border)',
+                }}
+              >
+                <p style={{ fontSize: 10, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>
+                  URL resolvida
+                </p>
+                <p style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text)', wordBreak: 'break-all', lineHeight: 1.5 }}>
+                  {resolvedUrl}
+                </p>
+              </div>
             )}
-            <span
-              style={{
-                fontFamily: 'monospace',
-                fontSize: 12,
-                color: resolvedUrl ? 'var(--text)' : 'var(--text-subtle)',
-                flex: 1,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {resolvedUrl || 'Selecione ERP e endpoint para ver a URL...'}
-            </span>
           </div>
 
           {/* Tabs */}
