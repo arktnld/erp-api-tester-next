@@ -1,7 +1,13 @@
 import type { Metadata } from 'next'
+import { Space_Grotesk } from 'next/font/google'
 import { Sidebar } from '@/components/layout/sidebar'
 import { prisma } from '@erp/db'
 import './globals.css'
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-logo',
+})
 
 export const metadata: Metadata = {
   title: 'ERP API Tester',
@@ -30,7 +36,7 @@ export default async function RootLayout({
   })
 
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" className={spaceGrotesk.variable}>
       <body>
         <Sidebar erps={erps} />
         <main

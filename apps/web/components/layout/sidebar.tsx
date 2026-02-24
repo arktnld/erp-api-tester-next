@@ -82,32 +82,18 @@ export function Sidebar({ erps }: { erps: SidebarERP[] }) {
       {/* Logo */}
       <div
         style={{
-          padding: '20px 16px 16px',
+          padding: '18px 16px 16px',
           borderBottom: '1px solid var(--border)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
         }}
       >
-        <div
-          style={{
-            width: 28,
-            height: 28,
-            borderRadius: 6,
-            backgroundColor: 'var(--accent)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 14,
-            fontWeight: 700,
-            color: 'white',
-            flexShrink: 0,
-          }}
-        >
-          E
-        </div>
-        <span style={{ fontWeight: 600, fontSize: 13, color: 'var(--text)' }}>
-          ERP Tester
+        <span style={{
+          fontFamily: 'var(--font-logo)',
+          fontSize: 18,
+          fontWeight: 700,
+          letterSpacing: '-0.02em',
+        }}>
+          <span style={{ color: 'var(--accent)' }}>ERP</span>
+          <span style={{ color: 'var(--text)' }}> Tester</span>
         </span>
       </div>
 
