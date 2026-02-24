@@ -125,6 +125,76 @@ const sectionLabel: React.CSSProperties = {
   marginTop: 12,
 }
 
+const treeBtnStyle: React.CSSProperties = {
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  color: 'var(--text-muted)',
+  fontSize: 10,
+  padding: '0 2px',
+  verticalAlign: 'middle',
+  lineHeight: 1,
+  userSelect: 'none',
+}
+
+function JsonTree({ value, depth = 0 }: { value: unknown; depth?: number }) {
+  const [open, setOpen] = useState(depth < 2)
+
+  if (value === null) return <span style={{ color: '#abb2bf' }}>null</span>
+  if (value === undefined) return <span style={{ color: '#abb2bf' }}>undefined</span>
+  if (typeof value === 'boolean') return <span style={{ color: '#56b6c2' }}>{String(value)}</span>
+  if (typeof value === 'number') return <span style={{ color: '#d19a66' }}>{String(value)}</span>
+  if (typeof value === 'string') return <span style={{ color: '#98c379' }}>"{value}"</span>
+
+  const isArr = Array.isArray(value)
+  const entries: [string, unknown][] = isArr
+    ? (value as unknown[]).map((v, i) => [String(i), v])
+    : Object.entries(value as Record<string, unknown>)
+  const openChar = isArr ? '[' : '{'
+  const closeChar = isArr ? ']' : '}'
+
+  if (entries.length === 0) {
+    return <span style={{ color: 'var(--text-muted)' }}>{openChar}{closeChar}</span>
+  }
+
+  return (
+    <>
+      <button onClick={() => setOpen((o) => !o)} style={treeBtnStyle}>
+        {open ? '▾' : '▸'}
+      </button>
+      {open ? (
+        <>
+          <span style={{ color: 'var(--text-muted)' }}>{openChar}</span>
+          <div style={{ paddingLeft: 18, marginLeft: 2, borderLeft: '1px solid var(--border)' }}>
+            {entries.map(([k, v], i) => (
+              <div key={k + String(i)} style={{ lineHeight: 1.7 }}>
+                {isArr ? (
+                  <span style={{ color: 'var(--text-subtle)', marginRight: 6, fontSize: 10 }}>{k}</span>
+                ) : (
+                  <>
+                    <span style={{ color: 'var(--accent)' }}>"{k}"</span>
+                    <span style={{ color: 'var(--text-muted)' }}>: </span>
+                  </>
+                )}
+                <JsonTree value={v} depth={depth + 1} />
+                {i < entries.length - 1 && <span style={{ color: 'var(--text-muted)' }}>,</span>}
+              </div>
+            ))}
+          </div>
+          <span style={{ color: 'var(--text-muted)' }}>{closeChar}</span>
+        </>
+      ) : (
+        <span
+          style={{ color: 'var(--text-muted)', cursor: 'pointer' }}
+          onClick={() => setOpen(true)}
+        >
+          {openChar}…{closeChar}
+        </span>
+      )}
+    </>
+  )
+}
+
 function findErpIdForCompany(erps: ERP[], companyId: number): number | null {
   return erps.find((e) => e.companies.some((c) => c.id === companyId))?.id ?? null
 }
@@ -149,7 +219,7 @@ export function TestPage({
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState<ExecuteResponse | null>(null)
   const [reqTab, setReqTab] = useState<'body' | 'headers'>('body')
-  const [resTab, setResTab] = useState<'json' | 'table' | 'raw' | 'headers' | 'timeline'>('json')
+  const [resTab, setResTab] = useState<'json' | 'tree' | 'raw' | 'headers' | 'timeline'>('json')
   const [curlCopied, setCurlCopied] = useState(false)
 
   const erp = erps.find((e) => e.id === erpId)
@@ -605,7 +675,7 @@ export function TestPage({
                 {(
                   [
                     { id: 'json', label: 'JSON' },
-                    { id: 'table', label: 'Tabela' },
+                    { id: 'tree', label: 'Árvore' },
                     { id: 'raw', label: 'Raw' },
                     { id: 'headers', label: 'Headers' },
                     { id: 'timeline', label: 'Timeline' },
@@ -638,52 +708,16 @@ export function TestPage({
                   </SyntaxHighlighter>
                 )}
 
-                {resTab === 'table' && (() => {
+                {resTab === 'tree' && (() => {
                   let parsed: unknown = null
                   try { parsed = JSON.parse(response.responseBody) } catch {}
-                  const entries = Array.isArray(parsed)
-                    ? parsed.map((v, i) => [String(i), v] as [string, unknown])
-                    : parsed && typeof parsed === 'object'
-                      ? Object.entries(parsed as Record<string, unknown>)
-                      : null
-                  if (!entries) {
-                    return (
-                      <p style={{ color: 'var(--text-subtle)', fontSize: 13 }}>
-                        Resposta não é um JSON válido.
-                      </p>
-                    )
-                  }
                   return (
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                      <tbody>
-                        {entries.map(([k, v]) => (
-                          <tr key={k} style={{ borderBottom: '1px solid var(--border)' }}>
-                            <td style={{
-                              padding: '6px 0',
-                              fontFamily: 'monospace',
-                              fontSize: 12,
-                              color: 'var(--text-muted)',
-                              width: '35%',
-                              paddingRight: 12,
-                              verticalAlign: 'top',
-                            }}>
-                              {k}
-                            </td>
-                            <td style={{
-                              padding: '6px 0',
-                              fontFamily: 'monospace',
-                              fontSize: 12,
-                              wordBreak: 'break-all',
-                              color: 'var(--text)',
-                            }}>
-                              {typeof v === 'object'
-                                ? JSON.stringify(v)
-                                : String(v ?? '')}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    <div style={{ fontFamily: 'monospace', fontSize: 12, lineHeight: 1.7, color: 'var(--text)' }}>
+                      {parsed !== null && parsed !== undefined
+                        ? <JsonTree value={parsed} />
+                        : <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{response.responseBody}</pre>
+                      }
+                    </div>
                   )
                 })()}
 
