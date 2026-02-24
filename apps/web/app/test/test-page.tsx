@@ -154,7 +154,7 @@ function JsonTree({ value, depth = 0 }: { value: unknown; depth?: number }) {
   const closeChar = isArr ? ']' : '}'
 
   if (entries.length === 0) {
-    return <span style={{ color: 'var(--text-muted)' }}>{openChar}{closeChar}</span>
+    return <span style={{ color: '#abb2bf' }}>{openChar}{closeChar}</span>
   }
 
   return (
@@ -164,28 +164,28 @@ function JsonTree({ value, depth = 0 }: { value: unknown; depth?: number }) {
       </button>
       {open ? (
         <>
-          <span style={{ color: 'var(--text-muted)' }}>{openChar}</span>
+          <span style={{ color: '#abb2bf' }}>{openChar}</span>
           <div style={{ paddingLeft: 18, marginLeft: 2, borderLeft: '1px solid var(--border)' }}>
             {entries.map(([k, v], i) => (
               <div key={k + String(i)} style={{ lineHeight: 1.7 }}>
                 {isArr ? (
-                  <span style={{ color: 'var(--text-subtle)', marginRight: 6, fontSize: 10 }}>{k}</span>
+                  <span style={{ color: '#abb2bf', marginRight: 6, fontSize: 10 }}>{k}</span>
                 ) : (
                   <>
-                    <span style={{ color: 'var(--accent)' }}>"{k}"</span>
-                    <span style={{ color: 'var(--text-muted)' }}>: </span>
+                    <span style={{ color: '#e06c75' }}>"{k}"</span>
+                    <span style={{ color: '#abb2bf' }}>: </span>
                   </>
                 )}
                 <JsonTree value={v} depth={depth + 1} />
-                {i < entries.length - 1 && <span style={{ color: 'var(--text-muted)' }}>,</span>}
+                {i < entries.length - 1 && <span style={{ color: '#abb2bf' }}>,</span>}
               </div>
             ))}
           </div>
-          <span style={{ color: 'var(--text-muted)' }}>{closeChar}</span>
+          <span style={{ color: '#abb2bf' }}>{closeChar}</span>
         </>
       ) : (
         <span
-          style={{ color: 'var(--text-muted)', cursor: 'pointer' }}
+          style={{ color: '#abb2bf', cursor: 'pointer' }}
           onClick={() => setOpen(true)}
         >
           {openChar}…{closeChar}
@@ -219,7 +219,7 @@ export function TestPage({
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState<ExecuteResponse | null>(null)
   const [reqTab, setReqTab] = useState<'body' | 'headers'>('body')
-  const [resTab, setResTab] = useState<'json' | 'tree' | 'raw' | 'headers' | 'timeline'>('json')
+  const [resTab, setResTab] = useState<'json' | 'tree' | 'raw' | 'headers' | 'timeline'>('tree')
   const [curlCopied, setCurlCopied] = useState(false)
 
   const erp = erps.find((e) => e.id === erpId)
@@ -253,7 +253,7 @@ export function TestPage({
       })
       const data = await res.json()
       setResponse(data)
-      setResTab('json')
+      setResTab('tree')
     } finally {
       setLoading(false)
     }
