@@ -32,6 +32,8 @@ type ERP = {
 type Company = {
   id: number
   name: string
+  baseUrl: string
+  authType: string
   erp: ERP
   testClients: TestClient[]
 }
@@ -113,18 +115,48 @@ export function CompanyDetailClient({ company }: { company: Company }) {
           <h1 style={{ fontSize: 20, fontWeight: 600, marginBottom: 4 }}>
             {company.name}
           </h1>
-          <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-            ERP:{' '}
-            <Link
-              href={`/erps/${company.erp.id}`}
-              style={{ color: 'var(--accent)', textDecoration: 'none' }}
-            >
-              {company.erp.name}
-            </Link>
-            {' · '}
-            {company.testClients.length} cliente
-            {company.testClients.length !== 1 ? 's' : ''}
-          </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginTop: 4 }}>
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+              ERP:{' '}
+              <Link
+                href={`/erps/${company.erp.id}`}
+                style={{ color: 'var(--accent)', textDecoration: 'none' }}
+              >
+                {company.erp.name}
+              </Link>
+            </span>
+            {company.baseUrl && (
+              <span
+                style={{
+                  fontFamily: 'monospace',
+                  fontSize: 11,
+                  color: 'var(--text-subtle)',
+                  backgroundColor: 'var(--surface-2)',
+                  padding: '2px 8px',
+                  borderRadius: 4,
+                  border: '1px solid var(--border)',
+                }}
+              >
+                {company.baseUrl}
+              </span>
+            )}
+            {company.authType !== 'none' && (
+              <span
+                style={{
+                  fontSize: 11,
+                  color: 'var(--accent)',
+                  backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)',
+                  padding: '2px 8px',
+                  borderRadius: 4,
+                }}
+              >
+                {company.authType}
+              </span>
+            )}
+            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+              {company.testClients.length} cliente{company.testClients.length !== 1 ? 's' : ''}
+            </span>
+          </div>
         </div>
         <Button onClick={() => openSheet()}>
           <Plus size={14} /> Novo Cliente
@@ -204,7 +236,7 @@ export function CompanyDetailClient({ company }: { company: Company }) {
                         width: 32,
                         height: 32,
                         borderRadius: '50%',
-                        backgroundColor: '#6366f118',
+                        backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -328,7 +360,7 @@ export function CompanyDetailClient({ company }: { company: Company }) {
                     <label style={labelStyle}>
                       {fs.label}
                       {fs.required && (
-                        <span style={{ color: '#ef4444', marginLeft: 2 }}>
+                        <span style={{ color: 'var(--status-error)', marginLeft: 2 }}>
                           *
                         </span>
                       )}{' '}
