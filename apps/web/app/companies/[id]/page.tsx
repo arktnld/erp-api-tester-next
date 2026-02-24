@@ -1,6 +1,8 @@
 import { getCompany } from '@/lib/actions/companies'
 import { CompanyDetailClient } from './company-detail-client'
 
+export const dynamic = 'force-dynamic'
+
 export default async function CompanyDetailPage({
   params,
 }: {

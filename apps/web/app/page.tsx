@@ -1,6 +1,8 @@
 import { prisma } from '@erp/db'
 import { Server, Building2, Zap, Clock } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 export default async function Dashboard() {
   const [erps, companies, endpoints, requests] = await Promise.all([
     prisma.eRP.count(),

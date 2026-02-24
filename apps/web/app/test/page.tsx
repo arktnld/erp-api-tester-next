@@ -1,6 +1,8 @@
 import { prisma } from '@erp/db'
 import { TestPage } from './test-page'
 
+export const dynamic = 'force-dynamic'
+
 export default async function TestRoute() {
   const erps = await prisma.eRP.findMany({
     orderBy: { name: 'asc' },

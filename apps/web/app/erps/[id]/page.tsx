@@ -1,6 +1,8 @@
 import { getERP } from '@/lib/actions/erps'
 import { ERPDetailClient } from './erp-detail-client'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ERPDetailPage({
   params,
 }: {
