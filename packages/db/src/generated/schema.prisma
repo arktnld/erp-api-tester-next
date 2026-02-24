@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model ERP {
+  id           Int              @id @default(autoincrement())
+  name         String           @unique
+  baseUrl      String
+  authType     String           @default("none")
+  authConfig   String           @default("{}")
+  createdAt    DateTime         @default(now())
+  companies    Company[]
+  endpoints    Endpoint[]
+  fieldSchemas ERPFieldSchema[]
+}
+
+model ERPFieldSchema {
+  id        Int     @id @default(autoincrement())
+  erpId     Int
+  fieldName String
+  label     String
+  fieldType String  @default("text")
+  required  Boolean @default(false)
+  sortOrder Int     @default(0)
+  erp       ERP     @relation(fields: [erpId], references: [id], onDelete: Cascade)
+}
+
+model Endpoint {
+  id           Int    @id @default(autoincrement())
+  erpId        Int
+  name         String
+  method       String @default("GET")
+  pathTemplate String
+  bodyTemplate String @default("")
+  headers      String @default("{}")
+  sortOrder    Int    @default(0)
+  erp          ERP    @relation(fields: [erpId], references: [id], onDelete: Cascade)
+}
+
+model Company {
+  id          Int          @id @default(autoincrement())
+  name        String
+  erpId       Int
+  createdAt   DateTime     @default(now())
+  erp         ERP          @relation(fields: [erpId], references: [id])
+  testClients TestClient[]
+}
+
+model TestClient {
+  id         Int      @id @default(autoincrement())
+  name       String
+  companyId  Int
+  fieldsData String   @default("{}")
+  createdAt  DateTime @default(now())
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model RequestHistory {
+  id              Int      @id @default(autoincrement())
+  erpName         String
+  companyName     String
+  endpointName    String
+  clientName      String
+  method          String
+  url             String
+  requestBody     String   @default("")
+  requestHeaders  String   @default("{}")
+  statusCode      Int
+  responseBody    String   @default("")
+  responseHeaders String   @default("{}")
+  durationMs      Int
+  createdAt       DateTime @default(now())
+}
