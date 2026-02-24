@@ -172,7 +172,7 @@ function JsonTree({ value, depth = 0 }: { value: unknown; depth?: number }) {
                   <span style={{ color: '#abb2bf', marginRight: 6, fontSize: 10 }}>{k}</span>
                 ) : (
                   <>
-                    <span style={{ color: '#e06c75' }}>"{k}"</span>
+                    <span style={{ color: '#d19a66' }}>"{k}"</span>
                     <span style={{ color: '#abb2bf' }}>: </span>
                   </>
                 )}
@@ -219,7 +219,7 @@ export function TestPage({
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState<ExecuteResponse | null>(null)
   const [reqTab, setReqTab] = useState<'body' | 'headers'>('body')
-  const [resTab, setResTab] = useState<'json' | 'tree' | 'raw' | 'headers' | 'timeline'>('tree')
+  const [resTab, setResTab] = useState<'json' | 'raw' | 'headers' | 'timeline'>('json')
   const [curlCopied, setCurlCopied] = useState(false)
 
   const erp = erps.find((e) => e.id === erpId)
@@ -253,7 +253,7 @@ export function TestPage({
       })
       const data = await res.json()
       setResponse(data)
-      setResTab('tree')
+      setResTab('json')
     } finally {
       setLoading(false)
     }
@@ -675,7 +675,6 @@ export function TestPage({
                 {(
                   [
                     { id: 'json', label: 'JSON' },
-                    { id: 'tree', label: 'Árvore' },
                     { id: 'raw', label: 'Raw' },
                     { id: 'headers', label: 'Headers' },
                     { id: 'timeline', label: 'Timeline' },
@@ -693,29 +692,23 @@ export function TestPage({
 
               {/* Content */}
               <div style={{ flex: 1, overflow: 'auto', padding: 16 }}>
-                {resTab === 'json' && (
-                  <SyntaxHighlighter
-                    language="json"
-                    style={atomOneDark}
-                    customStyle={{
-                      margin: 0,
-                      borderRadius: 8,
-                      fontSize: 12,
-                      backgroundColor: 'var(--surface-2)',
-                    }}
-                  >
-                    {tryPrettyJson(response.responseBody)}
-                  </SyntaxHighlighter>
-                )}
-
-                {resTab === 'tree' && (() => {
+                {resTab === 'json' && (() => {
                   let parsed: unknown = null
                   try { parsed = JSON.parse(response.responseBody) } catch {}
                   return (
-                    <div style={{ fontFamily: 'monospace', fontSize: 12, lineHeight: 1.7, color: 'var(--text)' }}>
+                    <div style={{
+                      backgroundColor: '#282c34',
+                      borderRadius: 8,
+                      padding: '14px 16px',
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                      lineHeight: 1.7,
+                      color: '#abb2bf',
+                      overflow: 'auto',
+                    }}>
                       {parsed !== null && parsed !== undefined
                         ? <JsonTree value={parsed} />
-                        : <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>{response.responseBody}</pre>
+                        : <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: '#abb2bf' }}>{response.responseBody}</pre>
                       }
                     </div>
                   )
