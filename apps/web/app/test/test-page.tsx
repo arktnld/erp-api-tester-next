@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Play, Loader2 } from 'lucide-react'
+import { Play, Loader2, Copy, Check } from 'lucide-react'
 import { MethodBadge, StatusBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import SyntaxHighlighter from 'react-syntax-highlighter'
@@ -16,7 +16,14 @@ type Endpoint = {
   headers: string
 }
 type TestClient = { id: number; name: string; fieldsData: string }
-type Company = { id: number; name: string; baseUrl: string; testClients: TestClient[] }
+type Company = {
+  id: number
+  name: string
+  baseUrl: string
+  authType: string
+  authConfig: string | null
+  testClients: TestClient[]
+}
 type ERP = {
   id: number
   name: string
@@ -45,6 +52,42 @@ function tryPrettyJson(text: string): string {
   } catch {
     return text
   }
+}
+
+function generateCurl(
+  endpoint: Endpoint,
+  company: Company,
+  fields: Record<string, string>
+): string {
+  const url = `${company.baseUrl}${substitute(endpoint.pathTemplate, fields)}`
+  const parts: string[] = [`curl -X ${endpoint.method} '${url}'`]
+
+  try {
+    const authConfig = JSON.parse(company.authConfig || '{}') as Record<string, string>
+    if (company.authType === 'bearer' && authConfig.token) {
+      parts.push(`  -H 'Authorization: Bearer ${authConfig.token}'`)
+    } else if (company.authType === 'api_key' && authConfig.header && authConfig.value) {
+      parts.push(`  -H '${authConfig.header}: ${authConfig.value}'`)
+    } else if (company.authType === 'basic' && authConfig.username && authConfig.password) {
+      const encoded = btoa(`${authConfig.username}:${authConfig.password}`)
+      parts.push(`  -H 'Authorization: Basic ${encoded}'`)
+    }
+  } catch {}
+
+  try {
+    const endpointHeaders = JSON.parse(endpoint.headers || '{}') as Record<string, string>
+    for (const [k, v] of Object.entries(endpointHeaders)) {
+      parts.push(`  -H '${k}: ${v}'`)
+    }
+  } catch {}
+
+  const body = endpoint.bodyTemplate?.trim() ? substitute(endpoint.bodyTemplate, fields) : ''
+  if (body) {
+    parts.push(`  -H 'Content-Type: application/json'`)
+    parts.push(`  -d '${body}'`)
+  }
+
+  return parts.join(' \\\n')
 }
 
 const selectStyle: React.CSSProperties = {
@@ -106,7 +149,8 @@ export function TestPage({
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState<ExecuteResponse | null>(null)
   const [reqTab, setReqTab] = useState<'body' | 'headers'>('body')
-  const [resTab, setResTab] = useState<'pretty' | 'raw' | 'headers' | 'timeline'>('pretty')
+  const [resTab, setResTab] = useState<'json' | 'table' | 'raw' | 'headers' | 'timeline'>('json')
+  const [curlCopied, setCurlCopied] = useState(false)
 
   const erp = erps.find((e) => e.id === erpId)
   const company = erp?.companies.find((c) => c.id === companyId)
@@ -139,7 +183,7 @@ export function TestPage({
       })
       const data = await res.json()
       setResponse(data)
-      setResTab('pretty')
+      setResTab('json')
     } finally {
       setLoading(false)
     }
@@ -318,6 +362,22 @@ export function TestPage({
                 Executar
               </>
             )}
+          </Button>
+
+          <Button
+            variant="ghost"
+            disabled={!canExecute}
+            style={{ width: '100%', marginTop: 6 }}
+            onClick={() => {
+              if (!endpoint || !company) return
+              const curl = generateCurl(endpoint, company, fields)
+              navigator.clipboard.writeText(curl)
+              setCurlCopied(true)
+              setTimeout(() => setCurlCopied(false), 2000)
+            }}
+          >
+            {curlCopied ? <Check size={14} /> : <Copy size={14} />}
+            {curlCopied ? 'Copiado!' : 'Copiar curl'}
           </Button>
         </div>
 
@@ -543,21 +603,27 @@ export function TestPage({
                 }}
               >
                 {(
-                  ['pretty', 'raw', 'headers', 'timeline'] as const
-                ).map((t) => (
+                  [
+                    { id: 'json', label: 'JSON' },
+                    { id: 'table', label: 'Tabela' },
+                    { id: 'raw', label: 'Raw' },
+                    { id: 'headers', label: 'Headers' },
+                    { id: 'timeline', label: 'Timeline' },
+                  ] as const
+                ).map(({ id, label }) => (
                   <button
-                    key={t}
-                    style={tabBtnStyle(resTab === t)}
-                    onClick={() => setResTab(t)}
+                    key={id}
+                    style={tabBtnStyle(resTab === id)}
+                    onClick={() => setResTab(id)}
                   >
-                    {t.charAt(0).toUpperCase() + t.slice(1)}
+                    {label}
                   </button>
                 ))}
               </div>
 
               {/* Content */}
               <div style={{ flex: 1, overflow: 'auto', padding: 16 }}>
-                {resTab === 'pretty' && (
+                {resTab === 'json' && (
                   <SyntaxHighlighter
                     language="json"
                     style={atomOneDark}
@@ -571,6 +637,55 @@ export function TestPage({
                     {tryPrettyJson(response.responseBody)}
                   </SyntaxHighlighter>
                 )}
+
+                {resTab === 'table' && (() => {
+                  let parsed: unknown = null
+                  try { parsed = JSON.parse(response.responseBody) } catch {}
+                  const entries = Array.isArray(parsed)
+                    ? parsed.map((v, i) => [String(i), v] as [string, unknown])
+                    : parsed && typeof parsed === 'object'
+                      ? Object.entries(parsed as Record<string, unknown>)
+                      : null
+                  if (!entries) {
+                    return (
+                      <p style={{ color: 'var(--text-subtle)', fontSize: 13 }}>
+                        Resposta não é um JSON válido.
+                      </p>
+                    )
+                  }
+                  return (
+                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                      <tbody>
+                        {entries.map(([k, v]) => (
+                          <tr key={k} style={{ borderBottom: '1px solid var(--border)' }}>
+                            <td style={{
+                              padding: '6px 0',
+                              fontFamily: 'monospace',
+                              fontSize: 12,
+                              color: 'var(--text-muted)',
+                              width: '35%',
+                              paddingRight: 12,
+                              verticalAlign: 'top',
+                            }}>
+                              {k}
+                            </td>
+                            <td style={{
+                              padding: '6px 0',
+                              fontFamily: 'monospace',
+                              fontSize: 12,
+                              wordBreak: 'break-all',
+                              color: 'var(--text)',
+                            }}>
+                              {typeof v === 'object'
+                                ? JSON.stringify(v)
+                                : String(v ?? '')}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )
+                })()}
 
                 {resTab === 'raw' && (
                   <pre

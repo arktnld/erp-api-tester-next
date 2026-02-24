@@ -15,7 +15,14 @@ export default async function TestRoute({
       endpoints: { orderBy: { sortOrder: 'asc' } },
       companies: {
         orderBy: { name: 'asc' },
-        include: { testClients: { orderBy: { name: 'asc' } } },
+        select: {
+          id: true,
+          name: true,
+          baseUrl: true,
+          authType: true,
+          authConfig: true,
+          testClients: { orderBy: { name: 'asc' } },
+        },
       },
     },
   })
