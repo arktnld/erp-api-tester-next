@@ -68,3 +68,11 @@ input, select, textarea {
 input::placeholder, textarea::placeholder {
   color: var(--text-subtle);
 }
+
+/* Button variants */
+.btn-default { background-color: var(--accent); color: white; }
+.btn-default:hover:not(:disabled) { background-color: var(--accent-hover); }
+.btn-ghost { color: var(--text-muted); }
+.btn-ghost:hover:not(:disabled) { color: var(--text); background-color: var(--surface-2); }
+.btn-danger { background-color: color-mix(in srgb, var(--status-error) 10%, transparent); color: var(--status-error); }
+.btn-danger:hover:not(:disabled) { background-color: color-mix(in srgb, var(--status-error) 20%, transparent); }
