@@ -103,7 +103,7 @@ export function Sidebar() {
           color: 'var(--text-subtle)',
         }}
       >
-        v2.0 · Next.js + Motia
+        v2.0 · Next.js + Prisma
       </div>
     </aside>
   )
