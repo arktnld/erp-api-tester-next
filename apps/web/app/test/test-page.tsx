@@ -221,6 +221,7 @@ export function TestPage({
   const [reqTab, setReqTab] = useState<'body' | 'headers'>('body')
   const [resTab, setResTab] = useState<'json' | 'raw' | 'headers' | 'timeline'>('json')
   const [curlCopied, setCurlCopied] = useState(false)
+  const [resCopied, setResCopied] = useState(false)
 
   const erp = erps.find((e) => e.id === erpId)
   const company = erp?.companies.find((c) => c.id === companyId)
@@ -667,6 +668,7 @@ export function TestPage({
               <div
                 style={{
                   display: 'flex',
+                  alignItems: 'center',
                   borderBottom: '1px solid var(--border)',
                   padding: '0 12px',
                   flexShrink: 0,
@@ -688,6 +690,29 @@ export function TestPage({
                     {label}
                   </button>
                 ))}
+                <button
+                  style={{
+                    marginLeft: 'auto',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    fontSize: 11,
+                    color: resCopied ? 'var(--status-success)' : 'var(--text-muted)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '4px 6px',
+                    borderRadius: 4,
+                  }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(tryPrettyJson(response.responseBody))
+                    setResCopied(true)
+                    setTimeout(() => setResCopied(false), 2000)
+                  }}
+                >
+                  {resCopied ? <Check size={12} /> : <Copy size={12} />}
+                  {resCopied ? 'Copiado' : 'Copiar'}
+                </button>
               </div>
 
               {/* Content */}
