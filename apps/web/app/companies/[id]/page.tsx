@@ -1,0 +1,12 @@
+import { getCompany } from '@/lib/actions/companies'
+import { CompanyDetailClient } from './company-detail-client'
+
+export default async function CompanyDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+  const company = await getCompany(Number(id))
+  return <CompanyDetailClient company={company} />
+}
