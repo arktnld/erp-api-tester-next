@@ -269,26 +269,57 @@ export function TestPage({
         overflow: 'hidden',
       }}
     >
-      {/* Header */}
+      {/* Header — URL bar + actions */}
       <div
         style={{
-          padding: '14px 24px',
+          padding: '10px 16px',
           borderBottom: '1px solid var(--border)',
           display: 'flex',
           alignItems: 'center',
-          gap: 12,
+          gap: 10,
           flexShrink: 0,
         }}
       >
-        <h1 style={{ fontSize: 15, fontWeight: 600 }}>Testar API</h1>
-        {response && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <StatusBadge code={response.statusCode} />
-            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-              {response.durationMs}ms
-            </span>
-          </div>
-        )}
+        {endpoint
+          ? <MethodBadge method={endpoint.method} />
+          : <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-subtle)', padding: '2px 6px', backgroundColor: 'var(--surface-2)', borderRadius: 4 }}>GET</span>
+        }
+        <span style={{
+          fontFamily: 'monospace',
+          fontSize: 12,
+          color: resolvedUrl ? 'var(--text)' : 'var(--text-subtle)',
+          flex: 1,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}>
+          {resolvedUrl || 'Selecione ERP, empresa e endpoint...'}
+        </span>
+        <Button
+          variant="ghost"
+          disabled={!canExecute}
+          style={{ flexShrink: 0 }}
+          onClick={() => {
+            if (!endpoint || !company) return
+            const curl = generateCurl(endpoint, company, fields)
+            navigator.clipboard.writeText(curl)
+            setCurlCopied(true)
+            setTimeout(() => setCurlCopied(false), 2000)
+          }}
+        >
+          {curlCopied ? <Check size={13} /> : <Copy size={13} />}
+          curl
+        </Button>
+        <Button
+          onClick={execute}
+          disabled={!canExecute || loading}
+          style={{ flexShrink: 0 }}
+        >
+          {loading
+            ? <><Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />Executando...</>
+            : <><Play size={13} />Executar</>
+          }
+        </Button>
       </div>
 
       {/* Three panes */}
@@ -386,70 +417,6 @@ export function TestPage({
             ))}
           </select>
 
-          {/* URL preview */}
-          {resolvedUrl && (
-            <div
-              style={{
-                marginTop: 12,
-                padding: '8px 10px',
-                backgroundColor: 'var(--surface-2)',
-                borderRadius: 6,
-                border: '1px solid var(--border)',
-              }}
-            >
-              <p style={{ ...sectionLabel, marginTop: 0 }}>URL resolvida</p>
-              <p
-                style={{
-                  fontFamily: 'monospace',
-                  fontSize: 11,
-                  color: 'var(--text-muted)',
-                  wordBreak: 'break-all',
-                  lineHeight: 1.5,
-                }}
-              >
-                {resolvedUrl}
-              </p>
-            </div>
-          )}
-
-          <div style={{ flex: 1 }} />
-
-          <Button
-            onClick={execute}
-            disabled={!canExecute || loading}
-            style={{ width: '100%', marginTop: 16 }}
-          >
-            {loading ? (
-              <>
-                <Loader2
-                  size={14}
-                  style={{ animation: 'spin 1s linear infinite' }}
-                />
-                Executando...
-              </>
-            ) : (
-              <>
-                <Play size={14} />
-                Executar
-              </>
-            )}
-          </Button>
-
-          <Button
-            variant="ghost"
-            disabled={!canExecute}
-            style={{ width: '100%', marginTop: 6 }}
-            onClick={() => {
-              if (!endpoint || !company) return
-              const curl = generateCurl(endpoint, company, fields)
-              navigator.clipboard.writeText(curl)
-              setCurlCopied(true)
-              setTimeout(() => setCurlCopied(false), 2000)
-            }}
-          >
-            {curlCopied ? <Check size={14} /> : <Copy size={14} />}
-            {curlCopied ? 'Copiado!' : 'Copiar curl'}
-          </Button>
         </div>
 
         {/* CENTER — Request Preview */}
@@ -462,64 +429,6 @@ export function TestPage({
             overflow: 'hidden',
           }}
         >
-          {/* URL bar */}
-          <div
-            style={{
-              padding: '10px 16px',
-              borderBottom: '1px solid var(--border)',
-              flexShrink: 0,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: resolvedUrl ? 6 : 0 }}>
-              {endpoint ? (
-                <MethodBadge method={endpoint.method} />
-              ) : (
-                <span
-                  style={{
-                    fontSize: 11,
-                    color: 'var(--text-subtle)',
-                    fontFamily: 'monospace',
-                    padding: '2px 6px',
-                    backgroundColor: 'var(--surface-2)',
-                    borderRadius: 4,
-                  }}
-                >
-                  METHOD
-                </span>
-              )}
-              <span
-                style={{
-                  fontFamily: 'monospace',
-                  fontSize: 12,
-                  color: resolvedUrl ? 'var(--text)' : 'var(--text-subtle)',
-                  flex: 1,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {resolvedUrl || 'Selecione ERP, empresa e endpoint...'}
-              </span>
-            </div>
-            {resolvedUrl && (
-              <div
-                style={{
-                  padding: '6px 10px',
-                  backgroundColor: 'var(--surface-2)',
-                  borderRadius: 6,
-                  border: '1px solid var(--border)',
-                }}
-              >
-                <p style={{ fontSize: 10, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 3 }}>
-                  URL resolvida
-                </p>
-                <p style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text)', wordBreak: 'break-all', lineHeight: 1.5 }}>
-                  {resolvedUrl}
-                </p>
-              </div>
-            )}
-          </div>
-
           {/* Tabs */}
           <div
             style={{
