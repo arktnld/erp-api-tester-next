@@ -5,14 +5,6 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { LayoutDashboard, Server, Building2, FlaskConical, History } from 'lucide-react'
 
-const nav = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/erps', label: 'ERPs', icon: Server },
-  { href: '/companies', label: 'Empresas', icon: Building2 },
-  { href: '/test', label: 'Testar API', icon: FlaskConical },
-  { href: '/history', label: 'Histórico', icon: History },
-]
-
 const methodColor: Record<string, string> = {
   GET: 'var(--method-get)',
   POST: 'var(--method-post)',
@@ -28,6 +20,20 @@ type SidebarERP = {
   endpoints: { id: number; name: string; method: string }[]
 }
 
+const subItemStyle = (active?: boolean): React.CSSProperties => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+  padding: '3px 10px 3px 28px',
+  fontSize: 12,
+  color: active ? 'var(--text)' : 'var(--text-muted)',
+  textDecoration: 'none',
+  borderRadius: 4,
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+})
+
 export function Sidebar({ erps }: { erps: SidebarERP[] }) {
   const pathname = usePathname()
   const [openErps, setOpenErps] = useState<Set<number>>(
@@ -42,6 +48,20 @@ export function Sidebar({ erps }: { erps: SidebarERP[] }) {
     next.has(id) ? next.delete(id) : next.add(id)
     return next
   }
+
+  const onErps = pathname.startsWith('/erps')
+  const onCompanies = pathname.startsWith('/companies')
+  const onTest = pathname.startsWith('/test')
+
+  const allCompanies = erps.flatMap((e) => e.companies)
+
+  const nav = [
+    { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/erps', label: 'ERPs', icon: Server },
+    { href: '/companies', label: 'Empresas', icon: Building2 },
+    { href: '/test', label: 'Testar API', icon: FlaskConical },
+    { href: '/history', label: 'Histórico', icon: History },
+  ]
 
   return (
     <aside
@@ -91,16 +111,14 @@ export function Sidebar({ erps }: { erps: SidebarERP[] }) {
         </span>
       </div>
 
-      {/* Nav + Tree */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
-        {/* Main nav */}
-        <nav style={{ padding: '8px' }}>
-          {nav.map(({ href, label, icon: Icon }) => {
-            const active =
-              pathname === href || (href !== '/' && pathname.startsWith(href))
-            return (
+      {/* Nav */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 8px' }}>
+        {nav.map(({ href, label, icon: Icon }) => {
+          const active =
+            pathname === href || (href !== '/' && pathname.startsWith(href))
+          return (
+            <div key={href}>
               <Link
-                key={href}
                 href={href}
                 style={{
                   display: 'flex',
@@ -120,129 +138,130 @@ export function Sidebar({ erps }: { erps: SidebarERP[] }) {
                 <Icon size={15} />
                 {label}
               </Link>
-            )
-          })}
-        </nav>
 
-        {/* Separator */}
-        {erps.length > 0 && (
-          <div style={{ borderTop: '1px solid var(--border)', margin: '4px 0' }} />
-        )}
+              {/* ERPs subtree */}
+              {href === '/erps' && onErps && (
+                <div style={{ marginBottom: 4 }}>
+                  {erps.map((erp) => (
+                    <Link
+                      key={erp.id}
+                      href={`/erps/${erp.id}`}
+                      style={subItemStyle(pathname === `/erps/${erp.id}`)}
+                    >
+                      {erp.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
 
-        {/* ERP Tree */}
-        {erps.map((erp) => (
-          <div key={erp.id}>
-            {/* ERP row */}
-            <button
-              onClick={() => setOpenErps((s) => toggle(s, erp.id))}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5,
-                padding: '5px 10px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-              }}
-            >
-              <span style={{ fontSize: 9, color: 'var(--text-subtle)', flexShrink: 0 }}>
-                {openErps.has(erp.id) ? '▾' : '▸'}
-              </span>
-              <Link
-                href={`/erps/${erp.id}`}
-                onClick={(e) => e.stopPropagation()}
-                style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: 'var(--text)',
-                  textDecoration: 'none',
-                  flex: 1,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {erp.name}
-              </Link>
-            </button>
+              {/* Empresas subtree */}
+              {href === '/companies' && onCompanies && (
+                <div style={{ marginBottom: 4 }}>
+                  {allCompanies.map((c) => (
+                    <Link
+                      key={c.id}
+                      href={`/companies/${c.id}`}
+                      style={subItemStyle(pathname === `/companies/${c.id}`)}
+                    >
+                      {c.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
 
-            {openErps.has(erp.id) && erp.companies.map((company) => (
-              <div key={company.id}>
-                {/* Company row */}
-                <button
-                  onClick={() => setOpenCompanies((s) => toggle(s, company.id))}
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 5,
-                    padding: '4px 10px 4px 22px',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                >
-                  <span style={{ fontSize: 9, color: 'var(--text-subtle)', flexShrink: 0 }}>
-                    {openCompanies.has(company.id) ? '▾' : '▸'}
-                  </span>
-                  <Link
-                    href={`/companies/${company.id}`}
-                    onClick={(e) => e.stopPropagation()}
-                    style={{
-                      fontSize: 12,
-                      color: 'var(--text-muted)',
-                      textDecoration: 'none',
-                      flex: 1,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {company.name}
-                  </Link>
-                </button>
+              {/* Testar API subtree */}
+              {href === '/test' && onTest && (
+                <div style={{ marginBottom: 4 }}>
+                  {erps.map((erp) => (
+                    <div key={erp.id}>
+                      <button
+                        onClick={() => setOpenErps((s) => toggle(s, erp.id))}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 5,
+                          padding: '4px 10px 4px 20px',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                        }}
+                      >
+                        <span style={{ fontSize: 9, color: 'var(--text-subtle)', flexShrink: 0 }}>
+                          {openErps.has(erp.id) ? '▾' : '▸'}
+                        </span>
+                        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>
+                          {erp.name}
+                        </span>
+                      </button>
 
-                {/* Endpoints */}
-                {openCompanies.has(company.id) && erp.endpoints.map((ep) => (
-                  <Link
-                    key={ep.id}
-                    href={`/test?companyId=${company.id}&endpointId=${ep.id}`}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 5,
-                      padding: '3px 10px 3px 34px',
-                      textDecoration: 'none',
-                    }}
-                  >
-                    <span style={{
-                      fontFamily: 'monospace',
-                      fontSize: 9,
-                      fontWeight: 700,
-                      color: methodColor[ep.method] ?? 'var(--text-muted)',
-                      flexShrink: 0,
-                      minWidth: 30,
-                    }}>
-                      {ep.method}
-                    </span>
-                    <span style={{
-                      fontSize: 12,
-                      color: 'var(--text-muted)',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}>
-                      {ep.name}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            ))}
-          </div>
-        ))}
+                      {openErps.has(erp.id) && erp.companies.map((c) => (
+                        <div key={c.id}>
+                          <button
+                            onClick={() => setOpenCompanies((s) => toggle(s, c.id))}
+                            style={{
+                              width: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 5,
+                              padding: '3px 10px 3px 30px',
+                              background: 'none',
+                              border: 'none',
+                              cursor: 'pointer',
+                              textAlign: 'left',
+                            }}
+                          >
+                            <span style={{ fontSize: 9, color: 'var(--text-subtle)', flexShrink: 0 }}>
+                              {openCompanies.has(c.id) ? '▾' : '▸'}
+                            </span>
+                            <span style={{ fontSize: 12, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {c.name}
+                            </span>
+                          </button>
+
+                          {openCompanies.has(c.id) && erp.endpoints.map((ep) => (
+                            <Link
+                              key={ep.id}
+                              href={`/test?companyId=${c.id}&endpointId=${ep.id}`}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 5,
+                                padding: '3px 10px 3px 42px',
+                                textDecoration: 'none',
+                              }}
+                            >
+                              <span style={{
+                                fontFamily: 'monospace',
+                                fontSize: 9,
+                                fontWeight: 700,
+                                color: methodColor[ep.method] ?? 'var(--text-muted)',
+                                flexShrink: 0,
+                                minWidth: 28,
+                              }}>
+                                {ep.method}
+                              </span>
+                              <span style={{
+                                fontSize: 11,
+                                color: 'var(--text-muted)',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}>
+                                {ep.name}
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
 
       {/* Footer */}
