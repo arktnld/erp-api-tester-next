@@ -295,11 +295,8 @@ export function TestPage({
         }}>
           {resolvedUrl || 'Selecione ERP, empresa e endpoint...'}
         </span>
-        <Button
-          variant="ghost"
-          size="sm"
+        <button
           disabled={!canExecute}
-          style={{ flexShrink: 0 }}
           onClick={() => {
             if (!endpoint || !company) return
             const curl = generateCurl(endpoint, company, fields)
@@ -307,21 +304,48 @@ export function TestPage({
             setCurlCopied(true)
             setTimeout(() => setCurlCopied(false), 2000)
           }}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            padding: '5px 10px',
+            fontSize: 12,
+            color: curlCopied ? 'var(--status-success)' : 'var(--text-muted)',
+            background: 'none',
+            border: '1px solid var(--border)',
+            borderRadius: 6,
+            cursor: canExecute ? 'pointer' : 'not-allowed',
+            opacity: canExecute ? 1 : 0.4,
+            flexShrink: 0,
+          }}
         >
           {curlCopied ? <Check size={12} /> : <Copy size={12} />}
           curl
-        </Button>
-        <Button
-          size="sm"
+        </button>
+        <button
           onClick={execute}
           disabled={!canExecute || loading}
-          style={{ flexShrink: 0 }}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            padding: '5px 14px',
+            fontSize: 12,
+            fontWeight: 500,
+            color: 'white',
+            backgroundColor: 'var(--accent)',
+            border: 'none',
+            borderRadius: 6,
+            cursor: canExecute && !loading ? 'pointer' : 'not-allowed',
+            opacity: canExecute && !loading ? 1 : 0.5,
+            flexShrink: 0,
+          }}
         >
           {loading
             ? <><Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />Executando...</>
             : <><Play size={12} />Executar</>
           }
-        </Button>
+        </button>
       </div>
 
       {/* Three panes */}
