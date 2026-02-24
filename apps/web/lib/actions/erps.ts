@@ -22,25 +22,12 @@ export async function getERP(id: number) {
   })
 }
 
-export async function createERP(data: {
-  name: string
-  baseUrl: string
-  authType: string
-  authConfig: string
-}) {
+export async function createERP(data: { name: string }) {
   await prisma.eRP.create({ data })
   revalidatePath('/erps')
 }
 
-export async function updateERP(
-  id: number,
-  data: {
-    name: string
-    baseUrl: string
-    authType: string
-    authConfig: string
-  }
-) {
+export async function updateERP(id: number, data: { name: string }) {
   await prisma.eRP.update({ where: { id }, data })
   revalidatePath('/erps')
   revalidatePath(`/erps/${id}`)

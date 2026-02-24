@@ -25,14 +25,20 @@ export async function getCompany(id: number) {
   })
 }
 
-export async function createCompany(data: { name: string; erpId: number }) {
+export async function createCompany(data: {
+  name: string
+  erpId: number
+  baseUrl: string
+  authType: string
+  authConfig: string
+}) {
   await prisma.company.create({ data })
   revalidatePath('/companies')
 }
 
 export async function updateCompany(
   id: number,
-  data: { name: string; erpId: number }
+  data: { name: string; erpId: number; baseUrl: string; authType: string; authConfig: string }
 ) {
   await prisma.company.update({ where: { id }, data })
   revalidatePath('/companies')
