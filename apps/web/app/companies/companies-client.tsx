@@ -15,10 +15,21 @@ type Company = {
   id: number
   name: string
   erpId: number
+  baseUrl: string
+  authType: string
+  authConfig: string
   erp: { id: number; name: string }
   _count: { testClients: number }
 }
 type ERP = { id: number; name: string }
+
+const AUTH_TYPES = ['none', 'bearer', 'api_key', 'basic']
+const AUTH_PLACEHOLDERS: Record<string, string> = {
+  bearer: '{"token": "eyJhbGciOiJSUzI1NiJ9..."}',
+  api_key: '{"header": "X-API-Key", "value": "abc123"}',
+  basic: '{"username": "admin", "password": "secret"}',
+  none: '{}',
+}
 
 const labelStyle: React.CSSProperties = {
   display: 'block',
@@ -26,6 +37,30 @@ const labelStyle: React.CSSProperties = {
   color: 'var(--text-muted)',
   marginBottom: 4,
   marginTop: 12,
+}
+const selectStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '8px 12px',
+  backgroundColor: 'var(--surface-2)',
+  border: '1px solid var(--border)',
+  borderRadius: 6,
+  color: 'var(--text)',
+  fontSize: 13,
+  outline: 'none',
+  cursor: 'pointer',
+}
+const textareaStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '8px 12px',
+  backgroundColor: 'var(--surface-2)',
+  border: '1px solid var(--border)',
+  borderRadius: 6,
+  color: 'var(--text)',
+  fontSize: 12,
+  fontFamily: 'monospace',
+  outline: 'none',
+  resize: 'vertical',
+  marginTop: 4,
 }
 
 export function CompaniesClient({
@@ -35,18 +70,20 @@ export function CompaniesClient({
   companies: Company[]
   erps: ERP[]
 }) {
-  const [sheet, setSheet] = useState<{ open: boolean; company?: Company }>({
-    open: false,
-  })
+  const [sheet, setSheet] = useState<{ open: boolean; company?: Company }>({ open: false })
   const [name, setName] = useState('')
   const [erpId, setErpId] = useState('')
+  const [baseUrl, setBaseUrl] = useState('')
+  const [authType, setAuthType] = useState('none')
+  const [authConfig, setAuthConfig] = useState('{}')
   const [isPending, startTransition] = useTransition()
 
   const openSheet = (company?: Company) => {
     setName(company?.name ?? '')
-    setErpId(
-      company?.erpId?.toString() ?? (erps[0]?.id?.toString() ?? '')
-    )
+    setErpId(company?.erpId?.toString() ?? (erps[0]?.id?.toString() ?? ''))
+    setBaseUrl(company?.baseUrl ?? '')
+    setAuthType(company?.authType ?? 'none')
+    setAuthConfig(company?.authConfig ?? '{}')
     setSheet({ open: true, company })
   }
 
@@ -89,6 +126,15 @@ export function CompaniesClient({
       ),
     },
     {
+      accessorKey: 'baseUrl',
+      header: 'URL Base',
+      cell: ({ row }) => (
+        <span style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+          {row.original.baseUrl || <span style={{ color: 'var(--text-subtle)' }}>—</span>}
+        </span>
+      ),
+    },
+    {
       accessorKey: '_count.testClients',
       header: 'Clientes',
       cell: ({ getValue }) => (
@@ -102,19 +148,13 @@ export function CompaniesClient({
       header: '',
       cell: ({ row }) => (
         <div style={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => openSheet(row.original)}
-          >
+          <Button variant="ghost" size="sm" onClick={() => openSheet(row.original)}>
             <Pencil size={13} />
           </Button>
           <Button
             variant="ghost"
             size="sm"
-            onClick={() =>
-              startTransition(() => deleteCompany(row.original.id))
-            }
+            onClick={() => startTransition(() => deleteCompany(row.original.id))}
           >
             <Trash2 size={13} />
           </Button>
@@ -159,6 +199,7 @@ export function CompaniesClient({
         open={sheet.open}
         onClose={() => setSheet({ open: false })}
         title={sheet.company ? 'Editar Empresa' : 'Nova Empresa'}
+        width={520}
       >
         <form
           onSubmit={(e) => {
@@ -168,9 +209,12 @@ export function CompaniesClient({
                 await updateCompany(sheet.company.id, {
                   name,
                   erpId: Number(erpId),
+                  baseUrl,
+                  authType,
+                  authConfig,
                 })
               } else {
-                await createCompany({ name, erpId: Number(erpId) })
+                await createCompany({ name, erpId: Number(erpId), baseUrl, authType, authConfig })
               }
               setSheet({ open: false })
             })
@@ -185,27 +229,45 @@ export function CompaniesClient({
           />
 
           <label style={labelStyle}>ERP</label>
-          <select
-            value={erpId}
-            onChange={(e) => setErpId(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '8px 12px',
-              backgroundColor: 'var(--surface-2)',
-              border: '1px solid var(--border)',
-              borderRadius: 6,
-              color: 'var(--text)',
-              fontSize: 13,
-              outline: 'none',
-              cursor: 'pointer',
-            }}
-          >
+          <select value={erpId} onChange={(e) => setErpId(e.target.value)} style={selectStyle}>
             {erps.map((erp) => (
               <option key={erp.id} value={erp.id}>
                 {erp.name}
               </option>
             ))}
           </select>
+
+          <label style={labelStyle}>URL Base</label>
+          <Input
+            value={baseUrl}
+            onChange={(e) => setBaseUrl(e.target.value)}
+            placeholder="https://api.empresa.com.br"
+            required
+          />
+
+          <label style={labelStyle}>Tipo de Autenticação</label>
+          <select
+            value={authType}
+            onChange={(e) => { setAuthType(e.target.value); setAuthConfig('{}') }}
+            style={selectStyle}
+          >
+            {AUTH_TYPES.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+
+          {authType !== 'none' && (
+            <>
+              <label style={labelStyle}>Config de Auth (JSON)</label>
+              <textarea
+                value={authConfig}
+                onChange={(e) => setAuthConfig(e.target.value)}
+                placeholder={AUTH_PLACEHOLDERS[authType]}
+                rows={4}
+                style={textareaStyle}
+              />
+            </>
+          )}
 
           <Button
             type="submit"
