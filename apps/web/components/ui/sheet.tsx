@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 
 interface SheetProps {
@@ -18,6 +18,20 @@ export function Sheet({
   children,
   width = 480,
 }: SheetProps) {
+  const [mounted, setMounted] = useState(open)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    if (open) {
+      setMounted(true)
+      requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)))
+    } else {
+      setVisible(false)
+      const t = setTimeout(() => setMounted(false), 260)
+      return () => clearTimeout(t)
+    }
+  }, [open])
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -26,7 +40,7 @@ export function Sheet({
     return () => document.removeEventListener('keydown', handleKey)
   }, [open, onClose])
 
-  if (!open) return null
+  if (!mounted) return null
 
   return (
     <>
@@ -38,6 +52,8 @@ export function Sheet({
           inset: 0,
           backgroundColor: 'rgba(0,0,0,0.6)',
           zIndex: 100,
+          opacity: visible ? 1 : 0,
+          transition: 'opacity 0.25s ease',
         }}
       />
       {/* Panel */}
@@ -54,6 +70,8 @@ export function Sheet({
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
+          transform: visible ? 'translateX(0)' : 'translateX(100%)',
+          transition: 'transform 0.25s cubic-bezier(0.32, 0.72, 0, 1)',
         }}
       >
         <div

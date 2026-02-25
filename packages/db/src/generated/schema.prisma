@@ -61,6 +61,23 @@ model TestClient {
   company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
+model PostmanCollection {
+  id           Int              @id @default(autoincrement())
+  name         String
+  context      String
+  systemPrompt String           @default("")
+  createdAt    DateTime         @default(now())
+  chunks       EmbeddingChunk[]
+}
+
+model EmbeddingChunk {
+  id           Int               @id @default(autoincrement())
+  collectionId Int
+  text         String
+  embedding    String
+  collection   PostmanCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+}
+
 model RequestHistory {
   id              Int      @id @default(autoincrement())
   erpName         String

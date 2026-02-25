@@ -32,8 +32,6 @@ type FieldSchema = {
 type ERP = {
   id: number
   name: string
-  baseUrl: string
-  authType: string
   endpoints: Endpoint[]
   fieldSchemas: FieldSchema[]
 }
@@ -135,15 +133,6 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
           <h1 style={{ fontSize: 20, fontWeight: 600, marginBottom: 4 }}>
             {erp.name}
           </h1>
-          <p
-            style={{
-              fontSize: 12,
-              color: 'var(--text-muted)',
-              fontFamily: 'monospace',
-            }}
-          >
-            {erp.baseUrl} · auth: {erp.authType}
-          </p>
         </div>
       </div>
 

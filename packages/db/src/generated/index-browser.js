@@ -163,6 +163,21 @@ exports.Prisma.TestClientScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.PostmanCollectionScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  context: 'context',
+  systemPrompt: 'systemPrompt',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.EmbeddingChunkScalarFieldEnum = {
+  id: 'id',
+  collectionId: 'collectionId',
+  text: 'text',
+  embedding: 'embedding'
+};
+
 exports.Prisma.RequestHistoryScalarFieldEnum = {
   id: 'id',
   erpName: 'erpName',
@@ -200,6 +215,8 @@ exports.Prisma.ModelName = {
   Endpoint: 'Endpoint',
   Company: 'Company',
   TestClient: 'TestClient',
+  PostmanCollection: 'PostmanCollection',
+  EmbeddingChunk: 'EmbeddingChunk',
   RequestHistory: 'RequestHistory'
 };
 

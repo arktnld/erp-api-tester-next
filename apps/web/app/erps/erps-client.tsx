@@ -14,9 +14,6 @@ import { deleteERP } from '@/lib/actions/erps'
 type ERP = {
   id: number
   name: string
-  baseUrl: string
-  authType: string
-  authConfig: string
   _count: { endpoints: number; companies: number }
 }
 
@@ -45,39 +42,6 @@ export function ERPsClient({ erps }: { erps: ERP[] }) {
           {row.original.name}
           <ChevronRight size={13} color="var(--text-subtle)" />
         </Link>
-      ),
-    },
-    {
-      accessorKey: 'baseUrl',
-      header: 'URL Base',
-      cell: ({ getValue }) => (
-        <span
-          style={{
-            fontFamily: 'monospace',
-            fontSize: 12,
-            color: 'var(--text-muted)',
-          }}
-        >
-          {getValue() as string}
-        </span>
-      ),
-    },
-    {
-      accessorKey: 'authType',
-      header: 'Auth',
-      cell: ({ getValue }) => (
-        <span
-          style={{
-            fontSize: 12,
-            padding: '2px 8px',
-            borderRadius: 4,
-            backgroundColor: 'var(--surface-2)',
-            color: 'var(--text-muted)',
-            fontFamily: 'monospace',
-          }}
-        >
-          {getValue() as string}
-        </span>
       ),
     },
     {

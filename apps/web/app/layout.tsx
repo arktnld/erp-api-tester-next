@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Space_Grotesk } from 'next/font/google'
 import { Sidebar } from '@/components/layout/sidebar'
+import { PageTransition } from '@/components/layout/page-transition'
 import { prisma } from '@erp/db'
 import './globals.css'
 
@@ -46,7 +47,7 @@ export default async function RootLayout({
             backgroundColor: 'var(--background)',
           }}
         >
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
       </body>
     </html>

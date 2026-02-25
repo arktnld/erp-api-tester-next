@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { LayoutDashboard, Server, Building2, FlaskConical, History } from 'lucide-react'
+import { LayoutDashboard, Server, Building2, FlaskConical, History, MessageSquare, BookOpen } from 'lucide-react'
 
 const methodColor: Record<string, string> = {
   GET: 'var(--method-get)',
@@ -59,7 +59,9 @@ export function Sidebar({ erps }: { erps: SidebarERP[] }) {
     { href: '/erps', label: 'ERPs', icon: Server },
     { href: '/companies', label: 'Empresas', icon: Building2 },
     { href: '/test', label: 'Testar API', icon: FlaskConical },
+    { href: '/chat', label: 'Chat IA', icon: MessageSquare },
     { href: '/history', label: 'Histórico', icon: History },
+    { href: '/docs', label: 'Como usar', icon: BookOpen },
   ]
 
   return (
