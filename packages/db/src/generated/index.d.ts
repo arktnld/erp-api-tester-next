@@ -49,6 +49,11 @@ export type PostmanCollection = $Result.DefaultSelection<Prisma.$PostmanCollecti
  */
 export type EmbeddingChunk = $Result.DefaultSelection<Prisma.$EmbeddingChunkPayload>
 /**
+ * Model Setting
+ * 
+ */
+export type Setting = $Result.DefaultSelection<Prisma.$SettingPayload>
+/**
  * Model RequestHistory
  * 
  */
@@ -241,6 +246,16 @@ export class PrismaClient<
     * ```
     */
   get embeddingChunk(): Prisma.EmbeddingChunkDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.setting`: Exposes CRUD operations for the **Setting** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Settings
+    * const settings = await prisma.setting.findMany()
+    * ```
+    */
+  get setting(): Prisma.SettingDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.requestHistory`: Exposes CRUD operations for the **RequestHistory** model.
@@ -699,6 +714,7 @@ export namespace Prisma {
     TestClient: 'TestClient',
     PostmanCollection: 'PostmanCollection',
     EmbeddingChunk: 'EmbeddingChunk',
+    Setting: 'Setting',
     RequestHistory: 'RequestHistory'
   };
 
@@ -718,7 +734,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "eRP" | "eRPFieldSchema" | "endpoint" | "company" | "testClient" | "postmanCollection" | "embeddingChunk" | "requestHistory"
+      modelProps: "eRP" | "eRPFieldSchema" | "endpoint" | "company" | "testClient" | "postmanCollection" | "embeddingChunk" | "setting" | "requestHistory"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1190,18 +1206,6 @@ export namespace Prisma {
             args: Prisma.EmbeddingChunkFindManyArgs<ExtArgs>
             result: $Utils.PayloadToResult<Prisma.$EmbeddingChunkPayload>[]
           }
-          create: {
-            args: Prisma.EmbeddingChunkCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$EmbeddingChunkPayload>
-          }
-          createMany: {
-            args: Prisma.EmbeddingChunkCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.EmbeddingChunkCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$EmbeddingChunkPayload>[]
-          }
           delete: {
             args: Prisma.EmbeddingChunkDeleteArgs<ExtArgs>
             result: $Utils.PayloadToResult<Prisma.$EmbeddingChunkPayload>
@@ -1222,10 +1226,6 @@ export namespace Prisma {
             args: Prisma.EmbeddingChunkUpdateManyAndReturnArgs<ExtArgs>
             result: $Utils.PayloadToResult<Prisma.$EmbeddingChunkPayload>[]
           }
-          upsert: {
-            args: Prisma.EmbeddingChunkUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$EmbeddingChunkPayload>
-          }
           aggregate: {
             args: Prisma.EmbeddingChunkAggregateArgs<ExtArgs>
             result: $Utils.Optional<AggregateEmbeddingChunk>
@@ -1237,6 +1237,80 @@ export namespace Prisma {
           count: {
             args: Prisma.EmbeddingChunkCountArgs<ExtArgs>
             result: $Utils.Optional<EmbeddingChunkCountAggregateOutputType> | number
+          }
+        }
+      }
+      Setting: {
+        payload: Prisma.$SettingPayload<ExtArgs>
+        fields: Prisma.SettingFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SettingFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SettingFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingPayload>
+          }
+          findFirst: {
+            args: Prisma.SettingFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SettingFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingPayload>
+          }
+          findMany: {
+            args: Prisma.SettingFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingPayload>[]
+          }
+          create: {
+            args: Prisma.SettingCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingPayload>
+          }
+          createMany: {
+            args: Prisma.SettingCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SettingCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingPayload>[]
+          }
+          delete: {
+            args: Prisma.SettingDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingPayload>
+          }
+          update: {
+            args: Prisma.SettingUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingPayload>
+          }
+          deleteMany: {
+            args: Prisma.SettingDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SettingUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SettingUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingPayload>[]
+          }
+          upsert: {
+            args: Prisma.SettingUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SettingPayload>
+          }
+          aggregate: {
+            args: Prisma.SettingAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSetting>
+          }
+          groupBy: {
+            args: Prisma.SettingGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SettingGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SettingCountArgs<ExtArgs>
+            result: $Utils.Optional<SettingCountAggregateOutputType> | number
           }
         }
       }
@@ -1417,6 +1491,7 @@ export namespace Prisma {
     testClient?: TestClientOmit
     postmanCollection?: PostmanCollectionOmit
     embeddingChunk?: EmbeddingChunkOmit
+    setting?: SettingOmit
     requestHistory?: RequestHistoryOmit
   }
 
@@ -2493,6 +2568,7 @@ export namespace Prisma {
      * The data used to create many ERPS.
      */
     data: ERPCreateManyInput | ERPCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -2511,6 +2587,7 @@ export namespace Prisma {
      * The data used to create many ERPS.
      */
     data: ERPCreateManyInput | ERPCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -2756,12 +2833,14 @@ export namespace Prisma {
     id: number | null
     erpId: number | null
     sortOrder: number | null
+    sourceEndpointId: number | null
   }
 
   export type ERPFieldSchemaSumAggregateOutputType = {
     id: number | null
     erpId: number | null
     sortOrder: number | null
+    sourceEndpointId: number | null
   }
 
   export type ERPFieldSchemaMinAggregateOutputType = {
@@ -2772,6 +2851,9 @@ export namespace Prisma {
     fieldType: string | null
     required: boolean | null
     sortOrder: number | null
+    sourceEndpointId: number | null
+    endpointParam: string | null
+    responsePath: string | null
   }
 
   export type ERPFieldSchemaMaxAggregateOutputType = {
@@ -2782,6 +2864,9 @@ export namespace Prisma {
     fieldType: string | null
     required: boolean | null
     sortOrder: number | null
+    sourceEndpointId: number | null
+    endpointParam: string | null
+    responsePath: string | null
   }
 
   export type ERPFieldSchemaCountAggregateOutputType = {
@@ -2792,6 +2877,9 @@ export namespace Prisma {
     fieldType: number
     required: number
     sortOrder: number
+    sourceEndpointId: number
+    endpointParam: number
+    responsePath: number
     _all: number
   }
 
@@ -2800,12 +2888,14 @@ export namespace Prisma {
     id?: true
     erpId?: true
     sortOrder?: true
+    sourceEndpointId?: true
   }
 
   export type ERPFieldSchemaSumAggregateInputType = {
     id?: true
     erpId?: true
     sortOrder?: true
+    sourceEndpointId?: true
   }
 
   export type ERPFieldSchemaMinAggregateInputType = {
@@ -2816,6 +2906,9 @@ export namespace Prisma {
     fieldType?: true
     required?: true
     sortOrder?: true
+    sourceEndpointId?: true
+    endpointParam?: true
+    responsePath?: true
   }
 
   export type ERPFieldSchemaMaxAggregateInputType = {
@@ -2826,6 +2919,9 @@ export namespace Prisma {
     fieldType?: true
     required?: true
     sortOrder?: true
+    sourceEndpointId?: true
+    endpointParam?: true
+    responsePath?: true
   }
 
   export type ERPFieldSchemaCountAggregateInputType = {
@@ -2836,6 +2932,9 @@ export namespace Prisma {
     fieldType?: true
     required?: true
     sortOrder?: true
+    sourceEndpointId?: true
+    endpointParam?: true
+    responsePath?: true
     _all?: true
   }
 
@@ -2933,6 +3032,9 @@ export namespace Prisma {
     fieldType: string
     required: boolean
     sortOrder: number
+    sourceEndpointId: number | null
+    endpointParam: string
+    responsePath: string
     _count: ERPFieldSchemaCountAggregateOutputType | null
     _avg: ERPFieldSchemaAvgAggregateOutputType | null
     _sum: ERPFieldSchemaSumAggregateOutputType | null
@@ -2962,6 +3064,9 @@ export namespace Prisma {
     fieldType?: boolean
     required?: boolean
     sortOrder?: boolean
+    sourceEndpointId?: boolean
+    endpointParam?: boolean
+    responsePath?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["eRPFieldSchema"]>
 
@@ -2973,6 +3078,9 @@ export namespace Prisma {
     fieldType?: boolean
     required?: boolean
     sortOrder?: boolean
+    sourceEndpointId?: boolean
+    endpointParam?: boolean
+    responsePath?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["eRPFieldSchema"]>
 
@@ -2984,6 +3092,9 @@ export namespace Prisma {
     fieldType?: boolean
     required?: boolean
     sortOrder?: boolean
+    sourceEndpointId?: boolean
+    endpointParam?: boolean
+    responsePath?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["eRPFieldSchema"]>
 
@@ -2995,9 +3106,12 @@ export namespace Prisma {
     fieldType?: boolean
     required?: boolean
     sortOrder?: boolean
+    sourceEndpointId?: boolean
+    endpointParam?: boolean
+    responsePath?: boolean
   }
 
-  export type ERPFieldSchemaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "erpId" | "fieldName" | "label" | "fieldType" | "required" | "sortOrder", ExtArgs["result"]["eRPFieldSchema"]>
+  export type ERPFieldSchemaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "erpId" | "fieldName" | "label" | "fieldType" | "required" | "sortOrder" | "sourceEndpointId" | "endpointParam" | "responsePath", ExtArgs["result"]["eRPFieldSchema"]>
   export type ERPFieldSchemaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     erp?: boolean | ERPDefaultArgs<ExtArgs>
   }
@@ -3021,6 +3135,9 @@ export namespace Prisma {
       fieldType: string
       required: boolean
       sortOrder: number
+      sourceEndpointId: number | null
+      endpointParam: string
+      responsePath: string
     }, ExtArgs["result"]["eRPFieldSchema"]>
     composites: {}
   }
@@ -3452,6 +3569,9 @@ export namespace Prisma {
     readonly fieldType: FieldRef<"ERPFieldSchema", 'String'>
     readonly required: FieldRef<"ERPFieldSchema", 'Boolean'>
     readonly sortOrder: FieldRef<"ERPFieldSchema", 'Int'>
+    readonly sourceEndpointId: FieldRef<"ERPFieldSchema", 'Int'>
+    readonly endpointParam: FieldRef<"ERPFieldSchema", 'String'>
+    readonly responsePath: FieldRef<"ERPFieldSchema", 'String'>
   }
     
 
@@ -3681,6 +3801,7 @@ export namespace Prisma {
      * The data used to create many ERPFieldSchemas.
      */
     data: ERPFieldSchemaCreateManyInput | ERPFieldSchemaCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -3699,6 +3820,7 @@ export namespace Prisma {
      * The data used to create many ERPFieldSchemas.
      */
     data: ERPFieldSchemaCreateManyInput | ERPFieldSchemaCreateManyInput[]
+    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -3897,6 +4019,9 @@ export namespace Prisma {
     bodyTemplate: string | null
     headers: string | null
     sortOrder: number | null
+    group: string | null
+    requiresClient: boolean | null
+    isModification: boolean | null
   }
 
   export type EndpointMaxAggregateOutputType = {
@@ -3908,6 +4033,9 @@ export namespace Prisma {
     bodyTemplate: string | null
     headers: string | null
     sortOrder: number | null
+    group: string | null
+    requiresClient: boolean | null
+    isModification: boolean | null
   }
 
   export type EndpointCountAggregateOutputType = {
@@ -3919,6 +4047,9 @@ export namespace Prisma {
     bodyTemplate: number
     headers: number
     sortOrder: number
+    group: number
+    requiresClient: number
+    isModification: number
     _all: number
   }
 
@@ -3944,6 +4075,9 @@ export namespace Prisma {
     bodyTemplate?: true
     headers?: true
     sortOrder?: true
+    group?: true
+    requiresClient?: true
+    isModification?: true
   }
 
   export type EndpointMaxAggregateInputType = {
@@ -3955,6 +4089,9 @@ export namespace Prisma {
     bodyTemplate?: true
     headers?: true
     sortOrder?: true
+    group?: true
+    requiresClient?: true
+    isModification?: true
   }
 
   export type EndpointCountAggregateInputType = {
@@ -3966,6 +4103,9 @@ export namespace Prisma {
     bodyTemplate?: true
     headers?: true
     sortOrder?: true
+    group?: true
+    requiresClient?: true
+    isModification?: true
     _all?: true
   }
 
@@ -4064,6 +4204,9 @@ export namespace Prisma {
     bodyTemplate: string
     headers: string
     sortOrder: number
+    group: string
+    requiresClient: boolean
+    isModification: boolean
     _count: EndpointCountAggregateOutputType | null
     _avg: EndpointAvgAggregateOutputType | null
     _sum: EndpointSumAggregateOutputType | null
@@ -4094,6 +4237,9 @@ export namespace Prisma {
     bodyTemplate?: boolean
     headers?: boolean
     sortOrder?: boolean
+    group?: boolean
+    requiresClient?: boolean
+    isModification?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["endpoint"]>
 
@@ -4106,6 +4252,9 @@ export namespace Prisma {
     bodyTemplate?: boolean
     headers?: boolean
     sortOrder?: boolean
+    group?: boolean
+    requiresClient?: boolean
+    isModification?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["endpoint"]>
 
@@ -4118,6 +4267,9 @@ export namespace Prisma {
     bodyTemplate?: boolean
     headers?: boolean
     sortOrder?: boolean
+    group?: boolean
+    requiresClient?: boolean
+    isModification?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["endpoint"]>
 
@@ -4130,9 +4282,12 @@ export namespace Prisma {
     bodyTemplate?: boolean
     headers?: boolean
     sortOrder?: boolean
+    group?: boolean
+    requiresClient?: boolean
+    isModification?: boolean
   }
 
-  export type EndpointOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "erpId" | "name" | "method" | "pathTemplate" | "bodyTemplate" | "headers" | "sortOrder", ExtArgs["result"]["endpoint"]>
+  export type EndpointOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "erpId" | "name" | "method" | "pathTemplate" | "bodyTemplate" | "headers" | "sortOrder" | "group" | "requiresClient" | "isModification", ExtArgs["result"]["endpoint"]>
   export type EndpointInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     erp?: boolean | ERPDefaultArgs<ExtArgs>
   }
@@ -4157,6 +4312,9 @@ export namespace Prisma {
       bodyTemplate: string
       headers: string
       sortOrder: number
+      group: string
+      requiresClient: boolean
+      isModification: boolean
     }, ExtArgs["result"]["endpoint"]>
     composites: {}
   }
@@ -4589,6 +4747,9 @@ export namespace Prisma {
     readonly bodyTemplate: FieldRef<"Endpoint", 'String'>
     readonly headers: FieldRef<"Endpoint", 'String'>
     readonly sortOrder: FieldRef<"Endpoint", 'Int'>
+    readonly group: FieldRef<"Endpoint", 'String'>
+    readonly requiresClient: FieldRef<"Endpoint", 'Boolean'>
+    readonly isModification: FieldRef<"Endpoint", 'Boolean'>
   }
     
 
@@ -4818,6 +4979,7 @@ export namespace Prisma {
      * The data used to create many Endpoints.
      */
     data: EndpointCreateManyInput | EndpointCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -4836,6 +4998,7 @@ export namespace Prisma {
      * The data used to create many Endpoints.
      */
     data: EndpointCreateManyInput | EndpointCreateManyInput[]
+    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -5028,6 +5191,7 @@ export namespace Prisma {
     name: string | null
     erpId: number | null
     baseUrl: string | null
+    environments: string | null
     authType: string | null
     authConfig: string | null
     createdAt: Date | null
@@ -5038,6 +5202,7 @@ export namespace Prisma {
     name: string | null
     erpId: number | null
     baseUrl: string | null
+    environments: string | null
     authType: string | null
     authConfig: string | null
     createdAt: Date | null
@@ -5048,6 +5213,7 @@ export namespace Prisma {
     name: number
     erpId: number
     baseUrl: number
+    environments: number
     authType: number
     authConfig: number
     createdAt: number
@@ -5070,6 +5236,7 @@ export namespace Prisma {
     name?: true
     erpId?: true
     baseUrl?: true
+    environments?: true
     authType?: true
     authConfig?: true
     createdAt?: true
@@ -5080,6 +5247,7 @@ export namespace Prisma {
     name?: true
     erpId?: true
     baseUrl?: true
+    environments?: true
     authType?: true
     authConfig?: true
     createdAt?: true
@@ -5090,6 +5258,7 @@ export namespace Prisma {
     name?: true
     erpId?: true
     baseUrl?: true
+    environments?: true
     authType?: true
     authConfig?: true
     createdAt?: true
@@ -5187,6 +5356,7 @@ export namespace Prisma {
     name: string
     erpId: number
     baseUrl: string
+    environments: string
     authType: string
     authConfig: string
     createdAt: Date
@@ -5216,6 +5386,7 @@ export namespace Prisma {
     name?: boolean
     erpId?: boolean
     baseUrl?: boolean
+    environments?: boolean
     authType?: boolean
     authConfig?: boolean
     createdAt?: boolean
@@ -5229,6 +5400,7 @@ export namespace Prisma {
     name?: boolean
     erpId?: boolean
     baseUrl?: boolean
+    environments?: boolean
     authType?: boolean
     authConfig?: boolean
     createdAt?: boolean
@@ -5240,6 +5412,7 @@ export namespace Prisma {
     name?: boolean
     erpId?: boolean
     baseUrl?: boolean
+    environments?: boolean
     authType?: boolean
     authConfig?: boolean
     createdAt?: boolean
@@ -5251,12 +5424,13 @@ export namespace Prisma {
     name?: boolean
     erpId?: boolean
     baseUrl?: boolean
+    environments?: boolean
     authType?: boolean
     authConfig?: boolean
     createdAt?: boolean
   }
 
-  export type CompanyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "erpId" | "baseUrl" | "authType" | "authConfig" | "createdAt", ExtArgs["result"]["company"]>
+  export type CompanyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "erpId" | "baseUrl" | "environments" | "authType" | "authConfig" | "createdAt", ExtArgs["result"]["company"]>
   export type CompanyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     erp?: boolean | ERPDefaultArgs<ExtArgs>
     testClients?: boolean | Company$testClientsArgs<ExtArgs>
@@ -5280,6 +5454,7 @@ export namespace Prisma {
       name: string
       erpId: number
       baseUrl: string
+      environments: string
       authType: string
       authConfig: string
       createdAt: Date
@@ -5712,6 +5887,7 @@ export namespace Prisma {
     readonly name: FieldRef<"Company", 'String'>
     readonly erpId: FieldRef<"Company", 'Int'>
     readonly baseUrl: FieldRef<"Company", 'String'>
+    readonly environments: FieldRef<"Company", 'String'>
     readonly authType: FieldRef<"Company", 'String'>
     readonly authConfig: FieldRef<"Company", 'String'>
     readonly createdAt: FieldRef<"Company", 'DateTime'>
@@ -5944,6 +6120,7 @@ export namespace Prisma {
      * The data used to create many Companies.
      */
     data: CompanyCreateManyInput | CompanyCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -5962,6 +6139,7 @@ export namespace Prisma {
      * The data used to create many Companies.
      */
     data: CompanyCreateManyInput | CompanyCreateManyInput[]
+    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -7062,6 +7240,7 @@ export namespace Prisma {
      * The data used to create many TestClients.
      */
     data: TestClientCreateManyInput | TestClientCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -7080,6 +7259,7 @@ export namespace Prisma {
      * The data used to create many TestClients.
      */
     data: TestClientCreateManyInput | TestClientCreateManyInput[]
+    skipDuplicates?: boolean
     /**
      * Choose, which related nodes to fetch as well
      */
@@ -8148,6 +8328,7 @@ export namespace Prisma {
      * The data used to create many PostmanCollections.
      */
     data: PostmanCollectionCreateManyInput | PostmanCollectionCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -8166,6 +8347,7 @@ export namespace Prisma {
      * The data used to create many PostmanCollections.
      */
     data: PostmanCollectionCreateManyInput | PostmanCollectionCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -8373,21 +8555,18 @@ export namespace Prisma {
     id: number | null
     collectionId: number | null
     text: string | null
-    embedding: string | null
   }
 
   export type EmbeddingChunkMaxAggregateOutputType = {
     id: number | null
     collectionId: number | null
     text: string | null
-    embedding: string | null
   }
 
   export type EmbeddingChunkCountAggregateOutputType = {
     id: number
     collectionId: number
     text: number
-    embedding: number
     _all: number
   }
 
@@ -8406,21 +8585,18 @@ export namespace Prisma {
     id?: true
     collectionId?: true
     text?: true
-    embedding?: true
   }
 
   export type EmbeddingChunkMaxAggregateInputType = {
     id?: true
     collectionId?: true
     text?: true
-    embedding?: true
   }
 
   export type EmbeddingChunkCountAggregateInputType = {
     id?: true
     collectionId?: true
     text?: true
-    embedding?: true
     _all?: true
   }
 
@@ -8514,7 +8690,6 @@ export namespace Prisma {
     id: number
     collectionId: number
     text: string
-    embedding: string
     _count: EmbeddingChunkCountAggregateOutputType | null
     _avg: EmbeddingChunkAvgAggregateOutputType | null
     _sum: EmbeddingChunkSumAggregateOutputType | null
@@ -8540,23 +8715,14 @@ export namespace Prisma {
     id?: boolean
     collectionId?: boolean
     text?: boolean
-    embedding?: boolean
     collection?: boolean | PostmanCollectionDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["embeddingChunk"]>
 
-  export type EmbeddingChunkSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    collectionId?: boolean
-    text?: boolean
-    embedding?: boolean
-    collection?: boolean | PostmanCollectionDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["embeddingChunk"]>
 
   export type EmbeddingChunkSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     collectionId?: boolean
     text?: boolean
-    embedding?: boolean
     collection?: boolean | PostmanCollectionDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["embeddingChunk"]>
 
@@ -8564,14 +8730,10 @@ export namespace Prisma {
     id?: boolean
     collectionId?: boolean
     text?: boolean
-    embedding?: boolean
   }
 
-  export type EmbeddingChunkOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "collectionId" | "text" | "embedding", ExtArgs["result"]["embeddingChunk"]>
+  export type EmbeddingChunkOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "collectionId" | "text", ExtArgs["result"]["embeddingChunk"]>
   export type EmbeddingChunkInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    collection?: boolean | PostmanCollectionDefaultArgs<ExtArgs>
-  }
-  export type EmbeddingChunkIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     collection?: boolean | PostmanCollectionDefaultArgs<ExtArgs>
   }
   export type EmbeddingChunkIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -8587,7 +8749,6 @@ export namespace Prisma {
       id: number
       collectionId: number
       text: string
-      embedding: string
     }, ExtArgs["result"]["embeddingChunk"]>
     composites: {}
   }
@@ -8676,58 +8837,6 @@ export namespace Prisma {
      * 
      */
     findMany<T extends EmbeddingChunkFindManyArgs>(args?: SelectSubset<T, EmbeddingChunkFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmbeddingChunkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a EmbeddingChunk.
-     * @param {EmbeddingChunkCreateArgs} args - Arguments to create a EmbeddingChunk.
-     * @example
-     * // Create one EmbeddingChunk
-     * const EmbeddingChunk = await prisma.embeddingChunk.create({
-     *   data: {
-     *     // ... data to create a EmbeddingChunk
-     *   }
-     * })
-     * 
-     */
-    create<T extends EmbeddingChunkCreateArgs>(args: SelectSubset<T, EmbeddingChunkCreateArgs<ExtArgs>>): Prisma__EmbeddingChunkClient<$Result.GetResult<Prisma.$EmbeddingChunkPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many EmbeddingChunks.
-     * @param {EmbeddingChunkCreateManyArgs} args - Arguments to create many EmbeddingChunks.
-     * @example
-     * // Create many EmbeddingChunks
-     * const embeddingChunk = await prisma.embeddingChunk.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends EmbeddingChunkCreateManyArgs>(args?: SelectSubset<T, EmbeddingChunkCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many EmbeddingChunks and returns the data saved in the database.
-     * @param {EmbeddingChunkCreateManyAndReturnArgs} args - Arguments to create many EmbeddingChunks.
-     * @example
-     * // Create many EmbeddingChunks
-     * const embeddingChunk = await prisma.embeddingChunk.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many EmbeddingChunks and only return the `id`
-     * const embeddingChunkWithIdOnly = await prisma.embeddingChunk.createManyAndReturn({
-     *   select: { id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends EmbeddingChunkCreateManyAndReturnArgs>(args?: SelectSubset<T, EmbeddingChunkCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmbeddingChunkPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
 
     /**
      * Delete a EmbeddingChunk.
@@ -8822,25 +8931,6 @@ export namespace Prisma {
      * 
      */
     updateManyAndReturn<T extends EmbeddingChunkUpdateManyAndReturnArgs>(args: SelectSubset<T, EmbeddingChunkUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmbeddingChunkPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one EmbeddingChunk.
-     * @param {EmbeddingChunkUpsertArgs} args - Arguments to update or create a EmbeddingChunk.
-     * @example
-     * // Update or create a EmbeddingChunk
-     * const embeddingChunk = await prisma.embeddingChunk.upsert({
-     *   create: {
-     *     // ... data to create a EmbeddingChunk
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the EmbeddingChunk we want to update
-     *   }
-     * })
-     */
-    upsert<T extends EmbeddingChunkUpsertArgs>(args: SelectSubset<T, EmbeddingChunkUpsertArgs<ExtArgs>>): Prisma__EmbeddingChunkClient<$Result.GetResult<Prisma.$EmbeddingChunkPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
 
 
     /**
@@ -9015,7 +9105,6 @@ export namespace Prisma {
     readonly id: FieldRef<"EmbeddingChunk", 'Int'>
     readonly collectionId: FieldRef<"EmbeddingChunk", 'Int'>
     readonly text: FieldRef<"EmbeddingChunk", 'String'>
-    readonly embedding: FieldRef<"EmbeddingChunk", 'String'>
   }
     
 
@@ -9216,60 +9305,6 @@ export namespace Prisma {
   }
 
   /**
-   * EmbeddingChunk create
-   */
-  export type EmbeddingChunkCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EmbeddingChunk
-     */
-    select?: EmbeddingChunkSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the EmbeddingChunk
-     */
-    omit?: EmbeddingChunkOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EmbeddingChunkInclude<ExtArgs> | null
-    /**
-     * The data needed to create a EmbeddingChunk.
-     */
-    data: XOR<EmbeddingChunkCreateInput, EmbeddingChunkUncheckedCreateInput>
-  }
-
-  /**
-   * EmbeddingChunk createMany
-   */
-  export type EmbeddingChunkCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many EmbeddingChunks.
-     */
-    data: EmbeddingChunkCreateManyInput | EmbeddingChunkCreateManyInput[]
-  }
-
-  /**
-   * EmbeddingChunk createManyAndReturn
-   */
-  export type EmbeddingChunkCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EmbeddingChunk
-     */
-    select?: EmbeddingChunkSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the EmbeddingChunk
-     */
-    omit?: EmbeddingChunkOmit<ExtArgs> | null
-    /**
-     * The data used to create many EmbeddingChunks.
-     */
-    data: EmbeddingChunkCreateManyInput | EmbeddingChunkCreateManyInput[]
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EmbeddingChunkIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
    * EmbeddingChunk update
    */
   export type EmbeddingChunkUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9344,36 +9379,6 @@ export namespace Prisma {
   }
 
   /**
-   * EmbeddingChunk upsert
-   */
-  export type EmbeddingChunkUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the EmbeddingChunk
-     */
-    select?: EmbeddingChunkSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the EmbeddingChunk
-     */
-    omit?: EmbeddingChunkOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: EmbeddingChunkInclude<ExtArgs> | null
-    /**
-     * The filter to search for the EmbeddingChunk to update in case it exists.
-     */
-    where: EmbeddingChunkWhereUniqueInput
-    /**
-     * In case the EmbeddingChunk found by the `where` argument doesn't exist, create a new EmbeddingChunk with this data.
-     */
-    create: XOR<EmbeddingChunkCreateInput, EmbeddingChunkUncheckedCreateInput>
-    /**
-     * In case the EmbeddingChunk was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<EmbeddingChunkUpdateInput, EmbeddingChunkUncheckedUpdateInput>
-  }
-
-  /**
    * EmbeddingChunk delete
    */
   export type EmbeddingChunkDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -9425,6 +9430,962 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: EmbeddingChunkInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Setting
+   */
+
+  export type AggregateSetting = {
+    _count: SettingCountAggregateOutputType | null
+    _min: SettingMinAggregateOutputType | null
+    _max: SettingMaxAggregateOutputType | null
+  }
+
+  export type SettingMinAggregateOutputType = {
+    key: string | null
+    value: string | null
+  }
+
+  export type SettingMaxAggregateOutputType = {
+    key: string | null
+    value: string | null
+  }
+
+  export type SettingCountAggregateOutputType = {
+    key: number
+    value: number
+    _all: number
+  }
+
+
+  export type SettingMinAggregateInputType = {
+    key?: true
+    value?: true
+  }
+
+  export type SettingMaxAggregateInputType = {
+    key?: true
+    value?: true
+  }
+
+  export type SettingCountAggregateInputType = {
+    key?: true
+    value?: true
+    _all?: true
+  }
+
+  export type SettingAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Setting to aggregate.
+     */
+    where?: SettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Settings to fetch.
+     */
+    orderBy?: SettingOrderByWithRelationInput | SettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Settings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Settings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Settings
+    **/
+    _count?: true | SettingCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SettingMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SettingMaxAggregateInputType
+  }
+
+  export type GetSettingAggregateType<T extends SettingAggregateArgs> = {
+        [P in keyof T & keyof AggregateSetting]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSetting[P]>
+      : GetScalarType<T[P], AggregateSetting[P]>
+  }
+
+
+
+
+  export type SettingGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SettingWhereInput
+    orderBy?: SettingOrderByWithAggregationInput | SettingOrderByWithAggregationInput[]
+    by: SettingScalarFieldEnum[] | SettingScalarFieldEnum
+    having?: SettingScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SettingCountAggregateInputType | true
+    _min?: SettingMinAggregateInputType
+    _max?: SettingMaxAggregateInputType
+  }
+
+  export type SettingGroupByOutputType = {
+    key: string
+    value: string
+    _count: SettingCountAggregateOutputType | null
+    _min: SettingMinAggregateOutputType | null
+    _max: SettingMaxAggregateOutputType | null
+  }
+
+  type GetSettingGroupByPayload<T extends SettingGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SettingGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SettingGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SettingGroupByOutputType[P]>
+            : GetScalarType<T[P], SettingGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SettingSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    key?: boolean
+    value?: boolean
+  }, ExtArgs["result"]["setting"]>
+
+  export type SettingSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    key?: boolean
+    value?: boolean
+  }, ExtArgs["result"]["setting"]>
+
+  export type SettingSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    key?: boolean
+    value?: boolean
+  }, ExtArgs["result"]["setting"]>
+
+  export type SettingSelectScalar = {
+    key?: boolean
+    value?: boolean
+  }
+
+  export type SettingOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"key" | "value", ExtArgs["result"]["setting"]>
+
+  export type $SettingPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Setting"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      key: string
+      value: string
+    }, ExtArgs["result"]["setting"]>
+    composites: {}
+  }
+
+  type SettingGetPayload<S extends boolean | null | undefined | SettingDefaultArgs> = $Result.GetResult<Prisma.$SettingPayload, S>
+
+  type SettingCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SettingFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SettingCountAggregateInputType | true
+    }
+
+  export interface SettingDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Setting'], meta: { name: 'Setting' } }
+    /**
+     * Find zero or one Setting that matches the filter.
+     * @param {SettingFindUniqueArgs} args - Arguments to find a Setting
+     * @example
+     * // Get one Setting
+     * const setting = await prisma.setting.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SettingFindUniqueArgs>(args: SelectSubset<T, SettingFindUniqueArgs<ExtArgs>>): Prisma__SettingClient<$Result.GetResult<Prisma.$SettingPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Setting that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SettingFindUniqueOrThrowArgs} args - Arguments to find a Setting
+     * @example
+     * // Get one Setting
+     * const setting = await prisma.setting.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SettingFindUniqueOrThrowArgs>(args: SelectSubset<T, SettingFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SettingClient<$Result.GetResult<Prisma.$SettingPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Setting that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettingFindFirstArgs} args - Arguments to find a Setting
+     * @example
+     * // Get one Setting
+     * const setting = await prisma.setting.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SettingFindFirstArgs>(args?: SelectSubset<T, SettingFindFirstArgs<ExtArgs>>): Prisma__SettingClient<$Result.GetResult<Prisma.$SettingPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Setting that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettingFindFirstOrThrowArgs} args - Arguments to find a Setting
+     * @example
+     * // Get one Setting
+     * const setting = await prisma.setting.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SettingFindFirstOrThrowArgs>(args?: SelectSubset<T, SettingFindFirstOrThrowArgs<ExtArgs>>): Prisma__SettingClient<$Result.GetResult<Prisma.$SettingPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Settings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettingFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Settings
+     * const settings = await prisma.setting.findMany()
+     * 
+     * // Get first 10 Settings
+     * const settings = await prisma.setting.findMany({ take: 10 })
+     * 
+     * // Only select the `key`
+     * const settingWithKeyOnly = await prisma.setting.findMany({ select: { key: true } })
+     * 
+     */
+    findMany<T extends SettingFindManyArgs>(args?: SelectSubset<T, SettingFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Setting.
+     * @param {SettingCreateArgs} args - Arguments to create a Setting.
+     * @example
+     * // Create one Setting
+     * const Setting = await prisma.setting.create({
+     *   data: {
+     *     // ... data to create a Setting
+     *   }
+     * })
+     * 
+     */
+    create<T extends SettingCreateArgs>(args: SelectSubset<T, SettingCreateArgs<ExtArgs>>): Prisma__SettingClient<$Result.GetResult<Prisma.$SettingPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Settings.
+     * @param {SettingCreateManyArgs} args - Arguments to create many Settings.
+     * @example
+     * // Create many Settings
+     * const setting = await prisma.setting.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SettingCreateManyArgs>(args?: SelectSubset<T, SettingCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Settings and returns the data saved in the database.
+     * @param {SettingCreateManyAndReturnArgs} args - Arguments to create many Settings.
+     * @example
+     * // Create many Settings
+     * const setting = await prisma.setting.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Settings and only return the `key`
+     * const settingWithKeyOnly = await prisma.setting.createManyAndReturn({
+     *   select: { key: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SettingCreateManyAndReturnArgs>(args?: SelectSubset<T, SettingCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettingPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Setting.
+     * @param {SettingDeleteArgs} args - Arguments to delete one Setting.
+     * @example
+     * // Delete one Setting
+     * const Setting = await prisma.setting.delete({
+     *   where: {
+     *     // ... filter to delete one Setting
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SettingDeleteArgs>(args: SelectSubset<T, SettingDeleteArgs<ExtArgs>>): Prisma__SettingClient<$Result.GetResult<Prisma.$SettingPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Setting.
+     * @param {SettingUpdateArgs} args - Arguments to update one Setting.
+     * @example
+     * // Update one Setting
+     * const setting = await prisma.setting.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SettingUpdateArgs>(args: SelectSubset<T, SettingUpdateArgs<ExtArgs>>): Prisma__SettingClient<$Result.GetResult<Prisma.$SettingPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Settings.
+     * @param {SettingDeleteManyArgs} args - Arguments to filter Settings to delete.
+     * @example
+     * // Delete a few Settings
+     * const { count } = await prisma.setting.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SettingDeleteManyArgs>(args?: SelectSubset<T, SettingDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Settings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettingUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Settings
+     * const setting = await prisma.setting.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SettingUpdateManyArgs>(args: SelectSubset<T, SettingUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Settings and returns the data updated in the database.
+     * @param {SettingUpdateManyAndReturnArgs} args - Arguments to update many Settings.
+     * @example
+     * // Update many Settings
+     * const setting = await prisma.setting.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Settings and only return the `key`
+     * const settingWithKeyOnly = await prisma.setting.updateManyAndReturn({
+     *   select: { key: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SettingUpdateManyAndReturnArgs>(args: SelectSubset<T, SettingUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SettingPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Setting.
+     * @param {SettingUpsertArgs} args - Arguments to update or create a Setting.
+     * @example
+     * // Update or create a Setting
+     * const setting = await prisma.setting.upsert({
+     *   create: {
+     *     // ... data to create a Setting
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Setting we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SettingUpsertArgs>(args: SelectSubset<T, SettingUpsertArgs<ExtArgs>>): Prisma__SettingClient<$Result.GetResult<Prisma.$SettingPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Settings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettingCountArgs} args - Arguments to filter Settings to count.
+     * @example
+     * // Count the number of Settings
+     * const count = await prisma.setting.count({
+     *   where: {
+     *     // ... the filter for the Settings we want to count
+     *   }
+     * })
+    **/
+    count<T extends SettingCountArgs>(
+      args?: Subset<T, SettingCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SettingCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Setting.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettingAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SettingAggregateArgs>(args: Subset<T, SettingAggregateArgs>): Prisma.PrismaPromise<GetSettingAggregateType<T>>
+
+    /**
+     * Group by Setting.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SettingGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SettingGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SettingGroupByArgs['orderBy'] }
+        : { orderBy?: SettingGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SettingGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSettingGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Setting model
+   */
+  readonly fields: SettingFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Setting.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SettingClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Setting model
+   */
+  interface SettingFieldRefs {
+    readonly key: FieldRef<"Setting", 'String'>
+    readonly value: FieldRef<"Setting", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Setting findUnique
+   */
+  export type SettingFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Setting
+     */
+    select?: SettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Setting
+     */
+    omit?: SettingOmit<ExtArgs> | null
+    /**
+     * Filter, which Setting to fetch.
+     */
+    where: SettingWhereUniqueInput
+  }
+
+  /**
+   * Setting findUniqueOrThrow
+   */
+  export type SettingFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Setting
+     */
+    select?: SettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Setting
+     */
+    omit?: SettingOmit<ExtArgs> | null
+    /**
+     * Filter, which Setting to fetch.
+     */
+    where: SettingWhereUniqueInput
+  }
+
+  /**
+   * Setting findFirst
+   */
+  export type SettingFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Setting
+     */
+    select?: SettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Setting
+     */
+    omit?: SettingOmit<ExtArgs> | null
+    /**
+     * Filter, which Setting to fetch.
+     */
+    where?: SettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Settings to fetch.
+     */
+    orderBy?: SettingOrderByWithRelationInput | SettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Settings.
+     */
+    cursor?: SettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Settings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Settings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Settings.
+     */
+    distinct?: SettingScalarFieldEnum | SettingScalarFieldEnum[]
+  }
+
+  /**
+   * Setting findFirstOrThrow
+   */
+  export type SettingFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Setting
+     */
+    select?: SettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Setting
+     */
+    omit?: SettingOmit<ExtArgs> | null
+    /**
+     * Filter, which Setting to fetch.
+     */
+    where?: SettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Settings to fetch.
+     */
+    orderBy?: SettingOrderByWithRelationInput | SettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Settings.
+     */
+    cursor?: SettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Settings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Settings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Settings.
+     */
+    distinct?: SettingScalarFieldEnum | SettingScalarFieldEnum[]
+  }
+
+  /**
+   * Setting findMany
+   */
+  export type SettingFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Setting
+     */
+    select?: SettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Setting
+     */
+    omit?: SettingOmit<ExtArgs> | null
+    /**
+     * Filter, which Settings to fetch.
+     */
+    where?: SettingWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Settings to fetch.
+     */
+    orderBy?: SettingOrderByWithRelationInput | SettingOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Settings.
+     */
+    cursor?: SettingWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Settings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Settings.
+     */
+    skip?: number
+    distinct?: SettingScalarFieldEnum | SettingScalarFieldEnum[]
+  }
+
+  /**
+   * Setting create
+   */
+  export type SettingCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Setting
+     */
+    select?: SettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Setting
+     */
+    omit?: SettingOmit<ExtArgs> | null
+    /**
+     * The data needed to create a Setting.
+     */
+    data: XOR<SettingCreateInput, SettingUncheckedCreateInput>
+  }
+
+  /**
+   * Setting createMany
+   */
+  export type SettingCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Settings.
+     */
+    data: SettingCreateManyInput | SettingCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Setting createManyAndReturn
+   */
+  export type SettingCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Setting
+     */
+    select?: SettingSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Setting
+     */
+    omit?: SettingOmit<ExtArgs> | null
+    /**
+     * The data used to create many Settings.
+     */
+    data: SettingCreateManyInput | SettingCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Setting update
+   */
+  export type SettingUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Setting
+     */
+    select?: SettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Setting
+     */
+    omit?: SettingOmit<ExtArgs> | null
+    /**
+     * The data needed to update a Setting.
+     */
+    data: XOR<SettingUpdateInput, SettingUncheckedUpdateInput>
+    /**
+     * Choose, which Setting to update.
+     */
+    where: SettingWhereUniqueInput
+  }
+
+  /**
+   * Setting updateMany
+   */
+  export type SettingUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Settings.
+     */
+    data: XOR<SettingUpdateManyMutationInput, SettingUncheckedUpdateManyInput>
+    /**
+     * Filter which Settings to update
+     */
+    where?: SettingWhereInput
+    /**
+     * Limit how many Settings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Setting updateManyAndReturn
+   */
+  export type SettingUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Setting
+     */
+    select?: SettingSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Setting
+     */
+    omit?: SettingOmit<ExtArgs> | null
+    /**
+     * The data used to update Settings.
+     */
+    data: XOR<SettingUpdateManyMutationInput, SettingUncheckedUpdateManyInput>
+    /**
+     * Filter which Settings to update
+     */
+    where?: SettingWhereInput
+    /**
+     * Limit how many Settings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Setting upsert
+   */
+  export type SettingUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Setting
+     */
+    select?: SettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Setting
+     */
+    omit?: SettingOmit<ExtArgs> | null
+    /**
+     * The filter to search for the Setting to update in case it exists.
+     */
+    where: SettingWhereUniqueInput
+    /**
+     * In case the Setting found by the `where` argument doesn't exist, create a new Setting with this data.
+     */
+    create: XOR<SettingCreateInput, SettingUncheckedCreateInput>
+    /**
+     * In case the Setting was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SettingUpdateInput, SettingUncheckedUpdateInput>
+  }
+
+  /**
+   * Setting delete
+   */
+  export type SettingDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Setting
+     */
+    select?: SettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Setting
+     */
+    omit?: SettingOmit<ExtArgs> | null
+    /**
+     * Filter which Setting to delete.
+     */
+    where: SettingWhereUniqueInput
+  }
+
+  /**
+   * Setting deleteMany
+   */
+  export type SettingDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Settings to delete
+     */
+    where?: SettingWhereInput
+    /**
+     * Limit how many Settings to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Setting without action
+   */
+  export type SettingDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Setting
+     */
+    select?: SettingSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Setting
+     */
+    omit?: SettingOmit<ExtArgs> | null
   }
 
 
@@ -10472,6 +11433,7 @@ export namespace Prisma {
      * The data used to create many RequestHistories.
      */
     data: RequestHistoryCreateManyInput | RequestHistoryCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -10490,6 +11452,7 @@ export namespace Prisma {
      * The data used to create many RequestHistories.
      */
     data: RequestHistoryCreateManyInput | RequestHistoryCreateManyInput[]
+    skipDuplicates?: boolean
   }
 
   /**
@@ -10636,6 +11599,9 @@ export namespace Prisma {
    */
 
   export const TransactionIsolationLevel: {
+    ReadUncommitted: 'ReadUncommitted',
+    ReadCommitted: 'ReadCommitted',
+    RepeatableRead: 'RepeatableRead',
     Serializable: 'Serializable'
   };
 
@@ -10658,7 +11624,10 @@ export namespace Prisma {
     label: 'label',
     fieldType: 'fieldType',
     required: 'required',
-    sortOrder: 'sortOrder'
+    sortOrder: 'sortOrder',
+    sourceEndpointId: 'sourceEndpointId',
+    endpointParam: 'endpointParam',
+    responsePath: 'responsePath'
   };
 
   export type ERPFieldSchemaScalarFieldEnum = (typeof ERPFieldSchemaScalarFieldEnum)[keyof typeof ERPFieldSchemaScalarFieldEnum]
@@ -10672,7 +11641,10 @@ export namespace Prisma {
     pathTemplate: 'pathTemplate',
     bodyTemplate: 'bodyTemplate',
     headers: 'headers',
-    sortOrder: 'sortOrder'
+    sortOrder: 'sortOrder',
+    group: 'group',
+    requiresClient: 'requiresClient',
+    isModification: 'isModification'
   };
 
   export type EndpointScalarFieldEnum = (typeof EndpointScalarFieldEnum)[keyof typeof EndpointScalarFieldEnum]
@@ -10683,6 +11655,7 @@ export namespace Prisma {
     name: 'name',
     erpId: 'erpId',
     baseUrl: 'baseUrl',
+    environments: 'environments',
     authType: 'authType',
     authConfig: 'authConfig',
     createdAt: 'createdAt'
@@ -10716,11 +11689,18 @@ export namespace Prisma {
   export const EmbeddingChunkScalarFieldEnum: {
     id: 'id',
     collectionId: 'collectionId',
-    text: 'text',
-    embedding: 'embedding'
+    text: 'text'
   };
 
   export type EmbeddingChunkScalarFieldEnum = (typeof EmbeddingChunkScalarFieldEnum)[keyof typeof EmbeddingChunkScalarFieldEnum]
+
+
+  export const SettingScalarFieldEnum: {
+    key: 'key',
+    value: 'value'
+  };
+
+  export type SettingScalarFieldEnum = (typeof SettingScalarFieldEnum)[keyof typeof SettingScalarFieldEnum]
 
 
   export const RequestHistoryScalarFieldEnum: {
@@ -10754,6 +11734,14 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+  export const QueryMode: {
+    default: 'default',
+    insensitive: 'insensitive'
+  };
+
+  export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
   export const NullsOrder: {
     first: 'first',
     last: 'last'
@@ -10775,6 +11763,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
    * Reference to a field of type 'String'
    */
   export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String'>
@@ -10782,9 +11777,23 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'String[]'
+   */
+  export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
+    
+
+
+  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+  /**
+   * Reference to a field of type 'DateTime[]'
+   */
+  export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
     
 
 
@@ -10799,6 +11808,13 @@ export namespace Prisma {
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float[]'
+   */
+  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
   /**
    * Deep Input Types
@@ -10869,6 +11885,9 @@ export namespace Prisma {
     fieldType?: StringFilter<"ERPFieldSchema"> | string
     required?: BoolFilter<"ERPFieldSchema"> | boolean
     sortOrder?: IntFilter<"ERPFieldSchema"> | number
+    sourceEndpointId?: IntNullableFilter<"ERPFieldSchema"> | number | null
+    endpointParam?: StringFilter<"ERPFieldSchema"> | string
+    responsePath?: StringFilter<"ERPFieldSchema"> | string
     erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
   }
 
@@ -10880,6 +11899,9 @@ export namespace Prisma {
     fieldType?: SortOrder
     required?: SortOrder
     sortOrder?: SortOrder
+    sourceEndpointId?: SortOrderInput | SortOrder
+    endpointParam?: SortOrder
+    responsePath?: SortOrder
     erp?: ERPOrderByWithRelationInput
   }
 
@@ -10894,6 +11916,9 @@ export namespace Prisma {
     fieldType?: StringFilter<"ERPFieldSchema"> | string
     required?: BoolFilter<"ERPFieldSchema"> | boolean
     sortOrder?: IntFilter<"ERPFieldSchema"> | number
+    sourceEndpointId?: IntNullableFilter<"ERPFieldSchema"> | number | null
+    endpointParam?: StringFilter<"ERPFieldSchema"> | string
+    responsePath?: StringFilter<"ERPFieldSchema"> | string
     erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
   }, "id">
 
@@ -10905,6 +11930,9 @@ export namespace Prisma {
     fieldType?: SortOrder
     required?: SortOrder
     sortOrder?: SortOrder
+    sourceEndpointId?: SortOrderInput | SortOrder
+    endpointParam?: SortOrder
+    responsePath?: SortOrder
     _count?: ERPFieldSchemaCountOrderByAggregateInput
     _avg?: ERPFieldSchemaAvgOrderByAggregateInput
     _max?: ERPFieldSchemaMaxOrderByAggregateInput
@@ -10923,6 +11951,9 @@ export namespace Prisma {
     fieldType?: StringWithAggregatesFilter<"ERPFieldSchema"> | string
     required?: BoolWithAggregatesFilter<"ERPFieldSchema"> | boolean
     sortOrder?: IntWithAggregatesFilter<"ERPFieldSchema"> | number
+    sourceEndpointId?: IntNullableWithAggregatesFilter<"ERPFieldSchema"> | number | null
+    endpointParam?: StringWithAggregatesFilter<"ERPFieldSchema"> | string
+    responsePath?: StringWithAggregatesFilter<"ERPFieldSchema"> | string
   }
 
   export type EndpointWhereInput = {
@@ -10937,6 +11968,9 @@ export namespace Prisma {
     bodyTemplate?: StringFilter<"Endpoint"> | string
     headers?: StringFilter<"Endpoint"> | string
     sortOrder?: IntFilter<"Endpoint"> | number
+    group?: StringFilter<"Endpoint"> | string
+    requiresClient?: BoolFilter<"Endpoint"> | boolean
+    isModification?: BoolFilter<"Endpoint"> | boolean
     erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
   }
 
@@ -10949,6 +11983,9 @@ export namespace Prisma {
     bodyTemplate?: SortOrder
     headers?: SortOrder
     sortOrder?: SortOrder
+    group?: SortOrder
+    requiresClient?: SortOrder
+    isModification?: SortOrder
     erp?: ERPOrderByWithRelationInput
   }
 
@@ -10964,6 +12001,9 @@ export namespace Prisma {
     bodyTemplate?: StringFilter<"Endpoint"> | string
     headers?: StringFilter<"Endpoint"> | string
     sortOrder?: IntFilter<"Endpoint"> | number
+    group?: StringFilter<"Endpoint"> | string
+    requiresClient?: BoolFilter<"Endpoint"> | boolean
+    isModification?: BoolFilter<"Endpoint"> | boolean
     erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
   }, "id">
 
@@ -10976,6 +12016,9 @@ export namespace Prisma {
     bodyTemplate?: SortOrder
     headers?: SortOrder
     sortOrder?: SortOrder
+    group?: SortOrder
+    requiresClient?: SortOrder
+    isModification?: SortOrder
     _count?: EndpointCountOrderByAggregateInput
     _avg?: EndpointAvgOrderByAggregateInput
     _max?: EndpointMaxOrderByAggregateInput
@@ -10995,6 +12038,9 @@ export namespace Prisma {
     bodyTemplate?: StringWithAggregatesFilter<"Endpoint"> | string
     headers?: StringWithAggregatesFilter<"Endpoint"> | string
     sortOrder?: IntWithAggregatesFilter<"Endpoint"> | number
+    group?: StringWithAggregatesFilter<"Endpoint"> | string
+    requiresClient?: BoolWithAggregatesFilter<"Endpoint"> | boolean
+    isModification?: BoolWithAggregatesFilter<"Endpoint"> | boolean
   }
 
   export type CompanyWhereInput = {
@@ -11005,6 +12051,7 @@ export namespace Prisma {
     name?: StringFilter<"Company"> | string
     erpId?: IntFilter<"Company"> | number
     baseUrl?: StringFilter<"Company"> | string
+    environments?: StringFilter<"Company"> | string
     authType?: StringFilter<"Company"> | string
     authConfig?: StringFilter<"Company"> | string
     createdAt?: DateTimeFilter<"Company"> | Date | string
@@ -11017,6 +12064,7 @@ export namespace Prisma {
     name?: SortOrder
     erpId?: SortOrder
     baseUrl?: SortOrder
+    environments?: SortOrder
     authType?: SortOrder
     authConfig?: SortOrder
     createdAt?: SortOrder
@@ -11032,6 +12080,7 @@ export namespace Prisma {
     name?: StringFilter<"Company"> | string
     erpId?: IntFilter<"Company"> | number
     baseUrl?: StringFilter<"Company"> | string
+    environments?: StringFilter<"Company"> | string
     authType?: StringFilter<"Company"> | string
     authConfig?: StringFilter<"Company"> | string
     createdAt?: DateTimeFilter<"Company"> | Date | string
@@ -11044,6 +12093,7 @@ export namespace Prisma {
     name?: SortOrder
     erpId?: SortOrder
     baseUrl?: SortOrder
+    environments?: SortOrder
     authType?: SortOrder
     authConfig?: SortOrder
     createdAt?: SortOrder
@@ -11062,6 +12112,7 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"Company"> | string
     erpId?: IntWithAggregatesFilter<"Company"> | number
     baseUrl?: StringWithAggregatesFilter<"Company"> | string
+    environments?: StringWithAggregatesFilter<"Company"> | string
     authType?: StringWithAggregatesFilter<"Company"> | string
     authConfig?: StringWithAggregatesFilter<"Company"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Company"> | Date | string
@@ -11188,7 +12239,6 @@ export namespace Prisma {
     id?: IntFilter<"EmbeddingChunk"> | number
     collectionId?: IntFilter<"EmbeddingChunk"> | number
     text?: StringFilter<"EmbeddingChunk"> | string
-    embedding?: StringFilter<"EmbeddingChunk"> | string
     collection?: XOR<PostmanCollectionScalarRelationFilter, PostmanCollectionWhereInput>
   }
 
@@ -11196,7 +12246,6 @@ export namespace Prisma {
     id?: SortOrder
     collectionId?: SortOrder
     text?: SortOrder
-    embedding?: SortOrder
     collection?: PostmanCollectionOrderByWithRelationInput
   }
 
@@ -11207,7 +12256,6 @@ export namespace Prisma {
     NOT?: EmbeddingChunkWhereInput | EmbeddingChunkWhereInput[]
     collectionId?: IntFilter<"EmbeddingChunk"> | number
     text?: StringFilter<"EmbeddingChunk"> | string
-    embedding?: StringFilter<"EmbeddingChunk"> | string
     collection?: XOR<PostmanCollectionScalarRelationFilter, PostmanCollectionWhereInput>
   }, "id">
 
@@ -11215,7 +12263,6 @@ export namespace Prisma {
     id?: SortOrder
     collectionId?: SortOrder
     text?: SortOrder
-    embedding?: SortOrder
     _count?: EmbeddingChunkCountOrderByAggregateInput
     _avg?: EmbeddingChunkAvgOrderByAggregateInput
     _max?: EmbeddingChunkMaxOrderByAggregateInput
@@ -11230,7 +12277,43 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"EmbeddingChunk"> | number
     collectionId?: IntWithAggregatesFilter<"EmbeddingChunk"> | number
     text?: StringWithAggregatesFilter<"EmbeddingChunk"> | string
-    embedding?: StringWithAggregatesFilter<"EmbeddingChunk"> | string
+  }
+
+  export type SettingWhereInput = {
+    AND?: SettingWhereInput | SettingWhereInput[]
+    OR?: SettingWhereInput[]
+    NOT?: SettingWhereInput | SettingWhereInput[]
+    key?: StringFilter<"Setting"> | string
+    value?: StringFilter<"Setting"> | string
+  }
+
+  export type SettingOrderByWithRelationInput = {
+    key?: SortOrder
+    value?: SortOrder
+  }
+
+  export type SettingWhereUniqueInput = Prisma.AtLeast<{
+    key?: string
+    AND?: SettingWhereInput | SettingWhereInput[]
+    OR?: SettingWhereInput[]
+    NOT?: SettingWhereInput | SettingWhereInput[]
+    value?: StringFilter<"Setting"> | string
+  }, "key">
+
+  export type SettingOrderByWithAggregationInput = {
+    key?: SortOrder
+    value?: SortOrder
+    _count?: SettingCountOrderByAggregateInput
+    _max?: SettingMaxOrderByAggregateInput
+    _min?: SettingMinOrderByAggregateInput
+  }
+
+  export type SettingScalarWhereWithAggregatesInput = {
+    AND?: SettingScalarWhereWithAggregatesInput | SettingScalarWhereWithAggregatesInput[]
+    OR?: SettingScalarWhereWithAggregatesInput[]
+    NOT?: SettingScalarWhereWithAggregatesInput | SettingScalarWhereWithAggregatesInput[]
+    key?: StringWithAggregatesFilter<"Setting"> | string
+    value?: StringWithAggregatesFilter<"Setting"> | string
   }
 
   export type RequestHistoryWhereInput = {
@@ -11404,6 +12487,9 @@ export namespace Prisma {
     fieldType?: string
     required?: boolean
     sortOrder?: number
+    sourceEndpointId?: number | null
+    endpointParam?: string
+    responsePath?: string
     erp: ERPCreateNestedOneWithoutFieldSchemasInput
   }
 
@@ -11415,6 +12501,9 @@ export namespace Prisma {
     fieldType?: string
     required?: boolean
     sortOrder?: number
+    sourceEndpointId?: number | null
+    endpointParam?: string
+    responsePath?: string
   }
 
   export type ERPFieldSchemaUpdateInput = {
@@ -11423,6 +12512,9 @@ export namespace Prisma {
     fieldType?: StringFieldUpdateOperationsInput | string
     required?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
+    sourceEndpointId?: NullableIntFieldUpdateOperationsInput | number | null
+    endpointParam?: StringFieldUpdateOperationsInput | string
+    responsePath?: StringFieldUpdateOperationsInput | string
     erp?: ERPUpdateOneRequiredWithoutFieldSchemasNestedInput
   }
 
@@ -11434,6 +12526,9 @@ export namespace Prisma {
     fieldType?: StringFieldUpdateOperationsInput | string
     required?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
+    sourceEndpointId?: NullableIntFieldUpdateOperationsInput | number | null
+    endpointParam?: StringFieldUpdateOperationsInput | string
+    responsePath?: StringFieldUpdateOperationsInput | string
   }
 
   export type ERPFieldSchemaCreateManyInput = {
@@ -11444,6 +12539,9 @@ export namespace Prisma {
     fieldType?: string
     required?: boolean
     sortOrder?: number
+    sourceEndpointId?: number | null
+    endpointParam?: string
+    responsePath?: string
   }
 
   export type ERPFieldSchemaUpdateManyMutationInput = {
@@ -11452,6 +12550,9 @@ export namespace Prisma {
     fieldType?: StringFieldUpdateOperationsInput | string
     required?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
+    sourceEndpointId?: NullableIntFieldUpdateOperationsInput | number | null
+    endpointParam?: StringFieldUpdateOperationsInput | string
+    responsePath?: StringFieldUpdateOperationsInput | string
   }
 
   export type ERPFieldSchemaUncheckedUpdateManyInput = {
@@ -11462,6 +12563,9 @@ export namespace Prisma {
     fieldType?: StringFieldUpdateOperationsInput | string
     required?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
+    sourceEndpointId?: NullableIntFieldUpdateOperationsInput | number | null
+    endpointParam?: StringFieldUpdateOperationsInput | string
+    responsePath?: StringFieldUpdateOperationsInput | string
   }
 
   export type EndpointCreateInput = {
@@ -11471,6 +12575,9 @@ export namespace Prisma {
     bodyTemplate?: string
     headers?: string
     sortOrder?: number
+    group?: string
+    requiresClient?: boolean
+    isModification?: boolean
     erp: ERPCreateNestedOneWithoutEndpointsInput
   }
 
@@ -11483,6 +12590,9 @@ export namespace Prisma {
     bodyTemplate?: string
     headers?: string
     sortOrder?: number
+    group?: string
+    requiresClient?: boolean
+    isModification?: boolean
   }
 
   export type EndpointUpdateInput = {
@@ -11492,6 +12602,9 @@ export namespace Prisma {
     bodyTemplate?: StringFieldUpdateOperationsInput | string
     headers?: StringFieldUpdateOperationsInput | string
     sortOrder?: IntFieldUpdateOperationsInput | number
+    group?: StringFieldUpdateOperationsInput | string
+    requiresClient?: BoolFieldUpdateOperationsInput | boolean
+    isModification?: BoolFieldUpdateOperationsInput | boolean
     erp?: ERPUpdateOneRequiredWithoutEndpointsNestedInput
   }
 
@@ -11504,6 +12617,9 @@ export namespace Prisma {
     bodyTemplate?: StringFieldUpdateOperationsInput | string
     headers?: StringFieldUpdateOperationsInput | string
     sortOrder?: IntFieldUpdateOperationsInput | number
+    group?: StringFieldUpdateOperationsInput | string
+    requiresClient?: BoolFieldUpdateOperationsInput | boolean
+    isModification?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type EndpointCreateManyInput = {
@@ -11515,6 +12631,9 @@ export namespace Prisma {
     bodyTemplate?: string
     headers?: string
     sortOrder?: number
+    group?: string
+    requiresClient?: boolean
+    isModification?: boolean
   }
 
   export type EndpointUpdateManyMutationInput = {
@@ -11524,6 +12643,9 @@ export namespace Prisma {
     bodyTemplate?: StringFieldUpdateOperationsInput | string
     headers?: StringFieldUpdateOperationsInput | string
     sortOrder?: IntFieldUpdateOperationsInput | number
+    group?: StringFieldUpdateOperationsInput | string
+    requiresClient?: BoolFieldUpdateOperationsInput | boolean
+    isModification?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type EndpointUncheckedUpdateManyInput = {
@@ -11535,11 +12657,15 @@ export namespace Prisma {
     bodyTemplate?: StringFieldUpdateOperationsInput | string
     headers?: StringFieldUpdateOperationsInput | string
     sortOrder?: IntFieldUpdateOperationsInput | number
+    group?: StringFieldUpdateOperationsInput | string
+    requiresClient?: BoolFieldUpdateOperationsInput | boolean
+    isModification?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type CompanyCreateInput = {
     name: string
     baseUrl?: string
+    environments?: string
     authType?: string
     authConfig?: string
     createdAt?: Date | string
@@ -11552,6 +12678,7 @@ export namespace Prisma {
     name: string
     erpId: number
     baseUrl?: string
+    environments?: string
     authType?: string
     authConfig?: string
     createdAt?: Date | string
@@ -11561,6 +12688,7 @@ export namespace Prisma {
   export type CompanyUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
     baseUrl?: StringFieldUpdateOperationsInput | string
+    environments?: StringFieldUpdateOperationsInput | string
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11573,6 +12701,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     erpId?: IntFieldUpdateOperationsInput | number
     baseUrl?: StringFieldUpdateOperationsInput | string
+    environments?: StringFieldUpdateOperationsInput | string
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11584,6 +12713,7 @@ export namespace Prisma {
     name: string
     erpId: number
     baseUrl?: string
+    environments?: string
     authType?: string
     authConfig?: string
     createdAt?: Date | string
@@ -11592,6 +12722,7 @@ export namespace Prisma {
   export type CompanyUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
     baseUrl?: StringFieldUpdateOperationsInput | string
+    environments?: StringFieldUpdateOperationsInput | string
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11602,6 +12733,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     erpId?: IntFieldUpdateOperationsInput | number
     baseUrl?: StringFieldUpdateOperationsInput | string
+    environments?: StringFieldUpdateOperationsInput | string
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -11716,22 +12848,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type EmbeddingChunkCreateInput = {
-    text: string
-    embedding: string
-    collection: PostmanCollectionCreateNestedOneWithoutChunksInput
-  }
-
-  export type EmbeddingChunkUncheckedCreateInput = {
-    id?: number
-    collectionId: number
-    text: string
-    embedding: string
-  }
-
   export type EmbeddingChunkUpdateInput = {
     text?: StringFieldUpdateOperationsInput | string
-    embedding?: StringFieldUpdateOperationsInput | string
     collection?: PostmanCollectionUpdateOneRequiredWithoutChunksNestedInput
   }
 
@@ -11739,26 +12857,51 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     collectionId?: IntFieldUpdateOperationsInput | number
     text?: StringFieldUpdateOperationsInput | string
-    embedding?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type EmbeddingChunkCreateManyInput = {
-    id?: number
-    collectionId: number
-    text: string
-    embedding: string
   }
 
   export type EmbeddingChunkUpdateManyMutationInput = {
     text?: StringFieldUpdateOperationsInput | string
-    embedding?: StringFieldUpdateOperationsInput | string
   }
 
   export type EmbeddingChunkUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     collectionId?: IntFieldUpdateOperationsInput | number
     text?: StringFieldUpdateOperationsInput | string
-    embedding?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SettingCreateInput = {
+    key: string
+    value: string
+  }
+
+  export type SettingUncheckedCreateInput = {
+    key: string
+    value: string
+  }
+
+  export type SettingUpdateInput = {
+    key?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SettingUncheckedUpdateInput = {
+    key?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SettingCreateManyInput = {
+    key: string
+    value: string
+  }
+
+  export type SettingUpdateManyMutationInput = {
+    key?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SettingUncheckedUpdateManyInput = {
+    key?: StringFieldUpdateOperationsInput | string
+    value?: StringFieldUpdateOperationsInput | string
   }
 
   export type RequestHistoryCreateInput = {
@@ -11900,8 +13043,8 @@ export namespace Prisma {
 
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -11911,8 +13054,8 @@ export namespace Prisma {
 
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -11920,13 +13063,14 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -11992,8 +13136,8 @@ export namespace Prisma {
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -12008,8 +13152,8 @@ export namespace Prisma {
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -12017,6 +13161,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
     not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
@@ -12025,8 +13170,8 @@ export namespace Prisma {
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -12042,9 +13187,25 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type ERPScalarRelationFilter = {
     is?: ERPWhereInput
     isNot?: ERPWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
   }
 
   export type ERPFieldSchemaCountOrderByAggregateInput = {
@@ -12055,12 +13216,16 @@ export namespace Prisma {
     fieldType?: SortOrder
     required?: SortOrder
     sortOrder?: SortOrder
+    sourceEndpointId?: SortOrder
+    endpointParam?: SortOrder
+    responsePath?: SortOrder
   }
 
   export type ERPFieldSchemaAvgOrderByAggregateInput = {
     id?: SortOrder
     erpId?: SortOrder
     sortOrder?: SortOrder
+    sourceEndpointId?: SortOrder
   }
 
   export type ERPFieldSchemaMaxOrderByAggregateInput = {
@@ -12071,6 +13236,9 @@ export namespace Prisma {
     fieldType?: SortOrder
     required?: SortOrder
     sortOrder?: SortOrder
+    sourceEndpointId?: SortOrder
+    endpointParam?: SortOrder
+    responsePath?: SortOrder
   }
 
   export type ERPFieldSchemaMinOrderByAggregateInput = {
@@ -12081,12 +13249,16 @@ export namespace Prisma {
     fieldType?: SortOrder
     required?: SortOrder
     sortOrder?: SortOrder
+    sourceEndpointId?: SortOrder
+    endpointParam?: SortOrder
+    responsePath?: SortOrder
   }
 
   export type ERPFieldSchemaSumOrderByAggregateInput = {
     id?: SortOrder
     erpId?: SortOrder
     sortOrder?: SortOrder
+    sourceEndpointId?: SortOrder
   }
 
   export type BoolWithAggregatesFilter<$PrismaModel = never> = {
@@ -12095,6 +13267,22 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type EndpointCountOrderByAggregateInput = {
@@ -12106,6 +13294,9 @@ export namespace Prisma {
     bodyTemplate?: SortOrder
     headers?: SortOrder
     sortOrder?: SortOrder
+    group?: SortOrder
+    requiresClient?: SortOrder
+    isModification?: SortOrder
   }
 
   export type EndpointAvgOrderByAggregateInput = {
@@ -12123,6 +13314,9 @@ export namespace Prisma {
     bodyTemplate?: SortOrder
     headers?: SortOrder
     sortOrder?: SortOrder
+    group?: SortOrder
+    requiresClient?: SortOrder
+    isModification?: SortOrder
   }
 
   export type EndpointMinOrderByAggregateInput = {
@@ -12134,6 +13328,9 @@ export namespace Prisma {
     bodyTemplate?: SortOrder
     headers?: SortOrder
     sortOrder?: SortOrder
+    group?: SortOrder
+    requiresClient?: SortOrder
+    isModification?: SortOrder
   }
 
   export type EndpointSumOrderByAggregateInput = {
@@ -12157,6 +13354,7 @@ export namespace Prisma {
     name?: SortOrder
     erpId?: SortOrder
     baseUrl?: SortOrder
+    environments?: SortOrder
     authType?: SortOrder
     authConfig?: SortOrder
     createdAt?: SortOrder
@@ -12172,6 +13370,7 @@ export namespace Prisma {
     name?: SortOrder
     erpId?: SortOrder
     baseUrl?: SortOrder
+    environments?: SortOrder
     authType?: SortOrder
     authConfig?: SortOrder
     createdAt?: SortOrder
@@ -12182,6 +13381,7 @@ export namespace Prisma {
     name?: SortOrder
     erpId?: SortOrder
     baseUrl?: SortOrder
+    environments?: SortOrder
     authType?: SortOrder
     authConfig?: SortOrder
     createdAt?: SortOrder
@@ -12282,7 +13482,6 @@ export namespace Prisma {
     id?: SortOrder
     collectionId?: SortOrder
     text?: SortOrder
-    embedding?: SortOrder
   }
 
   export type EmbeddingChunkAvgOrderByAggregateInput = {
@@ -12294,14 +13493,12 @@ export namespace Prisma {
     id?: SortOrder
     collectionId?: SortOrder
     text?: SortOrder
-    embedding?: SortOrder
   }
 
   export type EmbeddingChunkMinOrderByAggregateInput = {
     id?: SortOrder
     collectionId?: SortOrder
     text?: SortOrder
-    embedding?: SortOrder
   }
 
   export type EmbeddingChunkSumOrderByAggregateInput = {
@@ -12309,20 +13506,19 @@ export namespace Prisma {
     collectionId?: SortOrder
   }
 
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  export type SettingCountOrderByAggregateInput = {
+    key?: SortOrder
+    value?: SortOrder
   }
 
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
+  export type SettingMaxOrderByAggregateInput = {
+    key?: SortOrder
+    value?: SortOrder
+  }
+
+  export type SettingMinOrderByAggregateInput = {
+    key?: SortOrder
+    value?: SortOrder
   }
 
   export type RequestHistoryCountOrderByAggregateInput = {
@@ -12401,22 +13597,6 @@ export namespace Prisma {
     companyId?: SortOrder
     endpointId?: SortOrder
     testClientId?: SortOrder
-  }
-
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type CompanyCreateNestedManyWithoutErpInput = {
@@ -12571,6 +13751,14 @@ export namespace Prisma {
     set?: boolean
   }
 
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type ERPUpdateOneRequiredWithoutFieldSchemasNestedInput = {
     create?: XOR<ERPCreateWithoutFieldSchemasInput, ERPUncheckedCreateWithoutFieldSchemasInput>
     connectOrCreate?: ERPCreateOrConnectWithoutFieldSchemasInput
@@ -12664,24 +13852,14 @@ export namespace Prisma {
   }
 
   export type EmbeddingChunkCreateNestedManyWithoutCollectionInput = {
-    create?: XOR<EmbeddingChunkCreateWithoutCollectionInput, EmbeddingChunkUncheckedCreateWithoutCollectionInput> | EmbeddingChunkCreateWithoutCollectionInput[] | EmbeddingChunkUncheckedCreateWithoutCollectionInput[]
-    connectOrCreate?: EmbeddingChunkCreateOrConnectWithoutCollectionInput | EmbeddingChunkCreateOrConnectWithoutCollectionInput[]
-    createMany?: EmbeddingChunkCreateManyCollectionInputEnvelope
     connect?: EmbeddingChunkWhereUniqueInput | EmbeddingChunkWhereUniqueInput[]
   }
 
   export type EmbeddingChunkUncheckedCreateNestedManyWithoutCollectionInput = {
-    create?: XOR<EmbeddingChunkCreateWithoutCollectionInput, EmbeddingChunkUncheckedCreateWithoutCollectionInput> | EmbeddingChunkCreateWithoutCollectionInput[] | EmbeddingChunkUncheckedCreateWithoutCollectionInput[]
-    connectOrCreate?: EmbeddingChunkCreateOrConnectWithoutCollectionInput | EmbeddingChunkCreateOrConnectWithoutCollectionInput[]
-    createMany?: EmbeddingChunkCreateManyCollectionInputEnvelope
     connect?: EmbeddingChunkWhereUniqueInput | EmbeddingChunkWhereUniqueInput[]
   }
 
   export type EmbeddingChunkUpdateManyWithoutCollectionNestedInput = {
-    create?: XOR<EmbeddingChunkCreateWithoutCollectionInput, EmbeddingChunkUncheckedCreateWithoutCollectionInput> | EmbeddingChunkCreateWithoutCollectionInput[] | EmbeddingChunkUncheckedCreateWithoutCollectionInput[]
-    connectOrCreate?: EmbeddingChunkCreateOrConnectWithoutCollectionInput | EmbeddingChunkCreateOrConnectWithoutCollectionInput[]
-    upsert?: EmbeddingChunkUpsertWithWhereUniqueWithoutCollectionInput | EmbeddingChunkUpsertWithWhereUniqueWithoutCollectionInput[]
-    createMany?: EmbeddingChunkCreateManyCollectionInputEnvelope
     set?: EmbeddingChunkWhereUniqueInput | EmbeddingChunkWhereUniqueInput[]
     disconnect?: EmbeddingChunkWhereUniqueInput | EmbeddingChunkWhereUniqueInput[]
     delete?: EmbeddingChunkWhereUniqueInput | EmbeddingChunkWhereUniqueInput[]
@@ -12692,10 +13870,6 @@ export namespace Prisma {
   }
 
   export type EmbeddingChunkUncheckedUpdateManyWithoutCollectionNestedInput = {
-    create?: XOR<EmbeddingChunkCreateWithoutCollectionInput, EmbeddingChunkUncheckedCreateWithoutCollectionInput> | EmbeddingChunkCreateWithoutCollectionInput[] | EmbeddingChunkUncheckedCreateWithoutCollectionInput[]
-    connectOrCreate?: EmbeddingChunkCreateOrConnectWithoutCollectionInput | EmbeddingChunkCreateOrConnectWithoutCollectionInput[]
-    upsert?: EmbeddingChunkUpsertWithWhereUniqueWithoutCollectionInput | EmbeddingChunkUpsertWithWhereUniqueWithoutCollectionInput[]
-    createMany?: EmbeddingChunkCreateManyCollectionInputEnvelope
     set?: EmbeddingChunkWhereUniqueInput | EmbeddingChunkWhereUniqueInput[]
     disconnect?: EmbeddingChunkWhereUniqueInput | EmbeddingChunkWhereUniqueInput[]
     delete?: EmbeddingChunkWhereUniqueInput | EmbeddingChunkWhereUniqueInput[]
@@ -12703,12 +13877,6 @@ export namespace Prisma {
     update?: EmbeddingChunkUpdateWithWhereUniqueWithoutCollectionInput | EmbeddingChunkUpdateWithWhereUniqueWithoutCollectionInput[]
     updateMany?: EmbeddingChunkUpdateManyWithWhereWithoutCollectionInput | EmbeddingChunkUpdateManyWithWhereWithoutCollectionInput[]
     deleteMany?: EmbeddingChunkScalarWhereInput | EmbeddingChunkScalarWhereInput[]
-  }
-
-  export type PostmanCollectionCreateNestedOneWithoutChunksInput = {
-    create?: XOR<PostmanCollectionCreateWithoutChunksInput, PostmanCollectionUncheckedCreateWithoutChunksInput>
-    connectOrCreate?: PostmanCollectionCreateOrConnectWithoutChunksInput
-    connect?: PostmanCollectionWhereUniqueInput
   }
 
   export type PostmanCollectionUpdateOneRequiredWithoutChunksNestedInput = {
@@ -12719,18 +13887,10 @@ export namespace Prisma {
     update?: XOR<XOR<PostmanCollectionUpdateToOneWithWhereWithoutChunksInput, PostmanCollectionUpdateWithoutChunksInput>, PostmanCollectionUncheckedUpdateWithoutChunksInput>
   }
 
-  export type NullableIntFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
   export type NestedIntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -12740,8 +13900,8 @@ export namespace Prisma {
 
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -12754,8 +13914,8 @@ export namespace Prisma {
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -12765,8 +13925,8 @@ export namespace Prisma {
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -12781,8 +13941,8 @@ export namespace Prisma {
 
   export type NestedFloatFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[]
-    notIn?: number[]
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -12792,8 +13952,8 @@ export namespace Prisma {
 
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
-    in?: string[]
-    notIn?: string[]
+    in?: string[] | ListStringFieldRefInput<$PrismaModel>
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel>
     lt?: string | StringFieldRefInput<$PrismaModel>
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
@@ -12809,8 +13969,8 @@ export namespace Prisma {
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[]
-    notIn?: Date[] | string[]
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
     lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -12826,6 +13986,17 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
@@ -12834,21 +14005,10 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
   export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
     lt?: number | IntFieldRefInput<$PrismaModel>
     lte?: number | IntFieldRefInput<$PrismaModel>
     gt?: number | IntFieldRefInput<$PrismaModel>
@@ -12863,8 +14023,8 @@ export namespace Prisma {
 
   export type NestedFloatNullableFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | null
-    notIn?: number[] | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
     lt?: number | FloatFieldRefInput<$PrismaModel>
     lte?: number | FloatFieldRefInput<$PrismaModel>
     gt?: number | FloatFieldRefInput<$PrismaModel>
@@ -12875,6 +14035,7 @@ export namespace Prisma {
   export type CompanyCreateWithoutErpInput = {
     name: string
     baseUrl?: string
+    environments?: string
     authType?: string
     authConfig?: string
     createdAt?: Date | string
@@ -12885,6 +14046,7 @@ export namespace Prisma {
     id?: number
     name: string
     baseUrl?: string
+    environments?: string
     authType?: string
     authConfig?: string
     createdAt?: Date | string
@@ -12898,6 +14060,7 @@ export namespace Prisma {
 
   export type CompanyCreateManyErpInputEnvelope = {
     data: CompanyCreateManyErpInput | CompanyCreateManyErpInput[]
+    skipDuplicates?: boolean
   }
 
   export type EndpointCreateWithoutErpInput = {
@@ -12907,6 +14070,9 @@ export namespace Prisma {
     bodyTemplate?: string
     headers?: string
     sortOrder?: number
+    group?: string
+    requiresClient?: boolean
+    isModification?: boolean
   }
 
   export type EndpointUncheckedCreateWithoutErpInput = {
@@ -12917,6 +14083,9 @@ export namespace Prisma {
     bodyTemplate?: string
     headers?: string
     sortOrder?: number
+    group?: string
+    requiresClient?: boolean
+    isModification?: boolean
   }
 
   export type EndpointCreateOrConnectWithoutErpInput = {
@@ -12926,6 +14095,7 @@ export namespace Prisma {
 
   export type EndpointCreateManyErpInputEnvelope = {
     data: EndpointCreateManyErpInput | EndpointCreateManyErpInput[]
+    skipDuplicates?: boolean
   }
 
   export type ERPFieldSchemaCreateWithoutErpInput = {
@@ -12934,6 +14104,9 @@ export namespace Prisma {
     fieldType?: string
     required?: boolean
     sortOrder?: number
+    sourceEndpointId?: number | null
+    endpointParam?: string
+    responsePath?: string
   }
 
   export type ERPFieldSchemaUncheckedCreateWithoutErpInput = {
@@ -12943,6 +14116,9 @@ export namespace Prisma {
     fieldType?: string
     required?: boolean
     sortOrder?: number
+    sourceEndpointId?: number | null
+    endpointParam?: string
+    responsePath?: string
   }
 
   export type ERPFieldSchemaCreateOrConnectWithoutErpInput = {
@@ -12952,6 +14128,7 @@ export namespace Prisma {
 
   export type ERPFieldSchemaCreateManyErpInputEnvelope = {
     data: ERPFieldSchemaCreateManyErpInput | ERPFieldSchemaCreateManyErpInput[]
+    skipDuplicates?: boolean
   }
 
   export type CompanyUpsertWithWhereUniqueWithoutErpInput = {
@@ -12978,6 +14155,7 @@ export namespace Prisma {
     name?: StringFilter<"Company"> | string
     erpId?: IntFilter<"Company"> | number
     baseUrl?: StringFilter<"Company"> | string
+    environments?: StringFilter<"Company"> | string
     authType?: StringFilter<"Company"> | string
     authConfig?: StringFilter<"Company"> | string
     createdAt?: DateTimeFilter<"Company"> | Date | string
@@ -13011,6 +14189,9 @@ export namespace Prisma {
     bodyTemplate?: StringFilter<"Endpoint"> | string
     headers?: StringFilter<"Endpoint"> | string
     sortOrder?: IntFilter<"Endpoint"> | number
+    group?: StringFilter<"Endpoint"> | string
+    requiresClient?: BoolFilter<"Endpoint"> | boolean
+    isModification?: BoolFilter<"Endpoint"> | boolean
   }
 
   export type ERPFieldSchemaUpsertWithWhereUniqueWithoutErpInput = {
@@ -13040,6 +14221,9 @@ export namespace Prisma {
     fieldType?: StringFilter<"ERPFieldSchema"> | string
     required?: BoolFilter<"ERPFieldSchema"> | boolean
     sortOrder?: IntFilter<"ERPFieldSchema"> | number
+    sourceEndpointId?: IntNullableFilter<"ERPFieldSchema"> | number | null
+    endpointParam?: StringFilter<"ERPFieldSchema"> | string
+    responsePath?: StringFilter<"ERPFieldSchema"> | string
   }
 
   export type ERPCreateWithoutFieldSchemasInput = {
@@ -13174,6 +14358,7 @@ export namespace Prisma {
 
   export type TestClientCreateManyCompanyInputEnvelope = {
     data: TestClientCreateManyCompanyInput | TestClientCreateManyCompanyInput[]
+    skipDuplicates?: boolean
   }
 
   export type ERPUpsertWithoutCompaniesInput = {
@@ -13232,6 +14417,7 @@ export namespace Prisma {
   export type CompanyCreateWithoutTestClientsInput = {
     name: string
     baseUrl?: string
+    environments?: string
     authType?: string
     authConfig?: string
     createdAt?: Date | string
@@ -13243,6 +14429,7 @@ export namespace Prisma {
     name: string
     erpId: number
     baseUrl?: string
+    environments?: string
     authType?: string
     authConfig?: string
     createdAt?: Date | string
@@ -13267,6 +14454,7 @@ export namespace Prisma {
   export type CompanyUpdateWithoutTestClientsInput = {
     name?: StringFieldUpdateOperationsInput | string
     baseUrl?: StringFieldUpdateOperationsInput | string
+    environments?: StringFieldUpdateOperationsInput | string
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13278,35 +14466,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     erpId?: IntFieldUpdateOperationsInput | number
     baseUrl?: StringFieldUpdateOperationsInput | string
+    environments?: StringFieldUpdateOperationsInput | string
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type EmbeddingChunkCreateWithoutCollectionInput = {
-    text: string
-    embedding: string
-  }
-
-  export type EmbeddingChunkUncheckedCreateWithoutCollectionInput = {
-    id?: number
-    text: string
-    embedding: string
-  }
-
-  export type EmbeddingChunkCreateOrConnectWithoutCollectionInput = {
-    where: EmbeddingChunkWhereUniqueInput
-    create: XOR<EmbeddingChunkCreateWithoutCollectionInput, EmbeddingChunkUncheckedCreateWithoutCollectionInput>
-  }
-
-  export type EmbeddingChunkCreateManyCollectionInputEnvelope = {
-    data: EmbeddingChunkCreateManyCollectionInput | EmbeddingChunkCreateManyCollectionInput[]
-  }
-
-  export type EmbeddingChunkUpsertWithWhereUniqueWithoutCollectionInput = {
-    where: EmbeddingChunkWhereUniqueInput
-    update: XOR<EmbeddingChunkUpdateWithoutCollectionInput, EmbeddingChunkUncheckedUpdateWithoutCollectionInput>
-    create: XOR<EmbeddingChunkCreateWithoutCollectionInput, EmbeddingChunkUncheckedCreateWithoutCollectionInput>
   }
 
   export type EmbeddingChunkUpdateWithWhereUniqueWithoutCollectionInput = {
@@ -13326,7 +14489,6 @@ export namespace Prisma {
     id?: IntFilter<"EmbeddingChunk"> | number
     collectionId?: IntFilter<"EmbeddingChunk"> | number
     text?: StringFilter<"EmbeddingChunk"> | string
-    embedding?: StringFilter<"EmbeddingChunk"> | string
   }
 
   export type PostmanCollectionCreateWithoutChunksInput = {
@@ -13379,6 +14541,7 @@ export namespace Prisma {
     id?: number
     name: string
     baseUrl?: string
+    environments?: string
     authType?: string
     authConfig?: string
     createdAt?: Date | string
@@ -13392,6 +14555,9 @@ export namespace Prisma {
     bodyTemplate?: string
     headers?: string
     sortOrder?: number
+    group?: string
+    requiresClient?: boolean
+    isModification?: boolean
   }
 
   export type ERPFieldSchemaCreateManyErpInput = {
@@ -13401,11 +14567,15 @@ export namespace Prisma {
     fieldType?: string
     required?: boolean
     sortOrder?: number
+    sourceEndpointId?: number | null
+    endpointParam?: string
+    responsePath?: string
   }
 
   export type CompanyUpdateWithoutErpInput = {
     name?: StringFieldUpdateOperationsInput | string
     baseUrl?: StringFieldUpdateOperationsInput | string
+    environments?: StringFieldUpdateOperationsInput | string
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13416,6 +14586,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     baseUrl?: StringFieldUpdateOperationsInput | string
+    environments?: StringFieldUpdateOperationsInput | string
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13426,6 +14597,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     baseUrl?: StringFieldUpdateOperationsInput | string
+    environments?: StringFieldUpdateOperationsInput | string
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13438,6 +14610,9 @@ export namespace Prisma {
     bodyTemplate?: StringFieldUpdateOperationsInput | string
     headers?: StringFieldUpdateOperationsInput | string
     sortOrder?: IntFieldUpdateOperationsInput | number
+    group?: StringFieldUpdateOperationsInput | string
+    requiresClient?: BoolFieldUpdateOperationsInput | boolean
+    isModification?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type EndpointUncheckedUpdateWithoutErpInput = {
@@ -13448,6 +14623,9 @@ export namespace Prisma {
     bodyTemplate?: StringFieldUpdateOperationsInput | string
     headers?: StringFieldUpdateOperationsInput | string
     sortOrder?: IntFieldUpdateOperationsInput | number
+    group?: StringFieldUpdateOperationsInput | string
+    requiresClient?: BoolFieldUpdateOperationsInput | boolean
+    isModification?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type EndpointUncheckedUpdateManyWithoutErpInput = {
@@ -13458,6 +14636,9 @@ export namespace Prisma {
     bodyTemplate?: StringFieldUpdateOperationsInput | string
     headers?: StringFieldUpdateOperationsInput | string
     sortOrder?: IntFieldUpdateOperationsInput | number
+    group?: StringFieldUpdateOperationsInput | string
+    requiresClient?: BoolFieldUpdateOperationsInput | boolean
+    isModification?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ERPFieldSchemaUpdateWithoutErpInput = {
@@ -13466,6 +14647,9 @@ export namespace Prisma {
     fieldType?: StringFieldUpdateOperationsInput | string
     required?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
+    sourceEndpointId?: NullableIntFieldUpdateOperationsInput | number | null
+    endpointParam?: StringFieldUpdateOperationsInput | string
+    responsePath?: StringFieldUpdateOperationsInput | string
   }
 
   export type ERPFieldSchemaUncheckedUpdateWithoutErpInput = {
@@ -13475,6 +14659,9 @@ export namespace Prisma {
     fieldType?: StringFieldUpdateOperationsInput | string
     required?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
+    sourceEndpointId?: NullableIntFieldUpdateOperationsInput | number | null
+    endpointParam?: StringFieldUpdateOperationsInput | string
+    responsePath?: StringFieldUpdateOperationsInput | string
   }
 
   export type ERPFieldSchemaUncheckedUpdateManyWithoutErpInput = {
@@ -13484,6 +14671,9 @@ export namespace Prisma {
     fieldType?: StringFieldUpdateOperationsInput | string
     required?: BoolFieldUpdateOperationsInput | boolean
     sortOrder?: IntFieldUpdateOperationsInput | number
+    sourceEndpointId?: NullableIntFieldUpdateOperationsInput | number | null
+    endpointParam?: StringFieldUpdateOperationsInput | string
+    responsePath?: StringFieldUpdateOperationsInput | string
   }
 
   export type TestClientCreateManyCompanyInput = {
@@ -13513,27 +14703,18 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type EmbeddingChunkCreateManyCollectionInput = {
-    id?: number
-    text: string
-    embedding: string
-  }
-
   export type EmbeddingChunkUpdateWithoutCollectionInput = {
     text?: StringFieldUpdateOperationsInput | string
-    embedding?: StringFieldUpdateOperationsInput | string
   }
 
   export type EmbeddingChunkUncheckedUpdateWithoutCollectionInput = {
     id?: IntFieldUpdateOperationsInput | number
     text?: StringFieldUpdateOperationsInput | string
-    embedding?: StringFieldUpdateOperationsInput | string
   }
 
   export type EmbeddingChunkUncheckedUpdateManyWithoutCollectionInput = {
     id?: IntFieldUpdateOperationsInput | number
     text?: StringFieldUpdateOperationsInput | string
-    embedding?: StringFieldUpdateOperationsInput | string
   }
 
 

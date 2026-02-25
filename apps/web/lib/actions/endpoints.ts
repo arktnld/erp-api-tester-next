@@ -10,6 +10,9 @@ export async function createEndpoint(data: {
   pathTemplate: string
   bodyTemplate: string
   headers: string
+  group: string
+  requiresClient: boolean
+  isModification: boolean
 }) {
   await prisma.endpoint.create({ data })
   revalidatePath(`/erps/${data.erpId}`)
@@ -24,6 +27,9 @@ export async function updateEndpoint(
     pathTemplate: string
     bodyTemplate: string
     headers: string
+    group: string
+    requiresClient: boolean
+    isModification: boolean
   }
 ) {
   await prisma.endpoint.update({ where: { id }, data })
@@ -32,5 +38,14 @@ export async function updateEndpoint(
 
 export async function deleteEndpoint(id: number, erpId: number) {
   await prisma.endpoint.delete({ where: { id } })
+  revalidatePath(`/erps/${erpId}`)
+}
+
+export async function reorderEndpoints(erpId: number, orderedIds: number[]) {
+  await Promise.all(
+    orderedIds.map((id, index) =>
+      prisma.endpoint.update({ where: { id }, data: { sortOrder: index } })
+    )
+  )
   revalidatePath(`/erps/${erpId}`)
 }

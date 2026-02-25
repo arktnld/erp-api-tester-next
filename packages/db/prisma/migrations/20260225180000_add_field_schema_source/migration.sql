@@ -1,0 +1,3 @@
+ALTER TABLE "ERPFieldSchema" ADD COLUMN "sourceEndpointId" INTEGER;
+ALTER TABLE "ERPFieldSchema" ADD COLUMN "endpointParam" TEXT NOT NULL DEFAULT '';
+ALTER TABLE "ERPFieldSchema" ADD COLUMN "responsePath" TEXT NOT NULL DEFAULT '';

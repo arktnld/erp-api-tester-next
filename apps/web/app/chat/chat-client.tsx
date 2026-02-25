@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Send, Bot, User, Plus, Trash2, FileUp, Key, ChevronDown, ChevronRight, Zap, Loader2, CheckCircle2, Pencil, Check, X } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import { Send, Bot, User, Plus, Trash2, FileUp, Key, ChevronDown, ChevronRight, Zap, Loader2, CheckCircle2, Pencil, Check, X, Copy } from 'lucide-react'
 import { saveCollection, deleteCollection, updateCollectionPrompt } from '@/app/actions/collections'
 import { importCurlEndpoint } from '@/app/actions/import-curl'
+import { saveSettings, type Settings } from '@/lib/actions/settings'
 import { Sheet } from '@/components/ui/sheet'
 
 type Message = { role: 'user' | 'assistant'; content: string }
@@ -39,18 +41,6 @@ function parseCurl(input: string): ParsedCurl | { error: string } {
   } catch (e) { return { error: String(e) } }
 }
 
-function extractCodeParts(content: string): Array<{ type: 'text' | 'code'; text: string }> {
-  const parts: Array<{ type: 'text' | 'code'; text: string }> = []
-  const re = /```(?:bash|sh|shell|curl)?\n([\s\S]*?)```/g
-  let last = 0, m: RegExpExecArray | null
-  while ((m = re.exec(content)) !== null) {
-    if (m.index > last) parts.push({ type: 'text', text: content.slice(last, m.index) })
-    parts.push({ type: 'code', text: m[1] })
-    last = m.index + m[0].length
-  }
-  if (last < content.length) parts.push({ type: 'text', text: content.slice(last) })
-  return parts
-}
 type Provider = 'anthropic' | 'openai' | 'gemini'
 type EmbeddingProvider = 'openai' | 'gemini'
 
@@ -88,6 +78,42 @@ function parsePostman(json: Record<string, unknown>): { context: string; chunks:
   const colName = (json.info as Record<string, string>)?.name ?? 'Coleção'
   const context = `Coleção: ${colName}\nTotal: ${chunks.length} endpoints\n\n` + chunks.join('\n\n')
   return { context, chunks }
+}
+
+function parseOpenAPI(json: Record<string, unknown>): { context: string; chunks: string[] } {
+  const chunks: string[] = []
+  const paths = (json.paths as Record<string, Record<string, unknown>>) ?? {}
+  const HTTP_METHODS = ['get', 'post', 'put', 'patch', 'delete']
+
+  for (const [path, methods] of Object.entries(paths)) {
+    for (const [method, operation] of Object.entries(methods)) {
+      if (!HTTP_METHODS.includes(method)) continue
+      const op = operation as Record<string, unknown>
+      const summary = (op.summary as string) ?? (op.operationId as string) ?? path
+      const description = (op.description as string) ?? ''
+
+      let chunk = `${method.toUpperCase()} ${path} — ${summary}`
+      if (description) chunk += `\n  ${description}`
+
+      try {
+        const content = ((op.requestBody as Record<string, unknown>)?.content as Record<string, unknown>)
+        const schema = (content?.['application/json'] as Record<string, unknown>)?.schema as Record<string, unknown>
+        const props = schema?.properties as Record<string, unknown>
+        if (props) chunk += `\n  Campos: ${Object.keys(props).join(', ')}`
+      } catch {}
+
+      chunks.push(chunk)
+    }
+  }
+
+  const title = (json.info as Record<string, string>)?.title ?? 'API'
+  const context = `API: ${title}\nTotal: ${chunks.length} endpoints\n\n` + chunks.join('\n\n')
+  return { context, chunks }
+}
+
+function parseCollection(json: Record<string, unknown>): { context: string; chunks: string[] } {
+  if (json.paths) return parseOpenAPI(json)
+  return parsePostman(json)
 }
 
 const inputStyle: React.CSSProperties = {
@@ -142,7 +168,7 @@ function StepRow({ done, active, label, detail, error }: { done: boolean; active
   )
 }
 
-export function ChatClient({ initialCollections, erps }: { initialCollections: ColMeta[]; erps: ERP[] }) {
+export function ChatClient({ initialCollections, erps, initialSettings }: { initialCollections: ColMeta[]; erps: ERP[]; initialSettings: Settings }) {
   const [collections, setCollections] = useState<ColMeta[]>(initialCollections)
   const [activeId, setActiveId] = useState<number | null>(null)
 
@@ -195,31 +221,19 @@ export function ChatClient({ initialCollections, erps }: { initialCollections: C
 
   // Keys & provider
   const [showKey, setShowKey] = useState(false)
-  const [anthropicKey, setAnthropicKey] = useState('')
-  const [openaiKey, setOpenaiKey] = useState('')
-  const [geminiKey, setGeminiKey] = useState('')
-  const [provider, setProvider] = useState<Provider>('anthropic')
-  const [embeddingProvider, setEmbeddingProvider] = useState<EmbeddingProvider>('openai')
+  const [anthropicKey, setAnthropicKey] = useState(initialSettings.anthropic_api_key)
+  const [openaiKey, setOpenaiKey] = useState(initialSettings.openai_api_key)
+  const [geminiKey, setGeminiKey] = useState(initialSettings.gemini_api_key)
+  const [provider, setProvider] = useState<Provider>(initialSettings.chat_provider as Provider)
+  const [embeddingProvider, setEmbeddingProvider] = useState<EmbeddingProvider>(initialSettings.embedding_provider as EmbeddingProvider)
 
   // Per-collection prompt editor
   const [editingPrompt, setEditingPrompt] = useState(false)
   const [promptDraft, setPromptDraft] = useState('')
   const [savingPrompt, setSavingPrompt] = useState(false)
 
-  useEffect(() => {
-    setAnthropicKey(localStorage.getItem('anthropic_api_key') ?? '')
-    setOpenaiKey(localStorage.getItem('openai_api_key') ?? '')
-    setGeminiKey(localStorage.getItem('gemini_api_key') ?? '')
-    setProvider((localStorage.getItem('chat_provider') as Provider) ?? 'anthropic')
-    setEmbeddingProvider((localStorage.getItem('embedding_provider') as EmbeddingProvider) ?? 'openai')
-  }, [])
-
-  function saveKeys() {
-    localStorage.setItem('anthropic_api_key', anthropicKey)
-    localStorage.setItem('openai_api_key', openaiKey)
-    localStorage.setItem('gemini_api_key', geminiKey)
-    localStorage.setItem('chat_provider', provider)
-    localStorage.setItem('embedding_provider', embeddingProvider)
+  async function saveKeys() {
+    await saveSettings({ anthropic_api_key: anthropicKey, openai_api_key: openaiKey, gemini_api_key: geminiKey, chat_provider: provider, embedding_provider: embeddingProvider })
     setShowKey(false)
   }
 
@@ -227,6 +241,7 @@ export function ChatClient({ initialCollections, erps }: { initialCollections: C
   const [messages, setMessages] = useState<Message[]>([{ role: 'assistant', content: WELCOME }])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -258,7 +273,7 @@ export function ChatClient({ initialCollections, erps }: { initialCollections: C
     let chunks: string[]
     try {
       const parsed = JSON.parse(newJson)
-      const result = parsePostman(parsed)
+      const result = parseCollection(parsed)
       context = result.context
       chunks = result.chunks
     } catch {
@@ -682,33 +697,63 @@ export function ChatClient({ initialCollections, erps }: { initialCollections: C
               <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: msg.role === 'user' ? 'var(--accent)' : 'var(--surface-2)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {msg.role === 'user' ? <User size={13} color="white" /> : <Bot size={13} color="var(--accent)" />}
               </div>
-              <div style={{ maxWidth: '75%', backgroundColor: msg.role === 'user' ? 'var(--accent)' : 'var(--surface)', border: msg.role === 'assistant' ? '1px solid var(--border)' : 'none', borderRadius: msg.role === 'user' ? '12px 4px 12px 12px' : '4px 12px 12px 12px', padding: '10px 14px', fontSize: 13, lineHeight: 1.7, color: msg.role === 'user' ? 'white' : 'var(--text)', wordBreak: 'break-word' }}>
+              <div style={{ maxWidth: '75%', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ backgroundColor: msg.role === 'user' ? 'var(--accent)' : 'var(--surface)', border: msg.role === 'assistant' ? '1px solid var(--border)' : 'none', borderRadius: msg.role === 'user' ? '12px 4px 12px 12px' : '4px 12px 12px 12px', padding: '10px 14px', fontSize: 13, lineHeight: 1.7, color: msg.role === 'user' ? 'white' : 'var(--text)', wordBreak: 'break-word' }}>
                 {msg.content
                   ? msg.role === 'assistant'
-                    ? extractCodeParts(msg.content).map((part, pi) => {
-                        if (part.type === 'code') {
-                          const isCurl = part.text.trimStart().startsWith('curl ')
-                          return (
-                            <div key={pi} style={{ margin: '8px 0' }}>
-                              <pre style={{ backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, padding: '10px 12px', fontSize: 11, fontFamily: 'monospace', overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all', margin: 0 }}>{part.text}</pre>
-                              {isCurl && erps.length > 0 && (
-                                <button
-                                  onClick={() => openImport(part.text)}
-                                  style={{ marginTop: 6, padding: '4px 10px', fontSize: 11, fontWeight: 500, backgroundColor: 'var(--accent)', color: 'white', border: 'none', borderRadius: 5, cursor: 'pointer' }}
-                                >
-                                  ↓ Importar endpoint
-                                </button>
-                              )}
-                            </div>
-                          )
-                        }
-                        return <span key={pi} style={{ whiteSpace: 'pre-wrap' }}>{part.text}</span>
-                      })
+                    ? <ReactMarkdown
+                        components={{
+                          code({ className, children }) {
+                            const text = String(children)
+                            const isBlock = text.includes('\n') || !!className
+                            if (isBlock) {
+                              const clean = text.replace(/\n$/, '')
+                              const isCurl = clean.trimStart().startsWith('curl ')
+                              return (
+                                <div style={{ margin: '8px 0' }}>
+                                  <pre style={{ backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, padding: '10px 12px', fontSize: 11, fontFamily: 'monospace', overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all', margin: 0 }}>{clean}</pre>
+                                  {isCurl && erps.length > 0 && (
+                                    <button onClick={() => openImport(clean)} style={{ marginTop: 6, padding: '4px 10px', fontSize: 11, fontWeight: 500, backgroundColor: 'var(--accent)', color: 'white', border: 'none', borderRadius: 5, cursor: 'pointer' }}>
+                                      ↓ Importar endpoint
+                                    </button>
+                                  )}
+                                </div>
+                              )
+                            }
+                            return <code style={{ backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 3, padding: '1px 5px', fontSize: '0.9em', fontFamily: 'monospace' }}>{children}</code>
+                          },
+                          pre({ children }) { return <>{children}</> },
+                          p({ children }) { return <p style={{ margin: '0 0 6px' }}>{children}</p> },
+                          ul({ children }) { return <ul style={{ margin: '4px 0 6px', paddingLeft: 18 }}>{children}</ul> },
+                          ol({ children }) { return <ol style={{ margin: '4px 0 6px', paddingLeft: 18 }}>{children}</ol> },
+                          li({ children }) { return <li style={{ marginBottom: 2 }}>{children}</li> },
+                          strong({ children }) { return <strong style={{ fontWeight: 600 }}>{children}</strong> },
+                          h1({ children }) { return <h1 style={{ fontSize: 15, fontWeight: 700, margin: '6px 0 4px' }}>{children}</h1> },
+                          h2({ children }) { return <h2 style={{ fontSize: 14, fontWeight: 700, margin: '6px 0 4px' }}>{children}</h2> },
+                          h3({ children }) { return <h3 style={{ fontSize: 13, fontWeight: 600, margin: '4px 0 3px' }}>{children}</h3> },
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
                     : <span style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</span>
                   : loading && i === messages.length - 1
                     ? <span style={{ color: 'var(--text-subtle)' }}>▊</span>
                     : null
                 }
+              </div>
+              {msg.role === 'assistant' && msg.content && (
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(msg.content)
+                    setCopiedIdx(i)
+                    setTimeout(() => setCopiedIdx(null), 2000)
+                  }}
+                  style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 4, padding: '2px 8px', fontSize: 11, color: copiedIdx === i ? 'var(--status-success)' : 'var(--text-subtle)', background: 'none', border: 'none', cursor: 'pointer', borderRadius: 4 }}
+                >
+                  {copiedIdx === i ? <Check size={11} /> : <Copy size={11} />}
+                  {copiedIdx === i ? 'Copiado' : 'Copiar'}
+                </button>
+              )}
               </div>
             </div>
           ))}

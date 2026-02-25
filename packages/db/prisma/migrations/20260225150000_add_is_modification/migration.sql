@@ -1,0 +1,1 @@
+ALTER TABLE "Endpoint" ADD COLUMN "isModification" BOOLEAN NOT NULL DEFAULT false;

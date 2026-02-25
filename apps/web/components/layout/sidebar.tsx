@@ -49,11 +49,6 @@ export function Sidebar({ erps }: { erps: SidebarERP[] }) {
     return next
   }
 
-  const onErps = pathname.startsWith('/erps')
-  const onCompanies = pathname.startsWith('/companies')
-
-  const allCompanies = erps.flatMap((e) => e.companies)
-
   const nav = [
     { href: '/', label: 'Home', icon: LayoutDashboard },
     { href: '/erps', label: 'ERPs', icon: Server },
@@ -140,35 +135,6 @@ export function Sidebar({ erps }: { erps: SidebarERP[] }) {
                 {label}
               </Link>
 
-              {/* ERPs subtree */}
-              {href === '/erps' && onErps && (
-                <div style={{ marginBottom: 4 }}>
-                  {erps.map((erp) => (
-                    <Link
-                      key={erp.id}
-                      href={`/erps/${erp.id}`}
-                      style={subItemStyle(pathname === `/erps/${erp.id}`)}
-                    >
-                      {erp.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-
-              {/* Empresas subtree */}
-              {href === '/companies' && onCompanies && (
-                <div style={{ marginBottom: 4 }}>
-                  {allCompanies.map((c) => (
-                    <Link
-                      key={c.id}
-                      href={`/companies/${c.id}`}
-                      style={subItemStyle(pathname === `/companies/${c.id}`)}
-                    >
-                      {c.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
 
             </div>
           )

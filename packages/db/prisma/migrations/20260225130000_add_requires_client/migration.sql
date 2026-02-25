@@ -1,0 +1,1 @@
+ALTER TABLE "Endpoint" ADD COLUMN "requiresClient" BOOLEAN NOT NULL DEFAULT true;

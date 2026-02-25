@@ -87,6 +87,9 @@ Prisma.NullTypes = {
  * Enums
  */
 exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 });
 
@@ -103,7 +106,10 @@ exports.Prisma.ERPFieldSchemaScalarFieldEnum = {
   label: 'label',
   fieldType: 'fieldType',
   required: 'required',
-  sortOrder: 'sortOrder'
+  sortOrder: 'sortOrder',
+  sourceEndpointId: 'sourceEndpointId',
+  endpointParam: 'endpointParam',
+  responsePath: 'responsePath'
 };
 
 exports.Prisma.EndpointScalarFieldEnum = {
@@ -114,7 +120,10 @@ exports.Prisma.EndpointScalarFieldEnum = {
   pathTemplate: 'pathTemplate',
   bodyTemplate: 'bodyTemplate',
   headers: 'headers',
-  sortOrder: 'sortOrder'
+  sortOrder: 'sortOrder',
+  group: 'group',
+  requiresClient: 'requiresClient',
+  isModification: 'isModification'
 };
 
 exports.Prisma.CompanyScalarFieldEnum = {
@@ -122,6 +131,7 @@ exports.Prisma.CompanyScalarFieldEnum = {
   name: 'name',
   erpId: 'erpId',
   baseUrl: 'baseUrl',
+  environments: 'environments',
   authType: 'authType',
   authConfig: 'authConfig',
   createdAt: 'createdAt'
@@ -146,8 +156,12 @@ exports.Prisma.PostmanCollectionScalarFieldEnum = {
 exports.Prisma.EmbeddingChunkScalarFieldEnum = {
   id: 'id',
   collectionId: 'collectionId',
-  text: 'text',
-  embedding: 'embedding'
+  text: 'text'
+};
+
+exports.Prisma.SettingScalarFieldEnum = {
+  key: 'key',
+  value: 'value'
 };
 
 exports.Prisma.RequestHistoryScalarFieldEnum = {
@@ -175,6 +189,11 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+};
+
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
@@ -189,6 +208,7 @@ exports.Prisma.ModelName = {
   TestClient: 'TestClient',
   PostmanCollection: 'PostmanCollection',
   EmbeddingChunk: 'EmbeddingChunk',
+  Setting: 'Setting',
   RequestHistory: 'RequestHistory'
 };
 /**
@@ -228,7 +248,7 @@ const config = {
   "datasourceNames": [
     "db"
   ],
-  "activeProvider": "sqlite",
+  "activeProvider": "postgresql",
   "postinstall": false,
   "inlineDatasources": {
     "db": {
@@ -238,13 +258,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel ERP {\n  id           Int              @id @default(autoincrement())\n  name         String           @unique\n  createdAt    DateTime         @default(now())\n  companies    Company[]\n  endpoints    Endpoint[]\n  fieldSchemas ERPFieldSchema[]\n}\n\nmodel ERPFieldSchema {\n  id        Int     @id @default(autoincrement())\n  erpId     Int\n  fieldName String\n  label     String\n  fieldType String  @default(\"text\")\n  required  Boolean @default(false)\n  sortOrder Int     @default(0)\n  erp       ERP     @relation(fields: [erpId], references: [id], onDelete: Cascade)\n}\n\nmodel Endpoint {\n  id           Int    @id @default(autoincrement())\n  erpId        Int\n  name         String\n  method       String @default(\"GET\")\n  pathTemplate String\n  bodyTemplate String @default(\"\")\n  headers      String @default(\"{}\")\n  sortOrder    Int    @default(0)\n  erp          ERP    @relation(fields: [erpId], references: [id], onDelete: Cascade)\n}\n\nmodel Company {\n  id          Int          @id @default(autoincrement())\n  name        String\n  erpId       Int\n  baseUrl     String       @default(\"\")\n  authType    String       @default(\"none\")\n  authConfig  String       @default(\"{}\")\n  createdAt   DateTime     @default(now())\n  erp         ERP          @relation(fields: [erpId], references: [id])\n  testClients TestClient[]\n}\n\nmodel TestClient {\n  id         Int      @id @default(autoincrement())\n  name       String\n  companyId  Int\n  fieldsData String   @default(\"{}\")\n  createdAt  DateTime @default(now())\n  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)\n}\n\nmodel PostmanCollection {\n  id           Int              @id @default(autoincrement())\n  name         String\n  context      String\n  systemPrompt String           @default(\"\")\n  createdAt    DateTime         @default(now())\n  chunks       EmbeddingChunk[]\n}\n\nmodel EmbeddingChunk {\n  id           Int               @id @default(autoincrement())\n  collectionId Int\n  text         String\n  embedding    String\n  collection   PostmanCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)\n}\n\nmodel RequestHistory {\n  id              Int      @id @default(autoincrement())\n  erpName         String\n  companyName     String\n  endpointName    String\n  clientName      String\n  method          String\n  url             String\n  requestBody     String   @default(\"\")\n  requestHeaders  String   @default(\"{}\")\n  statusCode      Int\n  responseBody    String   @default(\"\")\n  responseHeaders String   @default(\"{}\")\n  durationMs      Int\n  companyId       Int?\n  endpointId      Int?\n  testClientId    Int?\n  createdAt       DateTime @default(now())\n}\n",
-  "inlineSchemaHash": "613d7f4145f65948fcde653f8f89d80712081fb8a391fe5f3c382fb4945b74dc",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel ERP {\n  id           Int              @id @default(autoincrement())\n  name         String           @unique\n  createdAt    DateTime         @default(now())\n  companies    Company[]\n  endpoints    Endpoint[]\n  fieldSchemas ERPFieldSchema[]\n}\n\nmodel ERPFieldSchema {\n  id               Int     @id @default(autoincrement())\n  erpId            Int\n  fieldName        String\n  label            String\n  fieldType        String  @default(\"text\")\n  required         Boolean @default(false)\n  sortOrder        Int     @default(0)\n  sourceEndpointId Int?\n  endpointParam    String  @default(\"\")\n  responsePath     String  @default(\"\")\n  erp              ERP     @relation(fields: [erpId], references: [id], onDelete: Cascade)\n}\n\nmodel Endpoint {\n  id             Int     @id @default(autoincrement())\n  erpId          Int\n  name           String\n  method         String  @default(\"GET\")\n  pathTemplate   String\n  bodyTemplate   String  @default(\"\")\n  headers        String  @default(\"{}\")\n  sortOrder      Int     @default(0)\n  group          String  @default(\"\")\n  requiresClient Boolean @default(true)\n  isModification Boolean @default(false)\n  erp            ERP     @relation(fields: [erpId], references: [id], onDelete: Cascade)\n}\n\nmodel Company {\n  id           Int          @id @default(autoincrement())\n  name         String\n  erpId        Int\n  baseUrl      String       @default(\"\")\n  environments String       @default(\"[]\")\n  authType     String       @default(\"none\")\n  authConfig   String       @default(\"{}\")\n  createdAt    DateTime     @default(now())\n  erp          ERP          @relation(fields: [erpId], references: [id])\n  testClients  TestClient[]\n}\n\nmodel TestClient {\n  id         Int      @id @default(autoincrement())\n  name       String\n  companyId  Int\n  fieldsData String   @default(\"{}\")\n  createdAt  DateTime @default(now())\n  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)\n}\n\nmodel PostmanCollection {\n  id           Int              @id @default(autoincrement())\n  name         String\n  context      String           @db.Text\n  systemPrompt String           @default(\"\")\n  createdAt    DateTime         @default(now())\n  chunks       EmbeddingChunk[]\n}\n\nmodel EmbeddingChunk {\n  id           Int                         @id @default(autoincrement())\n  collectionId Int\n  text         String                      @db.Text\n  embedding    Unsupported(\"vector(1536)\")\n  collection   PostmanCollection           @relation(fields: [collectionId], references: [id], onDelete: Cascade)\n}\n\nmodel Setting {\n  key   String @id\n  value String @db.Text\n}\n\nmodel RequestHistory {\n  id              Int      @id @default(autoincrement())\n  erpName         String\n  companyName     String\n  endpointName    String\n  clientName      String\n  method          String\n  url             String\n  requestBody     String   @default(\"\") @db.Text\n  requestHeaders  String   @default(\"{}\")\n  statusCode      Int\n  responseBody    String   @default(\"\") @db.Text\n  responseHeaders String   @default(\"{}\")\n  durationMs      Int\n  companyId       Int?\n  endpointId      Int?\n  testClientId    Int?\n  createdAt       DateTime @default(now())\n}\n",
+  "inlineSchemaHash": "85c56bb01addef7bb2839e2cd909a75dcd9a6e7384eafecc4b79ff3c18d73371",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"ERP\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"companies\",\"kind\":\"object\",\"type\":\"Company\",\"relationName\":\"CompanyToERP\"},{\"name\":\"endpoints\",\"kind\":\"object\",\"type\":\"Endpoint\",\"relationName\":\"ERPToEndpoint\"},{\"name\":\"fieldSchemas\",\"kind\":\"object\",\"type\":\"ERPFieldSchema\",\"relationName\":\"ERPToERPFieldSchema\"}],\"dbName\":null},\"ERPFieldSchema\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"erpId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"fieldName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"label\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fieldType\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"required\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"sortOrder\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"erp\",\"kind\":\"object\",\"type\":\"ERP\",\"relationName\":\"ERPToERPFieldSchema\"}],\"dbName\":null},\"Endpoint\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"erpId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"method\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"pathTemplate\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bodyTemplate\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"headers\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sortOrder\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"erp\",\"kind\":\"object\",\"type\":\"ERP\",\"relationName\":\"ERPToEndpoint\"}],\"dbName\":null},\"Company\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"erpId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"baseUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"authType\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"authConfig\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"erp\",\"kind\":\"object\",\"type\":\"ERP\",\"relationName\":\"CompanyToERP\"},{\"name\":\"testClients\",\"kind\":\"object\",\"type\":\"TestClient\",\"relationName\":\"CompanyToTestClient\"}],\"dbName\":null},\"TestClient\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"companyId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"fieldsData\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"company\",\"kind\":\"object\",\"type\":\"Company\",\"relationName\":\"CompanyToTestClient\"}],\"dbName\":null},\"PostmanCollection\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"context\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"systemPrompt\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"chunks\",\"kind\":\"object\",\"type\":\"EmbeddingChunk\",\"relationName\":\"EmbeddingChunkToPostmanCollection\"}],\"dbName\":null},\"EmbeddingChunk\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"collectionId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"text\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"embedding\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"collection\",\"kind\":\"object\",\"type\":\"PostmanCollection\",\"relationName\":\"EmbeddingChunkToPostmanCollection\"}],\"dbName\":null},\"RequestHistory\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"erpName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"companyName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"endpointName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"clientName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"method\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"requestBody\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"requestHeaders\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"statusCode\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"responseBody\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"responseHeaders\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"durationMs\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"companyId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"endpointId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"testClientId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"ERP\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"companies\",\"kind\":\"object\",\"type\":\"Company\",\"relationName\":\"CompanyToERP\"},{\"name\":\"endpoints\",\"kind\":\"object\",\"type\":\"Endpoint\",\"relationName\":\"ERPToEndpoint\"},{\"name\":\"fieldSchemas\",\"kind\":\"object\",\"type\":\"ERPFieldSchema\",\"relationName\":\"ERPToERPFieldSchema\"}],\"dbName\":null},\"ERPFieldSchema\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"erpId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"fieldName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"label\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fieldType\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"required\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"sortOrder\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"sourceEndpointId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"endpointParam\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"responsePath\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"erp\",\"kind\":\"object\",\"type\":\"ERP\",\"relationName\":\"ERPToERPFieldSchema\"}],\"dbName\":null},\"Endpoint\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"erpId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"method\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"pathTemplate\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"bodyTemplate\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"headers\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"sortOrder\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"group\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"requiresClient\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"isModification\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"erp\",\"kind\":\"object\",\"type\":\"ERP\",\"relationName\":\"ERPToEndpoint\"}],\"dbName\":null},\"Company\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"erpId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"baseUrl\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"environments\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"authType\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"authConfig\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"erp\",\"kind\":\"object\",\"type\":\"ERP\",\"relationName\":\"CompanyToERP\"},{\"name\":\"testClients\",\"kind\":\"object\",\"type\":\"TestClient\",\"relationName\":\"CompanyToTestClient\"}],\"dbName\":null},\"TestClient\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"companyId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"fieldsData\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"company\",\"kind\":\"object\",\"type\":\"Company\",\"relationName\":\"CompanyToTestClient\"}],\"dbName\":null},\"PostmanCollection\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"context\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"systemPrompt\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"chunks\",\"kind\":\"object\",\"type\":\"EmbeddingChunk\",\"relationName\":\"EmbeddingChunkToPostmanCollection\"}],\"dbName\":null},\"EmbeddingChunk\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"collectionId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"text\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"collection\",\"kind\":\"object\",\"type\":\"PostmanCollection\",\"relationName\":\"EmbeddingChunkToPostmanCollection\"}],\"dbName\":null},\"Setting\":{\"fields\":[{\"name\":\"key\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"value\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null},\"RequestHistory\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"erpName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"companyName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"endpointName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"clientName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"method\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"requestBody\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"requestHeaders\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"statusCode\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"responseBody\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"responseHeaders\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"durationMs\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"companyId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"endpointId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"testClientId\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

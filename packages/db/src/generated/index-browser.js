@@ -115,6 +115,9 @@ Prisma.NullTypes = {
  */
 
 exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 });
 
@@ -131,7 +134,10 @@ exports.Prisma.ERPFieldSchemaScalarFieldEnum = {
   label: 'label',
   fieldType: 'fieldType',
   required: 'required',
-  sortOrder: 'sortOrder'
+  sortOrder: 'sortOrder',
+  sourceEndpointId: 'sourceEndpointId',
+  endpointParam: 'endpointParam',
+  responsePath: 'responsePath'
 };
 
 exports.Prisma.EndpointScalarFieldEnum = {
@@ -142,7 +148,10 @@ exports.Prisma.EndpointScalarFieldEnum = {
   pathTemplate: 'pathTemplate',
   bodyTemplate: 'bodyTemplate',
   headers: 'headers',
-  sortOrder: 'sortOrder'
+  sortOrder: 'sortOrder',
+  group: 'group',
+  requiresClient: 'requiresClient',
+  isModification: 'isModification'
 };
 
 exports.Prisma.CompanyScalarFieldEnum = {
@@ -150,6 +159,7 @@ exports.Prisma.CompanyScalarFieldEnum = {
   name: 'name',
   erpId: 'erpId',
   baseUrl: 'baseUrl',
+  environments: 'environments',
   authType: 'authType',
   authConfig: 'authConfig',
   createdAt: 'createdAt'
@@ -174,8 +184,12 @@ exports.Prisma.PostmanCollectionScalarFieldEnum = {
 exports.Prisma.EmbeddingChunkScalarFieldEnum = {
   id: 'id',
   collectionId: 'collectionId',
-  text: 'text',
-  embedding: 'embedding'
+  text: 'text'
+};
+
+exports.Prisma.SettingScalarFieldEnum = {
+  key: 'key',
+  value: 'value'
 };
 
 exports.Prisma.RequestHistoryScalarFieldEnum = {
@@ -203,6 +217,11 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+};
+
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
@@ -217,6 +236,7 @@ exports.Prisma.ModelName = {
   TestClient: 'TestClient',
   PostmanCollection: 'PostmanCollection',
   EmbeddingChunk: 'EmbeddingChunk',
+  Setting: 'Setting',
   RequestHistory: 'RequestHistory'
 };
 

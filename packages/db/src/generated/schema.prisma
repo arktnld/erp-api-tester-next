@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -18,38 +18,45 @@ model ERP {
 }
 
 model ERPFieldSchema {
-  id        Int     @id @default(autoincrement())
-  erpId     Int
-  fieldName String
-  label     String
-  fieldType String  @default("text")
-  required  Boolean @default(false)
-  sortOrder Int     @default(0)
-  erp       ERP     @relation(fields: [erpId], references: [id], onDelete: Cascade)
+  id               Int     @id @default(autoincrement())
+  erpId            Int
+  fieldName        String
+  label            String
+  fieldType        String  @default("text")
+  required         Boolean @default(false)
+  sortOrder        Int     @default(0)
+  sourceEndpointId Int?
+  endpointParam    String  @default("")
+  responsePath     String  @default("")
+  erp              ERP     @relation(fields: [erpId], references: [id], onDelete: Cascade)
 }
 
 model Endpoint {
-  id           Int    @id @default(autoincrement())
-  erpId        Int
-  name         String
-  method       String @default("GET")
-  pathTemplate String
-  bodyTemplate String @default("")
-  headers      String @default("{}")
-  sortOrder    Int    @default(0)
-  erp          ERP    @relation(fields: [erpId], references: [id], onDelete: Cascade)
+  id             Int     @id @default(autoincrement())
+  erpId          Int
+  name           String
+  method         String  @default("GET")
+  pathTemplate   String
+  bodyTemplate   String  @default("")
+  headers        String  @default("{}")
+  sortOrder      Int     @default(0)
+  group          String  @default("")
+  requiresClient Boolean @default(true)
+  isModification Boolean @default(false)
+  erp            ERP     @relation(fields: [erpId], references: [id], onDelete: Cascade)
 }
 
 model Company {
-  id          Int          @id @default(autoincrement())
-  name        String
-  erpId       Int
-  baseUrl     String       @default("")
-  authType    String       @default("none")
-  authConfig  String       @default("{}")
-  createdAt   DateTime     @default(now())
-  erp         ERP          @relation(fields: [erpId], references: [id])
-  testClients TestClient[]
+  id           Int          @id @default(autoincrement())
+  name         String
+  erpId        Int
+  baseUrl      String       @default("")
+  environments String       @default("[]")
+  authType     String       @default("none")
+  authConfig   String       @default("{}")
+  createdAt    DateTime     @default(now())
+  erp          ERP          @relation(fields: [erpId], references: [id])
+  testClients  TestClient[]
 }
 
 model TestClient {
@@ -64,18 +71,23 @@ model TestClient {
 model PostmanCollection {
   id           Int              @id @default(autoincrement())
   name         String
-  context      String
+  context      String           @db.Text
   systemPrompt String           @default("")
   createdAt    DateTime         @default(now())
   chunks       EmbeddingChunk[]
 }
 
 model EmbeddingChunk {
-  id           Int               @id @default(autoincrement())
+  id           Int                         @id @default(autoincrement())
   collectionId Int
-  text         String
-  embedding    String
-  collection   PostmanCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  text         String                      @db.Text
+  embedding    Unsupported("vector(1536)")
+  collection   PostmanCollection           @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+}
+
+model Setting {
+  key   String @id
+  value String @db.Text
 }
 
 model RequestHistory {
@@ -86,10 +98,10 @@ model RequestHistory {
   clientName      String
   method          String
   url             String
-  requestBody     String   @default("")
+  requestBody     String   @default("") @db.Text
   requestHeaders  String   @default("{}")
   statusCode      Int
-  responseBody    String   @default("")
+  responseBody    String   @default("") @db.Text
   responseHeaders String   @default("{}")
   durationMs      Int
   companyId       Int?

@@ -6,15 +6,7 @@ import OpenAI from 'openai'
 
 export type EmbeddingProvider = 'openai' | 'gemini'
 
-function cosineSimilarity(a: number[], b: number[]): number {
-  let dot = 0, magA = 0, magB = 0
-  for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i]
-    magA += a[i] * a[i]
-    magB += b[i] * b[i]
-  }
-  return dot / (Math.sqrt(magA) * Math.sqrt(magB))
-}
+const DIMENSIONS = 1536
 
 async function geminiEmbedBatch(texts: string[], apiKey: string): Promise<number[][]> {
   return Promise.all(texts.map(async (text) => {
@@ -23,7 +15,11 @@ async function geminiEmbedBatch(texts: string[], apiKey: string): Promise<number
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'models/gemini-embedding-001', content: { parts: [{ text }] } }),
+        body: JSON.stringify({
+          model: 'models/gemini-embedding-001',
+          content: { parts: [{ text }] },
+          outputDimensionality: DIMENSIONS,
+        }),
       }
     )
     if (!res.ok) {
@@ -43,20 +39,18 @@ async function generateEmbeddings(
   if (provider === 'gemini') {
     const results: number[][] = []
     for (let i = 0; i < texts.length; i += 20) {
-      const batch = texts.slice(i, i + 20)
-      results.push(...await geminiEmbedBatch(batch, apiKey))
+      results.push(...await geminiEmbedBatch(texts.slice(i, i + 20), apiKey))
     }
     return results
   }
 
-  // OpenAI
   const client = new OpenAI({ apiKey })
   const results: number[][] = []
   for (let i = 0; i < texts.length; i += 100) {
-    const batch = texts.slice(i, i + 100)
     const res = await client.embeddings.create({
       model: 'text-embedding-3-small',
-      input: batch,
+      input: texts.slice(i, i + 100),
+      dimensions: DIMENSIONS,
     })
     results.push(...res.data.map(d => d.embedding))
   }
@@ -68,8 +62,7 @@ async function embedQuery(
   provider: EmbeddingProvider,
   apiKey: string
 ): Promise<number[]> {
-  const results = await generateEmbeddings([text], provider, apiKey)
-  return results[0]
+  return (await generateEmbeddings([text], provider, apiKey))[0]
 }
 
 export async function getCollections() {
@@ -100,13 +93,14 @@ export async function saveCollection(
   if (chunks.length > 0 && embeddingKey) {
     try {
       const embeddings = await generateEmbeddings(chunks, embeddingProvider, embeddingKey)
-      await prisma.embeddingChunk.createMany({
-        data: chunks.map((text, i) => ({
-          collectionId: col.id,
-          text,
-          embedding: JSON.stringify(embeddings[i]),
-        })),
-      })
+      await Promise.all(
+        chunks.map((text, i) =>
+          prisma.$executeRaw`
+            INSERT INTO "EmbeddingChunk" ("collectionId", "text", "embedding")
+            VALUES (${col.id}, ${text}, ${JSON.stringify(embeddings[i])}::vector)
+          `
+        )
+      )
       embeddingsCount = chunks.length
     } catch (err) {
       console.error('Embedding generation failed:', err)
@@ -125,12 +119,9 @@ export async function retrieveContext(
   embeddingKey: string,
   topK = 10
 ): Promise<string> {
-  const chunks = await prisma.embeddingChunk.findMany({
-    where: { collectionId },
-    select: { text: true, embedding: true },
-  })
+  const count = await prisma.embeddingChunk.count({ where: { collectionId } })
 
-  if (chunks.length === 0) {
+  if (count === 0) {
     const col = await prisma.postmanCollection.findUnique({
       where: { id: collectionId },
       select: { context: true },
@@ -140,12 +131,15 @@ export async function retrieveContext(
 
   const queryVec = await embedQuery(question, embeddingProvider, embeddingKey)
 
-  const scored = chunks.map(c => ({
-    text: c.text,
-    score: cosineSimilarity(queryVec, JSON.parse(c.embedding) as number[]),
-  }))
-  scored.sort((a, b) => b.score - a.score)
-  return scored.slice(0, topK).map(c => c.text).join('\n\n')
+  const rows = await prisma.$queryRaw<{ text: string }[]>`
+    SELECT text
+    FROM "EmbeddingChunk"
+    WHERE "collectionId" = ${collectionId}
+    ORDER BY embedding <=> ${JSON.stringify(queryVec)}::vector
+    LIMIT ${topK}
+  `
+
+  return rows.map(r => r.text).join('\n\n')
 }
 
 export async function deleteCollection(id: number) {

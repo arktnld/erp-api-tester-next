@@ -123,8 +123,10 @@ export default async function Dashboard() {
             ) : (
               recentHistory.map((h, i) => {
                 const repeatUrl =
-                  h.companyId && h.endpointId && h.testClientId
-                    ? `/test?companyId=${h.companyId}&endpointId=${h.endpointId}&clientId=${h.testClientId}`
+                  h.companyId && h.endpointId
+                    ? h.testClientId
+                      ? `/test?companyId=${h.companyId}&endpointId=${h.endpointId}&clientId=${h.testClientId}`
+                      : `/test?companyId=${h.companyId}&endpointId=${h.endpointId}`
                     : null
 
                 return (

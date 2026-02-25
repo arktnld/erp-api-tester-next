@@ -7,28 +7,33 @@ function substitute(template: string, fields: Record<string, string>): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { endpointId, clientId, rawBody: customBody } = await req.json()
+    const { endpointId, clientId, companyId, environmentUrl, rawBody: customBody, inlineFields } = await req.json()
 
-    const [endpoint, client] = await Promise.all([
-      prisma.endpoint.findUniqueOrThrow({ where: { id: endpointId } }),
-      prisma.testClient.findUniqueOrThrow({
+    const endpoint = await prisma.endpoint.findUniqueOrThrow({ where: { id: endpointId } })
+
+    let company: { id: number; name: string; baseUrl: string; authType: string; authConfig: string | null; erp: { name: string } }
+    let fields: Record<string, string> = {}
+    let clientName = ''
+
+    if (clientId) {
+      const client = await prisma.testClient.findUniqueOrThrow({
         where: { id: clientId },
         include: {
           company: {
-            select: {
-              id: true,
-              name: true,
-              baseUrl: true,
-              authType: true,
-              authConfig: true,
-              erp: { select: { name: true } },
-            },
+            select: { id: true, name: true, baseUrl: true, authType: true, authConfig: true, erp: { select: { name: true } } },
           },
         },
-      }),
-    ])
-
-    const fields = JSON.parse(client.fieldsData) as Record<string, string>
+      })
+      company = client.company
+      fields = JSON.parse(client.fieldsData) as Record<string, string>
+      clientName = client.name
+    } else {
+      company = await prisma.company.findUniqueOrThrow({
+        where: { id: companyId },
+        select: { id: true, name: true, baseUrl: true, authType: true, authConfig: true, erp: { select: { name: true } } },
+      })
+      if (inlineFields) fields = inlineFields as Record<string, string>
+    }
     const resolvedPath = substitute(endpoint.pathTemplate, fields)
     const resolvedBody =
       customBody != null
@@ -41,23 +46,23 @@ export async function POST(req: NextRequest) {
       string,
       string
     >
-    const authConfig = JSON.parse(client.company.authConfig || '{}') as Record<
+    const authConfig = JSON.parse(company.authConfig || '{}') as Record<
       string,
       string
     >
 
     // Build auth headers
     const authHeaders: Record<string, string> = {}
-    if (client.company.authType === 'bearer' && authConfig.token) {
+    if (company.authType === 'bearer' && authConfig.token) {
       authHeaders['Authorization'] = `Bearer ${authConfig.token}`
     } else if (
-      client.company.authType === 'api_key' &&
+      company.authType === 'api_key' &&
       authConfig.header &&
       authConfig.value
     ) {
       authHeaders[authConfig.header] = authConfig.value
     } else if (
-      client.company.authType === 'basic' &&
+      company.authType === 'basic' &&
       authConfig.username &&
       authConfig.password
     ) {
@@ -65,9 +70,11 @@ export async function POST(req: NextRequest) {
         `${authConfig.username}:${authConfig.password}`
       ).toString('base64')
       authHeaders['Authorization'] = `Basic ${encoded}`
+    } else if (company.authType === 'custom_headers') {
+      Object.assign(authHeaders, authConfig)
     }
 
-    const url = `${client.company.baseUrl}${resolvedPath}`
+    const url = `${environmentUrl ?? company.baseUrl}${resolvedPath}`
     const requestHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
       ...endpointHeaders,
@@ -100,13 +107,13 @@ export async function POST(req: NextRequest) {
 
     await prisma.requestHistory.create({
       data: {
-        erpName: client.company.erp.name,
-        companyName: client.company.name,
-        companyId: client.company.id,
+        erpName: company.erp.name,
+        companyName: company.name,
+        companyId: company.id,
         endpointId: endpoint.id,
-        testClientId: client.id,
+        testClientId: clientId ?? null,
         endpointName: endpoint.name,
-        clientName: client.name,
+        clientName: clientName,
         method: endpoint.method,
         url,
         requestBody: resolvedBody ?? '',

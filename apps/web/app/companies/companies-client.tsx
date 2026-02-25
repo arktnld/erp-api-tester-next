@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { Plus, Pencil, Trash2, ChevronRight } from 'lucide-react'
+import { Plus, Pencil, Trash2, ChevronRight, X } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTable } from '@/components/ui/data-table'
 import { PageHeader } from '@/components/ui/page-header'
@@ -11,23 +11,33 @@ import { Input } from '@/components/ui/input'
 import { Sheet } from '@/components/ui/sheet'
 import { createCompany, updateCompany, deleteCompany } from '@/lib/actions/companies'
 
+type Environment = { name: string; url: string }
 type Company = {
   id: number
   name: string
   erpId: number
   baseUrl: string
+  environments: string
   authType: string
   authConfig: string
   erp: { id: number; name: string }
   _count: { testClients: number }
 }
+
+const ENV_SUGGESTIONS = ['Homologação', 'Staging', 'Dev', 'Filial', 'Outro']
+
+function nextEnvSuggestion(existing: Environment[]): string {
+  const names = existing.map((e) => e.name)
+  return ENV_SUGGESTIONS.find((s) => !names.includes(s)) ?? 'Ambiente'
+}
 type ERP = { id: number; name: string }
 
-const AUTH_TYPES = ['none', 'bearer', 'api_key', 'basic']
+const AUTH_TYPES = ['none', 'bearer', 'api_key', 'basic', 'custom_headers']
 const AUTH_PLACEHOLDERS: Record<string, string> = {
   bearer: '{"token": "eyJhbGciOiJSUzI1NiJ9..."}',
   api_key: '{"header": "X-API-Key", "value": "abc123"}',
   basic: '{"username": "admin", "password": "secret"}',
+  custom_headers: '{"X-APIKEY": "abc123", "X-APIPASSWORD": "secret"}',
   none: '{}',
 }
 
@@ -74,6 +84,9 @@ export function CompaniesClient({
   const [name, setName] = useState('')
   const [erpId, setErpId] = useState('')
   const [baseUrl, setBaseUrl] = useState('')
+  const [environments, setEnvironments] = useState<Environment[]>([])
+  const [newEnvName, setNewEnvName] = useState('')
+  const [newEnvUrl, setNewEnvUrl] = useState('')
   const [authType, setAuthType] = useState('none')
   const [authConfig, setAuthConfig] = useState('{}')
   const [isPending, startTransition] = useTransition()
@@ -82,9 +95,27 @@ export function CompaniesClient({
     setName(company?.name ?? '')
     setErpId(company?.erpId?.toString() ?? (erps[0]?.id?.toString() ?? ''))
     setBaseUrl(company?.baseUrl ?? '')
+    const envs: Environment[] = company?.environments ? JSON.parse(company.environments) : []
+    setEnvironments(envs)
+    setNewEnvName(nextEnvSuggestion(envs))
+    setNewEnvUrl('')
     setAuthType(company?.authType ?? 'none')
     setAuthConfig(company?.authConfig ?? '{}')
     setSheet({ open: true, company })
+  }
+
+  const addEnvironment = () => {
+    if (!newEnvName.trim() || !newEnvUrl.trim()) return
+    const updated = [...environments, { name: newEnvName.trim(), url: newEnvUrl.trim() }]
+    setEnvironments(updated)
+    setNewEnvName(nextEnvSuggestion(updated))
+    setNewEnvUrl('')
+  }
+
+  const removeEnvironment = (i: number) => {
+    const updated = environments.filter((_, idx) => idx !== i)
+    setEnvironments(updated)
+    setNewEnvName(nextEnvSuggestion(updated))
   }
 
   const columns: ColumnDef<Company, unknown>[] = [
@@ -205,16 +236,18 @@ export function CompaniesClient({
           onSubmit={(e) => {
             e.preventDefault()
             startTransition(async () => {
+              const environmentsJson = JSON.stringify(environments)
               if (sheet.company) {
                 await updateCompany(sheet.company.id, {
                   name,
                   erpId: Number(erpId),
                   baseUrl,
+                  environments: environmentsJson,
                   authType,
                   authConfig,
                 })
               } else {
-                await createCompany({ name, erpId: Number(erpId), baseUrl, authType, authConfig })
+                await createCompany({ name, erpId: Number(erpId), baseUrl, environments: environmentsJson, authType, authConfig })
               }
               setSheet({ open: false })
             })
@@ -244,6 +277,43 @@ export function CompaniesClient({
             placeholder="https://api.empresa.com.br"
             required
           />
+
+          <label style={labelStyle}>URLs Adicionais</label>
+          {environments.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 8 }}>
+              <div style={{ display: 'flex', gap: 6, fontSize: 11, color: 'var(--text-subtle)', padding: '0 2px' }}>
+                <span style={{ width: 120 }}>Nome</span>
+                <span style={{ flex: 1 }}>URL</span>
+              </div>
+              {environments.map((env, i) => (
+                <div key={i} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <span style={{ width: 120, fontSize: 12, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{env.name}</span>
+                  <span style={{ flex: 1, fontSize: 12, fontFamily: 'monospace', color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{env.url}</span>
+                  <button type="button" onClick={() => removeEnvironment(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)', padding: 2, flexShrink: 0 }}>
+                    <X size={13} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <div style={{ display: 'flex', gap: 6 }}>
+            <Input
+              value={newEnvName}
+              onChange={(e) => setNewEnvName(e.target.value)}
+              placeholder="Homologação"
+              style={{ width: 130, flexShrink: 0 }}
+            />
+            <Input
+              value={newEnvUrl}
+              onChange={(e) => setNewEnvUrl(e.target.value)}
+              placeholder="https://hom.empresa.com.br"
+              style={{ flex: 1 }}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addEnvironment() } }}
+            />
+            <Button type="button" variant="ghost" onClick={addEnvironment} style={{ flexShrink: 0 }}>
+              <Plus size={13} />
+            </Button>
+          </div>
 
           <label style={labelStyle}>Tipo de Autenticação</label>
           <select

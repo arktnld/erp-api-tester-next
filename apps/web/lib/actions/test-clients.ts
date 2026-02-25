@@ -21,6 +21,10 @@ export async function updateTestClient(
   revalidatePath(`/companies/${companyId}`)
 }
 
+export async function getTestClient(id: number) {
+  return prisma.testClient.findUniqueOrThrow({ where: { id } })
+}
+
 export async function deleteTestClient(id: number, companyId: number) {
   await prisma.testClient.delete({ where: { id } })
   revalidatePath(`/companies/${companyId}`)

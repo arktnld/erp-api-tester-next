@@ -18,7 +18,10 @@ export async function getCompany(id: number) {
     where: { id },
     include: {
       erp: {
-        include: { fieldSchemas: { orderBy: { sortOrder: 'asc' } } },
+        include: {
+          fieldSchemas: { orderBy: { sortOrder: 'asc' } },
+          endpoints: { orderBy: { sortOrder: 'asc' } },
+        },
       },
       testClients: { orderBy: { name: 'asc' } },
     },
@@ -29,6 +32,7 @@ export async function createCompany(data: {
   name: string
   erpId: number
   baseUrl: string
+  environments: string
   authType: string
   authConfig: string
 }) {
@@ -38,7 +42,7 @@ export async function createCompany(data: {
 
 export async function updateCompany(
   id: number,
-  data: { name: string; erpId: number; baseUrl: string; authType: string; authConfig: string }
+  data: { name: string; erpId: number; baseUrl: string; environments: string; authType: string; authConfig: string }
 ) {
   await prisma.company.update({ where: { id }, data })
   revalidatePath('/companies')

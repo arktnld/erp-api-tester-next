@@ -1,0 +1,1 @@
+ALTER TABLE "Endpoint" ADD COLUMN "group" TEXT NOT NULL DEFAULT '';

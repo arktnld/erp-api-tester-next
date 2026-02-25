@@ -19,6 +19,7 @@ export default async function TestRoute({
           id: true,
           name: true,
           baseUrl: true,
+          environments: true,
           authType: true,
           authConfig: true,
           testClients: { orderBy: { name: 'asc' } },
