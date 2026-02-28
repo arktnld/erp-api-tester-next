@@ -55,10 +55,22 @@ function formatTimestamp(d: Date): string {
   })
 }
 
-function truncateBody(body: string, maxLines = 15): { lines: string[]; omitted: number } {
+function truncateBody(body: string, maxLines = 15, maxChars = 700): { lines: string[]; omitted: number } {
   const all = body.split('\n')
-  if (all.length <= maxLines) return { lines: all, omitted: 0 }
-  return { lines: all.slice(0, maxLines), omitted: all.length - maxLines }
+  const capped = all.length <= maxLines ? all : all.slice(0, maxLines)
+  // Also cap by total chars to handle long single-line content (HTML paragraphs, etc.)
+  let chars = 0
+  const result: string[] = []
+  for (const line of capped) {
+    if (chars + line.length > maxChars) {
+      const remaining = maxChars - chars
+      if (remaining > 20) result.push(line.slice(0, remaining) + '…')
+      break
+    }
+    result.push(line)
+    chars += line.length + 1
+  }
+  return { lines: result, omitted: all.length - result.length }
 }
 
 function prettyJson(text: string): string {

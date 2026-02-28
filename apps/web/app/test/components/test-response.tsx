@@ -165,7 +165,7 @@ export function TestResponse({ response, loading, erpName = '', companyName = ''
           if (response.contentCategory === 'image') return <ImageContent response={response} />
           if (response.isBinary) return <BinaryContent response={response} />
           if (response.contentCategory === 'xml' || response.contentCategory === 'html') {
-            const lang = response.contentCategory === 'xml' ? 'xml' : 'htmlbars'
+            const lang = 'xml'
             return (
               <SyntaxHighlighter
                 language={lang}
