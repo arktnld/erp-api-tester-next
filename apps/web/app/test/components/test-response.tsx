@@ -7,8 +7,9 @@ import { JsonTree } from './json-tree'
 import { tryPrettyJson } from '../lib/utils'
 import type { ExecuteResponse, ExportData } from '../lib/types'
 import { ExportButton } from './export-button'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import dynamic from 'next/dynamic'
+
+const CodeBlock = dynamic(() => import('@/components/ui/code-block').then(m => ({ default: m.CodeBlock })), { ssr: false })
 
 const tabBtnStyle = (active: boolean): React.CSSProperties => ({
   padding: '7px 14px',
@@ -167,14 +168,13 @@ export function TestResponse({ response, loading, erpName = '', companyName = ''
           if (response.contentCategory === 'xml' || response.contentCategory === 'html') {
             const lang = 'xml'
             return (
-              <SyntaxHighlighter
+              <CodeBlock
                 language={lang}
-                style={atomOneDark}
                 customStyle={{ borderRadius: 8, fontSize: 12, backgroundColor: 'var(--surface-2)', lineHeight: 1.7 }}
                 wrapLongLines
               >
                 {response.responseBody}
-              </SyntaxHighlighter>
+              </CodeBlock>
             )
           }
           let parsed: unknown = null
