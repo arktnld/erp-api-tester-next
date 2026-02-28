@@ -7,6 +7,8 @@ import { JsonTree } from './json-tree'
 import { tryPrettyJson } from '../lib/utils'
 import type { ExecuteResponse, ExportData } from '../lib/types'
 import { ExportButton } from './export-button'
+import SyntaxHighlighter from 'react-syntax-highlighter'
+import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 
 const tabBtnStyle = (active: boolean): React.CSSProperties => ({
   padding: '7px 14px',
@@ -162,6 +164,19 @@ export function TestResponse({ response, loading, erpName = '', companyName = ''
         {resTab === 'json' && (() => {
           if (response.contentCategory === 'image') return <ImageContent response={response} />
           if (response.isBinary) return <BinaryContent response={response} />
+          if (response.contentCategory === 'xml' || response.contentCategory === 'html') {
+            const lang = response.contentCategory === 'xml' ? 'xml' : 'htmlbars'
+            return (
+              <SyntaxHighlighter
+                language={lang}
+                style={atomOneDark}
+                customStyle={{ borderRadius: 8, fontSize: 12, backgroundColor: 'var(--surface-2)', lineHeight: 1.7 }}
+                wrapLongLines
+              >
+                {response.responseBody}
+              </SyntaxHighlighter>
+            )
+          }
           let parsed: unknown = null
           try { parsed = JSON.parse(response.responseBody) } catch {}
           return (
