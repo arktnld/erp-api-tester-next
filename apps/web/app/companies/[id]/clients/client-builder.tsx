@@ -117,15 +117,23 @@ export function ClientBuilder({ company, client }: { company: Company; client?: 
   const [filledCount, setFilledCount] = useState(0)
   const [fetchMissing, setFetchMissing] = useState<Set<string>>(new Set())
 
+  const autoFillFields = new Set(
+    company.erp.fieldSchemas.filter((fs) => fs.sourceEndpointId).map((fs) => fs.fieldName)
+  )
+
   const handleFetch = async () => {
     setFetchLoading(true)
     setFetchStatus('idle')
     setFetchError('')
+    setFetchMissing(new Set())
 
-    // Pool starts with user identifiers + already filled fields
+    // Pool starts with user identifiers + manually filled fields only
+    // (auto-filled fields are excluded so a new CPF always fetches fresh data)
     const pool: Record<string, string> = {}
     Object.entries(identifiers).forEach(([k, v]) => { if (v) pool[k] = v })
-    Object.entries(fieldValues).forEach(([k, v]) => { if (v) pool[k] = v })
+    Object.entries(fieldValues).forEach(([k, v]) => {
+      if (!autoFillFields.has(k) && v) pool[k] = v
+    })
 
     const executed = new Set<string>()
     let totalFilled = 0
@@ -174,8 +182,14 @@ export function ClientBuilder({ company, client }: { company: Company; client?: 
         }
       }
 
-      // Apply all collected values at once
-      setFieldValues((prev) => ({ ...prev, ...pool }))
+      // Reset auto-filled fields first, then apply new values
+      // Ensures that changing the identifier (CPF) clears stale data
+      setFieldValues((prev) => {
+        const next = { ...prev }
+        autoFillFields.forEach((name) => { next[name] = '' })
+        Object.assign(next, pool)
+        return next
+      })
       setFilledCount(totalFilled)
       if (lastError && totalFilled === 0) setFetchError(lastError)
 
