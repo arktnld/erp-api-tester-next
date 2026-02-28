@@ -23,7 +23,7 @@ Itens em ordem de prioridade. Grupos marcados com 📦 têm 1 plano só — não
   - `react-syntax-highlighter/dist/esm/light` + `registerLanguage`
   - `next/dynamic(() => import(...), { ssr: false })`
 
-- [ ] `[segurança]` **Headers de segurança HTTP** — uma mudança em `next.config.ts` cobre tudo:
+- [x] `[segurança]` **Headers de segurança HTTP** ✅ v1.7.0 — uma mudança em `next.config.ts` cobre tudo:
   - `Content-Security-Policy` 🔴, `X-Frame-Options: DENY` 🔴
   - `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` 🟡
   - `poweredByHeader: false`
