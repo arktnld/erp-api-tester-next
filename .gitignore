@@ -9,3 +9,4 @@ data/
 .motia/
 .pnpm-store/
 tsconfig.tsbuildinfo
+.worktrees/
