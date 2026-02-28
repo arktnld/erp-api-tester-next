@@ -3,8 +3,10 @@
 import dynamic from 'next/dynamic'
 import { tryPrettyJson } from '../lib/utils'
 import { sectionLabel } from '@/lib/styles'
+import type { EditorLanguage } from '@/components/ui/code-editor'
 
 const CodeBlock = dynamic(() => import('@/components/ui/code-block').then(m => ({ default: m.CodeBlock })), { ssr: false })
+const CodeEditor = dynamic(() => import('@/components/ui/code-editor').then(m => ({ default: m.CodeEditor })), { ssr: false })
 import type { ExecuteResponse } from '../lib/types'
 
 interface TestRequestProps {
@@ -12,11 +14,12 @@ interface TestRequestProps {
   resolvedBody: string
   bodyMode: 'form' | 'raw'
   rawBody: string
+  editorLanguage: EditorLanguage
   onBodyModeChange: (mode: 'form' | 'raw') => void
   onRawBodyChange: (value: string) => void
 }
 
-export function TestRequest({ response, resolvedBody, bodyMode, rawBody, onBodyModeChange, onRawBodyChange }: TestRequestProps) {
+export function TestRequest({ response, resolvedBody, bodyMode, rawBody, editorLanguage, onBodyModeChange, onRawBodyChange }: TestRequestProps) {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--border)', overflow: 'hidden' }}>
       <div style={{ flex: 1, overflow: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -82,26 +85,31 @@ export function TestRequest({ response, resolvedBody, bodyMode, rawBody, onBodyM
               <p style={{ fontSize: 12, color: 'var(--text-subtle)' }}>Nenhum body para este endpoint.</p>
             )
           ) : (
-            <textarea
-              value={rawBody}
-              onChange={(e) => onRawBodyChange(e.target.value)}
-              placeholder="{}"
-              spellCheck={false}
-              style={{
-                width: '100%',
-                minHeight: 180,
-                fontFamily: 'monospace',
-                fontSize: 12,
-                lineHeight: 1.6,
-                padding: '10px 12px',
-                backgroundColor: 'var(--surface-2)',
-                border: '1px solid var(--border)',
-                borderRadius: 8,
-                color: 'var(--text)',
-                resize: 'vertical',
-                outline: 'none',
-              }}
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <CodeEditor
+                value={rawBody}
+                onChange={onRawBodyChange}
+                language={editorLanguage}
+                minHeight={180}
+              />
+              {editorLanguage === 'json' && (
+                <button
+                  onClick={() => onRawBodyChange(tryPrettyJson(rawBody))}
+                  style={{
+                    alignSelf: 'flex-end',
+                    padding: '3px 10px',
+                    fontSize: 11,
+                    color: 'var(--text-muted)',
+                    background: 'none',
+                    border: '1px solid var(--border)',
+                    borderRadius: 5,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Formatar
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
