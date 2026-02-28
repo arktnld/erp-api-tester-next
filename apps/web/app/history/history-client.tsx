@@ -8,6 +8,8 @@ import { Sheet } from '@/components/ui/sheet'
 import { MethodBadge, StatusBadge } from '@/components/ui/badge'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import { ExportButton } from '@/app/test/components/export-button'
+import type { ExportData } from '@/app/test/lib/types'
 
 type HistoryItem = {
   id: number
@@ -182,6 +184,18 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
               >
                 {selected.durationMs}ms
               </span>
+              <div style={{ marginLeft: 'auto' }}>
+                <ExportButton data={{
+                  method: selected.method,
+                  url: selected.url,
+                  erpName: selected.erpName,
+                  companyName: selected.companyName,
+                  status: selected.statusCode,
+                  duration: selected.durationMs,
+                  timestamp: new Date(selected.createdAt),
+                  responseBody: selected.responseBody || null,
+                } satisfies ExportData} />
+              </div>
             </div>
 
             <p
