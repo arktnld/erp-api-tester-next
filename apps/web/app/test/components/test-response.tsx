@@ -5,7 +5,8 @@ import { Play, Loader2, Copy, Check, Download } from 'lucide-react'
 import { StatusBadge } from '@/components/ui/badge'
 import { JsonTree } from './json-tree'
 import { tryPrettyJson } from '../lib/utils'
-import type { ExecuteResponse } from '../lib/types'
+import type { ExecuteResponse, ExportData } from '../lib/types'
+import { ExportButton } from './export-button'
 
 const tabBtnStyle = (active: boolean): React.CSSProperties => ({
   padding: '7px 14px',
@@ -82,9 +83,11 @@ function ImageContent({ response }: { response: ExecuteResponse }) {
 interface TestResponseProps {
   response: ExecuteResponse | null
   loading: boolean
+  erpName?: string
+  companyName?: string
 }
 
-export function TestResponse({ response, loading }: TestResponseProps) {
+export function TestResponse({ response, loading, erpName = '', companyName = '' }: TestResponseProps) {
   const [resTab, setResTab] = useState<'json' | 'raw' | 'headers' | 'timeline'>('json')
   const [resCopied, setResCopied] = useState(false)
 
@@ -127,13 +130,30 @@ export function TestResponse({ response, loading }: TestResponseProps) {
         {([{ id: 'json', label: 'JSON' }, { id: 'raw', label: 'Raw' }, { id: 'headers', label: 'Headers' }, { id: 'timeline', label: 'Timeline' }] as const).map(({ id, label }) => (
           <button key={id} style={tabBtnStyle(resTab === id)} onClick={() => setResTab(id)}>{label}</button>
         ))}
-        <button
-          style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: resCopied ? 'var(--status-success)' : 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', borderRadius: 4 }}
-          onClick={() => { navigator.clipboard.writeText(tryPrettyJson(response.responseBody)); setResCopied(true); setTimeout(() => setResCopied(false), 2000) }}
-        >
-          {resCopied ? <Check size={12} /> : <Copy size={12} />}
-          {resCopied ? 'Copiado' : 'Copiar'}
-        </button>
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
+          <button
+            style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: resCopied ? 'var(--status-success)' : 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', borderRadius: 4 }}
+            onClick={() => { navigator.clipboard.writeText(tryPrettyJson(response.responseBody)); setResCopied(true); setTimeout(() => setResCopied(false), 2000) }}
+          >
+            {resCopied ? <Check size={12} /> : <Copy size={12} />}
+            {resCopied ? 'Copiado' : 'Copiar'}
+          </button>
+          <ExportButton data={{
+            method: response.method,
+            url: response.url,
+            erpName,
+            companyName,
+            status: response.statusCode,
+            duration: response.durationMs,
+            timestamp: new Date(),
+            responseBody: response.isBinary ? null : response.responseBody,
+            binaryMeta: response.isBinary ? {
+              mimeType: response.mimeType,
+              sizeKB: Math.floor(response.responseBody.length * 3 / 4) / 1024,
+              fileName: response.fileName,
+            } : undefined,
+          } satisfies ExportData} />
+        </div>
       </div>
 
       {/* Content */}

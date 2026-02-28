@@ -154,7 +154,12 @@ export function TestPage({
           onBodyModeChange={setBodyMode}
           onRawBodyChange={setRawBody}
         />
-        <TestResponse response={response} loading={loading} />
+        <TestResponse
+          response={response}
+          loading={loading}
+          erpName={erp?.name}
+          companyName={company?.name}
+        />
       </div>
 
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
