@@ -9,6 +9,19 @@ import { TestResponse } from './components/test-response'
 import { substitute, generateCurl, findErpIdForCompany } from './lib/utils'
 import type { ERP, Environment, ExecuteResponse } from './lib/types'
 
+function detectLanguage(headersJson: string): 'json' | 'xml' | 'text' {
+  try {
+    const headers = JSON.parse(headersJson) as Record<string, string>
+    const ct = Object.entries(headers)
+      .find(([k]) => k.toLowerCase() === 'content-type')?.[1]?.toLowerCase() ?? ''
+    if (ct.includes('xml')) return 'xml'
+    if (ct.includes('json') || !ct) return 'json'
+    return 'text'
+  } catch {
+    return 'json'
+  }
+}
+
 export function TestPage({
   erps,
   initialCompanyId,
@@ -50,6 +63,7 @@ export function TestPage({
   const resolvedBody = endpoint?.bodyTemplate?.trim() ? substitute(endpoint.bodyTemplate, allFields) : ''
   const needsClient = endpoint?.requiresClient !== false
   const canExecute = !!(erpId && companyId && endpointId && (!needsClient || clientId))
+  const editorLanguage = detectLanguage(endpoint?.headers ?? '{}')
 
   const execute = async () => {
     if (!canExecute) return
@@ -151,6 +165,7 @@ export function TestPage({
           resolvedBody={resolvedBody}
           bodyMode={bodyMode}
           rawBody={rawBody}
+          editorLanguage={editorLanguage}
           onBodyModeChange={setBodyMode}
           onRawBodyChange={setRawBody}
         />
