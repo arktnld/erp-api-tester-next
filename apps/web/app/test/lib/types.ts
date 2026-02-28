@@ -47,3 +47,19 @@ export interface ExecuteResponse {
   fileName: string | null
   isBinary: boolean
 }
+
+export interface ExportData {
+  method: string
+  url: string
+  erpName: string
+  companyName: string
+  status: number
+  duration: number
+  timestamp: Date
+  responseBody: string | null
+  binaryMeta?: {
+    mimeType: string
+    sizeKB: number
+    fileName: string | null
+  }
+}
