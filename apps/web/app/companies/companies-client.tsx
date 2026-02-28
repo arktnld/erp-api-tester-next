@@ -161,7 +161,10 @@ export function CompaniesClient({
       accessorKey: 'baseUrl',
       header: 'URL Base',
       cell: ({ row }) => (
-        <span style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+        <span
+          title={row.original.baseUrl || undefined}
+          style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'monospace' }}
+        >
           {row.original.baseUrl || <span style={{ color: 'var(--text-subtle)' }}>—</span>}
         </span>
       ),
