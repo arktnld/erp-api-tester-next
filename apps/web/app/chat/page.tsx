@@ -13,6 +13,7 @@ export default async function ChatPage() {
     prisma.eRP.findMany({ orderBy: { name: 'asc' }, select: { id: true, name: true } }),
     getSettings(),
   ])
-  const defaultSystemPrompt = fs.readFileSync(path.join(process.cwd(), '../../byte_prompt.md'), 'utf-8')
+  const promptPath = process.env.BYTE_PROMPT_PATH ?? path.join(process.cwd(), '../../byte_prompt.md')
+  const defaultSystemPrompt = fs.readFileSync(promptPath, 'utf-8')
   return <ChatClient initialCollections={collections} erps={erps} initialSettings={settings} defaultSystemPrompt={defaultSystemPrompt} />
 }
