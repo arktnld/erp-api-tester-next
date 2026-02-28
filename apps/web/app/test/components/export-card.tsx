@@ -114,7 +114,7 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
         </div>
 
         {/* ── Request ── */}
-        <div style={{ padding: '14px 20px', borderBottom: '1px solid #d1d9e0' }}>
+        <div style={{ padding: '8px 20px 14px', borderBottom: '1px solid #d1d9e0' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
             <span
               style={{

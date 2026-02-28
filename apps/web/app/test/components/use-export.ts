@@ -7,28 +7,18 @@ export function useExport(cardRef: React.RefObject<HTMLDivElement | null>) {
 
   async function capture() {
     if (!cardRef.current) return null
-    // Import dinâmico evita SSR issues no Next.js
-    const { default: html2canvas } = await import('html2canvas')
-    return html2canvas(cardRef.current, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      logging: false,
-    })
+    const { toPng } = await import('html-to-image')
+    return toPng(cardRef.current, { pixelRatio: 2 })
   }
 
   async function copyImage() {
     setCapturing(true)
     try {
-      const canvas = await capture()
-      if (!canvas) return
-      await new Promise<void>((resolve) => {
-        canvas.toBlob(async (blob) => {
-          if (!blob) { resolve(); return }
-          await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
-          resolve()
-        }, 'image/png')
-      })
+      const { toBlob } = await import('html-to-image')
+      if (!cardRef.current) return
+      const blob = await toBlob(cardRef.current, { pixelRatio: 2 })
+      if (!blob) return
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
     } finally {
       setCapturing(false)
     }
@@ -37,10 +27,10 @@ export function useExport(cardRef: React.RefObject<HTMLDivElement | null>) {
   async function downloadPng() {
     setCapturing(true)
     try {
-      const canvas = await capture()
-      if (!canvas) return
+      const dataUrl = await capture()
+      if (!dataUrl) return
       const a = document.createElement('a')
-      a.href = canvas.toDataURL('image/png')
+      a.href = dataUrl
       a.download = `resultado-api-${Date.now()}.png`
       a.click()
     } finally {
@@ -51,14 +41,16 @@ export function useExport(cardRef: React.RefObject<HTMLDivElement | null>) {
   async function downloadPdf() {
     setCapturing(true)
     try {
-      const canvas = await capture()
-      if (!canvas) return
+      const dataUrl = await capture()
+      if (!dataUrl) return
       const { default: jsPDF } = await import('jspdf')
-      // Dimensões reais do card (scale 2 → dividir por 2)
-      const cardW = canvas.width / 2
-      const cardH = canvas.height / 2
+      const img = new Image()
+      img.src = dataUrl
+      await new Promise<void>((resolve) => { img.onload = () => resolve() })
+      const cardW = img.naturalWidth / 2
+      const cardH = img.naturalHeight / 2
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [cardW, cardH] })
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, cardW, cardH)
+      pdf.addImage(dataUrl, 'PNG', 0, 0, cardW, cardH)
       pdf.save(`resultado-api-${Date.now()}.pdf`)
     } finally {
       setCapturing(false)
