@@ -1,5 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@erp/db'
+import { request as httpRequest } from 'node:http'
+import { request as httpsRequest } from 'node:https'
+
+function httpFetch(
+  url: string,
+  method: string,
+  headers: Record<string, string>,
+  body: string | null
+): Promise<{ status: number; body: string; headers: Record<string, string> }> {
+  return new Promise((resolve, reject) => {
+    const parsed = new URL(url)
+    const isHttps = parsed.protocol === 'https:'
+    const allHeaders = body
+      ? { ...headers, 'Content-Length': String(Buffer.byteLength(body)) }
+      : headers
+    const options = {
+      hostname: parsed.hostname,
+      port: parsed.port || (isHttps ? 443 : 80),
+      path: parsed.pathname + parsed.search,
+      method,
+      headers: allHeaders,
+    }
+    const req = (isHttps ? httpsRequest : httpRequest)(options, (res) => {
+      const resHeaders: Record<string, string> = {}
+      for (const [k, v] of Object.entries(res.headers)) {
+        if (typeof v === 'string') resHeaders[k] = v
+        else if (Array.isArray(v)) resHeaders[k] = v.join(', ')
+      }
+      let data = ''
+      res.on('data', (chunk) => { data += chunk })
+      res.on('end', () => resolve({ status: res.statusCode ?? 0, body: data, headers: resHeaders }))
+    })
+    req.on('error', reject)
+    if (body) req.write(body)
+    req.end()
+  })
+}
 
 function substitute(template: string, fields: Record<string, string>): string {
   return template.replace(/\{(\w+)\}/g, (_, key) => fields[key] ?? `{${key}}`)
@@ -34,6 +71,13 @@ export async function POST(req: NextRequest) {
       })
       if (inlineFields) fields = inlineFields as Record<string, string>
     }
+
+    // body_fields: injeta authConfig como campos de substituição no body
+    if (company.authType === 'body_fields') {
+      const bodyFields = JSON.parse(company.authConfig || '{}') as Record<string, string>
+      Object.assign(fields, bodyFields)
+    }
+
     const resolvedPath = substitute(endpoint.pathTemplate, fields)
     const resolvedBody =
       customBody != null
@@ -76,7 +120,7 @@ export async function POST(req: NextRequest) {
 
     const url = `${environmentUrl ?? company.baseUrl}${resolvedPath}`
     const requestHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
+      ...(resolvedBody != null && !endpointHeaders['Content-Type'] ? { 'Content-Type': 'application/json' } : {}),
       ...endpointHeaders,
       ...authHeaders,
     }
@@ -87,17 +131,10 @@ export async function POST(req: NextRequest) {
     let responseHeaders: Record<string, string> = {}
 
     try {
-      const res = await fetch(url, {
-        method: endpoint.method,
-        headers: requestHeaders,
-        body: resolvedBody ?? undefined,
-      })
-
+      const res = await httpFetch(url, endpoint.method, requestHeaders, resolvedBody)
       statusCode = res.status
-      responseBody = await res.text()
-      res.headers.forEach((value, key) => {
-        responseHeaders[key] = value
-      })
+      responseBody = res.body
+      responseHeaders = res.headers
     } catch (err: unknown) {
       statusCode = 0
       responseBody = JSON.stringify({ error: String(err) })

@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { Play, Loader2, Copy, Check } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { Copy, Check } from 'lucide-react'
 import { MethodBadge } from '@/components/ui/badge'
 import { TestSelectors } from './components/test-selectors'
 import { TestRequest } from './components/test-request'
 import { TestResponse } from './components/test-response'
 import { substitute, generateCurl, findErpIdForCompany } from './lib/utils'
-import type { ERP, Company, Endpoint, Environment, ExecuteResponse } from './lib/types'
+import type { ERP, Environment, ExecuteResponse } from './lib/types'
 
 export function TestPage({
   erps,
@@ -32,6 +32,9 @@ export function TestPage({
   const [curlCopied, setCurlCopied] = useState(false)
   const [bodyMode, setBodyMode] = useState<'form' | 'raw'>('form')
   const [rawBody, setRawBody] = useState('')
+  const [showCancel, setShowCancel] = useState(false)
+  const abortRef = useRef<AbortController | null>(null)
+  const cancelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const erp = erps.find((e) => e.id === erpId)
   const company = erp?.companies.find((c) => c.id === companyId)
@@ -41,15 +44,21 @@ export function TestPage({
   const companyEnvironments: Environment[] = company ? JSON.parse(company.environments || '[]') : []
   const activeUrl = environmentUrl ?? company?.baseUrl ?? ''
   const fields = client ? (JSON.parse(client.fieldsData) as Record<string, string>) : {}
-  const resolvedUrl = endpoint && company ? `${activeUrl}${substitute(endpoint.pathTemplate, fields)}` : ''
-  const resolvedBody = endpoint?.bodyTemplate?.trim() ? substitute(endpoint.bodyTemplate, fields) : ''
+  const bodyFields = company?.authType === 'body_fields' ? JSON.parse(company.authConfig || '{}') as Record<string, string> : {}
+  const allFields = { ...fields, ...bodyFields }
+  const resolvedUrl = endpoint && company ? `${activeUrl}${substitute(endpoint.pathTemplate, allFields)}` : ''
+  const resolvedBody = endpoint?.bodyTemplate?.trim() ? substitute(endpoint.bodyTemplate, allFields) : ''
   const needsClient = endpoint?.requiresClient !== false
   const canExecute = !!(erpId && companyId && endpointId && (!needsClient || clientId))
 
   const execute = async () => {
     if (!canExecute) return
+    const controller = new AbortController()
+    abortRef.current = controller
     setLoading(true)
+    setShowCancel(false)
     setResponse(null)
+    cancelTimerRef.current = setTimeout(() => setShowCancel(true), 400)
     try {
       const res = await fetch('/api/execute', {
         method: 'POST',
@@ -61,12 +70,22 @@ export function TestPage({
           environmentUrl: environmentUrl ?? undefined,
           ...(bodyMode === 'raw' ? { rawBody } : {}),
         }),
+        signal: controller.signal,
       })
       const data = await res.json()
       setResponse(data)
+    } catch (err) {
+      if ((err as Error).name !== 'AbortError') throw err
     } finally {
       setLoading(false)
+      setShowCancel(false)
+      if (cancelTimerRef.current) clearTimeout(cancelTimerRef.current)
+      abortRef.current = null
     }
+  }
+
+  const cancel = () => {
+    abortRef.current?.abort()
   }
 
   return (
@@ -84,7 +103,7 @@ export function TestPage({
           disabled={!canExecute}
           onClick={() => {
             if (!endpoint || !company) return
-            navigator.clipboard.writeText(generateCurl(endpoint, { ...company, baseUrl: activeUrl }, fields, bodyMode === 'raw' ? rawBody : undefined))
+            navigator.clipboard.writeText(generateCurl(endpoint, { ...company, baseUrl: activeUrl }, allFields, bodyMode === 'raw' ? rawBody : undefined))
             setCurlCopied(true)
             setTimeout(() => setCurlCopied(false), 2000)
           }}
@@ -93,11 +112,11 @@ export function TestPage({
           {curlCopied ? <Check size={12} /> : <Copy size={12} />} curl
         </button>
         <button
-          onClick={execute}
-          disabled={!canExecute || loading}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 14px', fontSize: 12, fontWeight: 500, color: 'white', backgroundColor: 'var(--accent)', border: 'none', borderRadius: 6, cursor: canExecute && !loading ? 'pointer' : 'not-allowed', opacity: canExecute && !loading ? 1 : 0.5, flexShrink: 0 }}
+          onClick={showCancel ? cancel : execute}
+          disabled={!loading && !canExecute}
+          style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '5px 0', width: 130, fontSize: 12, fontWeight: 500, color: 'white', backgroundColor: showCancel ? 'var(--status-error, #ef4444)' : 'var(--accent)', border: 'none', borderRadius: 6, cursor: showCancel || canExecute ? 'pointer' : 'not-allowed', opacity: loading || canExecute ? 1 : 0.5, flexShrink: 0, whiteSpace: 'nowrap' }}
         >
-          {loading ? <><Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} />Executando...</> : <><Play size={12} />Executar</>}
+          {loading ? (showCancel ? 'Cancelar' : 'Executando...') : 'Executar'}
         </button>
       </div>
 

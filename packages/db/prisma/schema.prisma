@@ -83,6 +83,8 @@ model EmbeddingChunk {
   text         String            @db.Text
   embedding    Unsupported("vector(1536)")
   collection   PostmanCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@index([collectionId])
 }
 
 model Setting {
@@ -108,4 +110,10 @@ model RequestHistory {
   endpointId      Int?
   testClientId    Int?
   createdAt       DateTime @default(now())
+
+  @@index([companyId])
+  @@index([endpointId])
+  @@index([testClientId])
+  @@index([createdAt])
+  @@index([statusCode])
 }

@@ -168,7 +168,7 @@ function StepRow({ done, active, label, detail, error }: { done: boolean; active
   )
 }
 
-export function ChatClient({ initialCollections, erps, initialSettings }: { initialCollections: ColMeta[]; erps: ERP[]; initialSettings: Settings }) {
+export function ChatClient({ initialCollections, erps, initialSettings, defaultSystemPrompt = '' }: { initialCollections: ColMeta[]; erps: ERP[]; initialSettings: Settings; defaultSystemPrompt?: string }) {
   const [collections, setCollections] = useState<ColMeta[]>(initialCollections)
   const [activeId, setActiveId] = useState<number | null>(null)
 
@@ -212,7 +212,7 @@ export function ChatClient({ initialCollections, erps, initialSettings }: { init
   const [showForm, setShowForm] = useState(false)
   const [newName, setNewName] = useState('')
   const [newJson, setNewJson] = useState('')
-  const [newSystemPrompt, setNewSystemPrompt] = useState('')
+  const [newSystemPrompt, setNewSystemPrompt] = useState(defaultSystemPrompt)
   const [formError, setFormError] = useState('')
   const [saveStage, setSaveStage] = useState<'idle' | 'parsing' | 'embedding' | 'saving' | 'done'>('idle')
   const [saveResult, setSaveResult] = useState<{ embeddingsCount: number; embeddingsError: string | null; name: string } | null>(null)

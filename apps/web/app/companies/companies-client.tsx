@@ -32,12 +32,13 @@ function nextEnvSuggestion(existing: Environment[]): string {
 }
 type ERP = { id: number; name: string }
 
-const AUTH_TYPES = ['none', 'bearer', 'api_key', 'basic', 'custom_headers']
+const AUTH_TYPES = ['none', 'bearer', 'api_key', 'basic', 'custom_headers', 'body_fields']
 const AUTH_PLACEHOLDERS: Record<string, string> = {
   bearer: '{"token": "eyJhbGciOiJSUzI1NiJ9..."}',
   api_key: '{"header": "X-API-Key", "value": "abc123"}',
   basic: '{"username": "admin", "password": "secret"}',
   custom_headers: '{"X-APIKEY": "abc123", "X-APIPASSWORD": "secret"}',
+  body_fields: '{"TOKEN": "seu-token", "APP": "nome-do-app"}',
   none: '{}',
 }
 

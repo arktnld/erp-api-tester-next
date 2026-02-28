@@ -2,6 +2,8 @@ import { getCollections } from '@/app/actions/collections'
 import { getSettings } from '@/lib/actions/settings'
 import { ChatClient } from './chat-client'
 import { prisma } from '@erp/db'
+import fs from 'fs'
+import path from 'path'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,5 +13,6 @@ export default async function ChatPage() {
     prisma.eRP.findMany({ orderBy: { name: 'asc' }, select: { id: true, name: true } }),
     getSettings(),
   ])
-  return <ChatClient initialCollections={collections} erps={erps} initialSettings={settings} />
+  const defaultSystemPrompt = fs.readFileSync(path.join(process.cwd(), '../../byte_prompt.md'), 'utf-8')
+  return <ChatClient initialCollections={collections} erps={erps} initialSettings={settings} defaultSystemPrompt={defaultSystemPrompt} />
 }

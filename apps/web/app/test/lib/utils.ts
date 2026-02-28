@@ -21,6 +21,7 @@ export function generateCurl(
   const url = `${company.baseUrl}${substitute(endpoint.pathTemplate, fields)}`
   const parts: string[] = [`curl -X ${endpoint.method} '${url}'`]
 
+  let bodyFields: Record<string, string> = {}
   try {
     const authConfig = JSON.parse(company.authConfig || '{}') as Record<string, string>
     if (company.authType === 'bearer' && authConfig.token) {
@@ -34,6 +35,8 @@ export function generateCurl(
       for (const [k, v] of Object.entries(authConfig)) {
         parts.push(`  -H '${k}: ${v}'`)
       }
+    } else if (company.authType === 'body_fields') {
+      bodyFields = authConfig
     }
   } catch {}
 
@@ -44,9 +47,11 @@ export function generateCurl(
     }
   } catch {}
 
-  const body = customBody ?? (endpoint.bodyTemplate?.trim() ? substitute(endpoint.bodyTemplate, fields) : '')
+  const allFields = { ...bodyFields, ...fields }
+  const body = customBody
+    ? substitute(customBody, allFields)
+    : (endpoint.bodyTemplate?.trim() ? substitute(endpoint.bodyTemplate, allFields) : '')
   if (body) {
-    parts.push(`  -H 'Content-Type: application/json'`)
     parts.push(`  -d '${body}'`)
   }
 

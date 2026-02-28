@@ -2,16 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
 import { LayoutDashboard, Server, Building2, FlaskConical, History, MessageSquare, BookOpen } from 'lucide-react'
-
-const methodColor: Record<string, string> = {
-  GET: 'var(--method-get)',
-  POST: 'var(--method-post)',
-  PUT: 'var(--method-put)',
-  PATCH: 'var(--method-patch)',
-  DELETE: 'var(--method-delete)',
-}
 
 type SidebarERP = {
   id: number
@@ -20,41 +11,15 @@ type SidebarERP = {
   endpoints: { id: number; name: string; method: string }[]
 }
 
-const subItemStyle = (active?: boolean): React.CSSProperties => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: 6,
-  padding: '3px 10px 3px 28px',
-  fontSize: 12,
-  color: active ? 'var(--text)' : 'var(--text-muted)',
-  textDecoration: 'none',
-  borderRadius: 4,
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-})
-
-export function Sidebar({ erps }: { erps: SidebarERP[] }) {
+export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
   const pathname = usePathname()
-  const [openErps, setOpenErps] = useState<Set<number>>(
-    () => new Set(erps.map((e) => e.id))
-  )
-  const [openCompanies, setOpenCompanies] = useState<Set<number>>(
-    () => new Set(erps.flatMap((e) => e.companies.map((c) => c.id)))
-  )
-
-  const toggle = (set: Set<number>, id: number): Set<number> => {
-    const next = new Set(set)
-    next.has(id) ? next.delete(id) : next.add(id)
-    return next
-  }
 
   const nav = [
     { href: '/', label: 'Home', icon: LayoutDashboard },
-    { href: '/erps', label: 'ERPs', icon: Server },
-    { href: '/companies', label: 'Empresas', icon: Building2 },
     { href: '/test', label: 'Testar API', icon: FlaskConical },
     { href: '/chat', label: 'Chat IA', icon: MessageSquare },
+    { href: '/erps', label: 'ERPs', icon: Server },
+    { href: '/companies', label: 'Empresas', icon: Building2 },
     { href: '/history', label: 'Histórico', icon: History },
     { href: '/docs', label: 'Como usar', icon: BookOpen },
   ]
