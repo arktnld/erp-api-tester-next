@@ -44,7 +44,7 @@ Itens em ordem de prioridade. Grupos marcados com 📦 têm 1 plano só — não
 
 - [x] `[editor]` **Editor de código robusto** ✅ v1.10.0 — substituir `<textarea>` do raw body por `@uiw/react-codemirror`. Syntax highlighting JSON/XML, autocompletar chaves, formatação automática
 
-- [ ] 📦 `[dívida]` **Error UX** — 2 itens, 1 plano:
+- [x] 📦 `[dívida]` **Error UX** ✅ v1.11.0 — 2 itens, 1 plano:
   - `error.tsx` nas rotas principais (/, /test, /history, /companies)
   - `loading.tsx` com skeleton nas rotas lentas (/test, /history)
 
