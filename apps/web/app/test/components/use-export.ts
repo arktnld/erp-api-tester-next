@@ -53,16 +53,13 @@ export function useExport(cardRef: React.RefObject<HTMLDivElement | null>) {
     try {
       const canvas = await capture()
       if (!canvas) return
-      canvas.toBlob((blob) => {
-        if (!blob) return
-        const url = URL.createObjectURL(blob)
-        const win = window.open(url, '_blank')
-        if (!win) { URL.revokeObjectURL(url); return }
-        win.addEventListener('load', () => {
-          win.print()
-          win.addEventListener('afterprint', () => URL.revokeObjectURL(url))
-        })
-      }, 'image/png')
+      const { default: jsPDF } = await import('jspdf')
+      // Dimensões reais do card (scale 2 → dividir por 2)
+      const cardW = canvas.width / 2
+      const cardH = canvas.height / 2
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [cardW, cardH] })
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, cardW, cardH)
+      pdf.save(`resultado-api-${Date.now()}.pdf`)
     } finally {
       setCapturing(false)
     }

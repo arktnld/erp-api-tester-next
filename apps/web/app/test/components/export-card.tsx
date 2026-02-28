@@ -90,7 +90,7 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
 
         {/* Endpoint */}
         <div style={{ padding: '14px 20px', borderBottom: `1px solid ${C.border}` }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 6 }}>
             <span
               style={{
                 fontSize: 11,
@@ -101,6 +101,7 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
                 padding: '2px 7px',
                 borderRadius: 4,
                 letterSpacing: 0.5,
+                flexShrink: 0,
               }}
             >
               {data.method}
@@ -110,10 +111,8 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
                 fontSize: 12,
                 fontFamily: 'monospace',
                 color: C.text,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                flex: 1,
+                wordBreak: 'break-all',
+                lineHeight: 1.5,
               }}
             >
               {data.url}
