@@ -28,7 +28,7 @@ Itens em ordem de prioridade. Grupos marcados com 📦 têm 1 plano só — não
   - `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy` 🟡
   - `poweredByHeader: false`
 
-- [ ] 📦 `[ui]` **UI tweaks** — 5 mudanças pequenas, 1 plano:
+- [x] 📦 `[ui]` **UI tweaks** ✅ v1.8.0 — 5 mudanças pequenas, 1 plano:
   - Numeração (1, 2, 3, 4) nos labels dos selects de teste
   - `title` no botão "Importar"
   - Renomear "Configurado" → "Configurar IA"
