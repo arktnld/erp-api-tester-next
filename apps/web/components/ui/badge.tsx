@@ -31,13 +31,13 @@ export function MethodBadge({ method }: { method: string }) {
 
 export function StatusBadge({ code }: { code: number }) {
   const v =
-    code >= 200 && code < 300
-      ? '--status-success'
-      : code >= 300 && code < 400
-        ? '--status-warning'
-        : code >= 400
-          ? '--status-error'
-          : '--text-muted'
+    code >= 500 ? '--status-error'
+    : code >= 400 ? '--status-warning'
+    : code >= 300 ? '--status-warning'
+    : code >= 200 ? '--status-success'
+    : code >= 100 ? '--accent'
+    : '--text-muted'
+  // 5xx=red, 4xx=amber, 3xx=amber, 2xx=green, 1xx=blue
   return (
     <span
       style={{
