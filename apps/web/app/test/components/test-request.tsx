@@ -1,8 +1,9 @@
 'use client'
 
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import dynamic from 'next/dynamic'
 import { tryPrettyJson } from '../lib/utils'
+
+const CodeBlock = dynamic(() => import('@/components/ui/code-block').then(m => ({ default: m.CodeBlock })), { ssr: false })
 import type { ExecuteResponse } from '../lib/types'
 
 const sectionLabel: React.CSSProperties = {
@@ -79,13 +80,12 @@ export function TestRequest({ response, resolvedBody, bodyMode, rawBody, onBodyM
 
           {bodyMode === 'form' ? (
             resolvedBody ? (
-              <SyntaxHighlighter
+              <CodeBlock
                 language="json"
-                style={atomOneDark}
                 customStyle={{ margin: 0, borderRadius: 8, fontSize: 12, backgroundColor: 'var(--surface-2)' }}
               >
                 {tryPrettyJson(resolvedBody)}
-              </SyntaxHighlighter>
+              </CodeBlock>
             ) : (
               <p style={{ fontSize: 12, color: 'var(--text-subtle)' }}>Nenhum body para este endpoint.</p>
             )
