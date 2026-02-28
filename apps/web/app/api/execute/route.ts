@@ -3,6 +3,7 @@ import { prisma } from '@erp/db'
 import { request as httpRequest } from 'node:http'
 import { request as httpsRequest } from 'node:https'
 import type { ContentCategory } from '@/app/test/lib/types'
+import { substitute } from '@/lib/utils'
 
 function getContentCategory(mimeType: string): ContentCategory {
   const m = mimeType.toLowerCase().split(';')[0].trim()
@@ -82,9 +83,6 @@ function httpFetch(
   })
 }
 
-function substitute(template: string, fields: Record<string, string>): string {
-  return template.replace(/\{(\w+)\}/g, (_, key) => fields[key] ?? `{${key}}`)
-}
 
 export async function POST(req: NextRequest) {
   try {

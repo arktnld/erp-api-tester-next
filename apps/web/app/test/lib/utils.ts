@@ -1,16 +1,6 @@
 import type { Endpoint, Company } from './types'
-
-export function substitute(template: string, fields: Record<string, string>): string {
-  return template.replace(/\{(\w+)\}/g, (_, key) => fields[key] ?? `{${key}}`)
-}
-
-export function tryPrettyJson(text: string): string {
-  try {
-    return JSON.stringify(JSON.parse(text), null, 2)
-  } catch {
-    return text
-  }
-}
+import { substitute, tryPrettyJson } from '@/lib/utils'
+export { substitute, tryPrettyJson }
 
 export function generateCurl(
   endpoint: Endpoint,

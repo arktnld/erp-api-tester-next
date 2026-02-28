@@ -12,6 +12,7 @@ import dynamic from 'next/dynamic'
 const CodeBlock = dynamic(() => import('@/components/ui/code-block').then(m => ({ default: m.CodeBlock })), { ssr: false })
 import { ExportButton } from '@/app/test/components/export-button'
 import type { ExportData } from '@/app/test/lib/types'
+import { tryPrettyJson } from '@/lib/utils'
 
 type HistoryItem = {
   id: number
@@ -28,14 +29,6 @@ type HistoryItem = {
   responseHeaders: string
   durationMs: number
   createdAt: Date
-}
-
-function tryPrettyJson(text: string): string {
-  try {
-    return JSON.stringify(JSON.parse(text), null, 2)
-  } catch {
-    return text || '—'
-  }
 }
 
 const tabBtnStyle = (active: boolean): React.CSSProperties => ({
@@ -367,7 +360,7 @@ export function HistoryClient({
 
             {tab === 'response' && (
               <CodeBlock language="json" customStyle={{ borderRadius: 8, fontSize: 12, maxHeight: 420, backgroundColor: 'var(--surface-2)' }}>
-                {tryPrettyJson(selected.responseBody)}
+                {tryPrettyJson(selected.responseBody) || '—'}
               </CodeBlock>
             )}
             {tab === 'request' && (
