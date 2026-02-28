@@ -40,7 +40,7 @@ function buildWhere(p: {
 export default async function HistoryPage({
   searchParams,
 }: {
-  searchParams: {
+  searchParams: Promise<{
     page?: string
     company?: string
     endpoint?: string
@@ -48,10 +48,11 @@ export default async function HistoryPage({
     status?: string
     from?: string
     to?: string
-  }
+  }>
 }) {
-  const page = Math.max(1, Number(searchParams.page) || 1)
-  const where = buildWhere(searchParams)
+  const params = await searchParams
+  const page = Math.max(1, Number(params.page) || 1)
+  const where = buildWhere(params)
 
   const [history, total, companies, endpoints, clients] = await Promise.all([
     prisma.requestHistory.findMany({
@@ -88,12 +89,12 @@ export default async function HistoryPage({
       endpoints={endpoints.map((r) => r.endpointName).filter(Boolean) as string[]}
       clients={clients.map((r) => r.clientName).filter(Boolean) as string[]}
       currentFilters={{
-        company: searchParams.company ?? '',
-        endpoint: searchParams.endpoint ?? '',
-        client: searchParams.client ?? '',
-        status: searchParams.status ?? '',
-        from: searchParams.from ?? '',
-        to: searchParams.to ?? '',
+        company: params.company ?? '',
+        endpoint: params.endpoint ?? '',
+        client: params.client ?? '',
+        status: params.status ?? '',
+        from: params.from ?? '',
+        to: params.to ?? '',
       }}
     />
   )
