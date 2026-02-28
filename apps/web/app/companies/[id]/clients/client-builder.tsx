@@ -7,6 +7,7 @@ import { ChevronLeft, Loader2, Check, Zap, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { createTestClient, updateTestClient } from '@/lib/actions/test-clients'
+import { formLabel as labelStyle } from '@/lib/styles'
 
 type FieldSchema = {
   id: number
@@ -57,14 +58,6 @@ function flattenJson(obj: unknown, prefix = ''): Array<{ key: string; value: str
     if (typeof v === 'object' && v !== null) return flattenJson(v, fullKey)
     return [{ key: fullKey, value: String(v ?? '') }]
   })
-}
-
-const labelStyle: React.CSSProperties = {
-  display: 'block',
-  fontSize: 12,
-  color: 'var(--text-muted)',
-  marginBottom: 4,
-  marginTop: 12,
 }
 
 export function ClientBuilder({ company, client }: { company: Company; client?: TestClient }) {

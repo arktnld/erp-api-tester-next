@@ -4,19 +4,13 @@ import { useState, useTransition } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { createERP, updateERP } from '@/lib/actions/erps'
+import { formLabel as labelStyle } from '@/lib/styles'
 
 interface ERPFormProps {
   erp?: { id: number; name: string }
   onSuccess: () => void
 }
 
-const labelStyle: React.CSSProperties = {
-  display: 'block',
-  fontSize: 12,
-  color: 'var(--text-muted)',
-  marginBottom: 4,
-  marginTop: 12,
-}
 
 export function ERPForm({ erp, onSuccess }: ERPFormProps) {
   const [name, setName] = useState(erp?.name ?? '')
