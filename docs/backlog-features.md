@@ -42,7 +42,7 @@ Itens em ordem de prioridade. Grupos marcados com 📦 têm 1 plano só — não
   - `labelStyle`, `selectStyle`, `sectionLabel` redefinidos em 6+ arquivos → `lib/styles.ts`
   - Path do `byte_prompt.md` hardcoded → variável de ambiente
 
-- [ ] `[editor]` **Editor de código robusto** — substituir `<textarea>` do raw body por `@uiw/react-codemirror`. Syntax highlighting JSON/XML, autocompletar chaves, formatação automática
+- [x] `[editor]` **Editor de código robusto** ✅ v1.10.0 — substituir `<textarea>` do raw body por `@uiw/react-codemirror`. Syntax highlighting JSON/XML, autocompletar chaves, formatação automática
 
 - [ ] 📦 `[dívida]` **Error UX** — 2 itens, 1 plano:
   - `error.tsx` nas rotas principais (/, /test, /history, /companies)
