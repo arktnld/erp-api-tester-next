@@ -135,22 +135,41 @@ export function HomeImport({ erps }: { erps: ERP[] }) {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        style={{
-          padding: '6px 16px',
-          fontSize: 13,
-          fontWeight: 500,
-          color: 'white',
-          backgroundColor: 'var(--accent)',
-          border: 'none',
-          borderRadius: 6,
-          cursor: 'pointer',
-          letterSpacing: '0.01em',
-        }}
-      >
-        Importar
-      </button>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <a
+          href="/api/backup"
+          style={{
+            padding: '6px 16px',
+            fontSize: 13,
+            fontWeight: 500,
+            color: 'var(--text-muted)',
+            backgroundColor: 'var(--surface)',
+            border: '1px solid var(--border)',
+            borderRadius: 6,
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+          }}
+        >
+          Exportar backup
+        </a>
+        <button
+          onClick={() => setOpen(true)}
+          style={{
+            padding: '6px 16px',
+            fontSize: 13,
+            fontWeight: 500,
+            color: 'white',
+            backgroundColor: 'var(--accent)',
+            border: 'none',
+            borderRadius: 6,
+            cursor: 'pointer',
+            letterSpacing: '0.01em',
+          }}
+        >
+          Importar
+        </button>
+      </div>
 
       <Sheet open={open} onClose={handleClose} title="Importar via curl" width={520}>
         {done ? (
