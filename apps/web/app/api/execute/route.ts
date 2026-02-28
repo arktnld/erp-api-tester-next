@@ -2,13 +2,38 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@erp/db'
 import { request as httpRequest } from 'node:http'
 import { request as httpsRequest } from 'node:https'
+import type { ContentCategory } from '@/app/test/lib/types'
+
+function getContentCategory(mimeType: string): ContentCategory {
+  const m = mimeType.toLowerCase().split(';')[0].trim()
+  if (m === 'application/json' || m === 'application/vnd.api+json' || m === 'application/ld+json') return 'json'
+  if (m === 'application/xml' || m === 'text/xml' || m === 'application/soap+xml') return 'xml'
+  if (m === 'text/html') return 'html'
+  if (m === 'text/csv') return 'csv'
+  if (m === 'text/plain' || m === 'application/x-www-form-urlencoded') return 'text'
+  if (m.startsWith('image/')) return 'image'
+  if (m === 'application/pdf' || m === 'application/msword' || m.startsWith('application/vnd.ms-') || m.startsWith('application/vnd.openxmlformats-')) return 'document'
+  if (m === 'application/zip' || m === 'application/octet-stream' || m.startsWith('audio/') || m.startsWith('video/')) return 'binary'
+  return 'text'
+}
+
+function isBinaryCategory(category: ContentCategory): boolean {
+  return category === 'image' || category === 'document' || category === 'binary'
+}
+
+function extractFileName(disposition: string | undefined): string | null {
+  if (!disposition) return null
+  const match = disposition.match(/filename\*=UTF-8''([^;]+)/i) ?? disposition.match(/filename="([^"]+)"/i)
+  return match ? decodeURIComponent(match[1]) : null
+}
 
 function httpFetch(
   url: string,
   method: string,
   headers: Record<string, string>,
-  body: string | null
-): Promise<{ status: number; body: string; headers: Record<string, string> }> {
+  body: string | null,
+  redirectsLeft = 5
+): Promise<{ status: number; body: string; headers: Record<string, string>; mimeType: string; fileName: string | null; contentCategory: ContentCategory; isBinary: boolean }> {
   return new Promise((resolve, reject) => {
     const parsed = new URL(url)
     const isHttps = parsed.protocol === 'https:'
@@ -23,14 +48,33 @@ function httpFetch(
       headers: allHeaders,
     }
     const req = (isHttps ? httpsRequest : httpRequest)(options, (res) => {
+      const status = res.statusCode ?? 0
+      if (status >= 300 && status < 400 && res.headers.location && redirectsLeft > 0) {
+        const location = res.headers.location
+        const nextUrl = location.startsWith('http') ? location : new URL(location, url).toString()
+        res.resume()
+        resolve(httpFetch(nextUrl, 'GET', {}, null, redirectsLeft - 1))
+        return
+      }
       const resHeaders: Record<string, string> = {}
       for (const [k, v] of Object.entries(res.headers)) {
         if (typeof v === 'string') resHeaders[k] = v
         else if (Array.isArray(v)) resHeaders[k] = v.join(', ')
       }
-      let data = ''
-      res.on('data', (chunk) => { data += chunk })
-      res.on('end', () => resolve({ status: res.statusCode ?? 0, body: data, headers: resHeaders }))
+      const chunks: Buffer[] = []
+      res.on('data', (chunk: Buffer | string) => {
+        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk))
+      })
+      res.on('end', () => {
+        const mimeType = (res.headers['content-type'] ?? '').split(';')[0].trim()
+        const contentCategory = mimeType ? getContentCategory(mimeType) : 'json'
+        const binary = isBinaryCategory(contentCategory)
+        const bodyStr = binary
+          ? Buffer.concat(chunks).toString('base64')
+          : Buffer.concat(chunks).toString('utf8')
+        const fileName = extractFileName(res.headers['content-disposition'])
+        resolve({ status, body: bodyStr, headers: resHeaders, mimeType, fileName, contentCategory, isBinary: binary })
+      })
     })
     req.on('error', reject)
     if (body) req.write(body)
@@ -129,12 +173,20 @@ export async function POST(req: NextRequest) {
     let statusCode = 0
     let responseBody = ''
     let responseHeaders: Record<string, string> = {}
+    let mimeType = ''
+    let fileName: string | null = null
+    let contentCategory: ContentCategory = 'json'
+    let isBinary = false
 
     try {
       const res = await httpFetch(url, endpoint.method, requestHeaders, resolvedBody)
       statusCode = res.status
       responseBody = res.body
       responseHeaders = res.headers
+      mimeType = res.mimeType
+      fileName = res.fileName
+      contentCategory = res.contentCategory
+      isBinary = res.isBinary
     } catch (err: unknown) {
       statusCode = 0
       responseBody = JSON.stringify({ error: String(err) })
@@ -171,6 +223,10 @@ export async function POST(req: NextRequest) {
       responseBody,
       responseHeaders,
       durationMs,
+      contentCategory,
+      mimeType,
+      fileName,
+      isBinary,
     })
   } catch (err: unknown) {
     return NextResponse.json(
