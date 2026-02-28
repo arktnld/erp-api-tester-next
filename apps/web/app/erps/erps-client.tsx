@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Plus, Pencil, Trash2, ChevronRight } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTable } from '@/components/ui/data-table'
@@ -18,6 +19,7 @@ type ERP = {
 }
 
 export function ERPsClient({ erps }: { erps: ERP[] }) {
+  const router = useRouter()
   const [sheet, setSheet] = useState<{ open: boolean; erp?: ERP }>({
     open: false,
   })
@@ -70,16 +72,14 @@ export function ERPsClient({ erps }: { erps: ERP[] }) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setSheet({ open: true, erp: row.original })}
+            onClick={(e) => { e.stopPropagation(); setSheet({ open: true, erp: row.original }) }}
           >
             <Pencil size={13} />
           </Button>
           <Button
             variant="ghost"
             size="sm"
-            onClick={() =>
-              startTransition(() => deleteERP(row.original.id))
-            }
+            onClick={(e) => { e.stopPropagation(); startTransition(() => deleteERP(row.original.id)) }}
           >
             <Trash2 size={13} />
           </Button>
@@ -111,6 +111,7 @@ export function ERPsClient({ erps }: { erps: ERP[] }) {
           data={erps}
           columns={columns}
           searchPlaceholder="Buscar ERPs..."
+          onRowClick={(row) => router.push(`/erps/${row.id}`)}
         />
       </div>
 

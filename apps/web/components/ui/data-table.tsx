@@ -14,12 +14,14 @@ interface DataTableProps<T> {
   data: T[]
   columns: ColumnDef<T, unknown>[]
   searchPlaceholder?: string
+  onRowClick?: (row: T) => void
 }
 
 export function DataTable<T>({
   data,
   columns,
   searchPlaceholder,
+  onRowClick,
 }: DataTableProps<T>) {
   const [globalFilter, setGlobalFilter] = useState('')
 
@@ -95,7 +97,9 @@ export function DataTable<T>({
               key={row.id}
               style={{
                 borderBottom: '1px solid var(--border)',
+                cursor: onRowClick ? 'pointer' : undefined,
               }}
+              onClick={() => onRowClick?.(row.original)}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = 'var(--surface-2)'
               }}
