@@ -25,6 +25,7 @@ const sectionLabel: React.CSSProperties = {
 }
 
 function renderEndpointOptions(endpoints: Endpoint[]) {
+  endpoints = endpoints.filter((ep) => ep.name)
   const renderGroup = (eps: Endpoint[]) => {
     const withGroup = eps.filter((ep) => ep.group)
     const withoutGroup = eps.filter((ep) => !ep.group)
@@ -94,7 +95,7 @@ export function TestSelectors({
       <p style={sectionLabel}>ERP</p>
       <select style={selectStyle} value={erpId ?? ''} onChange={(e) => onErpChange(Number(e.target.value) || null)}>
         <option value="">Selecionar ERP</option>
-        {erps.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
+        {erps.filter((e) => e.name).map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
       </select>
 
       <p style={sectionLabel}>Empresa</p>
@@ -105,7 +106,7 @@ export function TestSelectors({
         disabled={!erpId}
       >
         <option value="">Selecionar empresa</option>
-        {erp?.companies.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+        {erp?.companies.filter((c) => c.name).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
       </select>
 
       {companyEnvironments.length > 0 && (
@@ -143,7 +144,7 @@ export function TestSelectors({
         disabled={!companyId || !needsClient}
       >
         <option value="">{!needsClient ? 'Não necessário' : 'Selecionar cliente'}</option>
-        {company?.testClients.map((tc) => <option key={tc.id} value={tc.id}>{tc.name}</option>)}
+        {company?.testClients.filter((tc) => tc.name).map((tc) => <option key={tc.id} value={tc.id}>{tc.name}</option>)}
       </select>
     </div>
   )

@@ -58,6 +58,7 @@ const filterSelectStyle = (active: boolean): React.CSSProperties => ({
   borderRadius: 6,
   cursor: 'pointer',
   outline: 'none',
+  maxWidth: 180,
 })
 
 export function HistoryClient({ history }: { history: HistoryItem[] }) {
@@ -72,19 +73,15 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
   const [filterDateTo, setFilterDateTo] = useState('')
 
   const companies = useMemo(
-    () => [...new Set(history.map((h) => h.companyName))].sort(),
-    [history]
-  )
-  const endpoints = useMemo(
-    () => [...new Set(history.map((h) => h.endpointName))].sort(),
-    [history]
-  )
-  const clients = useMemo(
-    () => [...new Set(history.map((h) => h.clientName))].sort(),
+    () => [...new Set(history.map((h) => h.companyName).filter(Boolean))].sort(),
     [history]
   )
 
   const filtered = useMemo(() => {
+    function parseLocalDate(str: string): Date {
+      const [y, m, d] = str.split('-').map(Number)
+      return new Date(y, m - 1, d)
+    }
     return history.filter((item) => {
       if (filterCompany && item.companyName !== filterCompany) return false
       if (filterEndpoint && item.endpointName !== filterEndpoint) return false
@@ -93,15 +90,25 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
         const group = Math.floor(item.statusCode / 100) + 'xx'
         if (group !== filterStatus) return false
       }
-      if (filterDateFrom && new Date(item.createdAt) < new Date(filterDateFrom)) return false
+      const createdAt = new Date(item.createdAt)
+      if (filterDateFrom && createdAt < parseLocalDate(filterDateFrom)) return false
       if (filterDateTo) {
-        const to = new Date(filterDateTo)
+        const to = parseLocalDate(filterDateTo)
         to.setHours(23, 59, 59, 999)
-        if (new Date(item.createdAt) > to) return false
+        if (createdAt > to) return false
       }
       return true
     })
   }, [history, filterCompany, filterEndpoint, filterClient, filterStatus, filterDateFrom, filterDateTo])
+
+  const endpoints = useMemo(
+    () => [...new Set(filtered.map((h) => h.endpointName).filter(Boolean))].sort(),
+    [filtered]
+  )
+  const clients = useMemo(
+    () => [...new Set(filtered.map((h) => h.clientName).filter(Boolean))].sort(),
+    [filtered]
+  )
 
   function clearFilters() {
     setFilterCompany('')
@@ -215,7 +222,7 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
       >
         <select
           value={filterCompany}
-          onChange={(e) => setFilterCompany(e.target.value)}
+          onChange={(e) => { setFilterCompany(e.target.value); setFilterEndpoint(''); setFilterClient('') }}
           style={filterSelectStyle(!!filterCompany)}
         >
           <option value="">Todas as empresas</option>
@@ -226,7 +233,7 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
 
         <select
           value={filterEndpoint}
-          onChange={(e) => setFilterEndpoint(e.target.value)}
+          onChange={(e) => { setFilterEndpoint(e.target.value); setFilterClient('') }}
           style={filterSelectStyle(!!filterEndpoint)}
         >
           <option value="">Todos os endpoints</option>
