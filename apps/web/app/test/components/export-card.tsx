@@ -27,6 +27,58 @@ function colorizeJson(text: string): React.ReactNode[] {
   return result
 }
 
+function colorizeAttrs(attrs: string, baseKey: number): React.ReactNode[] {
+  const result: React.ReactNode[] = []
+  let k = baseKey
+  const re = /([\w:-]+)(\s*=\s*)("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|[^\s>]+)/g
+  let last = 0
+  let m: RegExpExecArray | null
+  while ((m = re.exec(attrs)) !== null) {
+    if (m.index > last) result.push(attrs.slice(last, m.index))
+    result.push(<span key={k++} style={{ color: '#953800' }}>{m[1]}</span>)
+    result.push(m[2])
+    result.push(<span key={k++} style={{ color: '#0550ae' }}>{m[3]}</span>)
+    last = m.index + m[0].length
+  }
+  if (last < attrs.length) result.push(attrs.slice(last))
+  return result
+}
+
+function colorizeXml(text: string): React.ReactNode[] {
+  const result: React.ReactNode[] = []
+  let k = 0
+  const tagRe = /(<!--[\s\S]*?-->|<[^>]*>)/g
+  let last = 0
+  let m: RegExpExecArray | null
+  while ((m = tagRe.exec(text)) !== null) {
+    if (m.index > last) result.push(text.slice(last, m.index))
+    const tok = m[1]
+    if (tok.startsWith('<!--')) {
+      result.push(<span key={k++} style={{ color: '#59636e' }}>{tok}</span>)
+    } else {
+      const parts = /^(<\/?)([^\s/>]+)([\s\S]*?)(\/?>)$/.exec(tok)
+      if (parts) {
+        const [, open, name, attrs, close] = parts
+        result.push(<span key={k++} style={{ color: '#59636e' }}>{open}</span>)
+        result.push(<span key={k++} style={{ color: '#116329' }}>{name}</span>)
+        if (attrs) { result.push(...colorizeAttrs(attrs, k)); k += 20 }
+        result.push(<span key={k++} style={{ color: '#59636e' }}>{close}</span>)
+      } else {
+        result.push(<span key={k++} style={{ color: '#116329' }}>{tok}</span>)
+      }
+    }
+    last = m.index + m[0].length
+  }
+  if (last < text.length) result.push(text.slice(last))
+  return result
+}
+
+function highlight(text: string): React.ReactNode[] {
+  if (text.trimStart().startsWith('<')) return colorizeXml(text)
+  try { JSON.parse(text); return colorizeJson(text) } catch {}
+  return [text]
+}
+
 function statusMeta(code: number): { color: string; bg: string; label: string } {
   if (code >= 500) return { color: '#d1242f', bg: '#ffebe9', label: 'Server Error' }
   if (code >= 400) return { color: '#d1242f', bg: '#ffebe9', label: 'Client Error' }
@@ -196,7 +248,7 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
                 Request Body
               </p>
               <pre style={{ margin: 0, fontSize: 11, fontFamily: '"Fira Code", "Cascadia Code", monospace', color: '#1f2328', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-                {colorizeJson(reqLines.join('\n'))}
+                {highlight(reqLines.join('\n'))}
               </pre>
               {reqOmitted > 0 && (
                 <p style={{ margin: '4px 0 0', fontSize: 11, color: '#59636e', fontFamily: 'monospace' }}>+ {reqOmitted} linhas omitidas</p>
@@ -252,7 +304,7 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
               wordBreak: 'break-all',
             }}
           >
-            {colorizeJson(lines.join('\n'))}
+            {highlight(lines.join('\n'))}
           </pre>
           {omitted > 0 && (
             <p style={{ margin: '8px 0 0', fontSize: 11, color: '#59636e', fontFamily: 'monospace' }}>
