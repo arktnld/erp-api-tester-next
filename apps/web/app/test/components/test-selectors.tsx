@@ -1,28 +1,9 @@
 'use client'
 
 import type { ERP, Endpoint, Company, Environment } from '../lib/types'
+import { sectionLabel, selectStyle as baseSelectStyle } from '@/lib/styles'
 
-const selectStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '7px 10px',
-  backgroundColor: 'var(--surface-2)',
-  border: '1px solid var(--border)',
-  borderRadius: 6,
-  color: 'var(--text)',
-  fontSize: 13,
-  outline: 'none',
-  cursor: 'pointer',
-  marginBottom: 8,
-}
-
-const sectionLabel: React.CSSProperties = {
-  fontSize: 10,
-  color: 'var(--text-subtle)',
-  textTransform: 'uppercase',
-  letterSpacing: '0.07em',
-  marginBottom: 6,
-  marginTop: 12,
-}
+const selectStyle: React.CSSProperties = { ...baseSelectStyle, padding: '7px 10px', marginBottom: 8 }
 
 function renderEndpointOptions(endpoints: Endpoint[]) {
   endpoints = endpoints.filter((ep) => ep.name)

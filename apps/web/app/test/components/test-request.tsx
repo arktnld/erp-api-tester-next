@@ -2,18 +2,10 @@
 
 import dynamic from 'next/dynamic'
 import { tryPrettyJson } from '../lib/utils'
+import { sectionLabel } from '@/lib/styles'
 
 const CodeBlock = dynamic(() => import('@/components/ui/code-block').then(m => ({ default: m.CodeBlock })), { ssr: false })
 import type { ExecuteResponse } from '../lib/types'
-
-const sectionLabel: React.CSSProperties = {
-  fontSize: 10,
-  color: 'var(--text-subtle)',
-  textTransform: 'uppercase',
-  letterSpacing: '0.07em',
-  marginBottom: 6,
-  marginTop: 12,
-}
 
 interface TestRequestProps {
   response: ExecuteResponse | null
