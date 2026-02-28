@@ -146,6 +146,7 @@ export function TestResponse({ response, loading, erpName = '', companyName = ''
             status: response.statusCode,
             duration: response.durationMs,
             timestamp: new Date(),
+            requestBody: response.requestBody,
             responseBody: response.isBinary ? null : response.responseBody,
             binaryMeta: response.isBinary ? {
               mimeType: response.mimeType,

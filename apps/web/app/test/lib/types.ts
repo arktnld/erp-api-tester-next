@@ -56,6 +56,7 @@ export interface ExportData {
   status: number
   duration: number
   timestamp: Date
+  requestBody?: string | null
   responseBody: string | null
   binaryMeta?: {
     mimeType: string

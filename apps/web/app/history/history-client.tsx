@@ -193,6 +193,7 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
                   status: selected.statusCode,
                   duration: selected.durationMs,
                   timestamp: new Date(selected.createdAt),
+                  requestBody: selected.requestBody || null,
                   responseBody: selected.responseBody || null,
                 } satisfies ExportData} />
               </div>

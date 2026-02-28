@@ -151,6 +151,24 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
           </span>
         </div>
 
+        {/* ── Request Body ── */}
+        {data.requestBody?.trim() && (() => {
+          const { lines: reqLines, omitted: reqOmitted } = truncateBody(prettyJson(data.requestBody), 8)
+          return (
+            <div style={{ padding: '10px 20px', borderBottom: '1px solid #d1d9e0', backgroundColor: '#ffffff' }}>
+              <p style={{ margin: '0 0 6px', fontSize: 10, fontWeight: 600, color: '#59636e', textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                Request Body
+              </p>
+              <pre style={{ margin: 0, fontSize: 11, fontFamily: '"Fira Code", "Cascadia Code", monospace', color: '#1f2328', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                {reqLines.join('\n')}
+              </pre>
+              {reqOmitted > 0 && (
+                <p style={{ margin: '4px 0 0', fontSize: 11, color: '#59636e', fontFamily: 'monospace' }}>+ {reqOmitted} linhas omitidas</p>
+              )}
+            </div>
+          )
+        })()}
+
         {/* ── Status ── */}
         <div
           style={{
