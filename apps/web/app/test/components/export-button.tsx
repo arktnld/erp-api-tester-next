@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
-import { Loader2, Share2, Image, Download, FileText } from 'lucide-react'
+import { Loader2, Share2, Image, Download } from 'lucide-react'
 import { ExportCard } from './export-card'
 import { useExport } from './use-export'
 import type { ExportData } from '../lib/types'
@@ -12,7 +12,7 @@ interface ExportButtonProps {
 
 export function ExportButton({ data }: ExportButtonProps) {
   const cardRef = useRef<HTMLDivElement>(null)
-  const { capturing, copyImage, downloadPng, downloadPdf } = useExport(cardRef)
+  const { capturing, copyImage, downloadPng } = useExport(cardRef)
   const [open, setOpen] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
 
@@ -94,9 +94,6 @@ export function ExportButton({ data }: ExportButtonProps) {
             </button>
             <button style={menuItemStyle} onClick={() => { downloadPng(); setOpen(false) }}>
               <Download size={13} /> Baixar PNG
-            </button>
-            <button style={menuItemStyle} onClick={() => { downloadPdf(); setOpen(false) }}>
-              <FileText size={13} /> Baixar PDF
             </button>
           </div>
         )}

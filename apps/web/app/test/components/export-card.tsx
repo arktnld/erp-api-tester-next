@@ -102,6 +102,7 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
                 fontSize: 14,
                 fontWeight: 700,
                 letterSpacing: '-0.02em',
+                whiteSpace: 'nowrap',
               }}
             >
               <span style={{ color: '#0969da' }}>ERP</span>
