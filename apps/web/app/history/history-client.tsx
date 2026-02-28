@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTable } from '@/components/ui/data-table'
 import { PageHeader } from '@/components/ui/page-header'
@@ -49,9 +49,71 @@ const tabBtnStyle = (active: boolean): React.CSSProperties => ({
   cursor: 'pointer',
 })
 
+const filterSelectStyle = (active: boolean): React.CSSProperties => ({
+  padding: '5px 8px',
+  fontSize: 13,
+  color: 'var(--text)',
+  backgroundColor: 'var(--surface-2)',
+  border: `1px solid ${active ? 'var(--accent)' : 'var(--border)'}`,
+  borderRadius: 6,
+  cursor: 'pointer',
+  outline: 'none',
+})
+
 export function HistoryClient({ history }: { history: HistoryItem[] }) {
   const [selected, setSelected] = useState<HistoryItem | null>(null)
   const [tab, setTab] = useState<'response' | 'request' | 'req-headers' | 'res-headers'>('response')
+
+  const [filterCompany, setFilterCompany] = useState('')
+  const [filterEndpoint, setFilterEndpoint] = useState('')
+  const [filterClient, setFilterClient] = useState('')
+  const [filterStatus, setFilterStatus] = useState('')
+  const [filterDateFrom, setFilterDateFrom] = useState('')
+  const [filterDateTo, setFilterDateTo] = useState('')
+
+  const companies = useMemo(
+    () => [...new Set(history.map((h) => h.companyName))].sort(),
+    [history]
+  )
+  const endpoints = useMemo(
+    () => [...new Set(history.map((h) => h.endpointName))].sort(),
+    [history]
+  )
+  const clients = useMemo(
+    () => [...new Set(history.map((h) => h.clientName))].sort(),
+    [history]
+  )
+
+  const filtered = useMemo(() => {
+    return history.filter((item) => {
+      if (filterCompany && item.companyName !== filterCompany) return false
+      if (filterEndpoint && item.endpointName !== filterEndpoint) return false
+      if (filterClient && item.clientName !== filterClient) return false
+      if (filterStatus) {
+        const group = Math.floor(item.statusCode / 100) + 'xx'
+        if (group !== filterStatus) return false
+      }
+      if (filterDateFrom && new Date(item.createdAt) < new Date(filterDateFrom)) return false
+      if (filterDateTo) {
+        const to = new Date(filterDateTo)
+        to.setHours(23, 59, 59, 999)
+        if (new Date(item.createdAt) > to) return false
+      }
+      return true
+    })
+  }, [history, filterCompany, filterEndpoint, filterClient, filterStatus, filterDateFrom, filterDateTo])
+
+  function clearFilters() {
+    setFilterCompany('')
+    setFilterEndpoint('')
+    setFilterClient('')
+    setFilterStatus('')
+    setFilterDateFrom('')
+    setFilterDateTo('')
+  }
+
+  const hasActiveFilters =
+    filterCompany || filterEndpoint || filterClient || filterStatus || filterDateFrom || filterDateTo
 
   const columns: ColumnDef<HistoryItem, unknown>[] = [
     {
@@ -140,6 +202,96 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
         title="Histórico"
         description="Últimas 200 requisições executadas"
       />
+
+      {/* Filter bar */}
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 8,
+          marginBottom: 12,
+          alignItems: 'center',
+        }}
+      >
+        <select
+          value={filterCompany}
+          onChange={(e) => setFilterCompany(e.target.value)}
+          style={filterSelectStyle(!!filterCompany)}
+        >
+          <option value="">Todas as empresas</option>
+          {companies.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+
+        <select
+          value={filterEndpoint}
+          onChange={(e) => setFilterEndpoint(e.target.value)}
+          style={filterSelectStyle(!!filterEndpoint)}
+        >
+          <option value="">Todos os endpoints</option>
+          {endpoints.map((e) => (
+            <option key={e} value={e}>{e}</option>
+          ))}
+        </select>
+
+        <select
+          value={filterClient}
+          onChange={(e) => setFilterClient(e.target.value)}
+          style={filterSelectStyle(!!filterClient)}
+        >
+          <option value="">Todos os clientes</option>
+          {clients.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          style={filterSelectStyle(!!filterStatus)}
+        >
+          <option value="">Todos os status</option>
+          <option value="2xx">2xx — Sucesso</option>
+          <option value="3xx">3xx — Redirect</option>
+          <option value="4xx">4xx — Erro cliente</option>
+          <option value="5xx">5xx — Erro servidor</option>
+        </select>
+
+        <input
+          type="date"
+          value={filterDateFrom}
+          onChange={(e) => setFilterDateFrom(e.target.value)}
+          style={filterSelectStyle(!!filterDateFrom)}
+          title="Data início"
+        />
+
+        <input
+          type="date"
+          value={filterDateTo}
+          onChange={(e) => setFilterDateTo(e.target.value)}
+          style={filterSelectStyle(!!filterDateTo)}
+          title="Data fim"
+        />
+
+        {hasActiveFilters && (
+          <button
+            onClick={clearFilters}
+            style={{
+              padding: '5px 12px',
+              fontSize: 12,
+              color: 'var(--text-muted)',
+              background: 'none',
+              border: '1px solid var(--border)',
+              borderRadius: 6,
+              cursor: 'pointer',
+            }}
+          >
+            Limpar filtros
+          </button>
+        )}
+      </div>
+
       <div
         style={{
           backgroundColor: 'var(--surface)',
@@ -149,7 +301,7 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
         }}
       >
         <DataTable
-          data={history}
+          data={filtered}
           columns={columns}
           searchPlaceholder="Buscar no histórico..."
         />
