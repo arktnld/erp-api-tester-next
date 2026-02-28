@@ -92,13 +92,13 @@ export function TestSelectors({
 }: TestSelectorsProps) {
   return (
     <div style={{ width: 260, minWidth: 260, borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', padding: '16px 14px', overflowY: 'auto' }}>
-      <p style={sectionLabel}>ERP</p>
+      <p style={sectionLabel}>1. ERP</p>
       <select style={selectStyle} value={erpId ?? ''} onChange={(e) => onErpChange(Number(e.target.value) || null)}>
         <option value="">Selecionar ERP</option>
         {erps.filter((e) => e.name).map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
       </select>
 
-      <p style={sectionLabel}>Empresa</p>
+      <p style={sectionLabel}>2. Empresa</p>
       <select
         style={{ ...selectStyle, opacity: !erpId ? 0.4 : 1 }}
         value={companyId ?? ''}
@@ -125,7 +125,7 @@ export function TestSelectors({
         </>
       )}
 
-      <p style={sectionLabel}>Endpoint</p>
+      <p style={sectionLabel}>3. Endpoint</p>
       <select
         style={{ ...selectStyle, opacity: !erpId ? 0.4 : 1 }}
         value={endpointId ?? ''}
@@ -136,7 +136,7 @@ export function TestSelectors({
         {erp && renderEndpointOptions(erp.endpoints)}
       </select>
 
-      <p style={{ ...sectionLabel, opacity: !needsClient ? 0.4 : 1 }}>Cliente de Teste</p>
+      <p style={{ ...sectionLabel, opacity: !needsClient ? 0.4 : 1 }}>4. Cliente de Teste</p>
       <select
         style={{ ...selectStyle, opacity: !companyId || !needsClient ? 0.4 : 1 }}
         value={clientId ?? ''}
