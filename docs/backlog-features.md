@@ -4,9 +4,9 @@
 
 Ordem de execução definida. Itens devem ser feitos em sequência — cada um desbloqueia o próximo.
 
-- [ ] **1. Guard imediato no crash de binário** — adicionar `?? {}` no `Object.entries(response.requestHeaders)` em `test-request.tsx`. Uma linha. Zero risco. Elimina o crash enquanto o fix completo não vai.
-- [ ] **2. Fix completo de resposta binária** — `httpFetch` coleta chunks como `Buffer[]`; detecta Content-Type antes de converter (texto → `utf8`, binário → `base64`); `route.ts` inclui `isBinary`, `mimeType`, `fileName` no response; `test-response.tsx` exibe botão de download se `isBinary: true`
-- [ ] **3. Strategy de Content-Type** — ampliar o fix acima com handle inteligente por categoria (tabela abaixo). `types.ts` recebe `contentCategory`; `test-response.tsx` renderiza por categoria: image preview, XML/HTML highlight, CSV, texto, download
+- [x] **1. Guard imediato no crash de binário** — `?? {}` em `test-request.tsx`. ✅ v1.1.0
+- [x] **2. Fix completo de resposta binária** — `httpFetch` com `Buffer[]`, base64, redirect follow, download button. ✅ v1.1.0
+- [x] **3. Strategy de Content-Type** — `contentCategory`, image preview inline (≤5MB), download para document/binary. ✅ v1.1.0
 - [ ] **4. Bug auto-fill CPF** — trigger de auto-fill deve reagir à mudança do campo raiz (CPF/CNPJ) e limpar/atualizar campos dependentes quando o CPF é trocado
 - [ ] **5. Card visual exportável** — botão `Exportar ▾` no resultado do teste e no histórico. Formatos: copiar imagem (clipboard), baixar PNG, baixar PDF via `window.print()`
 
@@ -75,6 +75,12 @@ Ordem de execução definida. Itens devem ser feitos em sequência — cada um d
 - [ ] **Editor de código robusto** — substituir o `<textarea>` do raw body editor por `@uiw/react-codemirror` (mais leve que Monaco). Syntax highlighting para JSON/XML, autocompletar chaves, formatação automática e indentação correta ao editar request bodies
 - [ ] **Prettier standalone** — formatar automaticamente JSON de request e response na interface, substituindo o `tryPrettyJson()` atual por formatação mais robusta com suporte a múltiplos formatos
 
+## Onboarding
+
+- [ ] **Wizard de setup inicial** — detectar quando o banco está vazio (zero ERPs cadastrados) e redirecionar para um wizard passo a passo antes de mostrar a aplicação. Passos: (1) criar primeiro ERP → (2) adicionar empresa → (3) cadastrar endpoint → (4) criar cliente de teste → (5) tela de conclusão com botão "Começar a testar". Evita que novos deployments apareçam como tela vazia sem instrução
+
+- [ ] **Tour de interface para novos usuários** — na primeira visita (flag em `localStorage`), exibir overlay com highlights sequenciais explicando os elementos principais: sidebar de navegação, seleção ERP→Empresa→Endpoint→Cliente, botão Executar, painel de resposta, histórico. Deve poder ser re-aberto via botão "?" na interface. Implementar com biblioteca leve (ex: `driver.js`) ou custom com `useEffect` + portal
+
 ## Qualidade de Vida
 
 - [ ] **Busca global** — encontrar empresa/endpoint/cliente rapidamente sem navegar pelo menu
@@ -107,7 +113,9 @@ Ordem de execução definida. Itens devem ser feitos em sequência — cada um d
 - [ ] **Nomenclatura ambígua "Configurado"** (chat) — botão no rodapé do painel esquerdo não comunica o que configura. Renomear para algo descritivo (ex: "Configurar IA" ou "Modelo: GPT-4")
 - [ ] **URLs longas truncadas sem tooltip** (empresas) — URLs de ambientes ficam cortadas na tabela sem forma de ver o valor completo. Adicionar tooltip ao hover com a URL completa
 - [ ] **Área clicável pequena nos cards de ERP** — apenas o `›` no nome do ERP é clicável, mas o target é pequeno e não é óbvio. Tornar a linha/card inteiro clicável
-- [ ] **Tema claro** — suporte a light mode além do dark mode atual, com toggle nas configurações do usuário. Antes de implementar, refatorar cores hardcoded nos componentes para CSS variables para evitar inconsistências.
+- [ ] **Adotar Shadcn/ui oficial** — os componentes em `components/ui/` (`Button`, `Sheet`, `Badge`, `Input`, etc.) são implementações custom que imitam a nomenclatura do Shadcn mas não usam Radix UI. Migrar para o Shadcn/ui real traz: acessibilidade nativa (ARIA, navegação por teclado, focus trap em modais), componentes prontos que hoje faltam (Tooltip, Dialog, DropdownMenu, Select, Tabs, Toast), e base sólida para o tema claro. Pré-requisito: rodar `npx shadcn@latest init` e migrar os componentes existentes gradualmente, começando pelos mais simples (Button, Badge, Input) antes dos compostos (Sheet → Dialog)
+
+- [ ] **Tema claro** — suporte a light mode além do dark mode atual, com toggle nas configurações do usuário. Depende da adoção do Shadcn/ui (CSS variables de tema já vêm configuradas). Antes de implementar, refatorar cores hardcoded nos componentes para CSS variables para evitar inconsistências.
 
 ## Performance
 
