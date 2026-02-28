@@ -84,7 +84,15 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
             borderBottom: `1px solid ${C.border}`,
           }}
         >
-          <span style={{ fontSize: 13, fontWeight: 600, color: C.accent }}>⬡ ERP Tester</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: C.accent, letterSpacing: '-1px', lineHeight: 1 }}>
+              {'</>'}
+            </span>
+            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>
+              <span style={{ color: C.accent }}>ERP</span>
+              <span style={{ color: C.text }}> Tester</span>
+            </span>
+          </div>
           <span style={{ fontSize: 12, color: C.subtle }}>{formatTimestamp(data.timestamp)}</span>
         </div>
 
@@ -93,15 +101,19 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 6 }}>
             <span
               style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 fontSize: 11,
                 fontWeight: 700,
                 fontFamily: 'monospace',
                 backgroundColor: C.accent,
                 color: '#fff',
-                padding: '2px 7px',
+                padding: '3px 8px',
                 borderRadius: 4,
                 letterSpacing: 0.5,
                 flexShrink: 0,
+                lineHeight: 1,
               }}
             >
               {data.method}
@@ -141,10 +153,10 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
                 height: 8,
                 borderRadius: '50%',
                 backgroundColor: sc,
-                display: 'inline-block',
+                flexShrink: 0,
               }}
             />
-            <span style={{ fontSize: 13, fontWeight: 600, color: sc }}>{data.status}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: sc, lineHeight: 1 }}>{data.status}</span>
           </div>
           <span style={{ fontSize: 12, color: C.muted, fontFamily: 'monospace' }}>{data.duration}ms</span>
         </div>
