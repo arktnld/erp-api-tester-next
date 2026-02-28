@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Play, Loader2, Copy, Check } from 'lucide-react'
+import { Play, Loader2, Copy, Check, Download } from 'lucide-react'
 import { StatusBadge } from '@/components/ui/badge'
 import { JsonTree } from './json-tree'
 import { tryPrettyJson } from '../lib/utils'
@@ -19,6 +19,65 @@ const tabBtnStyle = (active: boolean): React.CSSProperties => ({
   background: 'none',
   cursor: 'pointer',
 })
+
+function downloadBase64(base64: string, mimeType: string, fileName: string) {
+  const byteChars = atob(base64)
+  const bytes = new Uint8Array(byteChars.length)
+  for (let i = 0; i < byteChars.length; i++) bytes[i] = byteChars.charCodeAt(i)
+  const blob = new Blob([bytes], { type: mimeType })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = fileName
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+function BinaryContent({ response }: { response: ExecuteResponse }) {
+  const name = response.fileName ?? `download.${response.mimeType.split('/')[1] ?? 'bin'}`
+  const sizeKb = (Math.floor(response.responseBody.length * 3 / 4) / 1024).toFixed(1)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, height: '100%', minHeight: 120 }}>
+      <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+        [{response.mimeType} · {sizeKb}KB · {name}]
+      </p>
+      <button
+        onClick={() => downloadBase64(response.responseBody, response.mimeType, name)}
+        style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', fontSize: 13, fontWeight: 500, backgroundColor: 'var(--accent)', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer' }}
+      >
+        <Download size={14} />
+        Baixar {name}
+      </button>
+    </div>
+  )
+}
+
+function ImageContent({ response }: { response: ExecuteResponse }) {
+  const name = response.fileName ?? `imagem.${response.mimeType.split('/')[1] ?? 'jpg'}`
+  const sizeBytes = Math.floor(response.responseBody.length * 3 / 4)
+  const tooBig = sizeBytes > 5 * 1024 * 1024 // >5MB: não renderiza inline
+
+  if (tooBig) {
+    return <BinaryContent response={response} />
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+      <img
+        src={`data:${response.mimeType};base64,${response.responseBody}`}
+        alt={name}
+        style={{ maxWidth: '100%', maxHeight: 500, objectFit: 'contain', borderRadius: 8, border: '1px solid var(--border)' }}
+      />
+      <button
+        onClick={() => downloadBase64(response.responseBody, response.mimeType, name)}
+        style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer' }}
+      >
+        <Download size={12} />
+        {name}
+      </button>
+    </div>
+  )
+}
 
 interface TestResponseProps {
   response: ExecuteResponse | null
@@ -53,7 +112,11 @@ export function TestResponse({ response, loading }: TestResponseProps) {
       <div style={{ padding: '10px 16px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
         <StatusBadge code={response.statusCode} />
         <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{response.durationMs}ms</span>
-        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{(response.responseBody.length / 1024).toFixed(1)}KB</span>
+        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+          {response.isBinary
+            ? `${(Math.floor(response.responseBody.length * 3 / 4) / 1024).toFixed(1)}KB`
+            : `${(response.responseBody.length / 1024).toFixed(1)}KB`}
+        </span>
         <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-subtle)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
           {response.method} {response.url}
         </span>
@@ -76,6 +139,8 @@ export function TestResponse({ response, loading }: TestResponseProps) {
       {/* Content */}
       <div style={{ flex: 1, overflow: 'auto', padding: 16 }}>
         {resTab === 'json' && (() => {
+          if (response.contentCategory === 'image') return <ImageContent response={response} />
+          if (response.isBinary) return <BinaryContent response={response} />
           let parsed: unknown = null
           try { parsed = JSON.parse(response.responseBody) } catch {}
           return (
@@ -89,9 +154,13 @@ export function TestResponse({ response, loading }: TestResponseProps) {
         })()}
 
         {resTab === 'raw' && (
-          <pre style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--text)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', lineHeight: 1.6 }}>
-            {response.responseBody}
-          </pre>
+          response.contentCategory === 'image'
+            ? <ImageContent response={response} />
+            : response.isBinary
+              ? <BinaryContent response={response} />
+              : <pre style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--text)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', lineHeight: 1.6 }}>
+                  {response.responseBody}
+                </pre>
         )}
 
         {resTab === 'headers' && (

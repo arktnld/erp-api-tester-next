@@ -33,7 +33,7 @@ export function TestRequest({ response, resolvedBody, bodyMode, rawBody, onBodyM
           {response ? (
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <tbody>
-                {Object.entries(response.requestHeaders).map(([k, v]) => (
+                {Object.entries(response.requestHeaders ?? {}).map(([k, v]) => (
                   <tr key={k} style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '5px 0', fontFamily: 'monospace', fontSize: 12, color: 'var(--text-muted)', width: '40%', paddingRight: 12 }}>{k}</td>
                     <td style={{ padding: '5px 0', fontFamily: 'monospace', fontSize: 12, wordBreak: 'break-all' }}>{v}</td>

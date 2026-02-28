@@ -31,6 +31,8 @@ export type ERP = {
 
 export type Environment = { name: string; url: string }
 
+export type ContentCategory = 'json' | 'xml' | 'html' | 'csv' | 'text' | 'image' | 'document' | 'binary'
+
 export interface ExecuteResponse {
   statusCode: number
   url: string
@@ -40,4 +42,8 @@ export interface ExecuteResponse {
   responseBody: string
   responseHeaders: Record<string, string>
   durationMs: number
+  contentCategory: ContentCategory
+  mimeType: string
+  fileName: string | null
+  isBinary: boolean
 }
