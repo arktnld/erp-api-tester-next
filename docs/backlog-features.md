@@ -19,7 +19,7 @@ Itens em ordem de prioridade. Grupos marcados com 📦 têm 1 plano só — não
 
 ---
 
-- [ ] 📦 `[perf]` **SyntaxHighlighter light** — trocar import completo (881KB) pelo build light + registrar só JSON/bash (~15KB). Adicionar `next/dynamic` com `ssr: false` nos componentes que usam o highlighter. Afeta `/history` e `/test`.
+- [x] 📦 `[perf]` **SyntaxHighlighter light** ✅ v1.6.0 — trocar import completo (881KB) pelo build light + registrar só JSON/bash (~15KB). Adicionar `next/dynamic` com `ssr: false` nos componentes que usam o highlighter. Afeta `/history` e `/test`.
   - `react-syntax-highlighter/dist/esm/light` + `registerLanguage`
   - `next/dynamic(() => import(...), { ssr: false })`
 
