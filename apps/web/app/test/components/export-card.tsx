@@ -4,10 +4,21 @@ import { forwardRef } from 'react'
 import type { ExportData } from '../lib/types'
 
 function statusMeta(code: number): { color: string; bg: string; label: string } {
-  if (code >= 500) return { color: '#dc2626', bg: '#fef2f2', label: 'Server Error' }
-  if (code >= 400) return { color: '#dc2626', bg: '#fef2f2', label: 'Client Error' }
-  if (code >= 300) return { color: '#d97706', bg: '#fffbeb', label: 'Redirect' }
-  return { color: '#16a34a', bg: '#f0fdf4', label: 'OK' }
+  if (code >= 500) return { color: '#d1242f', bg: '#ffebe9', label: 'Server Error' }
+  if (code >= 400) return { color: '#d1242f', bg: '#ffebe9', label: 'Client Error' }
+  if (code >= 300) return { color: '#9a6700', bg: '#fff8c5', label: 'Redirect' }
+  return { color: '#1a7f37', bg: '#dafbe1', label: 'OK' }
+}
+
+function methodMeta(method: string): { color: string; bg: string } {
+  switch (method.toUpperCase()) {
+    case 'GET':    return { color: '#1a7f37', bg: '#dafbe1' }
+    case 'POST':   return { color: '#0969da', bg: '#ddf4ff' }
+    case 'PUT':    return { color: '#9a6700', bg: '#fff8c5' }
+    case 'PATCH':  return { color: '#8250df', bg: '#fbefff' }
+    case 'DELETE': return { color: '#d1242f', bg: '#ffebe9' }
+    default:       return { color: '#59636e', bg: '#f6f8fa' }
+  }
 }
 
 function formatTimestamp(d: Date): string {
@@ -37,6 +48,7 @@ function prettyJson(text: string): string {
 export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
   function ExportCard({ data }, ref) {
     const sm = statusMeta(data.status)
+    const mm = methodMeta(data.method)
 
     const bodyText = (() => {
       if (data.binaryMeta) {
@@ -57,27 +69,28 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
           borderRadius: 12,
           overflow: 'hidden',
           fontFamily: '-apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif',
-          border: '1px solid #e2e8f0',
+          border: '1px solid #d1d9e0',
           backgroundColor: '#ffffff',
         }}
       >
-        {/* ── Dark Header ── */}
+        {/* ── Header ── */}
         <div
           style={{
-            backgroundColor: '#0f172a',
-            padding: '14px 20px',
+            backgroundColor: '#f6f8fa',
+            padding: '12px 20px',
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'baseline',
             justifyContent: 'space-between',
+            borderBottom: '1px solid #d1d9e0',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
             <span
               style={{
                 fontFamily: 'monospace',
                 fontSize: 13,
                 fontWeight: 700,
-                color: '#818cf8',
+                color: '#0969da',
                 letterSpacing: '-1px',
               }}
             >
@@ -86,35 +99,37 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
             <span
               style={{
                 fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: 15,
+                fontSize: 14,
                 fontWeight: 700,
                 letterSpacing: '-0.02em',
               }}
             >
-              <span style={{ color: '#818cf8' }}>ERP</span>
-              <span style={{ color: '#e2e8f0' }}> Tester</span>
+              <span style={{ color: '#0969da' }}>ERP</span>
+              <span style={{ color: '#1f2328' }}> Tester</span>
             </span>
           </div>
-          <span style={{ fontSize: 11, color: '#64748b', fontFamily: 'monospace' }}>
+          <span style={{ fontSize: 11, color: '#59636e', fontFamily: 'monospace' }}>
             {formatTimestamp(data.timestamp)}
           </span>
         </div>
 
         {/* ── Request ── */}
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
+        <div style={{ padding: '14px 20px', borderBottom: '1px solid #d1d9e0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
             <span
               style={{
-                backgroundColor: '#6366f1',
-                color: '#fff',
-                fontSize: 10,
-                fontWeight: 800,
+                display: 'inline-block',
+                height: 20,
+                lineHeight: '20px',
+                padding: '0 8px',
+                backgroundColor: mm.bg,
+                color: mm.color,
+                fontSize: 11,
+                fontWeight: 700,
                 fontFamily: 'monospace',
-                padding: '4px 9px',
-                borderRadius: 5,
-                letterSpacing: 0.8,
+                borderRadius: 4,
+                letterSpacing: 0.5,
                 flexShrink: 0,
-                marginTop: 2,
               }}
             >
               {data.method}
@@ -123,7 +138,7 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
               style={{
                 fontSize: 12,
                 fontFamily: 'monospace',
-                color: '#1e293b',
+                color: '#1f2328',
                 wordBreak: 'break-all',
                 lineHeight: 1.6,
               }}
@@ -131,7 +146,7 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
               {data.url}
             </span>
           </div>
-          <span style={{ fontSize: 12, color: '#94a3b8' }}>
+          <span style={{ fontSize: 12, color: '#59636e' }}>
             {data.erpName} · {data.companyName}
           </span>
         </div>
@@ -144,7 +159,7 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            borderBottom: '1px solid #f1f5f9',
+            borderBottom: '1px solid #d1d9e0',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -157,20 +172,26 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
                 flexShrink: 0,
               }}
             />
-            <span style={{ fontSize: 14, fontWeight: 700, color: sm.color }}>{data.status}</span>
-            <span style={{ fontSize: 12, color: sm.color, opacity: 0.75 }}>{sm.label}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: sm.color, lineHeight: '20px' }}>
+              {data.status}
+            </span>
+            <span style={{ fontSize: 12, color: sm.color, opacity: 0.8, lineHeight: '20px' }}>
+              {sm.label}
+            </span>
           </div>
-          <span style={{ fontSize: 12, color: '#64748b', fontFamily: 'monospace' }}>{data.duration}ms</span>
+          <span style={{ fontSize: 12, color: '#59636e', fontFamily: 'monospace', lineHeight: '20px' }}>
+            {data.duration}ms
+          </span>
         </div>
 
         {/* ── Code block ── */}
-        <div style={{ backgroundColor: '#1e1e2e', padding: '16px 20px' }}>
+        <div style={{ backgroundColor: '#f6f8fa', padding: '14px 20px' }}>
           <pre
             style={{
               margin: 0,
               fontSize: 11,
               fontFamily: '"Fira Code", "Cascadia Code", "JetBrains Mono", monospace',
-              color: '#cdd6f4',
+              color: '#1f2328',
               lineHeight: 1.75,
               whiteSpace: 'pre-wrap',
               wordBreak: 'break-all',
@@ -179,7 +200,7 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
             {lines.join('\n')}
           </pre>
           {omitted > 0 && (
-            <p style={{ margin: '10px 0 0', fontSize: 11, color: '#4b5563', fontFamily: 'monospace' }}>
+            <p style={{ margin: '8px 0 0', fontSize: 11, color: '#59636e', fontFamily: 'monospace' }}>
               + {omitted} linhas omitidas
             </p>
           )}
