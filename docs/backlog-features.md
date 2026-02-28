@@ -1,177 +1,129 @@
 # Backlog de Features
 
-## Fila de Implementação
+## Concluído
 
-Ordem de execução definida. Itens devem ser feitos em sequência — cada um desbloqueia o próximo.
-
-- [x] **1. Guard imediato no crash de binário** — `?? {}` em `test-request.tsx`. ✅ v1.1.0
-- [x] **2. Fix completo de resposta binária** — `httpFetch` com `Buffer[]`, base64, redirect follow, download button. ✅ v1.1.0
-- [x] **3. Strategy de Content-Type** — `contentCategory`, image preview inline (≤5MB), download para document/binary. ✅ v1.1.0
-- [x] **4. Bug auto-fill CPF** — pool reseta campos auto-preenchidos antes de novo fetch. ✅ v1.2.0
-- [x] **5. Card visual exportável** — botão `Exportar ▾` no resultado do teste e no histórico. Copiar imagem (clipboard) + Baixar PNG via `html-to-image`. Syntax highlighting JSON/XML/HTML no card. ✅ v1.3.0
+- [x] **Guard imediato no crash de binário** — `?? {}` em `test-request.tsx` ✅ v1.1.0
+- [x] **Fix completo de resposta binária** — `httpFetch` com `Buffer[]`, base64, redirect follow, download button ✅ v1.1.0
+- [x] **Strategy de Content-Type** — `contentCategory`, image preview inline (≤5MB), download para document/binary ✅ v1.1.0
+- [x] **Bug auto-fill CPF** — pool reseta campos auto-preenchidos antes de novo fetch ✅ v1.2.0
+- [x] **Card visual exportável** — botão `Exportar ▾`, copiar imagem, baixar PNG, syntax highlighting ✅ v1.3.0
+- [x] **Filtro no histórico** — empresa, cliente, endpoint, status code, data range ✅ v1.3.1
+- [x] **Histórico sem paginação** — 50 registros/página, filtros server-side via URL params ✅ v1.4.0
 
 ---
 
-## Bugs Conhecidos
+## Fila
 
-- [ ] **Auto-fill não atualiza ao trocar CPF** — ao digitar um CPF diferente após já ter feito um preenchimento automático, os dados anteriores permanecem. O trigger de auto-fill precisa reagir à mudança do campo raiz (CPF/CNPJ) e limpar/atualizar os campos dependentes
+Itens em ordem de prioridade. Fazer em sequência.
 
-- [ ] **Crash ao receber resposta binária (PDF/arquivo)** — quando o endpoint retorna um arquivo binário (ex: boleto PDF com `Content-Type: application/pdf`), o site crasha em `test-request.tsx:36`. Causa raiz dupla: (1) `httpFetch` usa `data += chunk` que corrompe dados binários ao converter Buffer para UTF-8, (2) o JSON resultante quebra deixando `requestHeaders` como `undefined` no cliente.
+- [x] `[bug]` **Auto-fill não atualiza ao trocar CPF** ✅ v1.2.0 — ao digitar um CPF diferente após preenchimento automático, dados anteriores permanecem. O trigger de auto-fill precisa reagir à mudança do campo raiz (CPF/CNPJ) e limpar/atualizar os campos dependentes
 
-  **Plano de implementação:**
-  - **`httpFetch`** — coletar chunks como `Buffer[]` em vez de string. Após receber o response, verificar o `Content-Type` do header:
-    - Texto (`application/json`, `text/*`, `application/xml`, sem tipo) → `Buffer.concat(chunks).toString('utf8')`
-    - Binário (qualquer outro) → `Buffer.concat(chunks).toString('base64')`
-  - **`route.ts`** — incluir no response JSON: `isBinary: boolean`, `mimeType: string`, `fileName: string` (extraído do `Content-Disposition` se disponível)
-  - **`test-response.tsx`** — se `isBinary: true`, exibir botão de download em vez de tentar renderizar o body. Usar `mimeType` e `fileName` para criar o Blob e acionar o download
-  - **`test-request.tsx`** — adicionar `?? {}` no `Object.entries(response.requestHeaders)` como guard imediato para evitar o crash enquanto a solução completa não é implementada
-  - **Regra:** guiar-se 100% pelo `Content-Type` do header da resposta, nunca tentar adivinhar pelo conteúdo
+- [x] `[alta]` **Backup do banco** ✅ v1.5.0 — export periódico ou manual de toda a configuração (ERPs, endpoints, clientes de teste) em JSON, para evitar perda de dados em caso de falha no Postgres
 
-- [ ] **Estratégia de handle inteligente por formato de resposta** — implementar detecção automática do tipo de resposta e renderização adequada para cada categoria:
+- [ ] `[perf]` **`react-syntax-highlighter` importado completo** — gera chunk de 881KB carregando 300+ gramáticas. Trocar para build light (`/dist/esm/light`) e registrar apenas JSON/bash → ~15KB. Afeta `/history` (425KB) e `/test` (415KB). Principal suspeito do Render Delay de 991ms nos Core Web Vitals
 
-  | Categoria | Content-Types | Comportamento |
-  |-----------|--------------|---------------|
-  | `json` | `application/json`, `application/vnd.api+json`, `application/ld+json` | JSON tree interativo (já implementado) |
-  | `xml` | `application/xml`, `text/xml`, `application/soap+xml` | Syntax highlight como XML |
-  | `html` | `text/html` | Exibir como código (nunca renderizar — risco de segurança) |
-  | `csv` | `text/csv` | Texto simples (futuro: visualização em tabela) |
-  | `text` | `text/plain`, `application/x-www-form-urlencoded` | Texto simples |
-  | `image` | `image/*` | Preview inline com `<img>` + base64 data URL |
-  | `document` | `application/pdf`, `application/msword`, `application/vnd.ms-*`, `application/vnd.openxmlformats-*` | Botão de download com nome do arquivo |
-  | `binary` | `application/zip`, `application/octet-stream`, `audio/*`, `video/*` | Botão de download genérico |
-  | fallback | sem Content-Type | Tentar parse JSON; se falhar, exibir como texto |
+- [ ] `[perf]` **Sem `dynamic()` nos componentes pesados** — `SyntaxHighlighter` carregado no primeiro render. Usar `next/dynamic` com `ssr: false`
 
-  **Mudanças necessárias:**
-  - `httpFetch` em `route.ts` — coletar chunks como `Buffer[]`, verificar Content-Type antes de converter: texto → `utf8`, binário/imagem/documento → `base64`
-  - `route.ts` — retornar no response: `contentCategory`, `mimeType`, `fileName` (extraído do `Content-Disposition`), `isBinary`
-  - `types.ts` — adicionar campos `contentCategory`, `mimeType`, `fileName`, `isBinary` ao `ExecuteResponse`
-  - `test-response.tsx` — renderizar conforme `contentCategory`: image preview, download button, código XML/HTML, JSON tree, texto puro
-  - `test-request.tsx` — adicionar `?? {}` no `Object.entries(response.requestHeaders)` como guard imediato para evitar crash
+- [ ] `[segurança]` **Headers de segurança HTTP ausentes** — adicionar via `headers()` no `next.config.ts`:
+  - `Content-Security-Policy` 🔴
+  - `X-Frame-Options: DENY` 🔴
+  - `X-Content-Type-Options: nosniff` 🟡
+  - `Referrer-Policy: strict-origin-when-cross-origin` 🟡
+  - `Permissions-Policy` 🟡
+  - `poweredByHeader: false` — remove `x-powered-by: Next.js`
 
-## Compartilhamento e Evidência
+- [ ] `[editor]` **Editor de código robusto** — substituir `<textarea>` do raw body por `@uiw/react-codemirror`. Syntax highlighting JSON/XML, autocompletar chaves, formatação automática
 
-- [ ] **Card visual de requisição exportável** — gerar um card bem diagramado de uma execução para compartilhar como prova que está funcionando. Filosofia: é um **resumo visual**, não um dump completo — provar que a requisição funciona e mostrar as informações importantes. Para o output completo, o usuário copia separadamente.
+- [ ] `[ui]` **Fluxo de teste sem indicação de ordem** — adicionar numeração (1, 2, 3, 4) nos labels dos selects e/ou desabilitar os dependentes até o anterior ser preenchido
 
-  **Conteúdo do card:**
-  - Método + URL + ERP + empresa + timestamp
-  - Status code + duração
-  - Request headers e body (resumido se necessário)
-  - Response body — aparece se couber, truncado com "... +X linhas omitidas" se for grande, substituído por metadata se for binário (ex: `[PDF · 28KB · doc.pdf]`)
+- [ ] `[onboarding]` **Wizard de setup inicial** — detectar banco vazio (zero ERPs) e redirecionar para wizard: criar ERP → empresa → endpoint → cliente de teste → tela de conclusão
 
-  **Formatos de exportação** — botão `Exportar ▾` com dropdown:
-  - **Copiar imagem** — `html2canvas` → blob → `navigator.clipboard.write()` (cola direto no Slack/Teams)
-  - **Baixar PNG** — `html2canvas` → download
-  - **Baixar PDF** — `window.print()` com CSS de impressão → PDF vetorial via browser
+- [ ] `[dívida]` **Validação de input** — server actions aceitam dados crus. Adicionar schemas Zod em todos os `lib/actions/*`
 
-  **Disponível em:** página de teste (resultado atual) e histórico (qualquer execução passada)
+- [ ] `[dívida]` **`error.tsx` e error boundaries** — erros chegam direto ao usuário. Adicionar `error.tsx` nas rotas principais
 
-## Alta Prioridade
+- [ ] `[qualidade]` **Assertions** — validar que a resposta contém campos/valores esperados (ex: `status === "Ativo"`, `contratos.length > 0`)
 
-- [ ] **Filtro no histórico** — filtrar por empresa, cliente, endpoint, status code e data — resolve diretamente o diagnóstico em produção ("verificar o que aconteceu")
-- [ ] **Backup do banco** — export periódico ou manual de toda a configuração (ERPs, endpoints, clientes de teste) em JSON, para evitar perda de dados em caso de falha no Postgres
+- [ ] `[qol]` **Busca global** — encontrar empresa/endpoint/cliente rapidamente sem navegar pelo menu
 
-## Editor e Formatação
+- [ ] `[auth]` **Login** — autenticação via Clerk (VPN interna com acesso à internet)
 
-- [ ] **Editor de código robusto** — substituir o `<textarea>` do raw body editor por `@uiw/react-codemirror` (mais leve que Monaco). Syntax highlighting para JSON/XML, autocompletar chaves, formatação automática e indentação correta ao editar request bodies
-- [ ] **Prettier standalone** — formatar automaticamente JSON de request e response na interface, substituindo o `tryPrettyJson()` atual por formatação mais robusta com suporte a múltiplos formatos
+- [ ] `[auth]` **Três níveis de acesso** — Admin (acesso total), Editor (testar + gerenciar clientes), Viewer (somente leitura)
 
-## Onboarding
+- [ ] `[auth]` **Abas restritas** — seções visíveis só para admin (ERPs, configurações)
 
-- [ ] **Wizard de setup inicial** — detectar quando o banco está vazio (zero ERPs cadastrados) e redirecionar para um wizard passo a passo antes de mostrar a aplicação. Passos: (1) criar primeiro ERP → (2) adicionar empresa → (3) cadastrar endpoint → (4) criar cliente de teste → (5) tela de conclusão com botão "Começar a testar". Evita que novos deployments apareçam como tela vazia sem instrução
+- [ ] `[auth]` **Aba de configuração do usuário** — admin lista usuários, cria/remove contas, define roles
 
-- [ ] **Tour de interface para novos usuários** — na primeira visita (flag em `localStorage`), exibir overlay com highlights sequenciais explicando os elementos principais: sidebar de navegação, seleção ERP→Empresa→Endpoint→Cliente, botão Executar, painel de resposta, histórico. Deve poder ser re-aberto via botão "?" na interface. Implementar com biblioteca leve (ex: `driver.js`) ou custom com `useEffect` + portal
+- [ ] `[auth]` **Histórico de ações** — audit trail: admin vê log completo de quem fez o quê
 
-## Qualidade de Vida
+- [ ] `[ui]` **Adotar Shadcn/ui oficial** — componentes em `components/ui/` são custom sem Radix UI. Migrar gradualmente: Button, Badge, Input → Sheet → Dialog. Pré-requisito para tema claro
 
-- [ ] **Busca global** — encontrar empresa/endpoint/cliente rapidamente sem navegar pelo menu
-- [ ] **Notas em endpoints/empresas** — observações internas (ex: "esse endpoint é lento em produção")
-- [ ] **Reordenar endpoints** — drag and drop no ERP
+- [ ] `[ui]` **Tema claro** — light mode com toggle nas configurações. Depende do Shadcn/ui
 
-## Qualidade de Resposta
+- [ ] `[dívida]` **JSON stringificado no banco** — `authConfig`, `environments`, `fieldsData` são strings JSON. Migrar para JSONB para permitir queries e indexação
 
-- [ ] **Assertions** — validar que a resposta contém campos/valores esperados (ex: `status === "Ativo"`, `contratos.length > 0`) — útil para confirmar que um endpoint está retornando o esperado durante desenvolvimento
+- [ ] `[dívida]` **`/api/execute` sem proteção** — aceita URL arbitrária (risco SSRF). Após login, restringir a usuários autenticados e considerar allowlist de domínios
 
-## Workflows de Diagnóstico
+- [ ] `[dívida]` **Testes** — zero cobertura. Priorizar `lib/actions/` e `/api/execute`
 
-- [ ] **Cenários salvos / Playbooks** — sequência pré-configurada de endpoints para rodar em ordem com nome humano (ex: "Diagnóstico padrão sem internet" → executa 4 endpoints em ordem → mostra resumo)
+- [ ] `[dívida]` **Sem `loading.tsx`** — sem loading states globais nas rotas lentas. Adicionar skeleton em histórico e teste
 
-## Autenticação e Controle de Acesso (Auth/RBAC)
+- [ ] `[dívida]` **`substitute()` duplicada** — mesma função em `app/test/lib/utils.ts` e `app/api/execute/route.ts`. Centralizar em pacote compartilhado
 
-- [ ] **Login** — autenticação via **Clerk** (VPN interna com acesso à internet)
-- [ ] **Três níveis de acesso:**
-  - **Admin** — acesso total: gerencia usuários, vê histórico de todas as ações, pode criar/editar/deletar ERPs, empresas, endpoints, clientes de teste
-  - **Editor** — pode testar endpoints, criar e gerenciar clientes de teste, mas não mexe em ERPs/endpoints
-  - **Viewer** — somente leitura: pode executar testes com clientes existentes, vê histórico próprio
-- [ ] **Abas restritas** — algumas seções visíveis só para admin (ex: gerenciamento de ERPs, configurações)
-- [ ] **Aba de configuração do usuário** — admin vê lista de usuários, cria/remove contas, define roles
-- [ ] **Histórico de ações** — admin vê log completo de quem fez o quê no site (audit trail)
+- [ ] `[dívida]` **Providers de IA não abstraídos** — Anthropic, Google e OpenAI hardcoded no mesmo route handler. Criar camada de abstração
 
-## UI/UX
+- [ ] `[dívida]` **Path do `byte_prompt.md` hardcoded** — caminho absoluto no código. Mover para variável de ambiente
 
-- [ ] **Fluxo de teste sem indicação de ordem** — a tela de teste exige ERP → Empresa → Endpoint → Cliente nessa sequência, mas não há nenhuma pista visual disso. Adicionar numeração (1, 2, 3, 4) nos labels dos selects e/ou desabilitar os selects dependentes até o anterior ser preenchido
-- [ ] **Botão "Importar" sem tooltip** (home) — não fica claro o que o botão importa antes de clicar. Adicionar `title` ou tooltip com descrição do formato aceito
-- [ ] **Nomenclatura ambígua "Configurado"** (chat) — botão no rodapé do painel esquerdo não comunica o que configura. Renomear para algo descritivo (ex: "Configurar IA" ou "Modelo: GPT-4")
-- [ ] **URLs longas truncadas sem tooltip** (empresas) — URLs de ambientes ficam cortadas na tabela sem forma de ver o valor completo. Adicionar tooltip ao hover com a URL completa
-- [ ] **Área clicável pequena nos cards de ERP** — apenas o `›` no nome do ERP é clicável, mas o target é pequeno e não é óbvio. Tornar a linha/card inteiro clicável
-- [ ] **Adotar Shadcn/ui oficial** — os componentes em `components/ui/` (`Button`, `Sheet`, `Badge`, `Input`, etc.) são implementações custom que imitam a nomenclatura do Shadcn mas não usam Radix UI. Migrar para o Shadcn/ui real traz: acessibilidade nativa (ARIA, navegação por teclado, focus trap em modais), componentes prontos que hoje faltam (Tooltip, Dialog, DropdownMenu, Select, Tabs, Toast), e base sólida para o tema claro. Pré-requisito: rodar `npx shadcn@latest init` e migrar os componentes existentes gradualmente, começando pelos mais simples (Button, Badge, Input) antes dos compostos (Sheet → Dialog)
+- [ ] `[log]` **Sem logging estruturado** — nenhum `console.error` padronizado. Implementar `pino` com níveis (info, warn, error), integrado ao PM2
 
-- [ ] **Tema claro** — suporte a light mode além do dark mode atual, com toggle nas configurações do usuário. Depende da adoção do Shadcn/ui (CSS variables de tema já vêm configuradas). Antes de implementar, refatorar cores hardcoded nos componentes para CSS variables para evitar inconsistências.
+- [ ] `[arch]` **`/api/execute` sem separação de concerns** — busca DB, resolve templates, monta auth, executa HTTP e salva histórico num handler só. Extrair para service dedicado
 
-## Performance
+- [ ] `[arch]` **Types locais duplicados** — `Company`, `ERP`, `Endpoint` redefinidos em cada arquivo client. Criar pacote compartilhado
 
-- [ ] **`react-syntax-highlighter` importado completo** — gera um chunk de 881KB carregando 300+ gramáticas de linguagem. Trocar para o build light (`react-syntax-highlighter/dist/esm/light`) e registrar apenas JSON/bash reduz para ~15KB. Afeta `/history` (425KB) e `/test` (415KB). Evidência: Render Delay de 991ms e RenderBlocking detectados nos Core Web Vitals — esse chunk é o principal suspeito
-- [ ] **Sem `dynamic()` nos componentes pesados** — `SyntaxHighlighter` é carregado no primeiro render. Usar `next/dynamic` com `ssr: false` para carregar só quando necessário
-- [ ] **DOMSize excessivo** — sidebar renderiza todos os ERPs e endpoints no HTML inicial independente de estarem visíveis. Medir com DevTools (`performance.measure`) e avaliar virtualização ou lazy load dos itens do menu
-- [ ] **ForcedReflow (layout thrashing)** — JavaScript está consultando propriedades geométricas (`offsetHeight`, `getBoundingClientRect`, etc.) após mutações no DOM. Identificar origem com DevTools → Performance → "Forced reflow" e agrupar leituras antes das escritas
-- [ ] **Histórico sem paginação** — já em Dívida Técnica, mas impacto de performance cresce linearmente com o volume de registros
+- [ ] `[arch]` **Queries Prisma espalhadas** — server actions e pages fazem queries direto. Criar camada de repositório
 
-## Segurança
+- [ ] `[arch]` **`allFields` calculado em dois contextos** — frontend (preview) e backend (execução) calculam merge de campos separadamente. Risco de divergência
 
-- [ ] **Headers de segurança HTTP ausentes** — adicionar via `headers()` no `next.config.ts`. Todos resolvidos em uma única alteração:
-  - `Content-Security-Policy` 🔴 — sem proteção contra XSS
-  - `X-Frame-Options: DENY` 🔴 — vulnerável a clickjacking
-  - `X-Content-Type-Options: nosniff` 🟡 — previne MIME sniffing
-  - `Referrer-Policy: strict-origin-when-cross-origin` 🟡 — evita vazar URL em requests externos
-  - `Permissions-Policy` 🟡 — restringe acesso a APIs do browser (câmera, microfone, geolocalização)
-  - Remover `x-powered-by: Next.js` — expõe tecnologia desnecessariamente. Corrigir com `poweredByHeader: false` no `next.config.ts`
+- [ ] `[arch]` **Error handling inconsistente** — cada server action trata erros diferente. Definir padrão único (wrapper, tipo de retorno)
 
-## Dívida Técnica
+- [ ] `[dry]` **Auth type `if/else` repetido em 4 lugares** — `bearer → api_key → basic → custom_headers → body_fields` em `utils.ts`, `execute/route.ts`, `chat/route.ts`, `chat-client.tsx`. Centralizar em `buildAuthHeaders(company)`
 
-- [ ] **JSON stringificado no banco** — `authConfig`, `environments` e `fieldsData` são strings JSON dentro do Postgres. Migrar para colunas tipadas ou JSONB para permitir queries, indexação e validação de schema no banco
-- [ ] **Validação de input** — server actions aceitam dados crus sem validação. Adicionar schemas Zod em todos os `lib/actions/*` antes de tocar no banco
-- [ ] **`/api/execute` sem proteção** — aceita URL arbitrária e faz requisição HTTP no servidor (risco de SSRF). Após implementar login, restringir a usuários autenticados e considerar allowlist de domínios
-- [ ] **Testes** — zero cobertura. Priorizar `lib/actions/` e `/api/execute` que têm lógica de autenticação e substituição de templates
-- [ ] **`error.tsx` e error boundaries** — erros não tratados chegam direto ao usuário sem UI de fallback. Adicionar `error.tsx` nas rotas principais
-- [ ] **`substitute()` duplicada** — mesma função definida em `app/test/lib/utils.ts` e `app/api/execute/route.ts`. Centralizar em `@erp/db` ou em um pacote utilitário compartilhado
-- [ ] **Providers de IA não abstraídos** — Anthropic, Google e OpenAI hardcoded no mesmo route handler. Criar camada de abstração para facilitar troca e adição de providers
-- [ ] **Histórico sem paginação** — query traz todos os registros de uma vez. Adicionar paginação/cursor antes que o volume cresça
-- [ ] **Sem `loading.tsx`** — ausência de loading states globais nas rotas lentas. Adicionar skeleton nas páginas de histórico e teste
-- [ ] **Path do `byte_prompt.md` hardcoded** — caminho absoluto no código do chat. Mover para variável de ambiente ou path relativo ao projeto
+- [ ] `[dry]` **`tryPrettyJson()` duplicada** — em `app/test/lib/utils.ts` e `app/history/history-client.tsx`. Consolidar em `utils.ts`
 
-## Logging
+- [ ] `[dry]` **Objetos de estilo duplicados** — `labelStyle`, `selectStyle`, `sectionLabel` redefinidos em 6+ arquivos. Centralizar em `lib/styles.ts`
 
-- [ ] **Sem logging estruturado** — nenhum `console.error` padronizado ou sistema de log. Em produção, erros silenciosos são invisíveis. Implementar logging estruturado (ex: `pino`) com níveis (info, warn, error) nos route handlers e server actions, integrado ao PM2 para persistência em arquivo
+- [ ] `[dry]` **`ChatClient` com responsabilidades demais** — 795 linhas gerenciando coleções, parsing, configurações, chat e streaming. Dividir em `CollectionsPanel`, `ChatPanel`, `SettingsPanel`
 
-## Princípios DRY / KISS / YAGNI / SOLID
+- [ ] `[dry]` **`ClientBuilder` mistura lógica de negócio com UI** — auto-fill embutido no componente de formulário. Extrair para hook `useClientAutoFill()`
 
-- [ ] **Auth type `if/else` repetido em 4 lugares** (DRY + OCP) — a mesma cadeia `bearer → api_key → basic → custom_headers → body_fields` existe em `utils.ts`, `execute/route.ts`, `chat/route.ts` e `chat-client.tsx`. Adicionar um novo tipo de auth exige mudança nos 4 arquivos. Centralizar em uma função `buildAuthHeaders(company)` compartilhada
-- [ ] **`getGroupColor()` over-engineered** (YAGNI) — lógica de hashing cíclico com 8 combinações de cores em `erp-detail-client.tsx` para colorir grupos de endpoints. Substituir por array simples de cores fixas
-- [ ] **Providers de IA sem ponto de extensão** (OCP) — `chat/route.ts` usa `if (provider === 'gemini')... if (provider === 'openai')... if (provider === 'anthropic')`. Cada novo provider exige modificar o handler. Usar registry ou strategy pattern (relacionado ao item "Providers de IA não abstraídos")
-- [ ] **`ClientBuilder` chama `fetch('/api/execute')` diretamente** (DIP) — componente de UI acoplado ao detalhe de transporte HTTP. Extrair para um hook ou service `useEndpointExecute()`
-- [ ] **Componentes parseiam JSON strings internamente** (DIP) — `company.authConfig`, `company.environments` e `client.fieldsData` são parseados com `JSON.parse()` dentro dos componentes. Mover o parse para o servidor e passar dados já tipados via props (resolve junto com a migração de JSON stringificado no banco)
+- [ ] `[dry]` **`ClientBuilder` chama `fetch('/api/execute')` diretamente** — UI acoplada ao transporte HTTP. Extrair para hook `useEndpointExecute()`
 
-## Design Patterns
+- [ ] `[dry]` **Componentes parseiam JSON strings internamente** — `JSON.parse()` espalhado nos componentes. Mover parse para o servidor, passar dados já tipados via props
 
-- [ ] **`tryPrettyJson()` duplicada** — função definida em `app/test/lib/utils.ts` e novamente em `app/history/history-client.tsx`. Consolidar em `utils.ts` e importar
-- [ ] **Objetos de estilo duplicados** — `labelStyle`, `selectStyle`, `sectionLabel` redefinidos em 6+ arquivos (`companies-client.tsx`, `erp-form.tsx`, `client-builder.tsx`, `chat-client.tsx`, etc.). Centralizar em `lib/styles.ts` (resolve junto com o tema claro)
-- [ ] **`ChatClient` com responsabilidades demais** — 795 linhas gerenciando coleções, parsing de curl/Postman/OpenAPI, configurações, chat e streaming. Dividir em componentes menores (`CollectionsPanel`, `ChatPanel`, `SettingsPanel`) e utilitários separados
-- [ ] **`ClientBuilder` mistura lógica de negócio com UI** — lógica de auto-fill (encadeamento de endpoints, `flattenJson`, múltiplos fetches) embutida no componente de formulário. Extrair para um hook `useClientAutoFill()`
-- [ ] **Estado de modais inconsistente** — `CompaniesClient` usa `{ open: boolean; item? }`, `HistoryClient` usa `item | null`, `ERPsClient` usa outro formato. Padronizar com um único padrão em todos os componentes
+- [ ] `[dry]` **Estado de modais inconsistente** — `CompaniesClient` usa `{ open, item? }`, `HistoryClient` usa `item | null`, `ERPsClient` usa outro formato. Padronizar
 
-## Dívida de Arquitetura
+- [ ] `[dry]` **`getGroupColor()` over-engineered** — hashing cíclico com 8 combinações para colorir grupos. Substituir por array simples de cores fixas
 
-- [ ] **`/api/execute` sem separação de concerns** — um único handler faz: busca no DB, resolve templates, monta auth headers, executa HTTP e salva histórico. Extrair para um service dedicado antes que cresça com retry, timeout e rate limit
-- [ ] **Types locais duplicados** — `Company`, `ERP`, `Endpoint` são redefinidos em cada arquivo client em vez de virem de um pacote compartilhado. Qualquer mudança no schema Prisma requer update em múltiplos arquivos
-- [ ] **Queries Prisma espalhadas** — server actions e pages fazem queries direto sem abstração. Criar uma camada de repositório para centralizar o acesso ao banco
-- [ ] **`allFields` calculado em dois contextos** — frontend (preview do body) e backend (execução real) calculam o merge de campos separadamente. Lógica duplicada com risco de divergência futura
-- [ ] **Error handling inconsistente** — cada server action trata erros de forma diferente ou não trata. Definir um padrão único (wrapper, tipo de retorno) para todas as actions
+- [ ] `[dry]` **Providers de IA sem ponto de extensão** — `if (provider === 'gemini')... if (provider === 'openai')...`. Usar registry ou strategy pattern
+
+- [ ] `[perf]` **DOMSize excessivo** — sidebar renderiza todos os ERPs e endpoints no HTML inicial. Avaliar virtualização ou lazy load
+
+- [ ] `[perf]` **ForcedReflow (layout thrashing)** — JS consulta propriedades geométricas após mutações no DOM. Identificar e agrupar leituras antes das escritas
+
+- [ ] `[editor]` **Prettier standalone** — formatar automaticamente JSON de request e response, substituindo `tryPrettyJson()` atual
+
+- [ ] `[onboarding]` **Tour de interface** — na primeira visita, overlay com highlights sequenciais dos elementos principais. Re-abrível via botão "?"
+
+- [ ] `[workflow]` **Cenários salvos / Playbooks** — sequência pré-configurada de endpoints com nome humano (ex: "Diagnóstico padrão") → executa em ordem → mostra resumo
+
+- [ ] `[qol]` **Notas em endpoints/empresas** — observações internas (ex: "esse endpoint é lento em produção")
+
+- [ ] `[qol]` **Reordenar endpoints** — drag and drop no ERP
+
+- [ ] `[ui]` **Botão "Importar" sem tooltip** — não fica claro o que importa. Adicionar `title` ou tooltip
+
+- [ ] `[ui]` **Nomenclatura ambígua "Configurado"** — renomear para "Configurar IA" ou "Modelo: GPT-4"
+
+- [ ] `[ui]` **URLs longas truncadas sem tooltip** — adicionar tooltip ao hover com URL completa
+
+- [ ] `[ui]` **Área clicável pequena nos cards de ERP** — tornar linha/card inteiro clicável
