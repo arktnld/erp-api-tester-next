@@ -7,8 +7,9 @@ import { DataTable } from '@/components/ui/data-table'
 import { PageHeader } from '@/components/ui/page-header'
 import { Sheet } from '@/components/ui/sheet'
 import { MethodBadge, StatusBadge } from '@/components/ui/badge'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { atomOneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import dynamic from 'next/dynamic'
+
+const CodeBlock = dynamic(() => import('@/components/ui/code-block').then(m => ({ default: m.CodeBlock })), { ssr: false })
 import { ExportButton } from '@/app/test/components/export-button'
 import type { ExportData } from '@/app/test/lib/types'
 
@@ -365,14 +366,14 @@ export function HistoryClient({
             </div>
 
             {tab === 'response' && (
-              <SyntaxHighlighter language="json" style={atomOneDark} customStyle={{ borderRadius: 8, fontSize: 12, maxHeight: 420, backgroundColor: 'var(--surface-2)' }}>
+              <CodeBlock language="json" customStyle={{ borderRadius: 8, fontSize: 12, maxHeight: 420, backgroundColor: 'var(--surface-2)' }}>
                 {tryPrettyJson(selected.responseBody)}
-              </SyntaxHighlighter>
+              </CodeBlock>
             )}
             {tab === 'request' && (
-              <SyntaxHighlighter language="json" style={atomOneDark} customStyle={{ borderRadius: 8, fontSize: 12, maxHeight: 420, backgroundColor: 'var(--surface-2)' }}>
+              <CodeBlock language="json" customStyle={{ borderRadius: 8, fontSize: 12, maxHeight: 420, backgroundColor: 'var(--surface-2)' }}>
                 {tryPrettyJson(selected.requestBody || '{}')}
-              </SyntaxHighlighter>
+              </CodeBlock>
             )}
             {(tab === 'req-headers' || tab === 'res-headers') && (
               <div style={{ backgroundColor: 'var(--surface-2)', borderRadius: 8, padding: '12px 16px', maxHeight: 420, overflow: 'auto' }}>
