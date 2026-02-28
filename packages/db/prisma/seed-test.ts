@@ -26,7 +26,7 @@ async function main() {
       authType: 'none',
       authConfig: '{}',
       environments: JSON.stringify([
-        { label: 'Produção', url: 'https://httpbin.org' },
+        { name: 'Produção', url: 'https://httpbin.org' },
       ]),
     },
   })
