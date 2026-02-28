@@ -118,7 +118,7 @@ export function TestSelectors({
             onChange={(e) => onEnvironmentChange(e.target.value || null)}
           >
             <option value="">Produção</option>
-            {companyEnvironments.map((env) => (
+            {companyEnvironments.filter((env) => env.name).map((env) => (
               <option key={env.name} value={env.url}>{env.name}</option>
             ))}
           </select>
