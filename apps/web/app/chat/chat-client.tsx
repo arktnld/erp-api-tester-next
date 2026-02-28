@@ -6,6 +6,7 @@ import { Send, Bot, User, Plus, Trash2, FileUp, Key, ChevronDown, ChevronRight, 
 import { saveCollection, deleteCollection, updateCollectionPrompt } from '@/app/actions/collections'
 import { importCurlEndpoint } from '@/app/actions/import-curl'
 import { saveSettings, type Settings } from '@/lib/actions/settings'
+import { inputStyle as baseInput } from '@/lib/styles'
 import { Sheet } from '@/components/ui/sheet'
 
 type Message = { role: 'user' | 'assistant'; content: string }
@@ -116,17 +117,7 @@ function parseCollection(json: Record<string, unknown>): { context: string; chun
   return parsePostman(json)
 }
 
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '8px 10px',
-  backgroundColor: 'var(--surface-2)',
-  border: '1px solid var(--border)',
-  borderRadius: 6,
-  color: 'var(--text)',
-  fontSize: 12,
-  outline: 'none',
-  fontFamily: 'inherit',
-}
+const inputStyle: React.CSSProperties = { ...baseInput, fontSize: 12, fontFamily: 'inherit' }
 
 const labelStyle: React.CSSProperties = {
   fontSize: 10,

@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { Sheet } from '@/components/ui/sheet'
 import { importCurlEndpoint } from './actions/import-curl'
+import { inputStyle } from '@/lib/styles'
 
 type ERP = { id: number; name: string }
 
@@ -65,17 +66,6 @@ function parseCurl(input: string): ParsedCurl | ParseError {
   } catch (e) {
     return { error: String(e) }
   }
-}
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '8px 10px',
-  backgroundColor: 'var(--surface-2)',
-  border: '1px solid var(--border)',
-  borderRadius: 6,
-  color: 'var(--text)',
-  fontSize: 13,
-  outline: 'none',
 }
 
 const labelStyle: React.CSSProperties = {
