@@ -14,6 +14,7 @@ import {
   reorderEndpoints,
 } from '@/lib/actions/endpoints'
 import { createFieldSchema, updateFieldSchema, deleteFieldSchema } from '@/lib/actions/field-schemas'
+import { formLabel as labelStyle, selectStyle } from '@/lib/styles'
 
 type Endpoint = {
   id: number
@@ -69,26 +70,6 @@ function getGroupColor(group: string) {
 }
 
 const FIELD_TYPES = ['text', 'number', 'cpf', 'cnpj', 'email']
-
-const labelStyle: React.CSSProperties = {
-  display: 'block',
-  fontSize: 12,
-  color: 'var(--text-muted)',
-  marginBottom: 4,
-  marginTop: 12,
-}
-
-const selectStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '8px 12px',
-  backgroundColor: 'var(--surface-2)',
-  border: '1px solid var(--border)',
-  borderRadius: 6,
-  color: 'var(--text)',
-  fontSize: 13,
-  outline: 'none',
-  cursor: 'pointer',
-}
 
 const tabStyle = (active: boolean): React.CSSProperties => ({
   padding: '8px 16px',
