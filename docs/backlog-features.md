@@ -7,7 +7,7 @@ Ordem de execução definida. Itens devem ser feitos em sequência — cada um d
 - [x] **1. Guard imediato no crash de binário** — `?? {}` em `test-request.tsx`. ✅ v1.1.0
 - [x] **2. Fix completo de resposta binária** — `httpFetch` com `Buffer[]`, base64, redirect follow, download button. ✅ v1.1.0
 - [x] **3. Strategy de Content-Type** — `contentCategory`, image preview inline (≤5MB), download para document/binary. ✅ v1.1.0
-- [ ] **4. Bug auto-fill CPF** — trigger de auto-fill deve reagir à mudança do campo raiz (CPF/CNPJ) e limpar/atualizar campos dependentes quando o CPF é trocado
+- [x] **4. Bug auto-fill CPF** — pool reseta campos auto-preenchidos antes de novo fetch. ✅ v1.2.0
 - [ ] **5. Card visual exportável** — botão `Exportar ▾` no resultado do teste e no histórico. Formatos: copiar imagem (clipboard), baixar PNG, baixar PDF via `window.print()`
 
 ---
