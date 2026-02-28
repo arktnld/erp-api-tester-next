@@ -155,6 +155,7 @@ export function HomeImport({ erps }: { erps: ERP[] }) {
         </a>
         <button
           onClick={() => setOpen(true)}
+          title="Importar endpoint via curl"
           style={{
             padding: '6px 16px',
             fontSize: 13,

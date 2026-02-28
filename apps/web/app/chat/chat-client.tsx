@@ -620,7 +620,7 @@ export function ChatClient({ initialCollections, erps, initialSettings, defaultS
             style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', background: 'none', border: 'none', cursor: 'pointer', color: keysConfigured ? 'var(--status-success)' : 'var(--text-muted)', fontSize: 12, padding: 0 }}
           >
             <Key size={13} />
-            <span>{keysConfigured ? 'Configurado' : 'Configurações'}</span>
+            <span>Configurar IA</span>
             {showKey ? <ChevronDown size={12} style={{ marginLeft: 'auto' }} /> : <ChevronRight size={12} style={{ marginLeft: 'auto' }} />}
           </button>
 
