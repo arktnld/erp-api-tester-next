@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTable } from '@/components/ui/data-table'
@@ -93,11 +93,13 @@ export function HistoryClient({
   currentFilters,
 }: Props) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [selected, setSelected] = useState<HistoryItem | null>(null)
   const [tab, setTab] = useState<'response' | 'request' | 'req-headers' | 'res-headers'>('response')
 
   const totalPages = Math.ceil(total / pageSize)
-  const hasActiveFilters = Object.values(currentFilters).some(Boolean)
+  const hasActiveFilters = ['company', 'endpoint', 'client', 'status', 'from', 'to']
+    .some((k) => searchParams.get(k))
 
   function navigate(updates: Partial<Filters> & { page?: number }) {
     const params = new URLSearchParams()
