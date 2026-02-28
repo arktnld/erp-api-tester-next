@@ -81,9 +81,11 @@ function highlight(text: string): React.ReactNode[] {
 
 function statusMeta(code: number): { color: string; bg: string; label: string } {
   if (code >= 500) return { color: '#d1242f', bg: '#ffebe9', label: 'Server Error' }
-  if (code >= 400) return { color: '#d1242f', bg: '#ffebe9', label: 'Client Error' }
+  if (code >= 400) return { color: '#cf222e', bg: '#ffebe9', label: 'Client Error' }
   if (code >= 300) return { color: '#9a6700', bg: '#fff8c5', label: 'Redirect' }
-  return { color: '#1a7f37', bg: '#dafbe1', label: 'OK' }
+  if (code >= 200) return { color: '#1a7f37', bg: '#dafbe1', label: 'OK' }
+  if (code >= 100) return { color: '#0550ae', bg: '#ddf4ff', label: 'Informational' }
+  return { color: '#59636e', bg: '#f6f8fa', label: 'Unknown' }
 }
 
 function methodMeta(method: string): { color: string; bg: string } {
