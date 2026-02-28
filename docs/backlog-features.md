@@ -35,7 +35,7 @@ Itens em ordem de prioridade. Grupos marcados com 📦 têm 1 plano só — não
   - Tooltip ao hover em URLs longas de ambientes
   - Linha/card inteiro clicável nos cards de ERP
 
-- [ ] 📦 `[dry]` **DRY quick wins** — 5 deduplicações simples, 1 plano:
+- [x] 📦 `[dry]` **DRY quick wins** ✅ v1.9.0 — 5 deduplicações simples, 1 plano:
   - `tryPrettyJson()` duplicada em 2 arquivos → consolidar em `utils.ts`
   - `substitute()` duplicada em 2 arquivos → centralizar
   - `getGroupColor()` over-engineered → array simples de cores
