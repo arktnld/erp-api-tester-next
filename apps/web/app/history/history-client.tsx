@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { DataTable } from '@/components/ui/data-table'
 import { PageHeader } from '@/components/ui/page-header'
@@ -61,66 +62,58 @@ const filterSelectStyle = (active: boolean): React.CSSProperties => ({
   maxWidth: 180,
 })
 
-export function HistoryClient({ history }: { history: HistoryItem[] }) {
+interface Filters {
+  company: string
+  endpoint: string
+  client: string
+  status: string
+  from: string
+  to: string
+}
+
+interface Props {
+  history: HistoryItem[]
+  total: number
+  page: number
+  pageSize: number
+  companies: string[]
+  endpoints: string[]
+  clients: string[]
+  currentFilters: Filters
+}
+
+export function HistoryClient({
+  history,
+  total,
+  page,
+  pageSize,
+  companies,
+  endpoints,
+  clients,
+  currentFilters,
+}: Props) {
+  const router = useRouter()
   const [selected, setSelected] = useState<HistoryItem | null>(null)
   const [tab, setTab] = useState<'response' | 'request' | 'req-headers' | 'res-headers'>('response')
 
-  const [filterCompany, setFilterCompany] = useState('')
-  const [filterEndpoint, setFilterEndpoint] = useState('')
-  const [filterClient, setFilterClient] = useState('')
-  const [filterStatus, setFilterStatus] = useState('')
-  const [filterDateFrom, setFilterDateFrom] = useState('')
-  const [filterDateTo, setFilterDateTo] = useState('')
+  const totalPages = Math.ceil(total / pageSize)
+  const hasActiveFilters = Object.values(currentFilters).some(Boolean)
 
-  const companies = useMemo(
-    () => [...new Set(history.map((h) => h.companyName).filter(Boolean))].sort(),
-    [history]
-  )
-
-  const filtered = useMemo(() => {
-    function parseLocalDate(str: string): Date {
-      const [y, m, d] = str.split('-').map(Number)
-      return new Date(y, m - 1, d)
-    }
-    return history.filter((item) => {
-      if (filterCompany && item.companyName !== filterCompany) return false
-      if (filterEndpoint && item.endpointName !== filterEndpoint) return false
-      if (filterClient && item.clientName !== filterClient) return false
-      if (filterStatus) {
-        const group = Math.floor(item.statusCode / 100) + 'xx'
-        if (group !== filterStatus) return false
-      }
-      const createdAt = new Date(item.createdAt)
-      if (filterDateFrom && createdAt < parseLocalDate(filterDateFrom)) return false
-      if (filterDateTo) {
-        const to = parseLocalDate(filterDateTo)
-        to.setHours(23, 59, 59, 999)
-        if (createdAt > to) return false
-      }
-      return true
+  function navigate(updates: Partial<Filters> & { page?: number }) {
+    const params = new URLSearchParams()
+    const base: Record<string, string> = { ...currentFilters }
+    const overrides = Object.fromEntries(
+      Object.entries(updates).map(([k, v]) => [k, String(v ?? '')])
+    )
+    const merged = { ...base, ...overrides }
+    // Reset to page 1 when a filter changes (not when page is explicitly set)
+    const newPage = 'page' in updates ? String(updates.page) : '1'
+    Object.entries(merged).forEach(([k, v]) => {
+      if (v) params.set(k, v)
     })
-  }, [history, filterCompany, filterEndpoint, filterClient, filterStatus, filterDateFrom, filterDateTo])
-
-  const endpoints = useMemo(
-    () => [...new Set(filtered.map((h) => h.endpointName).filter(Boolean))].sort(),
-    [filtered]
-  )
-  const clients = useMemo(
-    () => [...new Set(filtered.map((h) => h.clientName).filter(Boolean))].sort(),
-    [filtered]
-  )
-
-  function clearFilters() {
-    setFilterCompany('')
-    setFilterEndpoint('')
-    setFilterClient('')
-    setFilterStatus('')
-    setFilterDateFrom('')
-    setFilterDateTo('')
+    if (newPage !== '1') params.set('page', newPage)
+    router.push(`/history?${params.toString()}`)
   }
-
-  const hasActiveFilters =
-    filterCompany || filterEndpoint || filterClient || filterStatus || filterDateFrom || filterDateTo
 
   const columns: ColumnDef<HistoryItem, unknown>[] = [
     {
@@ -133,18 +126,9 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
       header: 'Método',
       cell: ({ row }) => <MethodBadge method={row.original.method} />,
     },
-    {
-      accessorKey: 'erpName',
-      header: 'ERP',
-    },
-    {
-      accessorKey: 'endpointName',
-      header: 'Endpoint',
-    },
-    {
-      accessorKey: 'companyName',
-      header: 'Empresa',
-    },
+    { accessorKey: 'erpName', header: 'ERP' },
+    { accessorKey: 'endpointName', header: 'Endpoint' },
+    { accessorKey: 'companyName', header: 'Empresa' },
     {
       accessorKey: 'clientName',
       header: 'Cliente',
@@ -158,13 +142,7 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
       accessorKey: 'durationMs',
       header: 'Tempo',
       cell: ({ getValue }) => (
-        <span
-          style={{
-            fontFamily: 'monospace',
-            fontSize: 12,
-            color: 'var(--text-muted)',
-          }}
-        >
+        <span style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--text-muted)' }}>
           {getValue() as number}ms
         </span>
       ),
@@ -183,10 +161,7 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
       header: '',
       cell: ({ row }) => (
         <button
-          onClick={() => {
-            setSelected(row.original)
-            setTab('response')
-          }}
+          onClick={() => { setSelected(row.original); setTab('response') }}
           style={{
             fontSize: 12,
             color: 'var(--accent)',
@@ -207,56 +182,42 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
     <div style={{ padding: '32px 40px' }}>
       <PageHeader
         title="Histórico"
-        description="Últimas 200 requisições executadas"
+        description={`${total} requisição${total !== 1 ? 'ões' : ''} no total`}
       />
 
       {/* Filter bar */}
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: 8,
-          marginBottom: 12,
-          alignItems: 'center',
-        }}
-      >
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12, alignItems: 'center' }}>
         <select
-          value={filterCompany}
-          onChange={(e) => { setFilterCompany(e.target.value); setFilterEndpoint(''); setFilterClient('') }}
-          style={filterSelectStyle(!!filterCompany)}
+          value={currentFilters.company}
+          onChange={(e) => navigate({ company: e.target.value, endpoint: '', client: '' })}
+          style={filterSelectStyle(!!currentFilters.company)}
         >
           <option value="">Todas as empresas</option>
-          {companies.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
+          {companies.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
 
         <select
-          value={filterEndpoint}
-          onChange={(e) => { setFilterEndpoint(e.target.value); setFilterClient('') }}
-          style={filterSelectStyle(!!filterEndpoint)}
+          value={currentFilters.endpoint}
+          onChange={(e) => navigate({ endpoint: e.target.value, client: '' })}
+          style={filterSelectStyle(!!currentFilters.endpoint)}
         >
           <option value="">Todos os endpoints</option>
-          {endpoints.map((e) => (
-            <option key={e} value={e}>{e}</option>
-          ))}
+          {endpoints.map((e) => <option key={e} value={e}>{e}</option>)}
         </select>
 
         <select
-          value={filterClient}
-          onChange={(e) => setFilterClient(e.target.value)}
-          style={filterSelectStyle(!!filterClient)}
+          value={currentFilters.client}
+          onChange={(e) => navigate({ client: e.target.value })}
+          style={filterSelectStyle(!!currentFilters.client)}
         >
           <option value="">Todos os clientes</option>
-          {clients.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
+          {clients.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
 
         <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          style={filterSelectStyle(!!filterStatus)}
+          value={currentFilters.status}
+          onChange={(e) => navigate({ status: e.target.value })}
+          style={filterSelectStyle(!!currentFilters.status)}
         >
           <option value="">Todos os status</option>
           <option value="2xx">2xx — Sucesso</option>
@@ -267,23 +228,23 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
 
         <input
           type="date"
-          value={filterDateFrom}
-          onChange={(e) => setFilterDateFrom(e.target.value)}
-          style={filterSelectStyle(!!filterDateFrom)}
+          value={currentFilters.from}
+          onChange={(e) => navigate({ from: e.target.value })}
+          style={filterSelectStyle(!!currentFilters.from)}
           title="Data início"
         />
 
         <input
           type="date"
-          value={filterDateTo}
-          onChange={(e) => setFilterDateTo(e.target.value)}
-          style={filterSelectStyle(!!filterDateTo)}
+          value={currentFilters.to}
+          onChange={(e) => navigate({ to: e.target.value })}
+          style={filterSelectStyle(!!currentFilters.to)}
           title="Data fim"
         />
 
         {hasActiveFilters && (
           <button
-            onClick={clearFilters}
+            onClick={() => router.push('/history')}
             style={{
               padding: '5px 12px',
               fontSize: 12,
@@ -299,48 +260,72 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
         )}
       </div>
 
-      <div
-        style={{
-          backgroundColor: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 10,
-          overflow: 'hidden',
-        }}
-      >
+      <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
         <DataTable
-          data={filtered}
+          data={history}
           columns={columns}
-          searchPlaceholder="Buscar no histórico..."
+          searchPlaceholder="Buscar nesta página..."
         />
+
+        {/* Pagination controls */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '12px 16px',
+          borderTop: '1px solid var(--border)',
+          fontSize: 13,
+          color: 'var(--text-muted)',
+        }}>
+          <button
+            onClick={() => navigate({ page: page - 1 })}
+            disabled={page <= 1}
+            style={{
+              padding: '5px 12px',
+              fontSize: 12,
+              color: page <= 1 ? 'var(--text-subtle)' : 'var(--text)',
+              background: 'none',
+              border: '1px solid var(--border)',
+              borderRadius: 6,
+              cursor: page <= 1 ? 'not-allowed' : 'pointer',
+              opacity: page <= 1 ? 0.4 : 1,
+            }}
+          >
+            ← Anterior
+          </button>
+
+          <span>
+            Página {page} de {totalPages || 1}
+            {hasActiveFilters && ` · ${total} resultado${total !== 1 ? 's' : ''}`}
+          </span>
+
+          <button
+            onClick={() => navigate({ page: page + 1 })}
+            disabled={page >= totalPages}
+            style={{
+              padding: '5px 12px',
+              fontSize: 12,
+              color: page >= totalPages ? 'var(--text-subtle)' : 'var(--text)',
+              background: 'none',
+              border: '1px solid var(--border)',
+              borderRadius: 6,
+              cursor: page >= totalPages ? 'not-allowed' : 'pointer',
+              opacity: page >= totalPages ? 0.4 : 1,
+            }}
+          >
+            Próxima →
+          </button>
+        </div>
       </div>
 
       {/* Detail Sheet */}
-      <Sheet
-        open={!!selected}
-        onClose={() => setSelected(null)}
-        title="Detalhes da Requisição"
-        width={600}
-      >
+      <Sheet open={!!selected} onClose={() => setSelected(null)} title="Detalhes da Requisição" width={600}>
         {selected && (
           <div>
-            {/* Meta */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                marginBottom: 8,
-              }}
-            >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
               <MethodBadge method={selected.method} />
               <StatusBadge code={selected.statusCode} />
-              <span
-                style={{
-                  fontSize: 12,
-                  color: 'var(--text-muted)',
-                  fontFamily: 'monospace',
-                }}
-              >
+              <span style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
                 {selected.durationMs}ms
               </span>
               <div style={{ marginLeft: 'auto' }}>
@@ -358,28 +343,11 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
               </div>
             </div>
 
-            <p
-              style={{
-                fontFamily: 'monospace',
-                fontSize: 11,
-                color: 'var(--text-muted)',
-                marginBottom: 4,
-                wordBreak: 'break-all',
-                lineHeight: 1.5,
-              }}
-            >
+            <p style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-muted)', marginBottom: 4, wordBreak: 'break-all', lineHeight: 1.5 }}>
               {selected.url}
             </p>
 
-            <div
-              style={{
-                display: 'flex',
-                gap: 12,
-                fontSize: 12,
-                color: 'var(--text-subtle)',
-                marginBottom: 16,
-              }}
-            >
+            <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--text-subtle)', marginBottom: 16 }}>
               <span>{selected.erpName}</span>
               <span>·</span>
               <span>{selected.companyName}</span>
@@ -387,121 +355,31 @@ export function HistoryClient({ history }: { history: HistoryItem[] }) {
               <span>{selected.clientName}</span>
             </div>
 
-            {/* Tabs */}
-            <div
-              style={{
-                display: 'flex',
-                borderBottom: '1px solid var(--border)',
-                marginBottom: 16,
-              }}
-            >
-              <button
-                style={tabBtnStyle(tab === 'response')}
-                onClick={() => setTab('response')}
-              >
-                Resposta
-              </button>
-              <button
-                style={tabBtnStyle(tab === 'request')}
-                onClick={() => setTab('request')}
-              >
-                Request Body
-              </button>
-              <button
-                style={tabBtnStyle(tab === 'req-headers')}
-                onClick={() => setTab('req-headers')}
-              >
-                Req Headers
-              </button>
-              <button
-                style={tabBtnStyle(tab === 'res-headers')}
-                onClick={() => setTab('res-headers')}
-              >
-                Res Headers
-              </button>
+            <div style={{ display: 'flex', borderBottom: '1px solid var(--border)', marginBottom: 16 }}>
+              <button style={tabBtnStyle(tab === 'response')} onClick={() => setTab('response')}>Resposta</button>
+              <button style={tabBtnStyle(tab === 'request')} onClick={() => setTab('request')}>Request Body</button>
+              <button style={tabBtnStyle(tab === 'req-headers')} onClick={() => setTab('req-headers')}>Req Headers</button>
+              <button style={tabBtnStyle(tab === 'res-headers')} onClick={() => setTab('res-headers')}>Res Headers</button>
             </div>
 
-            {/* Content */}
             {tab === 'response' && (
-              <SyntaxHighlighter
-                language="json"
-                style={atomOneDark}
-                customStyle={{
-                  borderRadius: 8,
-                  fontSize: 12,
-                  maxHeight: 420,
-                  backgroundColor: 'var(--surface-2)',
-                }}
-              >
+              <SyntaxHighlighter language="json" style={atomOneDark} customStyle={{ borderRadius: 8, fontSize: 12, maxHeight: 420, backgroundColor: 'var(--surface-2)' }}>
                 {tryPrettyJson(selected.responseBody)}
               </SyntaxHighlighter>
             )}
-
             {tab === 'request' && (
-              <SyntaxHighlighter
-                language="json"
-                style={atomOneDark}
-                customStyle={{
-                  borderRadius: 8,
-                  fontSize: 12,
-                  maxHeight: 420,
-                  backgroundColor: 'var(--surface-2)',
-                }}
-              >
+              <SyntaxHighlighter language="json" style={atomOneDark} customStyle={{ borderRadius: 8, fontSize: 12, maxHeight: 420, backgroundColor: 'var(--surface-2)' }}>
                 {tryPrettyJson(selected.requestBody || '{}')}
               </SyntaxHighlighter>
             )}
-
             {(tab === 'req-headers' || tab === 'res-headers') && (
-              <div
-                style={{
-                  backgroundColor: 'var(--surface-2)',
-                  borderRadius: 8,
-                  padding: '12px 16px',
-                  maxHeight: 420,
-                  overflow: 'auto',
-                }}
-              >
-                <table
-                  style={{ width: '100%', borderCollapse: 'collapse' }}
-                >
+              <div style={{ backgroundColor: 'var(--surface-2)', borderRadius: 8, padding: '12px 16px', maxHeight: 420, overflow: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <tbody>
-                    {Object.entries(
-                      JSON.parse(
-                        tab === 'req-headers'
-                          ? selected.requestHeaders
-                          : selected.responseHeaders
-                      ) as Record<string, string>
-                    ).map(([k, v]) => (
-                      <tr
-                        key={k}
-                        style={{
-                          borderBottom: '1px solid var(--border)',
-                        }}
-                      >
-                        <td
-                          style={{
-                            padding: '6px 0',
-                            fontFamily: 'monospace',
-                            fontSize: 12,
-                            color: 'var(--text-muted)',
-                            width: '40%',
-                            paddingRight: 12,
-                            verticalAlign: 'top',
-                          }}
-                        >
-                          {k}
-                        </td>
-                        <td
-                          style={{
-                            padding: '6px 0',
-                            fontFamily: 'monospace',
-                            fontSize: 12,
-                            wordBreak: 'break-all',
-                          }}
-                        >
-                          {v}
-                        </td>
+                    {Object.entries(JSON.parse(tab === 'req-headers' ? selected.requestHeaders : selected.responseHeaders) as Record<string, string>).map(([k, v]) => (
+                      <tr key={k} style={{ borderBottom: '1px solid var(--border)' }}>
+                        <td style={{ padding: '6px 0', fontFamily: 'monospace', fontSize: 12, color: 'var(--text-muted)', width: '40%', paddingRight: 12, verticalAlign: 'top' }}>{k}</td>
+                        <td style={{ padding: '6px 0', fontFamily: 'monospace', fontSize: 12, wordBreak: 'break-all' }}>{v}</td>
                       </tr>
                     ))}
                   </tbody>
