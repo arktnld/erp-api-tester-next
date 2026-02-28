@@ -84,11 +84,11 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
             borderBottom: `1px solid ${C.border}`,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontFamily: 'monospace', fontSize: 15, fontWeight: 700, color: C.accent, letterSpacing: '-1px', lineHeight: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: C.accent, letterSpacing: '-1px' }}>
               {'</>'}
             </span>
-            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>
+            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 16, fontWeight: 700, letterSpacing: '-0.02em' }}>
               <span style={{ color: C.accent }}>ERP</span>
               <span style={{ color: C.text }}> Tester</span>
             </span>
@@ -98,22 +98,20 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
 
         {/* Endpoint */}
         <div style={{ padding: '14px 20px', borderBottom: `1px solid ${C.border}` }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
             <span
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                display: 'inline-block',
                 fontSize: 11,
                 fontWeight: 700,
                 fontFamily: 'monospace',
                 backgroundColor: C.accent,
                 color: '#fff',
-                padding: '3px 8px',
+                padding: '4px 8px',
                 borderRadius: 4,
                 letterSpacing: 0.5,
                 flexShrink: 0,
-                lineHeight: 1,
+                alignSelf: 'center',
               }}
             >
               {data.method}
@@ -147,7 +145,7 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span
+            <div
               style={{
                 width: 8,
                 height: 8,
@@ -155,8 +153,8 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
                 backgroundColor: sc,
                 flexShrink: 0,
               }}
-            />
-            <span style={{ fontSize: 13, fontWeight: 600, color: sc, lineHeight: 1 }}>{data.status}</span>
+            ></div>
+            <span style={{ fontSize: 13, fontWeight: 600, color: sc }}>{data.status}</span>
           </div>
           <span style={{ fontSize: 12, color: C.muted, fontFamily: 'monospace' }}>{data.duration}ms</span>
         </div>
