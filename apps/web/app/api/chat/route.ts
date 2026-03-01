@@ -3,7 +3,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { retrieveContext } from '@/app/actions/collections'
-import type { EmbeddingProvider } from '@/app/actions/collections'
+import type { EmbeddingProvider, RagResult } from '@/app/actions/collections'
 
 export async function POST(req: NextRequest) {
   const {
@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
 
   // RAG retrieval
   let systemContext = ''
+  let ragResult: RagResult = { context: '', chunks: [], mode: 'skipped' }
   if (collectionId) {
     const ep: EmbeddingProvider = embeddingProvider
     const eKey =
@@ -28,7 +29,8 @@ export async function POST(req: NextRequest) {
 
     if (eKey) {
       const lastUser = [...messages].reverse().find((m: { role: string }) => m.role === 'user')?.content ?? ''
-      systemContext = await retrieveContext(collectionId, lastUser, ep, eKey)
+      ragResult = await retrieveContext(collectionId, lastUser, ep, eKey)
+      systemContext = ragResult.context
     }
   }
 
@@ -45,6 +47,13 @@ ${systemContext}`
   const system = customPrompt?.trim()
     ? `${basePrompt}\n\nINSTRUÇÕES ADICIONAIS:\n${customPrompt.trim()}`
     : basePrompt
+
+  const ragHeaders = {
+    'X-Rag-Mode': ragResult.mode,
+    'X-Rag-Count': String(ragResult.chunks.length),
+    'X-Rag-Chunks': JSON.stringify(ragResult.chunks.map(c => c.slice(0, 200))),
+    'Access-Control-Expose-Headers': 'X-Rag-Mode, X-Rag-Count, X-Rag-Chunks',
+  }
 
   // --- Gemini ---
   if (provider === 'gemini') {
@@ -76,7 +85,7 @@ ${systemContext}`
         controller.close()
       },
     })
-    return new Response(readable, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
+    return new Response(readable, { headers: { 'Content-Type': 'text/plain; charset=utf-8', ...ragHeaders } })
   }
 
   // --- OpenAI ---
@@ -101,7 +110,7 @@ ${systemContext}`
         controller.close()
       },
     })
-    return new Response(readable, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
+    return new Response(readable, { headers: { 'Content-Type': 'text/plain; charset=utf-8', ...ragHeaders } })
   }
 
   // --- Anthropic (default) ---
@@ -125,7 +134,7 @@ ${systemContext}`
     },
     cancel() { anthropicStream.abort() },
   })
-  return new Response(readable, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
+  return new Response(readable, { headers: { 'Content-Type': 'text/plain; charset=utf-8', ...ragHeaders } })
 }
 
 function errorResponse(msg: string) {

@@ -112,13 +112,19 @@ export async function saveCollection(
   return { id: col.id, embeddingsCount, embeddingsError }
 }
 
+export type RagResult = {
+  context: string
+  chunks: string[]
+  mode: 'semantic' | 'fallback' | 'skipped'
+}
+
 export async function retrieveContext(
   collectionId: number,
   question: string,
   embeddingProvider: EmbeddingProvider,
   embeddingKey: string,
   topK = 10
-): Promise<string> {
+): Promise<RagResult> {
   const count = await prisma.embeddingChunk.count({ where: { collectionId } })
 
   if (count === 0) {
@@ -126,7 +132,8 @@ export async function retrieveContext(
       where: { id: collectionId },
       select: { context: true },
     })
-    return col?.context ?? ''
+    const context = col?.context ?? ''
+    return { context, chunks: [context], mode: 'fallback' }
   }
 
   const queryVec = await embedQuery(question, embeddingProvider, embeddingKey)
@@ -139,7 +146,8 @@ export async function retrieveContext(
     LIMIT ${topK}
   `
 
-  return rows.map(r => r.text).join('\n\n')
+  const chunks = rows.map(r => r.text)
+  return { context: chunks.join('\n\n'), chunks, mode: 'semantic' }
 }
 
 export async function deleteCollection(id: number) {

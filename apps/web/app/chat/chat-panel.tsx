@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Send, Bot, User, Check, Copy } from 'lucide-react'
+import { Send, Bot, User, Check, Copy, ChevronDown } from 'lucide-react'
 
 type Message = { role: 'user' | 'assistant'; content: string }
+type RagInfo = { mode: 'semantic' | 'fallback' | 'skipped'; count: number; chunks: string[] }
 type ColMeta = { id: number; name: string; systemPrompt: string; createdAt: Date }
 type ERP = { id: number; name: string }
 type Provider = 'anthropic' | 'openai' | 'gemini'
@@ -32,6 +33,8 @@ export function ChatPanel({
   onImportCurl: (curlText: string) => void
 }) {
   const [messages, setMessages] = useState<Message[]>([{ role: 'assistant', content: WELCOME }])
+  const [ragInfos, setRagInfos] = useState<Map<number, RagInfo>>(new Map())
+  const [expandedRag, setExpandedRag] = useState<number | null>(null)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null)
@@ -44,6 +47,8 @@ export function ChatPanel({
 
   useEffect(() => {
     setMessages([{ role: 'assistant', content: WELCOME }])
+    setRagInfos(new Map())
+    setExpandedRag(null)
   }, [activeCol?.id])
 
   const sendMessage = useCallback(async () => {
@@ -72,6 +77,10 @@ export function ChatPanel({
         const err = await res.json()
         throw new Error(err.error ?? 'Erro desconhecido')
       }
+      const ragMode = (res.headers.get('X-Rag-Mode') ?? 'skipped') as RagInfo['mode']
+      const ragCount = Number(res.headers.get('X-Rag-Count') ?? 0)
+      const ragChunks: string[] = JSON.parse(res.headers.get('X-Rag-Chunks') ?? '[]')
+
       const reader = res.body!.getReader()
       const decoder = new TextDecoder()
       let txt = ''
@@ -82,6 +91,9 @@ export function ChatPanel({
         txt += decoder.decode(value, { stream: true })
         setMessages(prev => [...prev.slice(0, -1), { role: 'assistant', content: txt }])
       }
+      // Store RAG info for the assistant message index
+      const assistantIdx = newMessages.length // index in final messages array
+      setRagInfos(prev => new Map(prev).set(assistantIdx, { mode: ragMode, count: ragCount, chunks: ragChunks }))
     } catch (e) {
       setMessages(prev => [...prev, { role: 'assistant', content: `Erro: ${String(e)}` }])
     } finally {
@@ -161,17 +173,47 @@ export function ChatPanel({
                 }
               </div>
               {msg.role === 'assistant' && msg.content && (
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(msg.content)
-                    setCopiedIdx(i)
-                    setTimeout(() => setCopiedIdx(null), 2000)
-                  }}
-                  style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 4, padding: '2px 8px', fontSize: 11, color: copiedIdx === i ? 'var(--status-success)' : 'var(--text-subtle)', background: 'none', border: 'none', cursor: 'pointer', borderRadius: 4 }}
-                >
-                  {copiedIdx === i ? <Check size={11} /> : <Copy size={11} />}
-                  {copiedIdx === i ? 'Copiado' : 'Copiar'}
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(msg.content)
+                      setCopiedIdx(i)
+                      setTimeout(() => setCopiedIdx(null), 2000)
+                    }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '2px 8px', fontSize: 11, color: copiedIdx === i ? 'var(--status-success)' : 'var(--text-subtle)', background: 'none', border: 'none', cursor: 'pointer', borderRadius: 4 }}
+                  >
+                    {copiedIdx === i ? <Check size={11} /> : <Copy size={11} />}
+                    {copiedIdx === i ? 'Copiado' : 'Copiar'}
+                  </button>
+                  {ragInfos.has(i) && (() => {
+                    const rag = ragInfos.get(i)!
+                    const modeColor = rag.mode === 'semantic' ? 'var(--status-success)' : rag.mode === 'fallback' ? 'var(--accent)' : 'var(--text-subtle)'
+                    const modeLabel = rag.mode === 'semantic' ? `RAG · ${rag.count} trechos` : rag.mode === 'fallback' ? 'RAG · fallback (sem embeddings)' : 'RAG · não consultado'
+                    return (
+                      <div style={{ position: 'relative' }}>
+                        <button
+                          onClick={() => setExpandedRag(expandedRag === i ? null : i)}
+                          style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '2px 8px', fontSize: 11, color: modeColor, background: 'none', border: `1px solid ${modeColor}`, borderRadius: 4, cursor: rag.mode !== 'skipped' ? 'pointer' : 'default', opacity: 0.8 }}
+                        >
+                          {modeLabel}
+                          {rag.mode !== 'skipped' && <ChevronDown size={10} style={{ transform: expandedRag === i ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />}
+                        </button>
+                        {expandedRag === i && rag.chunks.length > 0 && (
+                          <div style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: 6, zIndex: 10, backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: 12, width: 380, maxHeight: 320, overflowY: 'auto', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
+                            <p style={{ fontSize: 10, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8 }}>Trechos consultados</p>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                              {rag.chunks.map((chunk, ci) => (
+                                <div key={ci} style={{ backgroundColor: 'var(--surface-2)', borderRadius: 6, padding: '8px 10px', fontSize: 11, fontFamily: 'monospace', color: 'var(--text-muted)', lineHeight: 1.5, borderLeft: '2px solid var(--accent)' }}>
+                                  {chunk}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })()}
+                </div>
               )}
             </div>
           </div>
