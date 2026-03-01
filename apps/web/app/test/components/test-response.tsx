@@ -99,6 +99,18 @@ const menuItemStyle: React.CSSProperties = {
   textAlign: 'left', whiteSpace: 'nowrap',
 }
 
+function copyText(text: string) {
+  if (navigator.clipboard) return navigator.clipboard.writeText(text)
+  const el = document.createElement('textarea')
+  el.value = text
+  el.style.cssText = 'position:fixed;opacity:0'
+  document.body.appendChild(el)
+  el.select()
+  document.execCommand('copy')
+  document.body.removeChild(el)
+  return Promise.resolve()
+}
+
 function ActionsMenu({ response, curlString, erpName, companyName }: {
   response: ExecuteResponse
   curlString?: string
@@ -148,22 +160,20 @@ function ActionsMenu({ response, curlString, erpName, companyName }: {
         </button>
         {open && (
           <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 4px)', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 200, minWidth: 170, overflow: 'hidden' }}>
-            <button style={menuItemStyle} onClick={() => {
-              navigator.clipboard.writeText(tryPrettyJson(response.responseBody))
-              setOutputCopied(true); setTimeout(() => setOutputCopied(false), 1800)
-              setOpen(false)
+            <button style={{ ...menuItemStyle, color: outputCopied ? 'var(--status-success)' : 'var(--text)' }} onClick={() => {
+              copyText(tryPrettyJson(response.responseBody))
+              setOutputCopied(true); setTimeout(() => { setOutputCopied(false); setOpen(false) }, 1200)
             }}>
-              {outputCopied ? <Check size={13} color="var(--status-success)" /> : <Copy size={13} />}
-              Copiar output
+              {outputCopied ? <Check size={13} /> : <Copy size={13} />}
+              {outputCopied ? 'Copiado!' : 'Copiar output'}
             </button>
             {curlString && (
-              <button style={menuItemStyle} onClick={() => {
-                navigator.clipboard.writeText(curlString)
-                setCurlCopied(true); setTimeout(() => setCurlCopied(false), 1800)
-                setOpen(false)
+              <button style={{ ...menuItemStyle, color: curlCopied ? 'var(--status-success)' : 'var(--text)' }} onClick={() => {
+                copyText(curlString)
+                setCurlCopied(true); setTimeout(() => { setCurlCopied(false); setOpen(false) }, 1200)
               }}>
-                {curlCopied ? <Check size={13} color="var(--status-success)" /> : <Terminal size={13} />}
-                Copiar curl
+                {curlCopied ? <Check size={13} /> : <Terminal size={13} />}
+                {curlCopied ? 'Copiado!' : 'Copiar curl'}
               </button>
             )}
             <div style={{ height: 1, backgroundColor: 'var(--border)', margin: '4px 0' }} />
