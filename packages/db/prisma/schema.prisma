@@ -79,6 +79,7 @@ model PostmanCollection {
   context           String           @db.Text
   systemPrompt      String           @default("")
   embeddingProvider String           @default("openai")
+  rawJson           Json?
   createdAt         DateTime         @default(now())
   chunks            EmbeddingChunk[]
 }
