@@ -2,8 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Server, Building2, FlaskConical, History, MessageSquare, BookOpen, ListChecks } from 'lucide-react'
-import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { LayoutDashboard, Server, Building2, FlaskConical, History, MessageSquare, BookOpen, ListChecks, Settings } from 'lucide-react'
 import { TourButton } from '@/components/ui/tour-button'
 
 type SidebarERP = {
@@ -25,6 +24,7 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
     { href: '/history', label: 'Histórico', icon: History, tourId: 'history' },
     { href: '/playbooks', label: 'Playbooks', icon: ListChecks, tourId: 'playbooks' },
     { href: '/docs', label: 'Como usar', icon: BookOpen },
+    { href: '/settings', label: 'Configurações', icon: Settings },
   ]
 
   return (
@@ -122,9 +122,6 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
         </span>
         <div style={{ display: 'flex', gap: 4 }}>
           <TourButton />
-          <div data-tour="theme-toggle">
-            <ThemeToggle />
-          </div>
         </div>
       </div>
     </aside>

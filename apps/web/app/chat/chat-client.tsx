@@ -6,7 +6,6 @@ import { type Settings } from '@/lib/actions/settings'
 import { inputStyle as baseInput } from '@/lib/styles'
 import { Sheet } from '@/components/ui/sheet'
 import { CollectionsPanel } from './collections-panel'
-import { SettingsPanel } from './settings-panel'
 import { ChatPanel } from './chat-panel'
 
 type ColMeta = { id: number; name: string; systemPrompt: string; createdAt: Date }
@@ -150,18 +149,6 @@ export function ChatClient({ initialCollections, erps, initialSettings, defaultS
           openaiKey={openaiKey}
           geminiKey={geminiKey}
           defaultSystemPrompt={defaultSystemPrompt}
-        />
-        <SettingsPanel
-          provider={provider}
-          setProvider={setProvider}
-          embeddingProvider={embeddingProvider}
-          setEmbeddingProvider={setEmbeddingProvider}
-          anthropicKey={anthropicKey}
-          setAnthropicKey={setAnthropicKey}
-          openaiKey={openaiKey}
-          setOpenaiKey={setOpenaiKey}
-          geminiKey={geminiKey}
-          setGeminiKey={setGeminiKey}
         />
       </div>
 
