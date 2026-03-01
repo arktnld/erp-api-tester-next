@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Server, Building2, FlaskConical, History, MessageSquare, BookOpen, ListChecks } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { TourButton } from '@/components/ui/tour-button'
 
 type SidebarERP = {
   id: number
@@ -19,10 +20,10 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
     { href: '/', label: 'Home', icon: LayoutDashboard },
     { href: '/test', label: 'Testar API', icon: FlaskConical },
     { href: '/chat', label: 'Chat IA', icon: MessageSquare },
-    { href: '/erps', label: 'ERPs', icon: Server },
+    { href: '/erps', label: 'ERPs', icon: Server, tourId: 'erps' },
     { href: '/companies', label: 'Empresas', icon: Building2 },
-    { href: '/history', label: 'Histórico', icon: History },
-    { href: '/playbooks', label: 'Playbooks', icon: ListChecks },
+    { href: '/history', label: 'Histórico', icon: History, tourId: 'history' },
+    { href: '/playbooks', label: 'Playbooks', icon: ListChecks, tourId: 'playbooks' },
     { href: '/docs', label: 'Como usar', icon: BookOpen },
   ]
 
@@ -75,12 +76,12 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
       </div>
 
       {/* Nav */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 8px' }}>
-        {nav.map(({ href, label, icon: Icon }) => {
+      <div data-tour="nav" style={{ flex: 1, overflowY: 'auto', padding: '8px 8px' }}>
+        {nav.map(({ href, label, icon: Icon, tourId }) => {
           const active =
             pathname === href || (href !== '/' && pathname.startsWith(href))
           return (
-            <div key={href}>
+            <div key={href} {...(tourId ? { 'data-tour': tourId } : {})}>
               <Link
                 href={href}
                 style={{
@@ -101,8 +102,6 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
                 <Icon size={15} />
                 {label}
               </Link>
-
-
             </div>
           )
         })}
@@ -121,8 +120,11 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
         <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>
           © {new Date().getFullYear()} Jarbis
         </span>
-        <div data-tour="theme-toggle">
-          <ThemeToggle />
+        <div style={{ display: 'flex', gap: 4 }}>
+          <TourButton />
+          <div data-tour="theme-toggle">
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </aside>
