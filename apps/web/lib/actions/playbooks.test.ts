@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { extractFields } from './playbooks'
+import { extractFields } from '../playbook-utils'
 
 describe('extractFields', () => {
   it('returns empty for null capture', () => {
