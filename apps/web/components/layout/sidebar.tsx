@@ -56,25 +56,10 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
           gap: 8,
         }}
       >
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="10" cy="10" r="3" fill="var(--accent)" />
-          <line x1="2" y1="10" x2="7" y2="10" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" opacity="0.55" />
-          <line x1="13" y1="10" x2="18" y2="10" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" opacity="0.55" />
-          <line x1="10" y1="2" x2="10" y2="7" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" opacity="0.55" />
-          <line x1="10" y1="13" x2="10" y2="18" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" opacity="0.55" />
-          <circle cx="2" cy="10" r="1.5" fill="var(--accent)" opacity="0.45" />
-          <circle cx="18" cy="10" r="1.5" fill="var(--accent)" opacity="0.45" />
-          <circle cx="10" cy="2" r="1.5" fill="var(--accent)" opacity="0.45" />
-          <circle cx="10" cy="18" r="1.5" fill="var(--accent)" opacity="0.45" />
-        </svg>
-        <span style={{
-          fontFamily: 'var(--font-logo)',
-          fontSize: 18,
-          fontWeight: 700,
-          letterSpacing: '-0.02em',
-        }}>
-          <span style={{ color: 'var(--accent)' }}>ERP</span>
-          <span style={{ color: 'var(--text)' }}> Tester</span>
+        <span style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 800, letterSpacing: '-1px', lineHeight: 1 }}>
+          <span style={{ color: 'var(--accent)' }}>e</span>
+          <span style={{ color: 'var(--text)' }}>7</span>
+          <span style={{ color: 'var(--accent)' }}>r</span>
         </span>
       </div>
 
