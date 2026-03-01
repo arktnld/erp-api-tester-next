@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { Play, Loader2, Copy, Check, Download } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { Play, Loader2, Download, MoreHorizontal, Copy, Check, Terminal, Image as ImageIcon } from 'lucide-react'
 import { StatusBadge } from '@/components/ui/badge'
 import { JsonTree } from './json-tree'
 import { tryPrettyJson, tryPrettyXml } from '@/lib/utils'
 import type { ExecuteResponse, ExportData } from '../lib/types'
-import { ExportButton } from './export-button'
+import { ExportCard } from './export-card'
+import { useExport } from './use-export'
 import dynamic from 'next/dynamic'
 
 const CodeBlock = dynamic(() => import('@/components/ui/code-block').then(m => ({ default: m.CodeBlock })), { ssr: false })
@@ -88,11 +89,100 @@ interface TestResponseProps {
   loading: boolean
   erpName?: string
   companyName?: string
+  curlString?: string
 }
 
-export function TestResponse({ response, loading, erpName = '', companyName = '' }: TestResponseProps) {
+const menuItemStyle: React.CSSProperties = {
+  display: 'flex', alignItems: 'center', gap: 8, width: '100%',
+  padding: '7px 14px', fontSize: 12, color: 'var(--text)',
+  background: 'none', border: 'none', cursor: 'pointer',
+  textAlign: 'left', whiteSpace: 'nowrap',
+}
+
+function ActionsMenu({ response, curlString, erpName, companyName }: {
+  response: ExecuteResponse
+  curlString?: string
+  erpName: string
+  companyName: string
+}) {
+  const [open, setOpen] = useState(false)
+  const [outputCopied, setOutputCopied] = useState(false)
+  const [curlCopied, setCurlCopied] = useState(false)
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
+  const { capturing, copyImage, downloadPng } = useExport(cardRef)
+
+  const exportData: ExportData = {
+    method: response.method, url: response.url, erpName, companyName,
+    status: response.statusCode, duration: response.durationMs, timestamp: new Date(),
+    requestBody: response.requestBody,
+    responseBody: response.isBinary ? null : response.responseBody,
+    binaryMeta: response.isBinary ? {
+      mimeType: response.mimeType,
+      sizeKB: Math.floor(response.responseBody.length * 3 / 4) / 1024,
+      fileName: response.fileName,
+    } : undefined,
+  }
+
+  useEffect(() => {
+    if (!open) return
+    function handleClick(e: MouseEvent) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [open])
+
+  return (
+    <>
+      <div style={{ position: 'fixed', left: -9999, top: 0, zIndex: -1, pointerEvents: 'none' }}>
+        <ExportCard ref={cardRef} data={exportData} />
+      </div>
+      <div ref={wrapperRef} style={{ position: 'relative' }}>
+        <button
+          onClick={() => setOpen(v => !v)}
+          title="Ações"
+          style={{ display: 'flex', alignItems: 'center', fontSize: 11, color: 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', borderRadius: 4 }}
+        >
+          <MoreHorizontal size={14} />
+        </button>
+        {open && (
+          <div style={{ position: 'absolute', right: 0, top: 'calc(100% + 4px)', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, boxShadow: '0 4px 16px rgba(0,0,0,0.12)', zIndex: 200, minWidth: 170, overflow: 'hidden' }}>
+            <button style={menuItemStyle} onClick={() => {
+              navigator.clipboard.writeText(tryPrettyJson(response.responseBody))
+              setOutputCopied(true); setTimeout(() => setOutputCopied(false), 1800)
+              setOpen(false)
+            }}>
+              {outputCopied ? <Check size={13} color="var(--status-success)" /> : <Copy size={13} />}
+              Copiar output
+            </button>
+            {curlString && (
+              <button style={menuItemStyle} onClick={() => {
+                navigator.clipboard.writeText(curlString)
+                setCurlCopied(true); setTimeout(() => setCurlCopied(false), 1800)
+                setOpen(false)
+              }}>
+                {curlCopied ? <Check size={13} color="var(--status-success)" /> : <Terminal size={13} />}
+                Copiar curl
+              </button>
+            )}
+            <div style={{ height: 1, backgroundColor: 'var(--border)', margin: '4px 0' }} />
+            <button style={menuItemStyle} onClick={() => { copyImage(); setOpen(false) }} disabled={capturing}>
+              {capturing ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <ImageIcon size={13} />}
+              Copiar imagem
+            </button>
+            <button style={menuItemStyle} onClick={() => { downloadPng(); setOpen(false) }} disabled={capturing}>
+              <Download size={13} /> Baixar PNG
+            </button>
+          </div>
+        )}
+      </div>
+    </>
+  )
+}
+
+export function TestResponse({ response, loading, erpName = '', companyName = '', curlString }: TestResponseProps) {
   const [resTab, setResTab] = useState<'json' | 'raw' | 'headers' | 'timeline'>('json')
-  const [resCopied, setResCopied] = useState(false)
 
   if (!response) {
     return (
@@ -133,30 +223,8 @@ export function TestResponse({ response, loading, erpName = '', companyName = ''
         {([{ id: 'json', label: 'JSON' }, { id: 'raw', label: 'Raw' }, { id: 'headers', label: 'Headers' }, { id: 'timeline', label: 'Timeline' }] as const).map(({ id, label }) => (
           <button key={id} style={tabBtnStyle(resTab === id)} onClick={() => setResTab(id)}>{label}</button>
         ))}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4 }}>
-          <button
-            style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: resCopied ? 'var(--status-success)' : 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', borderRadius: 4 }}
-            onClick={() => { navigator.clipboard.writeText(tryPrettyJson(response.responseBody)); setResCopied(true); setTimeout(() => setResCopied(false), 2000) }}
-          >
-            {resCopied ? <Check size={12} /> : <Copy size={12} />}
-            {resCopied ? 'Copiado' : 'Copiar'}
-          </button>
-          <ExportButton data={{
-            method: response.method,
-            url: response.url,
-            erpName,
-            companyName,
-            status: response.statusCode,
-            duration: response.durationMs,
-            timestamp: new Date(),
-            requestBody: response.requestBody,
-            responseBody: response.isBinary ? null : response.responseBody,
-            binaryMeta: response.isBinary ? {
-              mimeType: response.mimeType,
-              sizeKB: Math.floor(response.responseBody.length * 3 / 4) / 1024,
-              fileName: response.fileName,
-            } : undefined,
-          } satisfies ExportData} />
+        <div style={{ marginLeft: 'auto' }}>
+          <ActionsMenu response={response} curlString={curlString} erpName={erpName} companyName={companyName} />
         </div>
       </div>
 

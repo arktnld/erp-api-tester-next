@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Copy, Check } from 'lucide-react'
 import { MethodBadge } from '@/components/ui/badge'
 import { TestSelectors } from './components/test-selectors'
 import { TestRequest } from './components/test-request'
@@ -43,7 +42,6 @@ export function TestPage({
   const [environmentUrl, setEnvironmentUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState<ExecuteResponse | null>(null)
-  const [curlCopied, setCurlCopied] = useState(false)
   const [bodyMode, setBodyMode] = useState<'form' | 'raw'>('form')
   const [rawBody, setRawBody] = useState('')
   const [showCancel, setShowCancel] = useState(false)
@@ -114,18 +112,6 @@ export function TestPage({
           {resolvedUrl || 'Selecione ERP, empresa e endpoint...'}
         </span>
         <button
-          disabled={!canExecute}
-          onClick={() => {
-            if (!endpoint || !company) return
-            navigator.clipboard.writeText(generateCurl(endpoint, { ...company, baseUrl: activeUrl }, allFields, bodyMode === 'raw' ? rawBody : undefined))
-            setCurlCopied(true)
-            setTimeout(() => setCurlCopied(false), 2000)
-          }}
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '5px 10px', fontSize: 12, color: curlCopied ? 'var(--status-success)' : 'var(--text-muted)', background: 'none', border: '1px solid var(--border)', borderRadius: 6, cursor: canExecute ? 'pointer' : 'not-allowed', opacity: canExecute ? 1 : 0.4, flexShrink: 0 }}
-        >
-          {curlCopied ? <Check size={12} /> : <Copy size={12} />} curl
-        </button>
-        <button
           onClick={showCancel ? cancel : execute}
           disabled={!loading && !canExecute}
           style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 4, padding: '5px 0', width: 130, fontSize: 12, fontWeight: 500, color: 'white', backgroundColor: showCancel ? 'var(--status-error, #ef4444)' : 'var(--accent)', border: 'none', borderRadius: 6, cursor: showCancel || canExecute ? 'pointer' : 'not-allowed', opacity: loading || canExecute ? 1 : 0.5, flexShrink: 0, whiteSpace: 'nowrap' }}
@@ -174,6 +160,7 @@ export function TestPage({
           loading={loading}
           erpName={erp?.name}
           companyName={company?.name}
+          curlString={endpoint && company ? generateCurl(endpoint, { ...company, baseUrl: activeUrl }, allFields, bodyMode === 'raw' ? rawBody : undefined) : undefined}
         />
       </div>
 
