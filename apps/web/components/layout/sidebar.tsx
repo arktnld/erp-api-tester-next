@@ -4,21 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Server, Building2, FlaskConical, History, MessageSquare, BookOpen, ListChecks, Settings } from 'lucide-react'
 import { UserButton } from '@clerk/nextjs'
-import { dark } from '@clerk/themes'
-import { useEffect, useState } from 'react'
 import { TourButton } from '@/components/ui/tour-button'
-
-function ThemedUserButton() {
-  const [isDark, setIsDark] = useState(true)
-  useEffect(() => {
-    const check = () => setIsDark(document.documentElement.getAttribute('data-theme') !== 'light')
-    check()
-    const obs = new MutationObserver(check)
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
-    return () => obs.disconnect()
-  }, [])
-  return <UserButton afterSignOutUrl="/sign-in" appearance={{ baseTheme: isDark ? dark : undefined }} />
-}
 
 type SidebarERP = {
   id: number
@@ -134,7 +120,7 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
           justifyContent: 'space-between',
         }}
       >
-        <ThemedUserButton />
+        <UserButton afterSignOutUrl="/sign-in" />
         <div style={{ display: 'flex', gap: 4 }}>
           <TourButton />
         </div>

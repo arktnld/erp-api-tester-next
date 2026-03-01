@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import { Space_Grotesk } from 'next/font/google'
-import { ClerkProvider } from '@clerk/nextjs'
+import { ClerkThemeProvider } from '@/components/layout/clerk-theme-provider'
 import { Sidebar } from '@/components/layout/sidebar'
 import { CommandPalette } from '@/components/ui/command-palette'
 import { MainContent } from '@/components/layout/main-content'
@@ -45,7 +45,7 @@ export default async function RootLayout({
   ])
 
   return (
-    <ClerkProvider>
+    <ClerkThemeProvider>
     <html lang="pt-BR" className={spaceGrotesk.variable}>
       <Script id="theme-init" strategy="beforeInteractive">{`
         (function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light')})()
@@ -58,6 +58,6 @@ export default async function RootLayout({
         </RoleProvider>
       </body>
     </html>
-    </ClerkProvider>
+    </ClerkThemeProvider>
   )
 }
