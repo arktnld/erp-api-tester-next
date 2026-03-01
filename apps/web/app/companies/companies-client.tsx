@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Sheet } from '@/components/ui/sheet'
 import { createCompany, updateCompany, deleteCompany } from '@/lib/actions/companies'
 import { formLabel as labelStyle, selectStyle } from '@/lib/styles'
+import { useRole } from '@/lib/role-context'
 
 type Environment = { name: string; url: string }
 type Company = {
@@ -76,6 +77,7 @@ export function CompaniesClient({
   const [authConfig, setAuthConfig] = useState('{}')
   const [notes, setNotes] = useState('')
   const [isPending, startTransition] = useTransition()
+  const { canEdit } = useRole()
 
   const openSheet = (company?: Company) => {
     setName(company?.name ?? '')
@@ -164,10 +166,10 @@ export function CompaniesClient({
         </span>
       ),
     },
-    {
+    ...(canEdit ? [{
       id: 'actions',
       header: '',
-      cell: ({ row }) => (
+      cell: ({ row }: { row: { original: Company } }) => (
         <div style={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
           <Button variant="ghost" size="sm" onClick={() => openSheet(row.original)}>
             <Pencil size={13} />
@@ -181,7 +183,7 @@ export function CompaniesClient({
           </Button>
         </div>
       ),
-    },
+    }] : []),
   ]
 
   return (
@@ -190,15 +192,17 @@ export function CompaniesClient({
         title="Empresas"
         description="Empresas vinculadas a ERPs com clientes de teste"
         action={
-          erps.length > 0 ? (
-            <Button onClick={() => openSheet()}>
-              <Plus size={15} /> Nova Empresa
-            </Button>
-          ) : (
-            <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
-              Cadastre um ERP primeiro
-            </span>
-          )
+          canEdit
+            ? erps.length > 0 ? (
+                <Button onClick={() => openSheet()}>
+                  <Plus size={15} /> Nova Empresa
+                </Button>
+              ) : (
+                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                  Cadastre um ERP primeiro
+                </span>
+              )
+            : undefined
         }
       />
       <div
@@ -216,7 +220,7 @@ export function CompaniesClient({
         />
       </div>
 
-      <Sheet
+      {canEdit && <Sheet
         open={sheet.open}
         onClose={() => setSheet({ open: false })}
         title={sheet.company ? 'Editar Empresa' : 'Nova Empresa'}
@@ -351,7 +355,7 @@ export function CompaniesClient({
                 : 'Criar Empresa'}
           </Button>
         </form>
-      </Sheet>
+      </Sheet>}
     </div>
   )
 }

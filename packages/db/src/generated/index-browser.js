@@ -224,6 +224,17 @@ exports.Prisma.PlaybookRunScalarFieldEnum = {
   steps: 'steps'
 };
 
+exports.Prisma.AuditLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  userEmail: 'userEmail',
+  action: 'action',
+  resourceType: 'resourceType',
+  resourceId: 'resourceId',
+  resourceName: 'resourceName',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.RequestHistoryScalarFieldEnum = {
   id: 'id',
   erpName: 'erpName',
@@ -282,6 +293,7 @@ exports.Prisma.ModelName = {
   Playbook: 'Playbook',
   PlaybookStep: 'PlaybookStep',
   PlaybookRun: 'PlaybookRun',
+  AuditLog: 'AuditLog',
   RequestHistory: 'RequestHistory'
 };
 

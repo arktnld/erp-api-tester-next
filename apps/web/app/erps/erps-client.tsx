@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Sheet } from '@/components/ui/sheet'
 import { ERPForm } from './erp-form'
 import { deleteERP } from '@/lib/actions/erps'
+import { useRole } from '@/lib/role-context'
 
 type ERP = {
   id: number
@@ -20,6 +21,7 @@ type ERP = {
 
 export function ERPsClient({ erps }: { erps: ERP[] }) {
   const router = useRouter()
+  const { canEdit } = useRole()
   const [sheet, setSheet] = useState<{ open: boolean; erp?: ERP }>({
     open: false,
   })
@@ -64,10 +66,10 @@ export function ERPsClient({ erps }: { erps: ERP[] }) {
         </span>
       ),
     },
-    {
+    ...(canEdit ? [{
       id: 'actions',
       header: '',
-      cell: ({ row }) => (
+      cell: ({ row }: { row: { original: ERP } }) => (
         <div style={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
           <Button
             variant="ghost"
@@ -85,7 +87,7 @@ export function ERPsClient({ erps }: { erps: ERP[] }) {
           </Button>
         </div>
       ),
-    },
+    }] : []),
   ]
 
   return (
@@ -94,9 +96,11 @@ export function ERPsClient({ erps }: { erps: ERP[] }) {
         title="ERPs"
         description="Gerencie os sistemas ERP e seus endpoints"
         action={
-          <Button onClick={() => setSheet({ open: true })}>
-            <Plus size={15} /> Novo ERP
-          </Button>
+          canEdit ? (
+            <Button onClick={() => setSheet({ open: true })}>
+              <Plus size={15} /> Novo ERP
+            </Button>
+          ) : undefined
         }
       />
       <div
@@ -115,7 +119,7 @@ export function ERPsClient({ erps }: { erps: ERP[] }) {
         />
       </div>
 
-      <Sheet
+      {canEdit && <Sheet
         open={sheet.open}
         onClose={() => setSheet({ open: false })}
         title={sheet.erp ? 'Editar ERP' : 'Novo ERP'}
@@ -124,7 +128,7 @@ export function ERPsClient({ erps }: { erps: ERP[] }) {
           erp={sheet.erp}
           onSuccess={() => setSheet({ open: false })}
         />
-      </Sheet>
+      </Sheet>}
     </div>
   )
 }

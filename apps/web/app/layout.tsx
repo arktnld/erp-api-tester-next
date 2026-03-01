@@ -5,6 +5,8 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { Sidebar } from '@/components/layout/sidebar'
 import { CommandPalette } from '@/components/ui/command-palette'
 import { MainContent } from '@/components/layout/main-content'
+import { RoleProvider } from '@/lib/role-context'
+import { getCurrentRole } from '@/lib/require-role'
 import { prisma } from '@erp/db'
 import './globals.css'
 
@@ -23,21 +25,24 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const erps = await prisma.eRP.findMany({
-    orderBy: { name: 'asc' },
-    select: {
-      id: true,
-      name: true,
-      companies: {
-        orderBy: { name: 'asc' },
-        select: { id: true, name: true },
+  const [erps, role] = await Promise.all([
+    prisma.eRP.findMany({
+      orderBy: { name: 'asc' },
+      select: {
+        id: true,
+        name: true,
+        companies: {
+          orderBy: { name: 'asc' },
+          select: { id: true, name: true },
+        },
+        endpoints: {
+          orderBy: { sortOrder: 'asc' },
+          select: { id: true, name: true, method: true, pathTemplate: true },
+        },
       },
-      endpoints: {
-        orderBy: { sortOrder: 'asc' },
-        select: { id: true, name: true, method: true, pathTemplate: true },
-      },
-    },
-  })
+    }),
+    getCurrentRole(),
+  ])
 
   return (
     <ClerkProvider>
@@ -46,9 +51,11 @@ export default async function RootLayout({
         (function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light')})()
       `}</Script>
       <body>
-        <CommandPalette erps={erps} />
-        <Sidebar erps={erps} />
-        <MainContent>{children}</MainContent>
+        <RoleProvider role={role}>
+          <CommandPalette erps={erps} />
+          <Sidebar erps={erps} />
+          <MainContent>{children}</MainContent>
+        </RoleProvider>
       </body>
     </html>
     </ClerkProvider>

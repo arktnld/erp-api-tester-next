@@ -17,6 +17,7 @@ import {
 } from '@/lib/actions/endpoints'
 import { createFieldSchema, updateFieldSchema, deleteFieldSchema } from '@/lib/actions/field-schemas'
 import { formLabel as labelStyle, selectStyle } from '@/lib/styles'
+import { useRole } from '@/lib/role-context'
 
 type Endpoint = {
   id: number
@@ -94,6 +95,7 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
   const [endpointSheet, setEndpointSheet] = useState<{ open: boolean; endpoint?: Endpoint }>({ open: false })
   const [fieldSheet, setFieldSheet] = useState<{ open: boolean; field?: FieldSchema }>({ open: false })
   const [isPending, startTransition] = useTransition()
+  const { canEdit } = useRole()
 
   // Endpoint form state
   const [epName, setEpName] = useState('')
@@ -171,9 +173,11 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
       {/* Endpoints Tab */}
       {tab === 'endpoints' && (
         <div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-            <Button onClick={() => openEndpointSheet()}><Plus size={14} /> Endpoint</Button>
-          </div>
+          {canEdit && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+              <Button onClick={() => openEndpointSheet()}><Plus size={14} /> Endpoint</Button>
+            </div>
+          )}
 
           {endpoints.length === 0 ? (
             <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '32px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>
@@ -217,10 +221,12 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
                                 </p>
                               )}
                             </div>
-                            <div style={{ display: 'flex', gap: 2 }}>
-                              <Button variant="ghost" size="sm" onClick={() => openEndpointSheet(ep)}><Pencil size={13} /></Button>
-                              <Button variant="ghost" size="sm" onClick={() => startTransition(() => deleteEndpoint(ep.id, erp.id))}><Trash2 size={13} /></Button>
-                            </div>
+                            {canEdit && (
+                              <div style={{ display: 'flex', gap: 2 }}>
+                                <Button variant="ghost" size="sm" onClick={() => openEndpointSheet(ep)}><Pencil size={13} /></Button>
+                                <Button variant="ghost" size="sm" onClick={() => startTransition(() => deleteEndpoint(ep.id, erp.id))}><Trash2 size={13} /></Button>
+                              </div>
+                            )}
                           </div>
                         )}
                       </Draggable>
@@ -237,9 +243,11 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
       {/* Fields Tab */}
       {tab === 'fields' && (
         <div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
-            <Button onClick={() => openFieldSheet()}><Plus size={14} /> Campo</Button>
-          </div>
+          {canEdit && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+              <Button onClick={() => openFieldSheet()}><Plus size={14} /> Campo</Button>
+            </div>
+          )}
           <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
             Campos definidos aqui aparecem nos clientes de teste. Configure a fonte automática para preencher via API.
           </p>
@@ -279,10 +287,12 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
                         </div>
                       )}
                     </div>
-                    <div style={{ display: 'flex', gap: 2 }}>
-                      <Button variant="ghost" size="sm" onClick={() => openFieldSheet(fs)}><Pencil size={13} /></Button>
-                      <Button variant="ghost" size="sm" onClick={() => startTransition(() => deleteFieldSchema(fs.id, erp.id))}><Trash2 size={13} /></Button>
-                    </div>
+                    {canEdit && (
+                      <div style={{ display: 'flex', gap: 2 }}>
+                        <Button variant="ghost" size="sm" onClick={() => openFieldSheet(fs)}><Pencil size={13} /></Button>
+                        <Button variant="ghost" size="sm" onClick={() => startTransition(() => deleteFieldSchema(fs.id, erp.id))}><Trash2 size={13} /></Button>
+                      </div>
+                    )}
                   </div>
                 )
               })}
@@ -292,7 +302,7 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
       )}
 
       {/* Endpoint Sheet */}
-      <Sheet open={endpointSheet.open} onClose={() => setEndpointSheet({ open: false })} title={endpointSheet.endpoint ? 'Editar Endpoint' : 'Novo Endpoint'}>
+      {canEdit && <Sheet open={endpointSheet.open} onClose={() => setEndpointSheet({ open: false })} title={endpointSheet.endpoint ? 'Editar Endpoint' : 'Novo Endpoint'}>
         <form onSubmit={(e) => {
           e.preventDefault()
           startTransition(async () => {
@@ -347,10 +357,10 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
             {isPending ? 'Salvando...' : 'Salvar Endpoint'}
           </Button>
         </form>
-      </Sheet>
+      </Sheet>}
 
       {/* Field Schema Sheet */}
-      <Sheet open={fieldSheet.open} onClose={() => setFieldSheet({ open: false })} title={fieldSheet.field ? 'Editar Campo' : 'Novo Campo'} width={520}>
+      {canEdit && <Sheet open={fieldSheet.open} onClose={() => setFieldSheet({ open: false })} title={fieldSheet.field ? 'Editar Campo' : 'Novo Campo'} width={520}>
         <form onSubmit={(e) => {
           e.preventDefault()
           startTransition(async () => {
@@ -439,7 +449,7 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
             {isPending ? 'Salvando...' : fieldSheet.field ? 'Salvar Campo' : 'Adicionar Campo'}
           </Button>
         </form>
-      </Sheet>
+      </Sheet>}
     </div>
   )
 }

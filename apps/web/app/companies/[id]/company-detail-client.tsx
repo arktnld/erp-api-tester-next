@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ChevronLeft, Plus, Pencil, Trash2, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { deleteTestClient } from '@/lib/actions/test-clients'
+import { useRole } from '@/lib/role-context'
 
 type FieldSchema = {
   id: number
@@ -35,6 +36,7 @@ type Company = {
 
 export function CompanyDetailClient({ company }: { company: Company }) {
   const [, startTransition] = useTransition()
+  const { canEdit } = useRole()
 
   return (
     <div style={{ padding: '32px 40px' }}>
@@ -75,9 +77,11 @@ export function CompanyDetailClient({ company }: { company: Company }) {
             </p>
           )}
         </div>
-        <Link href={`/companies/${company.id}/clients/new`}>
-          <Button><Plus size={14} /> Novo Cliente</Button>
-        </Link>
+        {canEdit && (
+          <Link href={`/companies/${company.id}/clients/new`}>
+            <Button><Plus size={14} /> Novo Cliente</Button>
+          </Link>
+        )}
       </div>
 
       {company.testClients.length === 0 ? (
@@ -101,18 +105,20 @@ export function CompanyDetailClient({ company }: { company: Company }) {
                     </div>
                     <span style={{ fontWeight: 500, fontSize: 13 }}>{client.name}</span>
                   </div>
-                  <div style={{ display: 'flex', gap: 2 }}>
-                    <Link href={`/companies/${company.id}/clients/${client.id}/edit`}>
-                      <Button variant="ghost" size="sm"><Pencil size={12} /></Button>
-                    </Link>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => startTransition(() => deleteTestClient(client.id, company.id))}
-                    >
-                      <Trash2 size={12} />
-                    </Button>
-                  </div>
+                  {canEdit && (
+                    <div style={{ display: 'flex', gap: 2 }}>
+                      <Link href={`/companies/${company.id}/clients/${client.id}/edit`}>
+                        <Button variant="ghost" size="sm"><Pencil size={12} /></Button>
+                      </Link>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => startTransition(() => deleteTestClient(client.id, company.id))}
+                      >
+                        <Trash2 size={12} />
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 {company.erp.fieldSchemas.length > 0 && (
