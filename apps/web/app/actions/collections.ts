@@ -6,7 +6,6 @@ import OpenAI from 'openai'
 import { reciprocalRankFusion } from '@/lib/utils'
 import { EMBEDDING_PROVIDERS } from '@/lib/providers'
 import type { EmbeddingProvider } from '@/lib/providers'
-export type { EmbeddingProvider }
 
 const DIMENSIONS = 1536
 

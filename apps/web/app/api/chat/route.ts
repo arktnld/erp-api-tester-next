@@ -3,8 +3,9 @@ import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { retrieveContext } from '@/app/actions/collections'
-import type { EmbeddingProvider, RagResult } from '@/app/actions/collections'
+import type { RagResult } from '@/app/actions/collections'
 import { CHAT_PROVIDERS } from '@/lib/providers'
+import type { EmbeddingProvider } from '@/lib/providers'
 
 export async function POST(req: NextRequest) {
   const {
