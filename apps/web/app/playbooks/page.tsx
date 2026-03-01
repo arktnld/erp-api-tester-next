@@ -5,7 +5,7 @@ import { PageHeader } from '@/components/ui/page-header'
 import { Button } from '@/components/ui/button'
 import { DeleteButton } from './delete-button'
 import { getCurrentRole } from '@/lib/require-role'
-import { canEdit as checkCanEdit } from '@/lib/roles'
+import { canAdmin as checkCanEdit } from '@/lib/roles'
 
 export const dynamic = 'force-dynamic'
 

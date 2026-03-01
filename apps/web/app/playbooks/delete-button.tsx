@@ -8,7 +8,7 @@ import { useRole } from '@/lib/role-context'
 
 export function DeleteButton({ id }: { id: number }) {
   const [, startTransition] = useTransition()
-  const { canEdit } = useRole()
+  const { canAdmin: canEdit } = useRole()
   if (!canEdit) return null
   return (
     <Button variant="ghost" size="sm" onClick={() => startTransition(() => deletePlaybook(id))}>

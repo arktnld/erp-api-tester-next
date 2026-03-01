@@ -21,7 +21,7 @@ type ERP = {
 
 export function ERPsClient({ erps }: { erps: ERP[] }) {
   const router = useRouter()
-  const { canEdit } = useRole()
+  const { canAdmin: canEdit } = useRole()
   const [sheet, setSheet] = useState<{ open: boolean; erp?: ERP }>({
     open: false,
   })

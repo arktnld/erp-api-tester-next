@@ -3,7 +3,7 @@
 import { prisma } from '@erp/db'
 import { revalidatePath } from 'next/cache'
 import { ERPSchema } from './schemas'
-import { requireEdit } from '@/lib/require-role'
+import { requireAdmin } from '@/lib/require-role'
 import { recordAudit } from '@/lib/audit'
 
 export async function getERPs() {
@@ -26,7 +26,7 @@ export async function getERP(id: number) {
 }
 
 export async function createERP(data: { name: string }) {
-  await requireEdit()
+  await requireAdmin()
   const parsed = ERPSchema.parse(data)
   const erp = await prisma.eRP.create({ data: parsed })
   revalidatePath('/erps')
@@ -35,7 +35,7 @@ export async function createERP(data: { name: string }) {
 }
 
 export async function updateERP(id: number, data: { name: string }) {
-  await requireEdit()
+  await requireAdmin()
   const parsed = ERPSchema.parse(data)
   await prisma.eRP.update({ where: { id }, data: parsed })
   revalidatePath('/erps')
@@ -44,7 +44,7 @@ export async function updateERP(id: number, data: { name: string }) {
 }
 
 export async function deleteERP(id: number) {
-  await requireEdit()
+  await requireAdmin()
   const erp = await prisma.eRP.findUniqueOrThrow({ where: { id }, select: { name: true } })
   await prisma.eRP.delete({ where: { id } })
   revalidatePath('/erps')

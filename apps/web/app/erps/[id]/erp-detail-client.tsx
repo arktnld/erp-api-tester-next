@@ -95,7 +95,7 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
   const [endpointSheet, setEndpointSheet] = useState<{ open: boolean; endpoint?: Endpoint }>({ open: false })
   const [fieldSheet, setFieldSheet] = useState<{ open: boolean; field?: FieldSchema }>({ open: false })
   const [isPending, startTransition] = useTransition()
-  const { canEdit } = useRole()
+  const { canAdmin: canEdit } = useRole()
 
   // Endpoint form state
   const [epName, setEpName] = useState('')

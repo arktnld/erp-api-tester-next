@@ -1,6 +1,6 @@
 import { Download } from 'lucide-react'
 import { auth, currentUser } from '@clerk/nextjs/server'
-import { getRole, canAdmin, canEdit } from '@/lib/roles'
+import { getRole, canAdmin } from '@/lib/roles'
 import { getSettings } from '@/lib/actions/settings'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { AISettingsForm } from './ai-settings-form'
@@ -24,7 +24,6 @@ export default async function SettingsPage() {
   const metaFromUser = user?.publicMetadata as Record<string, unknown> | undefined
   const role = getRole(metaFromJwt ?? metaFromUser)
   const isAdmin = canAdmin(role)
-  const isEditor = canEdit(role)
   const users = isAdmin ? await listUsers() : []
 
   return (
@@ -44,8 +43,8 @@ export default async function SettingsPage() {
         </div>
       </section>
 
-      {/* Chat IA — editor/admin only */}
-      {isEditor && (
+      {/* Chat IA — admin only */}
+      {isAdmin && (
         <section style={{ marginBottom: 32 }}>
           <h2 style={sectionTitle}>Chat IA</h2>
           <AISettingsForm initial={settings} />
