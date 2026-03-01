@@ -25,8 +25,9 @@ export async function getERP(id: number) {
 
 export async function createERP(data: { name: string }) {
   const parsed = ERPSchema.parse(data)
-  await prisma.eRP.create({ data: parsed })
+  const erp = await prisma.eRP.create({ data: parsed })
   revalidatePath('/erps')
+  return { id: erp.id }
 }
 
 export async function updateERP(id: number, data: { name: string }) {

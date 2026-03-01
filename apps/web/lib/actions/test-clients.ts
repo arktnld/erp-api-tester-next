@@ -10,10 +10,11 @@ export async function createTestClient(data: {
   fieldsData: string
 }) {
   const parsed = TestClientSchema.parse(data)
-  await prisma.testClient.create({
+  const client = await prisma.testClient.create({
     data: { ...parsed, fieldsData: JSON.parse(parsed.fieldsData) },
   })
   revalidatePath(`/companies/${parsed.companyId}`)
+  return { id: client.id }
 }
 
 export async function updateTestClient(

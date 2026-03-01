@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@erp/db'
 import { MethodBadge, StatusBadge } from '@/components/ui/badge'
@@ -7,6 +8,9 @@ import { HomeImport } from './home-import'
 export const dynamic = 'force-dynamic'
 
 export default async function Dashboard() {
+  const count = await prisma.eRP.count()
+  if (count === 0) redirect('/setup')
+
   const [recentHistory, companies, erpCount, endpointCount, erps] = await Promise.all([
     prisma.requestHistory.findMany({
       orderBy: { createdAt: 'desc' },
