@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { ChevronDown, ChevronRight, Check, Search } from 'lucide-react'
+// Check still used in ItemList and EndpointItem
 import type { ERP, Endpoint, Company, Environment } from '../lib/types'
 
 const METHOD_COLORS: Record<string, string> = {
@@ -59,7 +60,6 @@ function SectionHeader({
             <span style={{ fontSize: 12, color: 'var(--text)', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {selectedLabel}
             </span>
-            <Check size={11} color="var(--status-success)" style={{ flexShrink: 0 }} />
           </div>
         ) : (
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{label}</span>
@@ -283,15 +283,6 @@ export function TestSelectors({
   return (
     <div style={{ width: 260, minWidth: 260, borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
 
-      {/* Summary breadcrumb */}
-      {(erpId || companyId || endpointId || clientId) && (
-        <div style={{ padding: '10px 14px 6px', borderBottom: '1px solid var(--border)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '2px 4px', fontSize: 11 }}>
-          {erp && <span style={{ color: 'var(--text-muted)' }}>{erp.name}</span>}
-          {company && <><span style={{ color: 'var(--text-subtle)' }}>›</span><span style={{ color: 'var(--text-muted)' }}>{company.name}</span></>}
-          {selectedEndpoint && <><span style={{ color: 'var(--text-subtle)' }}>›</span><span style={{ color: 'var(--text-muted)' }}>{selectedEndpoint.name}</span></>}
-          {selectedClient && <><span style={{ color: 'var(--text-subtle)' }}>›</span><span style={{ color: 'var(--text-muted)' }}>{selectedClient.name}</span></>}
-        </div>
-      )}
 
       <div style={{ padding: '8px 6px', flex: 1 }}>
 
