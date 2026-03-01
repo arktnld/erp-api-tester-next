@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@erp/db'
 import { MethodBadge, StatusBadge } from '@/components/ui/badge'
-import { RotateCcw, Building2 } from 'lucide-react'
+import { RotateCcw, Building2, FlaskConical, MessageSquare, ListChecks, History } from 'lucide-react'
 import { HomeImport } from './home-import'
 import { getCurrentRole } from '@/lib/require-role'
 import { canAdmin as checkCanAdmin } from '@/lib/roles'
@@ -13,84 +13,116 @@ export default async function Dashboard() {
   const count = await prisma.eRP.count()
   if (count === 0) redirect('/setup')
 
-  const [recentHistory, companies, erpCount, endpointCount, erps, role] = await Promise.all([
-    prisma.requestHistory.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 10,
-      select: {
-        id: true,
-        method: true,
-        statusCode: true,
-        endpointName: true,
-        companyName: true,
-        clientName: true,
-        durationMs: true,
-        createdAt: true,
-        companyId: true,
-        endpointId: true,
-        testClientId: true,
-      },
-    }),
-    prisma.company.findMany({
-      orderBy: { name: 'asc' },
-      take: 8,
-      select: { id: true, name: true, _count: { select: { testClients: true } } },
-    }),
-    prisma.eRP.count(),
-    prisma.endpoint.count(),
-    prisma.eRP.findMany({ orderBy: { name: 'asc' }, select: { id: true, name: true } }),
-    getCurrentRole(),
-  ])
+  const [recentHistory, companies, erpCount, endpointCount, playbookCount, historyCount, erps, role] =
+    await Promise.all([
+      prisma.requestHistory.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 8,
+        select: {
+          id: true,
+          method: true,
+          statusCode: true,
+          endpointName: true,
+          companyName: true,
+          clientName: true,
+          durationMs: true,
+          createdAt: true,
+          companyId: true,
+          endpointId: true,
+          testClientId: true,
+        },
+      }),
+      prisma.company.findMany({
+        orderBy: { name: 'asc' },
+        take: 8,
+        select: { id: true, name: true, _count: { select: { testClients: true } } },
+      }),
+      prisma.eRP.count(),
+      prisma.endpoint.count(),
+      prisma.playbook.count(),
+      prisma.requestHistory.count(),
+      prisma.eRP.findMany({ orderBy: { name: 'asc' }, select: { id: true, name: true } }),
+      getCurrentRole(),
+    ])
   const isAdmin = checkCanAdmin(role)
-
-  // Collect unique recent companies from history (for quick access shortcuts)
-  const seenIds = new Set<number>()
-  const recentCompanies: { id: number; name: string }[] = []
-  for (const h of recentHistory) {
-    if (h.companyId && !seenIds.has(h.companyId)) {
-      seenIds.add(h.companyId)
-      recentCompanies.push({ id: h.companyId, name: h.companyName })
-    }
-  }
 
   const stats = [
     { label: 'ERPs', value: erpCount },
-    { label: 'Empresas', value: companies.length },
     { label: 'Endpoints', value: endpointCount },
-    { label: 'Requests', value: recentHistory.length > 0 ? '10+' : '0' },
+    { label: 'Empresas', value: companies.length },
+    { label: 'Playbooks', value: playbookCount },
+    { label: 'Requests', value: historyCount },
+  ]
+
+  const quickActions = [
+    { href: '/test', label: 'Testar API', desc: 'Disparar requisições', icon: FlaskConical, accent: true },
+    { href: '/chat', label: 'Chat IA', desc: 'Assistente inteligente', icon: MessageSquare, accent: false },
+    { href: '/playbooks', label: 'Playbooks', desc: 'Fluxos automatizados', icon: ListChecks, accent: false },
+    { href: '/history', label: 'Histórico', desc: 'Todas as requisições', icon: History, accent: false },
   ]
 
   return (
-    <div style={{ padding: '32px 40px', maxWidth: 900 }}>
+    <div style={{ padding: '32px 40px', maxWidth: 960 }}>
+      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
         <h1 style={{ fontSize: 20, fontWeight: 600 }}>Início</h1>
         <HomeImport erps={erps} canAdmin={isAdmin} />
       </div>
-      <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 32 }}>
-        Acesso rápido e histórico recente
+      <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 28 }}>
+        Acesso rápido e visão geral do sistema
       </p>
 
-      {/* Stats row */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 32 }}>
+      {/* Quick actions */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 28 }}>
+        {quickActions.map(({ href, label, desc, icon: Icon, accent }) => (
+          <Link
+            key={href}
+            href={href}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              padding: '14px 16px',
+              backgroundColor: accent ? 'var(--accent)' : 'var(--surface)',
+              border: `1px solid ${accent ? 'var(--accent)' : 'var(--border)'}`,
+              borderRadius: 10,
+              textDecoration: 'none',
+              color: accent ? '#fff' : 'var(--text)',
+              transition: 'opacity 0.1s',
+            }}
+          >
+            <Icon size={18} style={{ flexShrink: 0, opacity: accent ? 1 : 0.7 }} />
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 1 }}>{label}</p>
+              <p style={{ fontSize: 11, opacity: accent ? 0.85 : undefined, color: accent ? undefined : 'var(--text-muted)' }}>
+                {desc}
+              </p>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {/* Stats */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 28 }}>
         {stats.map(({ label, value }) => (
           <div
             key={label}
             style={{
-              padding: '10px 18px',
+              flex: 1,
+              padding: '12px 16px',
               backgroundColor: 'var(--surface)',
               border: '1px solid var(--border)',
               borderRadius: 8,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
+              textAlign: 'center',
             }}
           >
-            <span style={{ fontSize: 18, fontWeight: 700 }}>{value}</span>
-            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{label}</span>
+            <p style={{ fontSize: 22, fontWeight: 700, lineHeight: 1 }}>{value}</p>
+            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>{label}</p>
           </div>
         ))}
       </div>
 
+      {/* Main grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 240px', gap: 24 }}>
         {/* Recent requests */}
         <div>
@@ -162,13 +194,7 @@ export default async function Dashboard() {
                       >
                         {h.endpointName}
                       </p>
-                      <p
-                        style={{
-                          fontSize: 11,
-                          color: 'var(--text-subtle)',
-                          marginTop: 1,
-                        }}
-                      >
+                      <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginTop: 1 }}>
                         {h.companyName} · {h.clientName} · {h.durationMs}ms
                       </p>
                     </div>
