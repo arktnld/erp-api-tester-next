@@ -10,10 +10,10 @@ export function canAdmin(role: Role | undefined | null): boolean {
   return role === 'admin'
 }
 
-export function getRole(metadata: Record<string, unknown> | null | undefined): Role | undefined {
+export function getRole(metadata: Record<string, unknown> | null | undefined): Role {
   const role = metadata?.role
   if (role === 'admin' || role === 'editor' || role === 'viewer') return role
-  return undefined
+  return 'viewer'
 }
 
 export function getRoleLabel(role: Role | undefined | null): string {
