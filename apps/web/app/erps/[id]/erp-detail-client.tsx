@@ -26,6 +26,7 @@ type Endpoint = {
   group: string
   requiresClient: boolean
   isModification: boolean
+  notes: string
 }
 type FieldSchema = {
   id: number
@@ -101,6 +102,7 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
   const [epGroup, setEpGroup] = useState('')
   const [epRequiresClient, setEpRequiresClient] = useState(true)
   const [epIsModification, setEpIsModification] = useState(false)
+  const [epNotes, setEpNotes] = useState('')
 
   // Field form state
   const [fsName, setFsName] = useState('')
@@ -129,6 +131,7 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
     setEpGroup(ep?.group ?? '')
     setEpRequiresClient(ep?.requiresClient ?? true)
     setEpIsModification(ep?.isModification ?? false)
+    setEpNotes(ep?.notes ?? '')
     setEndpointSheet({ open: true, endpoint: ep })
   }
 
@@ -201,6 +204,11 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
                         {ep.isModification && <span style={{ fontSize: 11, fontWeight: 500, color: '#f59e0b', backgroundColor: '#f59e0b18', border: '1px solid #f59e0b44', borderRadius: 4, padding: '2px 8px' }}>modificação</span>}
                         {ep.requiresClient && <span style={{ fontSize: 11, fontWeight: 500, color: '#888', backgroundColor: '#88888818', border: '1px solid #88888844', borderRadius: 4, padding: '2px 8px' }}>cliente teste</span>}
                       </div>
+                    )}
+                    {ep.notes && (
+                      <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                        {ep.notes}
+                      </p>
                     )}
                   </div>
                   <div style={{ display: 'flex', gap: 2 }}>
@@ -276,7 +284,7 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
         <form onSubmit={(e) => {
           e.preventDefault()
           startTransition(async () => {
-            const data = { name: epName, method: epMethod, pathTemplate: epPath, bodyTemplate: epBody, headers: epHeaders, group: epGroup, requiresClient: epRequiresClient, isModification: epIsModification }
+            const data = { name: epName, method: epMethod, pathTemplate: epPath, bodyTemplate: epBody, headers: epHeaders, group: epGroup, requiresClient: epRequiresClient, isModification: epIsModification, notes: epNotes }
             if (endpointSheet.endpoint) {
               await updateEndpoint(endpointSheet.endpoint.id, erp.id, data)
             } else {
@@ -313,6 +321,15 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
             <input type="checkbox" checked={epIsModification} onChange={(e) => setEpIsModification(e.target.checked)} />
             Endpoint de modificação
           </label>
+
+          <label style={labelStyle}>Notas <span style={{ color: 'var(--text-subtle)' }}>(opcional)</span></label>
+          <textarea
+            value={epNotes}
+            onChange={(e) => setEpNotes(e.target.value)}
+            placeholder="Observações sobre este endpoint..."
+            rows={3}
+            style={{ width: '100%', padding: '8px 12px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, outline: 'none', resize: 'vertical' }}
+          />
 
           <Button type="submit" disabled={isPending} style={{ width: '100%', marginTop: 24 }}>
             {isPending ? 'Salvando...' : 'Salvar Endpoint'}

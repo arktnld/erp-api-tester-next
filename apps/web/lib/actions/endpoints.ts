@@ -14,10 +14,12 @@ export async function createEndpoint(data: {
   group: string
   requiresClient: boolean
   isModification: boolean
+  notes: string
 }) {
   const parsed = EndpointSchema.parse(data)
-  await prisma.endpoint.create({ data: parsed })
+  const ep = await prisma.endpoint.create({ data: parsed })
   revalidatePath(`/erps/${parsed.erpId}`)
+  return { id: ep.id }
 }
 
 export async function updateEndpoint(
@@ -32,6 +34,7 @@ export async function updateEndpoint(
     group: string
     requiresClient: boolean
     isModification: boolean
+    notes: string
   }
 ) {
   const parsed = EndpointSchema.omit({ erpId: true }).parse(data)

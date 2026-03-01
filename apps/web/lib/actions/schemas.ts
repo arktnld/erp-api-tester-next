@@ -23,6 +23,7 @@ export const EndpointSchema = z.object({
   group: z.string().default(''),
   requiresClient: z.boolean().default(true),
   isModification: z.boolean().default(false),
+  notes: z.string().default(''),
 })
 
 export const TestClientSchema = z.object({
