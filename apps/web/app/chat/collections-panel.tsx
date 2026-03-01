@@ -192,8 +192,10 @@ export function CollectionsPanel({
     if (!newJson.trim()) { setFormError('Cole ou importe o JSON.'); return }
     let context: string
     let chunks: string[]
+    let rawJson: unknown
     try {
       const parsed = JSON.parse(newJson)
+      rawJson = parsed
       const result = parseCollection(parsed)
       context = result.context
       chunks = result.chunks
@@ -211,7 +213,7 @@ export function CollectionsPanel({
       setSaveStage('saving')
     }
     try {
-      const { id, embeddingsCount, embeddingsError } = await saveCollection(collectionName, context, chunks, embeddingProvider, embKey, newSystemPrompt.trim())
+      const { id, embeddingsCount, embeddingsError } = await saveCollection(collectionName, context, chunks, embeddingProvider, embKey, newSystemPrompt.trim(), rawJson)
       onCollectionsChange(prev => [{ id, name: collectionName, systemPrompt: newSystemPrompt.trim(), createdAt: new Date() }, ...prev])
       onActiveChange(id)
       setNewName('')

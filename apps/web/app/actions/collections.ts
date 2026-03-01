@@ -6,6 +6,7 @@ import OpenAI from 'openai'
 import { reciprocalRankFusion } from '@/lib/utils'
 import { EMBEDDING_PROVIDERS } from '@/lib/providers'
 import type { EmbeddingProvider } from '@/lib/providers'
+import { parseCollectionStructure, parseFromChunks } from '@/app/collections/lib/parser'
 
 const DIMENSIONS = 1536
 
@@ -73,6 +74,33 @@ export async function getCollections() {
   })
 }
 
+export async function getAllCollections() {
+  return prisma.postmanCollection.findMany({
+    orderBy: { createdAt: 'desc' },
+    select: { id: true, name: true, createdAt: true },
+  })
+}
+
+export async function getCollectionStructure(id: number) {
+  const collection = await prisma.postmanCollection.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      rawJson: true,
+      chunks: { select: { text: true }, orderBy: { id: 'asc' } },
+    },
+  })
+
+  if (!collection) return null
+
+  const structure = collection.rawJson
+    ? parseCollectionStructure(collection.rawJson)
+    : parseFromChunks(collection.chunks.map((c) => c.text))
+
+  return { id: collection.id, name: collection.name, structure }
+}
+
 export async function updateCollectionPrompt(id: number, systemPrompt: string) {
   await prisma.postmanCollection.update({ where: { id }, data: { systemPrompt } })
   revalidatePath('/chat')
@@ -84,10 +112,11 @@ export async function saveCollection(
   chunks: string[],
   embeddingProvider: EmbeddingProvider,
   embeddingKey: string,
-  systemPrompt = ''
+  systemPrompt = '',
+  rawJson?: unknown
 ) {
   const storedProvider = embeddingKey ? embeddingProvider : 'openai'
-  const col = await prisma.postmanCollection.create({ data: { name, context, systemPrompt, embeddingProvider: storedProvider } })
+  const col = await prisma.postmanCollection.create({ data: { name, context, systemPrompt, embeddingProvider: storedProvider, rawJson: rawJson ?? undefined } })
 
   let embeddingsCount = 0
   let embeddingsError: string | null = null
