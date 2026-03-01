@@ -15,6 +15,7 @@ model ERP {
   companies    Company[]
   endpoints    Endpoint[]
   fieldSchemas ERPFieldSchema[]
+  playbooks    Playbook[]
 }
 
 model ERPFieldSchema {
@@ -43,8 +44,9 @@ model Endpoint {
   group          String  @default("")
   requiresClient  Boolean @default(true)
   isModification  Boolean @default(false)
-  notes           String  @default("") @db.Text
-  erp             ERP     @relation(fields: [erpId], references: [id], onDelete: Cascade)
+  notes           String        @default("") @db.Text
+  erp             ERP           @relation(fields: [erpId], references: [id], onDelete: Cascade)
+  playbookSteps   PlaybookStep[]
 }
 
 model Company {
@@ -93,6 +95,41 @@ model EmbeddingChunk {
 model Setting {
   key   String @id
   value String @db.Text
+}
+
+model Playbook {
+  id          Int            @id @default(autoincrement())
+  erpId       Int
+  name        String
+  description String         @default("") @db.Text
+  createdAt   DateTime       @default(now())
+  erp         ERP            @relation(fields: [erpId], references: [id], onDelete: Cascade)
+  steps       PlaybookStep[]
+  runs        PlaybookRun[]
+}
+
+model PlaybookStep {
+  id              Int      @id @default(autoincrement())
+  playbookId      Int
+  order           Int
+  endpointId      Int
+  stepName        String   @default("")
+  bodyOverride    String   @default("") @db.Text
+  responseCapture String   @default("") @db.Text
+  playbook        Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+  endpoint        Endpoint @relation(fields: [endpointId], references: [id])
+}
+
+model PlaybookRun {
+  id         Int       @id @default(autoincrement())
+  playbookId Int
+  companyId  Int
+  clientId   Int?
+  startedAt  DateTime  @default(now())
+  endedAt    DateTime?
+  status     String    @default("running")
+  steps      Json      @default("[]")
+  playbook   Playbook  @relation(fields: [playbookId], references: [id])
 }
 
 model RequestHistory {

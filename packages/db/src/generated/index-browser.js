@@ -151,7 +151,8 @@ exports.Prisma.EndpointScalarFieldEnum = {
   sortOrder: 'sortOrder',
   group: 'group',
   requiresClient: 'requiresClient',
-  isModification: 'isModification'
+  isModification: 'isModification',
+  notes: 'notes'
 };
 
 exports.Prisma.CompanyScalarFieldEnum = {
@@ -162,6 +163,7 @@ exports.Prisma.CompanyScalarFieldEnum = {
   environments: 'environments',
   authType: 'authType',
   authConfig: 'authConfig',
+  notes: 'notes',
   createdAt: 'createdAt'
 };
 
@@ -178,6 +180,7 @@ exports.Prisma.PostmanCollectionScalarFieldEnum = {
   name: 'name',
   context: 'context',
   systemPrompt: 'systemPrompt',
+  embeddingProvider: 'embeddingProvider',
   createdAt: 'createdAt'
 };
 
@@ -190,6 +193,35 @@ exports.Prisma.EmbeddingChunkScalarFieldEnum = {
 exports.Prisma.SettingScalarFieldEnum = {
   key: 'key',
   value: 'value'
+};
+
+exports.Prisma.PlaybookScalarFieldEnum = {
+  id: 'id',
+  erpId: 'erpId',
+  name: 'name',
+  description: 'description',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.PlaybookStepScalarFieldEnum = {
+  id: 'id',
+  playbookId: 'playbookId',
+  order: 'order',
+  endpointId: 'endpointId',
+  stepName: 'stepName',
+  bodyOverride: 'bodyOverride',
+  responseCapture: 'responseCapture'
+};
+
+exports.Prisma.PlaybookRunScalarFieldEnum = {
+  id: 'id',
+  playbookId: 'playbookId',
+  companyId: 'companyId',
+  clientId: 'clientId',
+  startedAt: 'startedAt',
+  endedAt: 'endedAt',
+  status: 'status',
+  steps: 'steps'
 };
 
 exports.Prisma.RequestHistoryScalarFieldEnum = {
@@ -247,6 +279,9 @@ exports.Prisma.ModelName = {
   PostmanCollection: 'PostmanCollection',
   EmbeddingChunk: 'EmbeddingChunk',
   Setting: 'Setting',
+  Playbook: 'Playbook',
+  PlaybookStep: 'PlaybookStep',
+  PlaybookRun: 'PlaybookRun',
   RequestHistory: 'RequestHistory'
 };
 

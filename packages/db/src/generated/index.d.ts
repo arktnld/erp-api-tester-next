@@ -54,6 +54,21 @@ export type EmbeddingChunk = $Result.DefaultSelection<Prisma.$EmbeddingChunkPayl
  */
 export type Setting = $Result.DefaultSelection<Prisma.$SettingPayload>
 /**
+ * Model Playbook
+ * 
+ */
+export type Playbook = $Result.DefaultSelection<Prisma.$PlaybookPayload>
+/**
+ * Model PlaybookStep
+ * 
+ */
+export type PlaybookStep = $Result.DefaultSelection<Prisma.$PlaybookStepPayload>
+/**
+ * Model PlaybookRun
+ * 
+ */
+export type PlaybookRun = $Result.DefaultSelection<Prisma.$PlaybookRunPayload>
+/**
  * Model RequestHistory
  * 
  */
@@ -256,6 +271,36 @@ export class PrismaClient<
     * ```
     */
   get setting(): Prisma.SettingDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.playbook`: Exposes CRUD operations for the **Playbook** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Playbooks
+    * const playbooks = await prisma.playbook.findMany()
+    * ```
+    */
+  get playbook(): Prisma.PlaybookDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.playbookStep`: Exposes CRUD operations for the **PlaybookStep** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PlaybookSteps
+    * const playbookSteps = await prisma.playbookStep.findMany()
+    * ```
+    */
+  get playbookStep(): Prisma.PlaybookStepDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.playbookRun`: Exposes CRUD operations for the **PlaybookRun** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PlaybookRuns
+    * const playbookRuns = await prisma.playbookRun.findMany()
+    * ```
+    */
+  get playbookRun(): Prisma.PlaybookRunDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.requestHistory`: Exposes CRUD operations for the **RequestHistory** model.
@@ -715,6 +760,9 @@ export namespace Prisma {
     PostmanCollection: 'PostmanCollection',
     EmbeddingChunk: 'EmbeddingChunk',
     Setting: 'Setting',
+    Playbook: 'Playbook',
+    PlaybookStep: 'PlaybookStep',
+    PlaybookRun: 'PlaybookRun',
     RequestHistory: 'RequestHistory'
   };
 
@@ -734,7 +782,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "eRP" | "eRPFieldSchema" | "endpoint" | "company" | "testClient" | "postmanCollection" | "embeddingChunk" | "setting" | "requestHistory"
+      modelProps: "eRP" | "eRPFieldSchema" | "endpoint" | "company" | "testClient" | "postmanCollection" | "embeddingChunk" | "setting" | "playbook" | "playbookStep" | "playbookRun" | "requestHistory"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1314,6 +1362,228 @@ export namespace Prisma {
           }
         }
       }
+      Playbook: {
+        payload: Prisma.$PlaybookPayload<ExtArgs>
+        fields: Prisma.PlaybookFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PlaybookFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PlaybookFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookPayload>
+          }
+          findFirst: {
+            args: Prisma.PlaybookFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PlaybookFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookPayload>
+          }
+          findMany: {
+            args: Prisma.PlaybookFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookPayload>[]
+          }
+          create: {
+            args: Prisma.PlaybookCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookPayload>
+          }
+          createMany: {
+            args: Prisma.PlaybookCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PlaybookCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookPayload>[]
+          }
+          delete: {
+            args: Prisma.PlaybookDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookPayload>
+          }
+          update: {
+            args: Prisma.PlaybookUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookPayload>
+          }
+          deleteMany: {
+            args: Prisma.PlaybookDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PlaybookUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PlaybookUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookPayload>[]
+          }
+          upsert: {
+            args: Prisma.PlaybookUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookPayload>
+          }
+          aggregate: {
+            args: Prisma.PlaybookAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePlaybook>
+          }
+          groupBy: {
+            args: Prisma.PlaybookGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PlaybookGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PlaybookCountArgs<ExtArgs>
+            result: $Utils.Optional<PlaybookCountAggregateOutputType> | number
+          }
+        }
+      }
+      PlaybookStep: {
+        payload: Prisma.$PlaybookStepPayload<ExtArgs>
+        fields: Prisma.PlaybookStepFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PlaybookStepFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookStepPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PlaybookStepFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookStepPayload>
+          }
+          findFirst: {
+            args: Prisma.PlaybookStepFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookStepPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PlaybookStepFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookStepPayload>
+          }
+          findMany: {
+            args: Prisma.PlaybookStepFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookStepPayload>[]
+          }
+          create: {
+            args: Prisma.PlaybookStepCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookStepPayload>
+          }
+          createMany: {
+            args: Prisma.PlaybookStepCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PlaybookStepCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookStepPayload>[]
+          }
+          delete: {
+            args: Prisma.PlaybookStepDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookStepPayload>
+          }
+          update: {
+            args: Prisma.PlaybookStepUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookStepPayload>
+          }
+          deleteMany: {
+            args: Prisma.PlaybookStepDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PlaybookStepUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PlaybookStepUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookStepPayload>[]
+          }
+          upsert: {
+            args: Prisma.PlaybookStepUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookStepPayload>
+          }
+          aggregate: {
+            args: Prisma.PlaybookStepAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePlaybookStep>
+          }
+          groupBy: {
+            args: Prisma.PlaybookStepGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PlaybookStepGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PlaybookStepCountArgs<ExtArgs>
+            result: $Utils.Optional<PlaybookStepCountAggregateOutputType> | number
+          }
+        }
+      }
+      PlaybookRun: {
+        payload: Prisma.$PlaybookRunPayload<ExtArgs>
+        fields: Prisma.PlaybookRunFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PlaybookRunFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookRunPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PlaybookRunFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookRunPayload>
+          }
+          findFirst: {
+            args: Prisma.PlaybookRunFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookRunPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PlaybookRunFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookRunPayload>
+          }
+          findMany: {
+            args: Prisma.PlaybookRunFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookRunPayload>[]
+          }
+          create: {
+            args: Prisma.PlaybookRunCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookRunPayload>
+          }
+          createMany: {
+            args: Prisma.PlaybookRunCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PlaybookRunCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookRunPayload>[]
+          }
+          delete: {
+            args: Prisma.PlaybookRunDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookRunPayload>
+          }
+          update: {
+            args: Prisma.PlaybookRunUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookRunPayload>
+          }
+          deleteMany: {
+            args: Prisma.PlaybookRunDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PlaybookRunUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PlaybookRunUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookRunPayload>[]
+          }
+          upsert: {
+            args: Prisma.PlaybookRunUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PlaybookRunPayload>
+          }
+          aggregate: {
+            args: Prisma.PlaybookRunAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePlaybookRun>
+          }
+          groupBy: {
+            args: Prisma.PlaybookRunGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PlaybookRunGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PlaybookRunCountArgs<ExtArgs>
+            result: $Utils.Optional<PlaybookRunCountAggregateOutputType> | number
+          }
+        }
+      }
       RequestHistory: {
         payload: Prisma.$RequestHistoryPayload<ExtArgs>
         fields: Prisma.RequestHistoryFieldRefs
@@ -1492,6 +1762,9 @@ export namespace Prisma {
     postmanCollection?: PostmanCollectionOmit
     embeddingChunk?: EmbeddingChunkOmit
     setting?: SettingOmit
+    playbook?: PlaybookOmit
+    playbookStep?: PlaybookStepOmit
+    playbookRun?: PlaybookRunOmit
     requestHistory?: RequestHistoryOmit
   }
 
@@ -1576,12 +1849,14 @@ export namespace Prisma {
     companies: number
     endpoints: number
     fieldSchemas: number
+    playbooks: number
   }
 
   export type ERPCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     companies?: boolean | ERPCountOutputTypeCountCompaniesArgs
     endpoints?: boolean | ERPCountOutputTypeCountEndpointsArgs
     fieldSchemas?: boolean | ERPCountOutputTypeCountFieldSchemasArgs
+    playbooks?: boolean | ERPCountOutputTypeCountPlaybooksArgs
   }
 
   // Custom InputTypes
@@ -1614,6 +1889,44 @@ export namespace Prisma {
    */
   export type ERPCountOutputTypeCountFieldSchemasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ERPFieldSchemaWhereInput
+  }
+
+  /**
+   * ERPCountOutputType without action
+   */
+  export type ERPCountOutputTypeCountPlaybooksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlaybookWhereInput
+  }
+
+
+  /**
+   * Count Type EndpointCountOutputType
+   */
+
+  export type EndpointCountOutputType = {
+    playbookSteps: number
+  }
+
+  export type EndpointCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    playbookSteps?: boolean | EndpointCountOutputTypeCountPlaybookStepsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * EndpointCountOutputType without action
+   */
+  export type EndpointCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EndpointCountOutputType
+     */
+    select?: EndpointCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * EndpointCountOutputType without action
+   */
+  export type EndpointCountOutputTypeCountPlaybookStepsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlaybookStepWhereInput
   }
 
 
@@ -1676,6 +1989,46 @@ export namespace Prisma {
    */
   export type PostmanCollectionCountOutputTypeCountChunksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: EmbeddingChunkWhereInput
+  }
+
+
+  /**
+   * Count Type PlaybookCountOutputType
+   */
+
+  export type PlaybookCountOutputType = {
+    steps: number
+    runs: number
+  }
+
+  export type PlaybookCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    steps?: boolean | PlaybookCountOutputTypeCountStepsArgs
+    runs?: boolean | PlaybookCountOutputTypeCountRunsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * PlaybookCountOutputType without action
+   */
+  export type PlaybookCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookCountOutputType
+     */
+    select?: PlaybookCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * PlaybookCountOutputType without action
+   */
+  export type PlaybookCountOutputTypeCountStepsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlaybookStepWhereInput
+  }
+
+  /**
+   * PlaybookCountOutputType without action
+   */
+  export type PlaybookCountOutputTypeCountRunsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlaybookRunWhereInput
   }
 
 
@@ -1868,6 +2221,7 @@ export namespace Prisma {
     companies?: boolean | ERP$companiesArgs<ExtArgs>
     endpoints?: boolean | ERP$endpointsArgs<ExtArgs>
     fieldSchemas?: boolean | ERP$fieldSchemasArgs<ExtArgs>
+    playbooks?: boolean | ERP$playbooksArgs<ExtArgs>
     _count?: boolean | ERPCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["eRP"]>
 
@@ -1894,6 +2248,7 @@ export namespace Prisma {
     companies?: boolean | ERP$companiesArgs<ExtArgs>
     endpoints?: boolean | ERP$endpointsArgs<ExtArgs>
     fieldSchemas?: boolean | ERP$fieldSchemasArgs<ExtArgs>
+    playbooks?: boolean | ERP$playbooksArgs<ExtArgs>
     _count?: boolean | ERPCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ERPIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -1905,6 +2260,7 @@ export namespace Prisma {
       companies: Prisma.$CompanyPayload<ExtArgs>[]
       endpoints: Prisma.$EndpointPayload<ExtArgs>[]
       fieldSchemas: Prisma.$ERPFieldSchemaPayload<ExtArgs>[]
+      playbooks: Prisma.$PlaybookPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -2307,6 +2663,7 @@ export namespace Prisma {
     companies<T extends ERP$companiesArgs<ExtArgs> = {}>(args?: Subset<T, ERP$companiesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     endpoints<T extends ERP$endpointsArgs<ExtArgs> = {}>(args?: Subset<T, ERP$endpointsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EndpointPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     fieldSchemas<T extends ERP$fieldSchemasArgs<ExtArgs> = {}>(args?: Subset<T, ERP$fieldSchemasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ERPFieldSchemaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    playbooks<T extends ERP$playbooksArgs<ExtArgs> = {}>(args?: Subset<T, ERP$playbooksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaybookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2796,6 +3153,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ERPFieldSchemaScalarFieldEnum | ERPFieldSchemaScalarFieldEnum[]
+  }
+
+  /**
+   * ERP.playbooks
+   */
+  export type ERP$playbooksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Playbook
+     */
+    select?: PlaybookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Playbook
+     */
+    omit?: PlaybookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookInclude<ExtArgs> | null
+    where?: PlaybookWhereInput
+    orderBy?: PlaybookOrderByWithRelationInput | PlaybookOrderByWithRelationInput[]
+    cursor?: PlaybookWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PlaybookScalarFieldEnum | PlaybookScalarFieldEnum[]
   }
 
   /**
@@ -4022,6 +4403,7 @@ export namespace Prisma {
     group: string | null
     requiresClient: boolean | null
     isModification: boolean | null
+    notes: string | null
   }
 
   export type EndpointMaxAggregateOutputType = {
@@ -4036,6 +4418,7 @@ export namespace Prisma {
     group: string | null
     requiresClient: boolean | null
     isModification: boolean | null
+    notes: string | null
   }
 
   export type EndpointCountAggregateOutputType = {
@@ -4050,6 +4433,7 @@ export namespace Prisma {
     group: number
     requiresClient: number
     isModification: number
+    notes: number
     _all: number
   }
 
@@ -4078,6 +4462,7 @@ export namespace Prisma {
     group?: true
     requiresClient?: true
     isModification?: true
+    notes?: true
   }
 
   export type EndpointMaxAggregateInputType = {
@@ -4092,6 +4477,7 @@ export namespace Prisma {
     group?: true
     requiresClient?: true
     isModification?: true
+    notes?: true
   }
 
   export type EndpointCountAggregateInputType = {
@@ -4106,6 +4492,7 @@ export namespace Prisma {
     group?: true
     requiresClient?: true
     isModification?: true
+    notes?: true
     _all?: true
   }
 
@@ -4207,6 +4594,7 @@ export namespace Prisma {
     group: string
     requiresClient: boolean
     isModification: boolean
+    notes: string
     _count: EndpointCountAggregateOutputType | null
     _avg: EndpointAvgAggregateOutputType | null
     _sum: EndpointSumAggregateOutputType | null
@@ -4240,7 +4628,10 @@ export namespace Prisma {
     group?: boolean
     requiresClient?: boolean
     isModification?: boolean
+    notes?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
+    playbookSteps?: boolean | Endpoint$playbookStepsArgs<ExtArgs>
+    _count?: boolean | EndpointCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["endpoint"]>
 
   export type EndpointSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4255,6 +4646,7 @@ export namespace Prisma {
     group?: boolean
     requiresClient?: boolean
     isModification?: boolean
+    notes?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["endpoint"]>
 
@@ -4270,6 +4662,7 @@ export namespace Prisma {
     group?: boolean
     requiresClient?: boolean
     isModification?: boolean
+    notes?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["endpoint"]>
 
@@ -4285,11 +4678,14 @@ export namespace Prisma {
     group?: boolean
     requiresClient?: boolean
     isModification?: boolean
+    notes?: boolean
   }
 
-  export type EndpointOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "erpId" | "name" | "method" | "pathTemplate" | "bodyTemplate" | "headers" | "sortOrder" | "group" | "requiresClient" | "isModification", ExtArgs["result"]["endpoint"]>
+  export type EndpointOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "erpId" | "name" | "method" | "pathTemplate" | "bodyTemplate" | "headers" | "sortOrder" | "group" | "requiresClient" | "isModification" | "notes", ExtArgs["result"]["endpoint"]>
   export type EndpointInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     erp?: boolean | ERPDefaultArgs<ExtArgs>
+    playbookSteps?: boolean | Endpoint$playbookStepsArgs<ExtArgs>
+    _count?: boolean | EndpointCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type EndpointIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     erp?: boolean | ERPDefaultArgs<ExtArgs>
@@ -4302,6 +4698,7 @@ export namespace Prisma {
     name: "Endpoint"
     objects: {
       erp: Prisma.$ERPPayload<ExtArgs>
+      playbookSteps: Prisma.$PlaybookStepPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -4315,6 +4712,7 @@ export namespace Prisma {
       group: string
       requiresClient: boolean
       isModification: boolean
+      notes: string
     }, ExtArgs["result"]["endpoint"]>
     composites: {}
   }
@@ -4710,6 +5108,7 @@ export namespace Prisma {
   export interface Prisma__EndpointClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     erp<T extends ERPDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ERPDefaultArgs<ExtArgs>>): Prisma__ERPClient<$Result.GetResult<Prisma.$ERPPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    playbookSteps<T extends Endpoint$playbookStepsArgs<ExtArgs> = {}>(args?: Subset<T, Endpoint$playbookStepsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaybookStepPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4750,6 +5149,7 @@ export namespace Prisma {
     readonly group: FieldRef<"Endpoint", 'String'>
     readonly requiresClient: FieldRef<"Endpoint", 'Boolean'>
     readonly isModification: FieldRef<"Endpoint", 'Boolean'>
+    readonly notes: FieldRef<"Endpoint", 'String'>
   }
     
 
@@ -5146,6 +5546,30 @@ export namespace Prisma {
   }
 
   /**
+   * Endpoint.playbookSteps
+   */
+  export type Endpoint$playbookStepsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookStep
+     */
+    select?: PlaybookStepSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookStep
+     */
+    omit?: PlaybookStepOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookStepInclude<ExtArgs> | null
+    where?: PlaybookStepWhereInput
+    orderBy?: PlaybookStepOrderByWithRelationInput | PlaybookStepOrderByWithRelationInput[]
+    cursor?: PlaybookStepWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PlaybookStepScalarFieldEnum | PlaybookStepScalarFieldEnum[]
+  }
+
+  /**
    * Endpoint without action
    */
   export type EndpointDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5192,6 +5616,7 @@ export namespace Prisma {
     erpId: number | null
     baseUrl: string | null
     authType: string | null
+    notes: string | null
     createdAt: Date | null
   }
 
@@ -5201,6 +5626,7 @@ export namespace Prisma {
     erpId: number | null
     baseUrl: string | null
     authType: string | null
+    notes: string | null
     createdAt: Date | null
   }
 
@@ -5212,6 +5638,7 @@ export namespace Prisma {
     environments: number
     authType: number
     authConfig: number
+    notes: number
     createdAt: number
     _all: number
   }
@@ -5233,6 +5660,7 @@ export namespace Prisma {
     erpId?: true
     baseUrl?: true
     authType?: true
+    notes?: true
     createdAt?: true
   }
 
@@ -5242,6 +5670,7 @@ export namespace Prisma {
     erpId?: true
     baseUrl?: true
     authType?: true
+    notes?: true
     createdAt?: true
   }
 
@@ -5253,6 +5682,7 @@ export namespace Prisma {
     environments?: true
     authType?: true
     authConfig?: true
+    notes?: true
     createdAt?: true
     _all?: true
   }
@@ -5351,6 +5781,7 @@ export namespace Prisma {
     environments: JsonValue
     authType: string
     authConfig: JsonValue
+    notes: string
     createdAt: Date
     _count: CompanyCountAggregateOutputType | null
     _avg: CompanyAvgAggregateOutputType | null
@@ -5381,6 +5812,7 @@ export namespace Prisma {
     environments?: boolean
     authType?: boolean
     authConfig?: boolean
+    notes?: boolean
     createdAt?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
     testClients?: boolean | Company$testClientsArgs<ExtArgs>
@@ -5395,6 +5827,7 @@ export namespace Prisma {
     environments?: boolean
     authType?: boolean
     authConfig?: boolean
+    notes?: boolean
     createdAt?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["company"]>
@@ -5407,6 +5840,7 @@ export namespace Prisma {
     environments?: boolean
     authType?: boolean
     authConfig?: boolean
+    notes?: boolean
     createdAt?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["company"]>
@@ -5419,10 +5853,11 @@ export namespace Prisma {
     environments?: boolean
     authType?: boolean
     authConfig?: boolean
+    notes?: boolean
     createdAt?: boolean
   }
 
-  export type CompanyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "erpId" | "baseUrl" | "environments" | "authType" | "authConfig" | "createdAt", ExtArgs["result"]["company"]>
+  export type CompanyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "erpId" | "baseUrl" | "environments" | "authType" | "authConfig" | "notes" | "createdAt", ExtArgs["result"]["company"]>
   export type CompanyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     erp?: boolean | ERPDefaultArgs<ExtArgs>
     testClients?: boolean | Company$testClientsArgs<ExtArgs>
@@ -5449,6 +5884,7 @@ export namespace Prisma {
       environments: Prisma.JsonValue
       authType: string
       authConfig: Prisma.JsonValue
+      notes: string
       createdAt: Date
     }, ExtArgs["result"]["company"]>
     composites: {}
@@ -5882,6 +6318,7 @@ export namespace Prisma {
     readonly environments: FieldRef<"Company", 'Json'>
     readonly authType: FieldRef<"Company", 'String'>
     readonly authConfig: FieldRef<"Company", 'Json'>
+    readonly notes: FieldRef<"Company", 'String'>
     readonly createdAt: FieldRef<"Company", 'DateTime'>
   }
     
@@ -7438,6 +7875,7 @@ export namespace Prisma {
     name: string | null
     context: string | null
     systemPrompt: string | null
+    embeddingProvider: string | null
     createdAt: Date | null
   }
 
@@ -7446,6 +7884,7 @@ export namespace Prisma {
     name: string | null
     context: string | null
     systemPrompt: string | null
+    embeddingProvider: string | null
     createdAt: Date | null
   }
 
@@ -7454,6 +7893,7 @@ export namespace Prisma {
     name: number
     context: number
     systemPrompt: number
+    embeddingProvider: number
     createdAt: number
     _all: number
   }
@@ -7472,6 +7912,7 @@ export namespace Prisma {
     name?: true
     context?: true
     systemPrompt?: true
+    embeddingProvider?: true
     createdAt?: true
   }
 
@@ -7480,6 +7921,7 @@ export namespace Prisma {
     name?: true
     context?: true
     systemPrompt?: true
+    embeddingProvider?: true
     createdAt?: true
   }
 
@@ -7488,6 +7930,7 @@ export namespace Prisma {
     name?: true
     context?: true
     systemPrompt?: true
+    embeddingProvider?: true
     createdAt?: true
     _all?: true
   }
@@ -7583,6 +8026,7 @@ export namespace Prisma {
     name: string
     context: string
     systemPrompt: string
+    embeddingProvider: string
     createdAt: Date
     _count: PostmanCollectionCountAggregateOutputType | null
     _avg: PostmanCollectionAvgAggregateOutputType | null
@@ -7610,6 +8054,7 @@ export namespace Prisma {
     name?: boolean
     context?: boolean
     systemPrompt?: boolean
+    embeddingProvider?: boolean
     createdAt?: boolean
     chunks?: boolean | PostmanCollection$chunksArgs<ExtArgs>
     _count?: boolean | PostmanCollectionCountOutputTypeDefaultArgs<ExtArgs>
@@ -7620,6 +8065,7 @@ export namespace Prisma {
     name?: boolean
     context?: boolean
     systemPrompt?: boolean
+    embeddingProvider?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["postmanCollection"]>
 
@@ -7628,6 +8074,7 @@ export namespace Prisma {
     name?: boolean
     context?: boolean
     systemPrompt?: boolean
+    embeddingProvider?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["postmanCollection"]>
 
@@ -7636,10 +8083,11 @@ export namespace Prisma {
     name?: boolean
     context?: boolean
     systemPrompt?: boolean
+    embeddingProvider?: boolean
     createdAt?: boolean
   }
 
-  export type PostmanCollectionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "context" | "systemPrompt" | "createdAt", ExtArgs["result"]["postmanCollection"]>
+  export type PostmanCollectionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "context" | "systemPrompt" | "embeddingProvider" | "createdAt", ExtArgs["result"]["postmanCollection"]>
   export type PostmanCollectionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     chunks?: boolean | PostmanCollection$chunksArgs<ExtArgs>
     _count?: boolean | PostmanCollectionCountOutputTypeDefaultArgs<ExtArgs>
@@ -7657,6 +8105,7 @@ export namespace Prisma {
       name: string
       context: string
       systemPrompt: string
+      embeddingProvider: string
       createdAt: Date
     }, ExtArgs["result"]["postmanCollection"]>
     composites: {}
@@ -8086,6 +8535,7 @@ export namespace Prisma {
     readonly name: FieldRef<"PostmanCollection", 'String'>
     readonly context: FieldRef<"PostmanCollection", 'String'>
     readonly systemPrompt: FieldRef<"PostmanCollection", 'String'>
+    readonly embeddingProvider: FieldRef<"PostmanCollection", 'String'>
     readonly createdAt: FieldRef<"PostmanCollection", 'DateTime'>
   }
     
@@ -10378,6 +10828,3437 @@ export namespace Prisma {
 
 
   /**
+   * Model Playbook
+   */
+
+  export type AggregatePlaybook = {
+    _count: PlaybookCountAggregateOutputType | null
+    _avg: PlaybookAvgAggregateOutputType | null
+    _sum: PlaybookSumAggregateOutputType | null
+    _min: PlaybookMinAggregateOutputType | null
+    _max: PlaybookMaxAggregateOutputType | null
+  }
+
+  export type PlaybookAvgAggregateOutputType = {
+    id: number | null
+    erpId: number | null
+  }
+
+  export type PlaybookSumAggregateOutputType = {
+    id: number | null
+    erpId: number | null
+  }
+
+  export type PlaybookMinAggregateOutputType = {
+    id: number | null
+    erpId: number | null
+    name: string | null
+    description: string | null
+    createdAt: Date | null
+  }
+
+  export type PlaybookMaxAggregateOutputType = {
+    id: number | null
+    erpId: number | null
+    name: string | null
+    description: string | null
+    createdAt: Date | null
+  }
+
+  export type PlaybookCountAggregateOutputType = {
+    id: number
+    erpId: number
+    name: number
+    description: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type PlaybookAvgAggregateInputType = {
+    id?: true
+    erpId?: true
+  }
+
+  export type PlaybookSumAggregateInputType = {
+    id?: true
+    erpId?: true
+  }
+
+  export type PlaybookMinAggregateInputType = {
+    id?: true
+    erpId?: true
+    name?: true
+    description?: true
+    createdAt?: true
+  }
+
+  export type PlaybookMaxAggregateInputType = {
+    id?: true
+    erpId?: true
+    name?: true
+    description?: true
+    createdAt?: true
+  }
+
+  export type PlaybookCountAggregateInputType = {
+    id?: true
+    erpId?: true
+    name?: true
+    description?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type PlaybookAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Playbook to aggregate.
+     */
+    where?: PlaybookWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Playbooks to fetch.
+     */
+    orderBy?: PlaybookOrderByWithRelationInput | PlaybookOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PlaybookWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Playbooks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Playbooks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Playbooks
+    **/
+    _count?: true | PlaybookCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PlaybookAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PlaybookSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PlaybookMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PlaybookMaxAggregateInputType
+  }
+
+  export type GetPlaybookAggregateType<T extends PlaybookAggregateArgs> = {
+        [P in keyof T & keyof AggregatePlaybook]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePlaybook[P]>
+      : GetScalarType<T[P], AggregatePlaybook[P]>
+  }
+
+
+
+
+  export type PlaybookGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlaybookWhereInput
+    orderBy?: PlaybookOrderByWithAggregationInput | PlaybookOrderByWithAggregationInput[]
+    by: PlaybookScalarFieldEnum[] | PlaybookScalarFieldEnum
+    having?: PlaybookScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PlaybookCountAggregateInputType | true
+    _avg?: PlaybookAvgAggregateInputType
+    _sum?: PlaybookSumAggregateInputType
+    _min?: PlaybookMinAggregateInputType
+    _max?: PlaybookMaxAggregateInputType
+  }
+
+  export type PlaybookGroupByOutputType = {
+    id: number
+    erpId: number
+    name: string
+    description: string
+    createdAt: Date
+    _count: PlaybookCountAggregateOutputType | null
+    _avg: PlaybookAvgAggregateOutputType | null
+    _sum: PlaybookSumAggregateOutputType | null
+    _min: PlaybookMinAggregateOutputType | null
+    _max: PlaybookMaxAggregateOutputType | null
+  }
+
+  type GetPlaybookGroupByPayload<T extends PlaybookGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PlaybookGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PlaybookGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PlaybookGroupByOutputType[P]>
+            : GetScalarType<T[P], PlaybookGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PlaybookSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    erpId?: boolean
+    name?: boolean
+    description?: boolean
+    createdAt?: boolean
+    erp?: boolean | ERPDefaultArgs<ExtArgs>
+    steps?: boolean | Playbook$stepsArgs<ExtArgs>
+    runs?: boolean | Playbook$runsArgs<ExtArgs>
+    _count?: boolean | PlaybookCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["playbook"]>
+
+  export type PlaybookSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    erpId?: boolean
+    name?: boolean
+    description?: boolean
+    createdAt?: boolean
+    erp?: boolean | ERPDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["playbook"]>
+
+  export type PlaybookSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    erpId?: boolean
+    name?: boolean
+    description?: boolean
+    createdAt?: boolean
+    erp?: boolean | ERPDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["playbook"]>
+
+  export type PlaybookSelectScalar = {
+    id?: boolean
+    erpId?: boolean
+    name?: boolean
+    description?: boolean
+    createdAt?: boolean
+  }
+
+  export type PlaybookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "erpId" | "name" | "description" | "createdAt", ExtArgs["result"]["playbook"]>
+  export type PlaybookInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    erp?: boolean | ERPDefaultArgs<ExtArgs>
+    steps?: boolean | Playbook$stepsArgs<ExtArgs>
+    runs?: boolean | Playbook$runsArgs<ExtArgs>
+    _count?: boolean | PlaybookCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type PlaybookIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    erp?: boolean | ERPDefaultArgs<ExtArgs>
+  }
+  export type PlaybookIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    erp?: boolean | ERPDefaultArgs<ExtArgs>
+  }
+
+  export type $PlaybookPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Playbook"
+    objects: {
+      erp: Prisma.$ERPPayload<ExtArgs>
+      steps: Prisma.$PlaybookStepPayload<ExtArgs>[]
+      runs: Prisma.$PlaybookRunPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      erpId: number
+      name: string
+      description: string
+      createdAt: Date
+    }, ExtArgs["result"]["playbook"]>
+    composites: {}
+  }
+
+  type PlaybookGetPayload<S extends boolean | null | undefined | PlaybookDefaultArgs> = $Result.GetResult<Prisma.$PlaybookPayload, S>
+
+  type PlaybookCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PlaybookFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PlaybookCountAggregateInputType | true
+    }
+
+  export interface PlaybookDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Playbook'], meta: { name: 'Playbook' } }
+    /**
+     * Find zero or one Playbook that matches the filter.
+     * @param {PlaybookFindUniqueArgs} args - Arguments to find a Playbook
+     * @example
+     * // Get one Playbook
+     * const playbook = await prisma.playbook.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PlaybookFindUniqueArgs>(args: SelectSubset<T, PlaybookFindUniqueArgs<ExtArgs>>): Prisma__PlaybookClient<$Result.GetResult<Prisma.$PlaybookPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Playbook that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PlaybookFindUniqueOrThrowArgs} args - Arguments to find a Playbook
+     * @example
+     * // Get one Playbook
+     * const playbook = await prisma.playbook.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PlaybookFindUniqueOrThrowArgs>(args: SelectSubset<T, PlaybookFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PlaybookClient<$Result.GetResult<Prisma.$PlaybookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Playbook that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookFindFirstArgs} args - Arguments to find a Playbook
+     * @example
+     * // Get one Playbook
+     * const playbook = await prisma.playbook.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PlaybookFindFirstArgs>(args?: SelectSubset<T, PlaybookFindFirstArgs<ExtArgs>>): Prisma__PlaybookClient<$Result.GetResult<Prisma.$PlaybookPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Playbook that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookFindFirstOrThrowArgs} args - Arguments to find a Playbook
+     * @example
+     * // Get one Playbook
+     * const playbook = await prisma.playbook.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PlaybookFindFirstOrThrowArgs>(args?: SelectSubset<T, PlaybookFindFirstOrThrowArgs<ExtArgs>>): Prisma__PlaybookClient<$Result.GetResult<Prisma.$PlaybookPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Playbooks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Playbooks
+     * const playbooks = await prisma.playbook.findMany()
+     * 
+     * // Get first 10 Playbooks
+     * const playbooks = await prisma.playbook.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const playbookWithIdOnly = await prisma.playbook.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PlaybookFindManyArgs>(args?: SelectSubset<T, PlaybookFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaybookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Playbook.
+     * @param {PlaybookCreateArgs} args - Arguments to create a Playbook.
+     * @example
+     * // Create one Playbook
+     * const Playbook = await prisma.playbook.create({
+     *   data: {
+     *     // ... data to create a Playbook
+     *   }
+     * })
+     * 
+     */
+    create<T extends PlaybookCreateArgs>(args: SelectSubset<T, PlaybookCreateArgs<ExtArgs>>): Prisma__PlaybookClient<$Result.GetResult<Prisma.$PlaybookPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Playbooks.
+     * @param {PlaybookCreateManyArgs} args - Arguments to create many Playbooks.
+     * @example
+     * // Create many Playbooks
+     * const playbook = await prisma.playbook.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PlaybookCreateManyArgs>(args?: SelectSubset<T, PlaybookCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Playbooks and returns the data saved in the database.
+     * @param {PlaybookCreateManyAndReturnArgs} args - Arguments to create many Playbooks.
+     * @example
+     * // Create many Playbooks
+     * const playbook = await prisma.playbook.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Playbooks and only return the `id`
+     * const playbookWithIdOnly = await prisma.playbook.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PlaybookCreateManyAndReturnArgs>(args?: SelectSubset<T, PlaybookCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaybookPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Playbook.
+     * @param {PlaybookDeleteArgs} args - Arguments to delete one Playbook.
+     * @example
+     * // Delete one Playbook
+     * const Playbook = await prisma.playbook.delete({
+     *   where: {
+     *     // ... filter to delete one Playbook
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PlaybookDeleteArgs>(args: SelectSubset<T, PlaybookDeleteArgs<ExtArgs>>): Prisma__PlaybookClient<$Result.GetResult<Prisma.$PlaybookPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Playbook.
+     * @param {PlaybookUpdateArgs} args - Arguments to update one Playbook.
+     * @example
+     * // Update one Playbook
+     * const playbook = await prisma.playbook.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PlaybookUpdateArgs>(args: SelectSubset<T, PlaybookUpdateArgs<ExtArgs>>): Prisma__PlaybookClient<$Result.GetResult<Prisma.$PlaybookPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Playbooks.
+     * @param {PlaybookDeleteManyArgs} args - Arguments to filter Playbooks to delete.
+     * @example
+     * // Delete a few Playbooks
+     * const { count } = await prisma.playbook.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PlaybookDeleteManyArgs>(args?: SelectSubset<T, PlaybookDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Playbooks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Playbooks
+     * const playbook = await prisma.playbook.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PlaybookUpdateManyArgs>(args: SelectSubset<T, PlaybookUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Playbooks and returns the data updated in the database.
+     * @param {PlaybookUpdateManyAndReturnArgs} args - Arguments to update many Playbooks.
+     * @example
+     * // Update many Playbooks
+     * const playbook = await prisma.playbook.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Playbooks and only return the `id`
+     * const playbookWithIdOnly = await prisma.playbook.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PlaybookUpdateManyAndReturnArgs>(args: SelectSubset<T, PlaybookUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaybookPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Playbook.
+     * @param {PlaybookUpsertArgs} args - Arguments to update or create a Playbook.
+     * @example
+     * // Update or create a Playbook
+     * const playbook = await prisma.playbook.upsert({
+     *   create: {
+     *     // ... data to create a Playbook
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Playbook we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PlaybookUpsertArgs>(args: SelectSubset<T, PlaybookUpsertArgs<ExtArgs>>): Prisma__PlaybookClient<$Result.GetResult<Prisma.$PlaybookPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Playbooks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookCountArgs} args - Arguments to filter Playbooks to count.
+     * @example
+     * // Count the number of Playbooks
+     * const count = await prisma.playbook.count({
+     *   where: {
+     *     // ... the filter for the Playbooks we want to count
+     *   }
+     * })
+    **/
+    count<T extends PlaybookCountArgs>(
+      args?: Subset<T, PlaybookCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PlaybookCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Playbook.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PlaybookAggregateArgs>(args: Subset<T, PlaybookAggregateArgs>): Prisma.PrismaPromise<GetPlaybookAggregateType<T>>
+
+    /**
+     * Group by Playbook.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PlaybookGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PlaybookGroupByArgs['orderBy'] }
+        : { orderBy?: PlaybookGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PlaybookGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPlaybookGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Playbook model
+   */
+  readonly fields: PlaybookFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Playbook.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PlaybookClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    erp<T extends ERPDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ERPDefaultArgs<ExtArgs>>): Prisma__ERPClient<$Result.GetResult<Prisma.$ERPPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    steps<T extends Playbook$stepsArgs<ExtArgs> = {}>(args?: Subset<T, Playbook$stepsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaybookStepPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    runs<T extends Playbook$runsArgs<ExtArgs> = {}>(args?: Subset<T, Playbook$runsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaybookRunPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Playbook model
+   */
+  interface PlaybookFieldRefs {
+    readonly id: FieldRef<"Playbook", 'Int'>
+    readonly erpId: FieldRef<"Playbook", 'Int'>
+    readonly name: FieldRef<"Playbook", 'String'>
+    readonly description: FieldRef<"Playbook", 'String'>
+    readonly createdAt: FieldRef<"Playbook", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Playbook findUnique
+   */
+  export type PlaybookFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Playbook
+     */
+    select?: PlaybookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Playbook
+     */
+    omit?: PlaybookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookInclude<ExtArgs> | null
+    /**
+     * Filter, which Playbook to fetch.
+     */
+    where: PlaybookWhereUniqueInput
+  }
+
+  /**
+   * Playbook findUniqueOrThrow
+   */
+  export type PlaybookFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Playbook
+     */
+    select?: PlaybookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Playbook
+     */
+    omit?: PlaybookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookInclude<ExtArgs> | null
+    /**
+     * Filter, which Playbook to fetch.
+     */
+    where: PlaybookWhereUniqueInput
+  }
+
+  /**
+   * Playbook findFirst
+   */
+  export type PlaybookFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Playbook
+     */
+    select?: PlaybookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Playbook
+     */
+    omit?: PlaybookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookInclude<ExtArgs> | null
+    /**
+     * Filter, which Playbook to fetch.
+     */
+    where?: PlaybookWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Playbooks to fetch.
+     */
+    orderBy?: PlaybookOrderByWithRelationInput | PlaybookOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Playbooks.
+     */
+    cursor?: PlaybookWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Playbooks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Playbooks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Playbooks.
+     */
+    distinct?: PlaybookScalarFieldEnum | PlaybookScalarFieldEnum[]
+  }
+
+  /**
+   * Playbook findFirstOrThrow
+   */
+  export type PlaybookFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Playbook
+     */
+    select?: PlaybookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Playbook
+     */
+    omit?: PlaybookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookInclude<ExtArgs> | null
+    /**
+     * Filter, which Playbook to fetch.
+     */
+    where?: PlaybookWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Playbooks to fetch.
+     */
+    orderBy?: PlaybookOrderByWithRelationInput | PlaybookOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Playbooks.
+     */
+    cursor?: PlaybookWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Playbooks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Playbooks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Playbooks.
+     */
+    distinct?: PlaybookScalarFieldEnum | PlaybookScalarFieldEnum[]
+  }
+
+  /**
+   * Playbook findMany
+   */
+  export type PlaybookFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Playbook
+     */
+    select?: PlaybookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Playbook
+     */
+    omit?: PlaybookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookInclude<ExtArgs> | null
+    /**
+     * Filter, which Playbooks to fetch.
+     */
+    where?: PlaybookWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Playbooks to fetch.
+     */
+    orderBy?: PlaybookOrderByWithRelationInput | PlaybookOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Playbooks.
+     */
+    cursor?: PlaybookWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Playbooks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Playbooks.
+     */
+    skip?: number
+    distinct?: PlaybookScalarFieldEnum | PlaybookScalarFieldEnum[]
+  }
+
+  /**
+   * Playbook create
+   */
+  export type PlaybookCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Playbook
+     */
+    select?: PlaybookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Playbook
+     */
+    omit?: PlaybookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Playbook.
+     */
+    data: XOR<PlaybookCreateInput, PlaybookUncheckedCreateInput>
+  }
+
+  /**
+   * Playbook createMany
+   */
+  export type PlaybookCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Playbooks.
+     */
+    data: PlaybookCreateManyInput | PlaybookCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Playbook createManyAndReturn
+   */
+  export type PlaybookCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Playbook
+     */
+    select?: PlaybookSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Playbook
+     */
+    omit?: PlaybookOmit<ExtArgs> | null
+    /**
+     * The data used to create many Playbooks.
+     */
+    data: PlaybookCreateManyInput | PlaybookCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Playbook update
+   */
+  export type PlaybookUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Playbook
+     */
+    select?: PlaybookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Playbook
+     */
+    omit?: PlaybookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Playbook.
+     */
+    data: XOR<PlaybookUpdateInput, PlaybookUncheckedUpdateInput>
+    /**
+     * Choose, which Playbook to update.
+     */
+    where: PlaybookWhereUniqueInput
+  }
+
+  /**
+   * Playbook updateMany
+   */
+  export type PlaybookUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Playbooks.
+     */
+    data: XOR<PlaybookUpdateManyMutationInput, PlaybookUncheckedUpdateManyInput>
+    /**
+     * Filter which Playbooks to update
+     */
+    where?: PlaybookWhereInput
+    /**
+     * Limit how many Playbooks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Playbook updateManyAndReturn
+   */
+  export type PlaybookUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Playbook
+     */
+    select?: PlaybookSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Playbook
+     */
+    omit?: PlaybookOmit<ExtArgs> | null
+    /**
+     * The data used to update Playbooks.
+     */
+    data: XOR<PlaybookUpdateManyMutationInput, PlaybookUncheckedUpdateManyInput>
+    /**
+     * Filter which Playbooks to update
+     */
+    where?: PlaybookWhereInput
+    /**
+     * Limit how many Playbooks to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Playbook upsert
+   */
+  export type PlaybookUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Playbook
+     */
+    select?: PlaybookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Playbook
+     */
+    omit?: PlaybookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Playbook to update in case it exists.
+     */
+    where: PlaybookWhereUniqueInput
+    /**
+     * In case the Playbook found by the `where` argument doesn't exist, create a new Playbook with this data.
+     */
+    create: XOR<PlaybookCreateInput, PlaybookUncheckedCreateInput>
+    /**
+     * In case the Playbook was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PlaybookUpdateInput, PlaybookUncheckedUpdateInput>
+  }
+
+  /**
+   * Playbook delete
+   */
+  export type PlaybookDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Playbook
+     */
+    select?: PlaybookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Playbook
+     */
+    omit?: PlaybookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookInclude<ExtArgs> | null
+    /**
+     * Filter which Playbook to delete.
+     */
+    where: PlaybookWhereUniqueInput
+  }
+
+  /**
+   * Playbook deleteMany
+   */
+  export type PlaybookDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Playbooks to delete
+     */
+    where?: PlaybookWhereInput
+    /**
+     * Limit how many Playbooks to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Playbook.steps
+   */
+  export type Playbook$stepsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookStep
+     */
+    select?: PlaybookStepSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookStep
+     */
+    omit?: PlaybookStepOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookStepInclude<ExtArgs> | null
+    where?: PlaybookStepWhereInput
+    orderBy?: PlaybookStepOrderByWithRelationInput | PlaybookStepOrderByWithRelationInput[]
+    cursor?: PlaybookStepWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PlaybookStepScalarFieldEnum | PlaybookStepScalarFieldEnum[]
+  }
+
+  /**
+   * Playbook.runs
+   */
+  export type Playbook$runsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookRun
+     */
+    select?: PlaybookRunSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookRun
+     */
+    omit?: PlaybookRunOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookRunInclude<ExtArgs> | null
+    where?: PlaybookRunWhereInput
+    orderBy?: PlaybookRunOrderByWithRelationInput | PlaybookRunOrderByWithRelationInput[]
+    cursor?: PlaybookRunWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PlaybookRunScalarFieldEnum | PlaybookRunScalarFieldEnum[]
+  }
+
+  /**
+   * Playbook without action
+   */
+  export type PlaybookDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Playbook
+     */
+    select?: PlaybookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Playbook
+     */
+    omit?: PlaybookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PlaybookStep
+   */
+
+  export type AggregatePlaybookStep = {
+    _count: PlaybookStepCountAggregateOutputType | null
+    _avg: PlaybookStepAvgAggregateOutputType | null
+    _sum: PlaybookStepSumAggregateOutputType | null
+    _min: PlaybookStepMinAggregateOutputType | null
+    _max: PlaybookStepMaxAggregateOutputType | null
+  }
+
+  export type PlaybookStepAvgAggregateOutputType = {
+    id: number | null
+    playbookId: number | null
+    order: number | null
+    endpointId: number | null
+  }
+
+  export type PlaybookStepSumAggregateOutputType = {
+    id: number | null
+    playbookId: number | null
+    order: number | null
+    endpointId: number | null
+  }
+
+  export type PlaybookStepMinAggregateOutputType = {
+    id: number | null
+    playbookId: number | null
+    order: number | null
+    endpointId: number | null
+    stepName: string | null
+    bodyOverride: string | null
+    responseCapture: string | null
+  }
+
+  export type PlaybookStepMaxAggregateOutputType = {
+    id: number | null
+    playbookId: number | null
+    order: number | null
+    endpointId: number | null
+    stepName: string | null
+    bodyOverride: string | null
+    responseCapture: string | null
+  }
+
+  export type PlaybookStepCountAggregateOutputType = {
+    id: number
+    playbookId: number
+    order: number
+    endpointId: number
+    stepName: number
+    bodyOverride: number
+    responseCapture: number
+    _all: number
+  }
+
+
+  export type PlaybookStepAvgAggregateInputType = {
+    id?: true
+    playbookId?: true
+    order?: true
+    endpointId?: true
+  }
+
+  export type PlaybookStepSumAggregateInputType = {
+    id?: true
+    playbookId?: true
+    order?: true
+    endpointId?: true
+  }
+
+  export type PlaybookStepMinAggregateInputType = {
+    id?: true
+    playbookId?: true
+    order?: true
+    endpointId?: true
+    stepName?: true
+    bodyOverride?: true
+    responseCapture?: true
+  }
+
+  export type PlaybookStepMaxAggregateInputType = {
+    id?: true
+    playbookId?: true
+    order?: true
+    endpointId?: true
+    stepName?: true
+    bodyOverride?: true
+    responseCapture?: true
+  }
+
+  export type PlaybookStepCountAggregateInputType = {
+    id?: true
+    playbookId?: true
+    order?: true
+    endpointId?: true
+    stepName?: true
+    bodyOverride?: true
+    responseCapture?: true
+    _all?: true
+  }
+
+  export type PlaybookStepAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PlaybookStep to aggregate.
+     */
+    where?: PlaybookStepWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlaybookSteps to fetch.
+     */
+    orderBy?: PlaybookStepOrderByWithRelationInput | PlaybookStepOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PlaybookStepWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlaybookSteps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlaybookSteps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PlaybookSteps
+    **/
+    _count?: true | PlaybookStepCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PlaybookStepAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PlaybookStepSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PlaybookStepMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PlaybookStepMaxAggregateInputType
+  }
+
+  export type GetPlaybookStepAggregateType<T extends PlaybookStepAggregateArgs> = {
+        [P in keyof T & keyof AggregatePlaybookStep]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePlaybookStep[P]>
+      : GetScalarType<T[P], AggregatePlaybookStep[P]>
+  }
+
+
+
+
+  export type PlaybookStepGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlaybookStepWhereInput
+    orderBy?: PlaybookStepOrderByWithAggregationInput | PlaybookStepOrderByWithAggregationInput[]
+    by: PlaybookStepScalarFieldEnum[] | PlaybookStepScalarFieldEnum
+    having?: PlaybookStepScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PlaybookStepCountAggregateInputType | true
+    _avg?: PlaybookStepAvgAggregateInputType
+    _sum?: PlaybookStepSumAggregateInputType
+    _min?: PlaybookStepMinAggregateInputType
+    _max?: PlaybookStepMaxAggregateInputType
+  }
+
+  export type PlaybookStepGroupByOutputType = {
+    id: number
+    playbookId: number
+    order: number
+    endpointId: number
+    stepName: string
+    bodyOverride: string
+    responseCapture: string
+    _count: PlaybookStepCountAggregateOutputType | null
+    _avg: PlaybookStepAvgAggregateOutputType | null
+    _sum: PlaybookStepSumAggregateOutputType | null
+    _min: PlaybookStepMinAggregateOutputType | null
+    _max: PlaybookStepMaxAggregateOutputType | null
+  }
+
+  type GetPlaybookStepGroupByPayload<T extends PlaybookStepGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PlaybookStepGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PlaybookStepGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PlaybookStepGroupByOutputType[P]>
+            : GetScalarType<T[P], PlaybookStepGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PlaybookStepSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    playbookId?: boolean
+    order?: boolean
+    endpointId?: boolean
+    stepName?: boolean
+    bodyOverride?: boolean
+    responseCapture?: boolean
+    playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+    endpoint?: boolean | EndpointDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["playbookStep"]>
+
+  export type PlaybookStepSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    playbookId?: boolean
+    order?: boolean
+    endpointId?: boolean
+    stepName?: boolean
+    bodyOverride?: boolean
+    responseCapture?: boolean
+    playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+    endpoint?: boolean | EndpointDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["playbookStep"]>
+
+  export type PlaybookStepSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    playbookId?: boolean
+    order?: boolean
+    endpointId?: boolean
+    stepName?: boolean
+    bodyOverride?: boolean
+    responseCapture?: boolean
+    playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+    endpoint?: boolean | EndpointDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["playbookStep"]>
+
+  export type PlaybookStepSelectScalar = {
+    id?: boolean
+    playbookId?: boolean
+    order?: boolean
+    endpointId?: boolean
+    stepName?: boolean
+    bodyOverride?: boolean
+    responseCapture?: boolean
+  }
+
+  export type PlaybookStepOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "playbookId" | "order" | "endpointId" | "stepName" | "bodyOverride" | "responseCapture", ExtArgs["result"]["playbookStep"]>
+  export type PlaybookStepInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+    endpoint?: boolean | EndpointDefaultArgs<ExtArgs>
+  }
+  export type PlaybookStepIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+    endpoint?: boolean | EndpointDefaultArgs<ExtArgs>
+  }
+  export type PlaybookStepIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+    endpoint?: boolean | EndpointDefaultArgs<ExtArgs>
+  }
+
+  export type $PlaybookStepPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PlaybookStep"
+    objects: {
+      playbook: Prisma.$PlaybookPayload<ExtArgs>
+      endpoint: Prisma.$EndpointPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      playbookId: number
+      order: number
+      endpointId: number
+      stepName: string
+      bodyOverride: string
+      responseCapture: string
+    }, ExtArgs["result"]["playbookStep"]>
+    composites: {}
+  }
+
+  type PlaybookStepGetPayload<S extends boolean | null | undefined | PlaybookStepDefaultArgs> = $Result.GetResult<Prisma.$PlaybookStepPayload, S>
+
+  type PlaybookStepCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PlaybookStepFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PlaybookStepCountAggregateInputType | true
+    }
+
+  export interface PlaybookStepDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PlaybookStep'], meta: { name: 'PlaybookStep' } }
+    /**
+     * Find zero or one PlaybookStep that matches the filter.
+     * @param {PlaybookStepFindUniqueArgs} args - Arguments to find a PlaybookStep
+     * @example
+     * // Get one PlaybookStep
+     * const playbookStep = await prisma.playbookStep.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PlaybookStepFindUniqueArgs>(args: SelectSubset<T, PlaybookStepFindUniqueArgs<ExtArgs>>): Prisma__PlaybookStepClient<$Result.GetResult<Prisma.$PlaybookStepPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PlaybookStep that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PlaybookStepFindUniqueOrThrowArgs} args - Arguments to find a PlaybookStep
+     * @example
+     * // Get one PlaybookStep
+     * const playbookStep = await prisma.playbookStep.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PlaybookStepFindUniqueOrThrowArgs>(args: SelectSubset<T, PlaybookStepFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PlaybookStepClient<$Result.GetResult<Prisma.$PlaybookStepPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PlaybookStep that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookStepFindFirstArgs} args - Arguments to find a PlaybookStep
+     * @example
+     * // Get one PlaybookStep
+     * const playbookStep = await prisma.playbookStep.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PlaybookStepFindFirstArgs>(args?: SelectSubset<T, PlaybookStepFindFirstArgs<ExtArgs>>): Prisma__PlaybookStepClient<$Result.GetResult<Prisma.$PlaybookStepPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PlaybookStep that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookStepFindFirstOrThrowArgs} args - Arguments to find a PlaybookStep
+     * @example
+     * // Get one PlaybookStep
+     * const playbookStep = await prisma.playbookStep.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PlaybookStepFindFirstOrThrowArgs>(args?: SelectSubset<T, PlaybookStepFindFirstOrThrowArgs<ExtArgs>>): Prisma__PlaybookStepClient<$Result.GetResult<Prisma.$PlaybookStepPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PlaybookSteps that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookStepFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PlaybookSteps
+     * const playbookSteps = await prisma.playbookStep.findMany()
+     * 
+     * // Get first 10 PlaybookSteps
+     * const playbookSteps = await prisma.playbookStep.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const playbookStepWithIdOnly = await prisma.playbookStep.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PlaybookStepFindManyArgs>(args?: SelectSubset<T, PlaybookStepFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaybookStepPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PlaybookStep.
+     * @param {PlaybookStepCreateArgs} args - Arguments to create a PlaybookStep.
+     * @example
+     * // Create one PlaybookStep
+     * const PlaybookStep = await prisma.playbookStep.create({
+     *   data: {
+     *     // ... data to create a PlaybookStep
+     *   }
+     * })
+     * 
+     */
+    create<T extends PlaybookStepCreateArgs>(args: SelectSubset<T, PlaybookStepCreateArgs<ExtArgs>>): Prisma__PlaybookStepClient<$Result.GetResult<Prisma.$PlaybookStepPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PlaybookSteps.
+     * @param {PlaybookStepCreateManyArgs} args - Arguments to create many PlaybookSteps.
+     * @example
+     * // Create many PlaybookSteps
+     * const playbookStep = await prisma.playbookStep.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PlaybookStepCreateManyArgs>(args?: SelectSubset<T, PlaybookStepCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PlaybookSteps and returns the data saved in the database.
+     * @param {PlaybookStepCreateManyAndReturnArgs} args - Arguments to create many PlaybookSteps.
+     * @example
+     * // Create many PlaybookSteps
+     * const playbookStep = await prisma.playbookStep.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PlaybookSteps and only return the `id`
+     * const playbookStepWithIdOnly = await prisma.playbookStep.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PlaybookStepCreateManyAndReturnArgs>(args?: SelectSubset<T, PlaybookStepCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaybookStepPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PlaybookStep.
+     * @param {PlaybookStepDeleteArgs} args - Arguments to delete one PlaybookStep.
+     * @example
+     * // Delete one PlaybookStep
+     * const PlaybookStep = await prisma.playbookStep.delete({
+     *   where: {
+     *     // ... filter to delete one PlaybookStep
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PlaybookStepDeleteArgs>(args: SelectSubset<T, PlaybookStepDeleteArgs<ExtArgs>>): Prisma__PlaybookStepClient<$Result.GetResult<Prisma.$PlaybookStepPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PlaybookStep.
+     * @param {PlaybookStepUpdateArgs} args - Arguments to update one PlaybookStep.
+     * @example
+     * // Update one PlaybookStep
+     * const playbookStep = await prisma.playbookStep.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PlaybookStepUpdateArgs>(args: SelectSubset<T, PlaybookStepUpdateArgs<ExtArgs>>): Prisma__PlaybookStepClient<$Result.GetResult<Prisma.$PlaybookStepPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PlaybookSteps.
+     * @param {PlaybookStepDeleteManyArgs} args - Arguments to filter PlaybookSteps to delete.
+     * @example
+     * // Delete a few PlaybookSteps
+     * const { count } = await prisma.playbookStep.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PlaybookStepDeleteManyArgs>(args?: SelectSubset<T, PlaybookStepDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PlaybookSteps.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookStepUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PlaybookSteps
+     * const playbookStep = await prisma.playbookStep.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PlaybookStepUpdateManyArgs>(args: SelectSubset<T, PlaybookStepUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PlaybookSteps and returns the data updated in the database.
+     * @param {PlaybookStepUpdateManyAndReturnArgs} args - Arguments to update many PlaybookSteps.
+     * @example
+     * // Update many PlaybookSteps
+     * const playbookStep = await prisma.playbookStep.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PlaybookSteps and only return the `id`
+     * const playbookStepWithIdOnly = await prisma.playbookStep.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PlaybookStepUpdateManyAndReturnArgs>(args: SelectSubset<T, PlaybookStepUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaybookStepPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PlaybookStep.
+     * @param {PlaybookStepUpsertArgs} args - Arguments to update or create a PlaybookStep.
+     * @example
+     * // Update or create a PlaybookStep
+     * const playbookStep = await prisma.playbookStep.upsert({
+     *   create: {
+     *     // ... data to create a PlaybookStep
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PlaybookStep we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PlaybookStepUpsertArgs>(args: SelectSubset<T, PlaybookStepUpsertArgs<ExtArgs>>): Prisma__PlaybookStepClient<$Result.GetResult<Prisma.$PlaybookStepPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PlaybookSteps.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookStepCountArgs} args - Arguments to filter PlaybookSteps to count.
+     * @example
+     * // Count the number of PlaybookSteps
+     * const count = await prisma.playbookStep.count({
+     *   where: {
+     *     // ... the filter for the PlaybookSteps we want to count
+     *   }
+     * })
+    **/
+    count<T extends PlaybookStepCountArgs>(
+      args?: Subset<T, PlaybookStepCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PlaybookStepCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PlaybookStep.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookStepAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PlaybookStepAggregateArgs>(args: Subset<T, PlaybookStepAggregateArgs>): Prisma.PrismaPromise<GetPlaybookStepAggregateType<T>>
+
+    /**
+     * Group by PlaybookStep.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookStepGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PlaybookStepGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PlaybookStepGroupByArgs['orderBy'] }
+        : { orderBy?: PlaybookStepGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PlaybookStepGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPlaybookStepGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PlaybookStep model
+   */
+  readonly fields: PlaybookStepFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PlaybookStep.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PlaybookStepClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    playbook<T extends PlaybookDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PlaybookDefaultArgs<ExtArgs>>): Prisma__PlaybookClient<$Result.GetResult<Prisma.$PlaybookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    endpoint<T extends EndpointDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EndpointDefaultArgs<ExtArgs>>): Prisma__EndpointClient<$Result.GetResult<Prisma.$EndpointPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PlaybookStep model
+   */
+  interface PlaybookStepFieldRefs {
+    readonly id: FieldRef<"PlaybookStep", 'Int'>
+    readonly playbookId: FieldRef<"PlaybookStep", 'Int'>
+    readonly order: FieldRef<"PlaybookStep", 'Int'>
+    readonly endpointId: FieldRef<"PlaybookStep", 'Int'>
+    readonly stepName: FieldRef<"PlaybookStep", 'String'>
+    readonly bodyOverride: FieldRef<"PlaybookStep", 'String'>
+    readonly responseCapture: FieldRef<"PlaybookStep", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PlaybookStep findUnique
+   */
+  export type PlaybookStepFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookStep
+     */
+    select?: PlaybookStepSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookStep
+     */
+    omit?: PlaybookStepOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookStepInclude<ExtArgs> | null
+    /**
+     * Filter, which PlaybookStep to fetch.
+     */
+    where: PlaybookStepWhereUniqueInput
+  }
+
+  /**
+   * PlaybookStep findUniqueOrThrow
+   */
+  export type PlaybookStepFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookStep
+     */
+    select?: PlaybookStepSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookStep
+     */
+    omit?: PlaybookStepOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookStepInclude<ExtArgs> | null
+    /**
+     * Filter, which PlaybookStep to fetch.
+     */
+    where: PlaybookStepWhereUniqueInput
+  }
+
+  /**
+   * PlaybookStep findFirst
+   */
+  export type PlaybookStepFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookStep
+     */
+    select?: PlaybookStepSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookStep
+     */
+    omit?: PlaybookStepOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookStepInclude<ExtArgs> | null
+    /**
+     * Filter, which PlaybookStep to fetch.
+     */
+    where?: PlaybookStepWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlaybookSteps to fetch.
+     */
+    orderBy?: PlaybookStepOrderByWithRelationInput | PlaybookStepOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PlaybookSteps.
+     */
+    cursor?: PlaybookStepWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlaybookSteps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlaybookSteps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlaybookSteps.
+     */
+    distinct?: PlaybookStepScalarFieldEnum | PlaybookStepScalarFieldEnum[]
+  }
+
+  /**
+   * PlaybookStep findFirstOrThrow
+   */
+  export type PlaybookStepFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookStep
+     */
+    select?: PlaybookStepSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookStep
+     */
+    omit?: PlaybookStepOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookStepInclude<ExtArgs> | null
+    /**
+     * Filter, which PlaybookStep to fetch.
+     */
+    where?: PlaybookStepWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlaybookSteps to fetch.
+     */
+    orderBy?: PlaybookStepOrderByWithRelationInput | PlaybookStepOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PlaybookSteps.
+     */
+    cursor?: PlaybookStepWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlaybookSteps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlaybookSteps.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlaybookSteps.
+     */
+    distinct?: PlaybookStepScalarFieldEnum | PlaybookStepScalarFieldEnum[]
+  }
+
+  /**
+   * PlaybookStep findMany
+   */
+  export type PlaybookStepFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookStep
+     */
+    select?: PlaybookStepSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookStep
+     */
+    omit?: PlaybookStepOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookStepInclude<ExtArgs> | null
+    /**
+     * Filter, which PlaybookSteps to fetch.
+     */
+    where?: PlaybookStepWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlaybookSteps to fetch.
+     */
+    orderBy?: PlaybookStepOrderByWithRelationInput | PlaybookStepOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PlaybookSteps.
+     */
+    cursor?: PlaybookStepWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlaybookSteps from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlaybookSteps.
+     */
+    skip?: number
+    distinct?: PlaybookStepScalarFieldEnum | PlaybookStepScalarFieldEnum[]
+  }
+
+  /**
+   * PlaybookStep create
+   */
+  export type PlaybookStepCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookStep
+     */
+    select?: PlaybookStepSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookStep
+     */
+    omit?: PlaybookStepOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookStepInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PlaybookStep.
+     */
+    data: XOR<PlaybookStepCreateInput, PlaybookStepUncheckedCreateInput>
+  }
+
+  /**
+   * PlaybookStep createMany
+   */
+  export type PlaybookStepCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PlaybookSteps.
+     */
+    data: PlaybookStepCreateManyInput | PlaybookStepCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PlaybookStep createManyAndReturn
+   */
+  export type PlaybookStepCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookStep
+     */
+    select?: PlaybookStepSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookStep
+     */
+    omit?: PlaybookStepOmit<ExtArgs> | null
+    /**
+     * The data used to create many PlaybookSteps.
+     */
+    data: PlaybookStepCreateManyInput | PlaybookStepCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookStepIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PlaybookStep update
+   */
+  export type PlaybookStepUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookStep
+     */
+    select?: PlaybookStepSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookStep
+     */
+    omit?: PlaybookStepOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookStepInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PlaybookStep.
+     */
+    data: XOR<PlaybookStepUpdateInput, PlaybookStepUncheckedUpdateInput>
+    /**
+     * Choose, which PlaybookStep to update.
+     */
+    where: PlaybookStepWhereUniqueInput
+  }
+
+  /**
+   * PlaybookStep updateMany
+   */
+  export type PlaybookStepUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PlaybookSteps.
+     */
+    data: XOR<PlaybookStepUpdateManyMutationInput, PlaybookStepUncheckedUpdateManyInput>
+    /**
+     * Filter which PlaybookSteps to update
+     */
+    where?: PlaybookStepWhereInput
+    /**
+     * Limit how many PlaybookSteps to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PlaybookStep updateManyAndReturn
+   */
+  export type PlaybookStepUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookStep
+     */
+    select?: PlaybookStepSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookStep
+     */
+    omit?: PlaybookStepOmit<ExtArgs> | null
+    /**
+     * The data used to update PlaybookSteps.
+     */
+    data: XOR<PlaybookStepUpdateManyMutationInput, PlaybookStepUncheckedUpdateManyInput>
+    /**
+     * Filter which PlaybookSteps to update
+     */
+    where?: PlaybookStepWhereInput
+    /**
+     * Limit how many PlaybookSteps to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookStepIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PlaybookStep upsert
+   */
+  export type PlaybookStepUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookStep
+     */
+    select?: PlaybookStepSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookStep
+     */
+    omit?: PlaybookStepOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookStepInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PlaybookStep to update in case it exists.
+     */
+    where: PlaybookStepWhereUniqueInput
+    /**
+     * In case the PlaybookStep found by the `where` argument doesn't exist, create a new PlaybookStep with this data.
+     */
+    create: XOR<PlaybookStepCreateInput, PlaybookStepUncheckedCreateInput>
+    /**
+     * In case the PlaybookStep was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PlaybookStepUpdateInput, PlaybookStepUncheckedUpdateInput>
+  }
+
+  /**
+   * PlaybookStep delete
+   */
+  export type PlaybookStepDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookStep
+     */
+    select?: PlaybookStepSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookStep
+     */
+    omit?: PlaybookStepOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookStepInclude<ExtArgs> | null
+    /**
+     * Filter which PlaybookStep to delete.
+     */
+    where: PlaybookStepWhereUniqueInput
+  }
+
+  /**
+   * PlaybookStep deleteMany
+   */
+  export type PlaybookStepDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PlaybookSteps to delete
+     */
+    where?: PlaybookStepWhereInput
+    /**
+     * Limit how many PlaybookSteps to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PlaybookStep without action
+   */
+  export type PlaybookStepDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookStep
+     */
+    select?: PlaybookStepSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookStep
+     */
+    omit?: PlaybookStepOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookStepInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PlaybookRun
+   */
+
+  export type AggregatePlaybookRun = {
+    _count: PlaybookRunCountAggregateOutputType | null
+    _avg: PlaybookRunAvgAggregateOutputType | null
+    _sum: PlaybookRunSumAggregateOutputType | null
+    _min: PlaybookRunMinAggregateOutputType | null
+    _max: PlaybookRunMaxAggregateOutputType | null
+  }
+
+  export type PlaybookRunAvgAggregateOutputType = {
+    id: number | null
+    playbookId: number | null
+    companyId: number | null
+    clientId: number | null
+  }
+
+  export type PlaybookRunSumAggregateOutputType = {
+    id: number | null
+    playbookId: number | null
+    companyId: number | null
+    clientId: number | null
+  }
+
+  export type PlaybookRunMinAggregateOutputType = {
+    id: number | null
+    playbookId: number | null
+    companyId: number | null
+    clientId: number | null
+    startedAt: Date | null
+    endedAt: Date | null
+    status: string | null
+  }
+
+  export type PlaybookRunMaxAggregateOutputType = {
+    id: number | null
+    playbookId: number | null
+    companyId: number | null
+    clientId: number | null
+    startedAt: Date | null
+    endedAt: Date | null
+    status: string | null
+  }
+
+  export type PlaybookRunCountAggregateOutputType = {
+    id: number
+    playbookId: number
+    companyId: number
+    clientId: number
+    startedAt: number
+    endedAt: number
+    status: number
+    steps: number
+    _all: number
+  }
+
+
+  export type PlaybookRunAvgAggregateInputType = {
+    id?: true
+    playbookId?: true
+    companyId?: true
+    clientId?: true
+  }
+
+  export type PlaybookRunSumAggregateInputType = {
+    id?: true
+    playbookId?: true
+    companyId?: true
+    clientId?: true
+  }
+
+  export type PlaybookRunMinAggregateInputType = {
+    id?: true
+    playbookId?: true
+    companyId?: true
+    clientId?: true
+    startedAt?: true
+    endedAt?: true
+    status?: true
+  }
+
+  export type PlaybookRunMaxAggregateInputType = {
+    id?: true
+    playbookId?: true
+    companyId?: true
+    clientId?: true
+    startedAt?: true
+    endedAt?: true
+    status?: true
+  }
+
+  export type PlaybookRunCountAggregateInputType = {
+    id?: true
+    playbookId?: true
+    companyId?: true
+    clientId?: true
+    startedAt?: true
+    endedAt?: true
+    status?: true
+    steps?: true
+    _all?: true
+  }
+
+  export type PlaybookRunAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PlaybookRun to aggregate.
+     */
+    where?: PlaybookRunWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlaybookRuns to fetch.
+     */
+    orderBy?: PlaybookRunOrderByWithRelationInput | PlaybookRunOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PlaybookRunWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlaybookRuns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlaybookRuns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PlaybookRuns
+    **/
+    _count?: true | PlaybookRunCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PlaybookRunAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PlaybookRunSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PlaybookRunMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PlaybookRunMaxAggregateInputType
+  }
+
+  export type GetPlaybookRunAggregateType<T extends PlaybookRunAggregateArgs> = {
+        [P in keyof T & keyof AggregatePlaybookRun]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePlaybookRun[P]>
+      : GetScalarType<T[P], AggregatePlaybookRun[P]>
+  }
+
+
+
+
+  export type PlaybookRunGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlaybookRunWhereInput
+    orderBy?: PlaybookRunOrderByWithAggregationInput | PlaybookRunOrderByWithAggregationInput[]
+    by: PlaybookRunScalarFieldEnum[] | PlaybookRunScalarFieldEnum
+    having?: PlaybookRunScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PlaybookRunCountAggregateInputType | true
+    _avg?: PlaybookRunAvgAggregateInputType
+    _sum?: PlaybookRunSumAggregateInputType
+    _min?: PlaybookRunMinAggregateInputType
+    _max?: PlaybookRunMaxAggregateInputType
+  }
+
+  export type PlaybookRunGroupByOutputType = {
+    id: number
+    playbookId: number
+    companyId: number
+    clientId: number | null
+    startedAt: Date
+    endedAt: Date | null
+    status: string
+    steps: JsonValue
+    _count: PlaybookRunCountAggregateOutputType | null
+    _avg: PlaybookRunAvgAggregateOutputType | null
+    _sum: PlaybookRunSumAggregateOutputType | null
+    _min: PlaybookRunMinAggregateOutputType | null
+    _max: PlaybookRunMaxAggregateOutputType | null
+  }
+
+  type GetPlaybookRunGroupByPayload<T extends PlaybookRunGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PlaybookRunGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PlaybookRunGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PlaybookRunGroupByOutputType[P]>
+            : GetScalarType<T[P], PlaybookRunGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PlaybookRunSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    playbookId?: boolean
+    companyId?: boolean
+    clientId?: boolean
+    startedAt?: boolean
+    endedAt?: boolean
+    status?: boolean
+    steps?: boolean
+    playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["playbookRun"]>
+
+  export type PlaybookRunSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    playbookId?: boolean
+    companyId?: boolean
+    clientId?: boolean
+    startedAt?: boolean
+    endedAt?: boolean
+    status?: boolean
+    steps?: boolean
+    playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["playbookRun"]>
+
+  export type PlaybookRunSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    playbookId?: boolean
+    companyId?: boolean
+    clientId?: boolean
+    startedAt?: boolean
+    endedAt?: boolean
+    status?: boolean
+    steps?: boolean
+    playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["playbookRun"]>
+
+  export type PlaybookRunSelectScalar = {
+    id?: boolean
+    playbookId?: boolean
+    companyId?: boolean
+    clientId?: boolean
+    startedAt?: boolean
+    endedAt?: boolean
+    status?: boolean
+    steps?: boolean
+  }
+
+  export type PlaybookRunOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "playbookId" | "companyId" | "clientId" | "startedAt" | "endedAt" | "status" | "steps", ExtArgs["result"]["playbookRun"]>
+  export type PlaybookRunInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+  }
+  export type PlaybookRunIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+  }
+  export type PlaybookRunIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+  }
+
+  export type $PlaybookRunPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PlaybookRun"
+    objects: {
+      playbook: Prisma.$PlaybookPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      playbookId: number
+      companyId: number
+      clientId: number | null
+      startedAt: Date
+      endedAt: Date | null
+      status: string
+      steps: Prisma.JsonValue
+    }, ExtArgs["result"]["playbookRun"]>
+    composites: {}
+  }
+
+  type PlaybookRunGetPayload<S extends boolean | null | undefined | PlaybookRunDefaultArgs> = $Result.GetResult<Prisma.$PlaybookRunPayload, S>
+
+  type PlaybookRunCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PlaybookRunFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PlaybookRunCountAggregateInputType | true
+    }
+
+  export interface PlaybookRunDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PlaybookRun'], meta: { name: 'PlaybookRun' } }
+    /**
+     * Find zero or one PlaybookRun that matches the filter.
+     * @param {PlaybookRunFindUniqueArgs} args - Arguments to find a PlaybookRun
+     * @example
+     * // Get one PlaybookRun
+     * const playbookRun = await prisma.playbookRun.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PlaybookRunFindUniqueArgs>(args: SelectSubset<T, PlaybookRunFindUniqueArgs<ExtArgs>>): Prisma__PlaybookRunClient<$Result.GetResult<Prisma.$PlaybookRunPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PlaybookRun that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PlaybookRunFindUniqueOrThrowArgs} args - Arguments to find a PlaybookRun
+     * @example
+     * // Get one PlaybookRun
+     * const playbookRun = await prisma.playbookRun.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PlaybookRunFindUniqueOrThrowArgs>(args: SelectSubset<T, PlaybookRunFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PlaybookRunClient<$Result.GetResult<Prisma.$PlaybookRunPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PlaybookRun that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookRunFindFirstArgs} args - Arguments to find a PlaybookRun
+     * @example
+     * // Get one PlaybookRun
+     * const playbookRun = await prisma.playbookRun.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PlaybookRunFindFirstArgs>(args?: SelectSubset<T, PlaybookRunFindFirstArgs<ExtArgs>>): Prisma__PlaybookRunClient<$Result.GetResult<Prisma.$PlaybookRunPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PlaybookRun that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookRunFindFirstOrThrowArgs} args - Arguments to find a PlaybookRun
+     * @example
+     * // Get one PlaybookRun
+     * const playbookRun = await prisma.playbookRun.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PlaybookRunFindFirstOrThrowArgs>(args?: SelectSubset<T, PlaybookRunFindFirstOrThrowArgs<ExtArgs>>): Prisma__PlaybookRunClient<$Result.GetResult<Prisma.$PlaybookRunPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PlaybookRuns that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookRunFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PlaybookRuns
+     * const playbookRuns = await prisma.playbookRun.findMany()
+     * 
+     * // Get first 10 PlaybookRuns
+     * const playbookRuns = await prisma.playbookRun.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const playbookRunWithIdOnly = await prisma.playbookRun.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PlaybookRunFindManyArgs>(args?: SelectSubset<T, PlaybookRunFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaybookRunPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PlaybookRun.
+     * @param {PlaybookRunCreateArgs} args - Arguments to create a PlaybookRun.
+     * @example
+     * // Create one PlaybookRun
+     * const PlaybookRun = await prisma.playbookRun.create({
+     *   data: {
+     *     // ... data to create a PlaybookRun
+     *   }
+     * })
+     * 
+     */
+    create<T extends PlaybookRunCreateArgs>(args: SelectSubset<T, PlaybookRunCreateArgs<ExtArgs>>): Prisma__PlaybookRunClient<$Result.GetResult<Prisma.$PlaybookRunPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PlaybookRuns.
+     * @param {PlaybookRunCreateManyArgs} args - Arguments to create many PlaybookRuns.
+     * @example
+     * // Create many PlaybookRuns
+     * const playbookRun = await prisma.playbookRun.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PlaybookRunCreateManyArgs>(args?: SelectSubset<T, PlaybookRunCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PlaybookRuns and returns the data saved in the database.
+     * @param {PlaybookRunCreateManyAndReturnArgs} args - Arguments to create many PlaybookRuns.
+     * @example
+     * // Create many PlaybookRuns
+     * const playbookRun = await prisma.playbookRun.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PlaybookRuns and only return the `id`
+     * const playbookRunWithIdOnly = await prisma.playbookRun.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PlaybookRunCreateManyAndReturnArgs>(args?: SelectSubset<T, PlaybookRunCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaybookRunPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PlaybookRun.
+     * @param {PlaybookRunDeleteArgs} args - Arguments to delete one PlaybookRun.
+     * @example
+     * // Delete one PlaybookRun
+     * const PlaybookRun = await prisma.playbookRun.delete({
+     *   where: {
+     *     // ... filter to delete one PlaybookRun
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PlaybookRunDeleteArgs>(args: SelectSubset<T, PlaybookRunDeleteArgs<ExtArgs>>): Prisma__PlaybookRunClient<$Result.GetResult<Prisma.$PlaybookRunPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PlaybookRun.
+     * @param {PlaybookRunUpdateArgs} args - Arguments to update one PlaybookRun.
+     * @example
+     * // Update one PlaybookRun
+     * const playbookRun = await prisma.playbookRun.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PlaybookRunUpdateArgs>(args: SelectSubset<T, PlaybookRunUpdateArgs<ExtArgs>>): Prisma__PlaybookRunClient<$Result.GetResult<Prisma.$PlaybookRunPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PlaybookRuns.
+     * @param {PlaybookRunDeleteManyArgs} args - Arguments to filter PlaybookRuns to delete.
+     * @example
+     * // Delete a few PlaybookRuns
+     * const { count } = await prisma.playbookRun.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PlaybookRunDeleteManyArgs>(args?: SelectSubset<T, PlaybookRunDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PlaybookRuns.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookRunUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PlaybookRuns
+     * const playbookRun = await prisma.playbookRun.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PlaybookRunUpdateManyArgs>(args: SelectSubset<T, PlaybookRunUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PlaybookRuns and returns the data updated in the database.
+     * @param {PlaybookRunUpdateManyAndReturnArgs} args - Arguments to update many PlaybookRuns.
+     * @example
+     * // Update many PlaybookRuns
+     * const playbookRun = await prisma.playbookRun.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PlaybookRuns and only return the `id`
+     * const playbookRunWithIdOnly = await prisma.playbookRun.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PlaybookRunUpdateManyAndReturnArgs>(args: SelectSubset<T, PlaybookRunUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaybookRunPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PlaybookRun.
+     * @param {PlaybookRunUpsertArgs} args - Arguments to update or create a PlaybookRun.
+     * @example
+     * // Update or create a PlaybookRun
+     * const playbookRun = await prisma.playbookRun.upsert({
+     *   create: {
+     *     // ... data to create a PlaybookRun
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PlaybookRun we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PlaybookRunUpsertArgs>(args: SelectSubset<T, PlaybookRunUpsertArgs<ExtArgs>>): Prisma__PlaybookRunClient<$Result.GetResult<Prisma.$PlaybookRunPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PlaybookRuns.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookRunCountArgs} args - Arguments to filter PlaybookRuns to count.
+     * @example
+     * // Count the number of PlaybookRuns
+     * const count = await prisma.playbookRun.count({
+     *   where: {
+     *     // ... the filter for the PlaybookRuns we want to count
+     *   }
+     * })
+    **/
+    count<T extends PlaybookRunCountArgs>(
+      args?: Subset<T, PlaybookRunCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PlaybookRunCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PlaybookRun.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookRunAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PlaybookRunAggregateArgs>(args: Subset<T, PlaybookRunAggregateArgs>): Prisma.PrismaPromise<GetPlaybookRunAggregateType<T>>
+
+    /**
+     * Group by PlaybookRun.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PlaybookRunGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PlaybookRunGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PlaybookRunGroupByArgs['orderBy'] }
+        : { orderBy?: PlaybookRunGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PlaybookRunGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPlaybookRunGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PlaybookRun model
+   */
+  readonly fields: PlaybookRunFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PlaybookRun.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PlaybookRunClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    playbook<T extends PlaybookDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PlaybookDefaultArgs<ExtArgs>>): Prisma__PlaybookClient<$Result.GetResult<Prisma.$PlaybookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PlaybookRun model
+   */
+  interface PlaybookRunFieldRefs {
+    readonly id: FieldRef<"PlaybookRun", 'Int'>
+    readonly playbookId: FieldRef<"PlaybookRun", 'Int'>
+    readonly companyId: FieldRef<"PlaybookRun", 'Int'>
+    readonly clientId: FieldRef<"PlaybookRun", 'Int'>
+    readonly startedAt: FieldRef<"PlaybookRun", 'DateTime'>
+    readonly endedAt: FieldRef<"PlaybookRun", 'DateTime'>
+    readonly status: FieldRef<"PlaybookRun", 'String'>
+    readonly steps: FieldRef<"PlaybookRun", 'Json'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PlaybookRun findUnique
+   */
+  export type PlaybookRunFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookRun
+     */
+    select?: PlaybookRunSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookRun
+     */
+    omit?: PlaybookRunOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookRunInclude<ExtArgs> | null
+    /**
+     * Filter, which PlaybookRun to fetch.
+     */
+    where: PlaybookRunWhereUniqueInput
+  }
+
+  /**
+   * PlaybookRun findUniqueOrThrow
+   */
+  export type PlaybookRunFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookRun
+     */
+    select?: PlaybookRunSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookRun
+     */
+    omit?: PlaybookRunOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookRunInclude<ExtArgs> | null
+    /**
+     * Filter, which PlaybookRun to fetch.
+     */
+    where: PlaybookRunWhereUniqueInput
+  }
+
+  /**
+   * PlaybookRun findFirst
+   */
+  export type PlaybookRunFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookRun
+     */
+    select?: PlaybookRunSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookRun
+     */
+    omit?: PlaybookRunOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookRunInclude<ExtArgs> | null
+    /**
+     * Filter, which PlaybookRun to fetch.
+     */
+    where?: PlaybookRunWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlaybookRuns to fetch.
+     */
+    orderBy?: PlaybookRunOrderByWithRelationInput | PlaybookRunOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PlaybookRuns.
+     */
+    cursor?: PlaybookRunWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlaybookRuns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlaybookRuns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlaybookRuns.
+     */
+    distinct?: PlaybookRunScalarFieldEnum | PlaybookRunScalarFieldEnum[]
+  }
+
+  /**
+   * PlaybookRun findFirstOrThrow
+   */
+  export type PlaybookRunFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookRun
+     */
+    select?: PlaybookRunSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookRun
+     */
+    omit?: PlaybookRunOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookRunInclude<ExtArgs> | null
+    /**
+     * Filter, which PlaybookRun to fetch.
+     */
+    where?: PlaybookRunWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlaybookRuns to fetch.
+     */
+    orderBy?: PlaybookRunOrderByWithRelationInput | PlaybookRunOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PlaybookRuns.
+     */
+    cursor?: PlaybookRunWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlaybookRuns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlaybookRuns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PlaybookRuns.
+     */
+    distinct?: PlaybookRunScalarFieldEnum | PlaybookRunScalarFieldEnum[]
+  }
+
+  /**
+   * PlaybookRun findMany
+   */
+  export type PlaybookRunFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookRun
+     */
+    select?: PlaybookRunSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookRun
+     */
+    omit?: PlaybookRunOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookRunInclude<ExtArgs> | null
+    /**
+     * Filter, which PlaybookRuns to fetch.
+     */
+    where?: PlaybookRunWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PlaybookRuns to fetch.
+     */
+    orderBy?: PlaybookRunOrderByWithRelationInput | PlaybookRunOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PlaybookRuns.
+     */
+    cursor?: PlaybookRunWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PlaybookRuns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PlaybookRuns.
+     */
+    skip?: number
+    distinct?: PlaybookRunScalarFieldEnum | PlaybookRunScalarFieldEnum[]
+  }
+
+  /**
+   * PlaybookRun create
+   */
+  export type PlaybookRunCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookRun
+     */
+    select?: PlaybookRunSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookRun
+     */
+    omit?: PlaybookRunOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookRunInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PlaybookRun.
+     */
+    data: XOR<PlaybookRunCreateInput, PlaybookRunUncheckedCreateInput>
+  }
+
+  /**
+   * PlaybookRun createMany
+   */
+  export type PlaybookRunCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PlaybookRuns.
+     */
+    data: PlaybookRunCreateManyInput | PlaybookRunCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PlaybookRun createManyAndReturn
+   */
+  export type PlaybookRunCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookRun
+     */
+    select?: PlaybookRunSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookRun
+     */
+    omit?: PlaybookRunOmit<ExtArgs> | null
+    /**
+     * The data used to create many PlaybookRuns.
+     */
+    data: PlaybookRunCreateManyInput | PlaybookRunCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookRunIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PlaybookRun update
+   */
+  export type PlaybookRunUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookRun
+     */
+    select?: PlaybookRunSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookRun
+     */
+    omit?: PlaybookRunOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookRunInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PlaybookRun.
+     */
+    data: XOR<PlaybookRunUpdateInput, PlaybookRunUncheckedUpdateInput>
+    /**
+     * Choose, which PlaybookRun to update.
+     */
+    where: PlaybookRunWhereUniqueInput
+  }
+
+  /**
+   * PlaybookRun updateMany
+   */
+  export type PlaybookRunUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PlaybookRuns.
+     */
+    data: XOR<PlaybookRunUpdateManyMutationInput, PlaybookRunUncheckedUpdateManyInput>
+    /**
+     * Filter which PlaybookRuns to update
+     */
+    where?: PlaybookRunWhereInput
+    /**
+     * Limit how many PlaybookRuns to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PlaybookRun updateManyAndReturn
+   */
+  export type PlaybookRunUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookRun
+     */
+    select?: PlaybookRunSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookRun
+     */
+    omit?: PlaybookRunOmit<ExtArgs> | null
+    /**
+     * The data used to update PlaybookRuns.
+     */
+    data: XOR<PlaybookRunUpdateManyMutationInput, PlaybookRunUncheckedUpdateManyInput>
+    /**
+     * Filter which PlaybookRuns to update
+     */
+    where?: PlaybookRunWhereInput
+    /**
+     * Limit how many PlaybookRuns to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookRunIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PlaybookRun upsert
+   */
+  export type PlaybookRunUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookRun
+     */
+    select?: PlaybookRunSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookRun
+     */
+    omit?: PlaybookRunOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookRunInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PlaybookRun to update in case it exists.
+     */
+    where: PlaybookRunWhereUniqueInput
+    /**
+     * In case the PlaybookRun found by the `where` argument doesn't exist, create a new PlaybookRun with this data.
+     */
+    create: XOR<PlaybookRunCreateInput, PlaybookRunUncheckedCreateInput>
+    /**
+     * In case the PlaybookRun was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PlaybookRunUpdateInput, PlaybookRunUncheckedUpdateInput>
+  }
+
+  /**
+   * PlaybookRun delete
+   */
+  export type PlaybookRunDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookRun
+     */
+    select?: PlaybookRunSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookRun
+     */
+    omit?: PlaybookRunOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookRunInclude<ExtArgs> | null
+    /**
+     * Filter which PlaybookRun to delete.
+     */
+    where: PlaybookRunWhereUniqueInput
+  }
+
+  /**
+   * PlaybookRun deleteMany
+   */
+  export type PlaybookRunDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PlaybookRuns to delete
+     */
+    where?: PlaybookRunWhereInput
+    /**
+     * Limit how many PlaybookRuns to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PlaybookRun without action
+   */
+  export type PlaybookRunDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookRun
+     */
+    select?: PlaybookRunSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookRun
+     */
+    omit?: PlaybookRunOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookRunInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model RequestHistory
    */
 
@@ -11632,7 +15513,8 @@ export namespace Prisma {
     sortOrder: 'sortOrder',
     group: 'group',
     requiresClient: 'requiresClient',
-    isModification: 'isModification'
+    isModification: 'isModification',
+    notes: 'notes'
   };
 
   export type EndpointScalarFieldEnum = (typeof EndpointScalarFieldEnum)[keyof typeof EndpointScalarFieldEnum]
@@ -11646,6 +15528,7 @@ export namespace Prisma {
     environments: 'environments',
     authType: 'authType',
     authConfig: 'authConfig',
+    notes: 'notes',
     createdAt: 'createdAt'
   };
 
@@ -11668,6 +15551,7 @@ export namespace Prisma {
     name: 'name',
     context: 'context',
     systemPrompt: 'systemPrompt',
+    embeddingProvider: 'embeddingProvider',
     createdAt: 'createdAt'
   };
 
@@ -11689,6 +15573,44 @@ export namespace Prisma {
   };
 
   export type SettingScalarFieldEnum = (typeof SettingScalarFieldEnum)[keyof typeof SettingScalarFieldEnum]
+
+
+  export const PlaybookScalarFieldEnum: {
+    id: 'id',
+    erpId: 'erpId',
+    name: 'name',
+    description: 'description',
+    createdAt: 'createdAt'
+  };
+
+  export type PlaybookScalarFieldEnum = (typeof PlaybookScalarFieldEnum)[keyof typeof PlaybookScalarFieldEnum]
+
+
+  export const PlaybookStepScalarFieldEnum: {
+    id: 'id',
+    playbookId: 'playbookId',
+    order: 'order',
+    endpointId: 'endpointId',
+    stepName: 'stepName',
+    bodyOverride: 'bodyOverride',
+    responseCapture: 'responseCapture'
+  };
+
+  export type PlaybookStepScalarFieldEnum = (typeof PlaybookStepScalarFieldEnum)[keyof typeof PlaybookStepScalarFieldEnum]
+
+
+  export const PlaybookRunScalarFieldEnum: {
+    id: 'id',
+    playbookId: 'playbookId',
+    companyId: 'companyId',
+    clientId: 'clientId',
+    startedAt: 'startedAt',
+    endedAt: 'endedAt',
+    status: 'status',
+    steps: 'steps'
+  };
+
+  export type PlaybookRunScalarFieldEnum = (typeof PlaybookRunScalarFieldEnum)[keyof typeof PlaybookRunScalarFieldEnum]
 
 
   export const RequestHistoryScalarFieldEnum: {
@@ -11849,6 +15771,7 @@ export namespace Prisma {
     companies?: CompanyListRelationFilter
     endpoints?: EndpointListRelationFilter
     fieldSchemas?: ERPFieldSchemaListRelationFilter
+    playbooks?: PlaybookListRelationFilter
   }
 
   export type ERPOrderByWithRelationInput = {
@@ -11858,6 +15781,7 @@ export namespace Prisma {
     companies?: CompanyOrderByRelationAggregateInput
     endpoints?: EndpointOrderByRelationAggregateInput
     fieldSchemas?: ERPFieldSchemaOrderByRelationAggregateInput
+    playbooks?: PlaybookOrderByRelationAggregateInput
   }
 
   export type ERPWhereUniqueInput = Prisma.AtLeast<{
@@ -11870,6 +15794,7 @@ export namespace Prisma {
     companies?: CompanyListRelationFilter
     endpoints?: EndpointListRelationFilter
     fieldSchemas?: ERPFieldSchemaListRelationFilter
+    playbooks?: PlaybookListRelationFilter
   }, "id" | "name">
 
   export type ERPOrderByWithAggregationInput = {
@@ -11989,7 +15914,9 @@ export namespace Prisma {
     group?: StringFilter<"Endpoint"> | string
     requiresClient?: BoolFilter<"Endpoint"> | boolean
     isModification?: BoolFilter<"Endpoint"> | boolean
+    notes?: StringFilter<"Endpoint"> | string
     erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
+    playbookSteps?: PlaybookStepListRelationFilter
   }
 
   export type EndpointOrderByWithRelationInput = {
@@ -12004,7 +15931,9 @@ export namespace Prisma {
     group?: SortOrder
     requiresClient?: SortOrder
     isModification?: SortOrder
+    notes?: SortOrder
     erp?: ERPOrderByWithRelationInput
+    playbookSteps?: PlaybookStepOrderByRelationAggregateInput
   }
 
   export type EndpointWhereUniqueInput = Prisma.AtLeast<{
@@ -12022,7 +15951,9 @@ export namespace Prisma {
     group?: StringFilter<"Endpoint"> | string
     requiresClient?: BoolFilter<"Endpoint"> | boolean
     isModification?: BoolFilter<"Endpoint"> | boolean
+    notes?: StringFilter<"Endpoint"> | string
     erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
+    playbookSteps?: PlaybookStepListRelationFilter
   }, "id">
 
   export type EndpointOrderByWithAggregationInput = {
@@ -12037,6 +15968,7 @@ export namespace Prisma {
     group?: SortOrder
     requiresClient?: SortOrder
     isModification?: SortOrder
+    notes?: SortOrder
     _count?: EndpointCountOrderByAggregateInput
     _avg?: EndpointAvgOrderByAggregateInput
     _max?: EndpointMaxOrderByAggregateInput
@@ -12059,6 +15991,7 @@ export namespace Prisma {
     group?: StringWithAggregatesFilter<"Endpoint"> | string
     requiresClient?: BoolWithAggregatesFilter<"Endpoint"> | boolean
     isModification?: BoolWithAggregatesFilter<"Endpoint"> | boolean
+    notes?: StringWithAggregatesFilter<"Endpoint"> | string
   }
 
   export type CompanyWhereInput = {
@@ -12072,6 +16005,7 @@ export namespace Prisma {
     environments?: JsonFilter<"Company">
     authType?: StringFilter<"Company"> | string
     authConfig?: JsonFilter<"Company">
+    notes?: StringFilter<"Company"> | string
     createdAt?: DateTimeFilter<"Company"> | Date | string
     erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
     testClients?: TestClientListRelationFilter
@@ -12085,6 +16019,7 @@ export namespace Prisma {
     environments?: SortOrder
     authType?: SortOrder
     authConfig?: SortOrder
+    notes?: SortOrder
     createdAt?: SortOrder
     erp?: ERPOrderByWithRelationInput
     testClients?: TestClientOrderByRelationAggregateInput
@@ -12101,6 +16036,7 @@ export namespace Prisma {
     environments?: JsonFilter<"Company">
     authType?: StringFilter<"Company"> | string
     authConfig?: JsonFilter<"Company">
+    notes?: StringFilter<"Company"> | string
     createdAt?: DateTimeFilter<"Company"> | Date | string
     erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
     testClients?: TestClientListRelationFilter
@@ -12114,6 +16050,7 @@ export namespace Prisma {
     environments?: SortOrder
     authType?: SortOrder
     authConfig?: SortOrder
+    notes?: SortOrder
     createdAt?: SortOrder
     _count?: CompanyCountOrderByAggregateInput
     _avg?: CompanyAvgOrderByAggregateInput
@@ -12133,6 +16070,7 @@ export namespace Prisma {
     environments?: JsonWithAggregatesFilter<"Company">
     authType?: StringWithAggregatesFilter<"Company"> | string
     authConfig?: JsonWithAggregatesFilter<"Company">
+    notes?: StringWithAggregatesFilter<"Company"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Company"> | Date | string
   }
 
@@ -12201,6 +16139,7 @@ export namespace Prisma {
     name?: StringFilter<"PostmanCollection"> | string
     context?: StringFilter<"PostmanCollection"> | string
     systemPrompt?: StringFilter<"PostmanCollection"> | string
+    embeddingProvider?: StringFilter<"PostmanCollection"> | string
     createdAt?: DateTimeFilter<"PostmanCollection"> | Date | string
     chunks?: EmbeddingChunkListRelationFilter
   }
@@ -12210,6 +16149,7 @@ export namespace Prisma {
     name?: SortOrder
     context?: SortOrder
     systemPrompt?: SortOrder
+    embeddingProvider?: SortOrder
     createdAt?: SortOrder
     chunks?: EmbeddingChunkOrderByRelationAggregateInput
   }
@@ -12222,6 +16162,7 @@ export namespace Prisma {
     name?: StringFilter<"PostmanCollection"> | string
     context?: StringFilter<"PostmanCollection"> | string
     systemPrompt?: StringFilter<"PostmanCollection"> | string
+    embeddingProvider?: StringFilter<"PostmanCollection"> | string
     createdAt?: DateTimeFilter<"PostmanCollection"> | Date | string
     chunks?: EmbeddingChunkListRelationFilter
   }, "id">
@@ -12231,6 +16172,7 @@ export namespace Prisma {
     name?: SortOrder
     context?: SortOrder
     systemPrompt?: SortOrder
+    embeddingProvider?: SortOrder
     createdAt?: SortOrder
     _count?: PostmanCollectionCountOrderByAggregateInput
     _avg?: PostmanCollectionAvgOrderByAggregateInput
@@ -12247,6 +16189,7 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"PostmanCollection"> | string
     context?: StringWithAggregatesFilter<"PostmanCollection"> | string
     systemPrompt?: StringWithAggregatesFilter<"PostmanCollection"> | string
+    embeddingProvider?: StringWithAggregatesFilter<"PostmanCollection"> | string
     createdAt?: DateTimeWithAggregatesFilter<"PostmanCollection"> | Date | string
   }
 
@@ -12332,6 +16275,211 @@ export namespace Prisma {
     NOT?: SettingScalarWhereWithAggregatesInput | SettingScalarWhereWithAggregatesInput[]
     key?: StringWithAggregatesFilter<"Setting"> | string
     value?: StringWithAggregatesFilter<"Setting"> | string
+  }
+
+  export type PlaybookWhereInput = {
+    AND?: PlaybookWhereInput | PlaybookWhereInput[]
+    OR?: PlaybookWhereInput[]
+    NOT?: PlaybookWhereInput | PlaybookWhereInput[]
+    id?: IntFilter<"Playbook"> | number
+    erpId?: IntFilter<"Playbook"> | number
+    name?: StringFilter<"Playbook"> | string
+    description?: StringFilter<"Playbook"> | string
+    createdAt?: DateTimeFilter<"Playbook"> | Date | string
+    erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
+    steps?: PlaybookStepListRelationFilter
+    runs?: PlaybookRunListRelationFilter
+  }
+
+  export type PlaybookOrderByWithRelationInput = {
+    id?: SortOrder
+    erpId?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    erp?: ERPOrderByWithRelationInput
+    steps?: PlaybookStepOrderByRelationAggregateInput
+    runs?: PlaybookRunOrderByRelationAggregateInput
+  }
+
+  export type PlaybookWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: PlaybookWhereInput | PlaybookWhereInput[]
+    OR?: PlaybookWhereInput[]
+    NOT?: PlaybookWhereInput | PlaybookWhereInput[]
+    erpId?: IntFilter<"Playbook"> | number
+    name?: StringFilter<"Playbook"> | string
+    description?: StringFilter<"Playbook"> | string
+    createdAt?: DateTimeFilter<"Playbook"> | Date | string
+    erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
+    steps?: PlaybookStepListRelationFilter
+    runs?: PlaybookRunListRelationFilter
+  }, "id">
+
+  export type PlaybookOrderByWithAggregationInput = {
+    id?: SortOrder
+    erpId?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+    _count?: PlaybookCountOrderByAggregateInput
+    _avg?: PlaybookAvgOrderByAggregateInput
+    _max?: PlaybookMaxOrderByAggregateInput
+    _min?: PlaybookMinOrderByAggregateInput
+    _sum?: PlaybookSumOrderByAggregateInput
+  }
+
+  export type PlaybookScalarWhereWithAggregatesInput = {
+    AND?: PlaybookScalarWhereWithAggregatesInput | PlaybookScalarWhereWithAggregatesInput[]
+    OR?: PlaybookScalarWhereWithAggregatesInput[]
+    NOT?: PlaybookScalarWhereWithAggregatesInput | PlaybookScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"Playbook"> | number
+    erpId?: IntWithAggregatesFilter<"Playbook"> | number
+    name?: StringWithAggregatesFilter<"Playbook"> | string
+    description?: StringWithAggregatesFilter<"Playbook"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"Playbook"> | Date | string
+  }
+
+  export type PlaybookStepWhereInput = {
+    AND?: PlaybookStepWhereInput | PlaybookStepWhereInput[]
+    OR?: PlaybookStepWhereInput[]
+    NOT?: PlaybookStepWhereInput | PlaybookStepWhereInput[]
+    id?: IntFilter<"PlaybookStep"> | number
+    playbookId?: IntFilter<"PlaybookStep"> | number
+    order?: IntFilter<"PlaybookStep"> | number
+    endpointId?: IntFilter<"PlaybookStep"> | number
+    stepName?: StringFilter<"PlaybookStep"> | string
+    bodyOverride?: StringFilter<"PlaybookStep"> | string
+    responseCapture?: StringFilter<"PlaybookStep"> | string
+    playbook?: XOR<PlaybookScalarRelationFilter, PlaybookWhereInput>
+    endpoint?: XOR<EndpointScalarRelationFilter, EndpointWhereInput>
+  }
+
+  export type PlaybookStepOrderByWithRelationInput = {
+    id?: SortOrder
+    playbookId?: SortOrder
+    order?: SortOrder
+    endpointId?: SortOrder
+    stepName?: SortOrder
+    bodyOverride?: SortOrder
+    responseCapture?: SortOrder
+    playbook?: PlaybookOrderByWithRelationInput
+    endpoint?: EndpointOrderByWithRelationInput
+  }
+
+  export type PlaybookStepWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: PlaybookStepWhereInput | PlaybookStepWhereInput[]
+    OR?: PlaybookStepWhereInput[]
+    NOT?: PlaybookStepWhereInput | PlaybookStepWhereInput[]
+    playbookId?: IntFilter<"PlaybookStep"> | number
+    order?: IntFilter<"PlaybookStep"> | number
+    endpointId?: IntFilter<"PlaybookStep"> | number
+    stepName?: StringFilter<"PlaybookStep"> | string
+    bodyOverride?: StringFilter<"PlaybookStep"> | string
+    responseCapture?: StringFilter<"PlaybookStep"> | string
+    playbook?: XOR<PlaybookScalarRelationFilter, PlaybookWhereInput>
+    endpoint?: XOR<EndpointScalarRelationFilter, EndpointWhereInput>
+  }, "id">
+
+  export type PlaybookStepOrderByWithAggregationInput = {
+    id?: SortOrder
+    playbookId?: SortOrder
+    order?: SortOrder
+    endpointId?: SortOrder
+    stepName?: SortOrder
+    bodyOverride?: SortOrder
+    responseCapture?: SortOrder
+    _count?: PlaybookStepCountOrderByAggregateInput
+    _avg?: PlaybookStepAvgOrderByAggregateInput
+    _max?: PlaybookStepMaxOrderByAggregateInput
+    _min?: PlaybookStepMinOrderByAggregateInput
+    _sum?: PlaybookStepSumOrderByAggregateInput
+  }
+
+  export type PlaybookStepScalarWhereWithAggregatesInput = {
+    AND?: PlaybookStepScalarWhereWithAggregatesInput | PlaybookStepScalarWhereWithAggregatesInput[]
+    OR?: PlaybookStepScalarWhereWithAggregatesInput[]
+    NOT?: PlaybookStepScalarWhereWithAggregatesInput | PlaybookStepScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"PlaybookStep"> | number
+    playbookId?: IntWithAggregatesFilter<"PlaybookStep"> | number
+    order?: IntWithAggregatesFilter<"PlaybookStep"> | number
+    endpointId?: IntWithAggregatesFilter<"PlaybookStep"> | number
+    stepName?: StringWithAggregatesFilter<"PlaybookStep"> | string
+    bodyOverride?: StringWithAggregatesFilter<"PlaybookStep"> | string
+    responseCapture?: StringWithAggregatesFilter<"PlaybookStep"> | string
+  }
+
+  export type PlaybookRunWhereInput = {
+    AND?: PlaybookRunWhereInput | PlaybookRunWhereInput[]
+    OR?: PlaybookRunWhereInput[]
+    NOT?: PlaybookRunWhereInput | PlaybookRunWhereInput[]
+    id?: IntFilter<"PlaybookRun"> | number
+    playbookId?: IntFilter<"PlaybookRun"> | number
+    companyId?: IntFilter<"PlaybookRun"> | number
+    clientId?: IntNullableFilter<"PlaybookRun"> | number | null
+    startedAt?: DateTimeFilter<"PlaybookRun"> | Date | string
+    endedAt?: DateTimeNullableFilter<"PlaybookRun"> | Date | string | null
+    status?: StringFilter<"PlaybookRun"> | string
+    steps?: JsonFilter<"PlaybookRun">
+    playbook?: XOR<PlaybookScalarRelationFilter, PlaybookWhereInput>
+  }
+
+  export type PlaybookRunOrderByWithRelationInput = {
+    id?: SortOrder
+    playbookId?: SortOrder
+    companyId?: SortOrder
+    clientId?: SortOrderInput | SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrderInput | SortOrder
+    status?: SortOrder
+    steps?: SortOrder
+    playbook?: PlaybookOrderByWithRelationInput
+  }
+
+  export type PlaybookRunWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: PlaybookRunWhereInput | PlaybookRunWhereInput[]
+    OR?: PlaybookRunWhereInput[]
+    NOT?: PlaybookRunWhereInput | PlaybookRunWhereInput[]
+    playbookId?: IntFilter<"PlaybookRun"> | number
+    companyId?: IntFilter<"PlaybookRun"> | number
+    clientId?: IntNullableFilter<"PlaybookRun"> | number | null
+    startedAt?: DateTimeFilter<"PlaybookRun"> | Date | string
+    endedAt?: DateTimeNullableFilter<"PlaybookRun"> | Date | string | null
+    status?: StringFilter<"PlaybookRun"> | string
+    steps?: JsonFilter<"PlaybookRun">
+    playbook?: XOR<PlaybookScalarRelationFilter, PlaybookWhereInput>
+  }, "id">
+
+  export type PlaybookRunOrderByWithAggregationInput = {
+    id?: SortOrder
+    playbookId?: SortOrder
+    companyId?: SortOrder
+    clientId?: SortOrderInput | SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrderInput | SortOrder
+    status?: SortOrder
+    steps?: SortOrder
+    _count?: PlaybookRunCountOrderByAggregateInput
+    _avg?: PlaybookRunAvgOrderByAggregateInput
+    _max?: PlaybookRunMaxOrderByAggregateInput
+    _min?: PlaybookRunMinOrderByAggregateInput
+    _sum?: PlaybookRunSumOrderByAggregateInput
+  }
+
+  export type PlaybookRunScalarWhereWithAggregatesInput = {
+    AND?: PlaybookRunScalarWhereWithAggregatesInput | PlaybookRunScalarWhereWithAggregatesInput[]
+    OR?: PlaybookRunScalarWhereWithAggregatesInput[]
+    NOT?: PlaybookRunScalarWhereWithAggregatesInput | PlaybookRunScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"PlaybookRun"> | number
+    playbookId?: IntWithAggregatesFilter<"PlaybookRun"> | number
+    companyId?: IntWithAggregatesFilter<"PlaybookRun"> | number
+    clientId?: IntNullableWithAggregatesFilter<"PlaybookRun"> | number | null
+    startedAt?: DateTimeWithAggregatesFilter<"PlaybookRun"> | Date | string
+    endedAt?: DateTimeNullableWithAggregatesFilter<"PlaybookRun"> | Date | string | null
+    status?: StringWithAggregatesFilter<"PlaybookRun"> | string
+    steps?: JsonWithAggregatesFilter<"PlaybookRun">
   }
 
   export type RequestHistoryWhereInput = {
@@ -12454,6 +16602,7 @@ export namespace Prisma {
     companies?: CompanyCreateNestedManyWithoutErpInput
     endpoints?: EndpointCreateNestedManyWithoutErpInput
     fieldSchemas?: ERPFieldSchemaCreateNestedManyWithoutErpInput
+    playbooks?: PlaybookCreateNestedManyWithoutErpInput
   }
 
   export type ERPUncheckedCreateInput = {
@@ -12463,6 +16612,7 @@ export namespace Prisma {
     companies?: CompanyUncheckedCreateNestedManyWithoutErpInput
     endpoints?: EndpointUncheckedCreateNestedManyWithoutErpInput
     fieldSchemas?: ERPFieldSchemaUncheckedCreateNestedManyWithoutErpInput
+    playbooks?: PlaybookUncheckedCreateNestedManyWithoutErpInput
   }
 
   export type ERPUpdateInput = {
@@ -12471,6 +16621,7 @@ export namespace Prisma {
     companies?: CompanyUpdateManyWithoutErpNestedInput
     endpoints?: EndpointUpdateManyWithoutErpNestedInput
     fieldSchemas?: ERPFieldSchemaUpdateManyWithoutErpNestedInput
+    playbooks?: PlaybookUpdateManyWithoutErpNestedInput
   }
 
   export type ERPUncheckedUpdateInput = {
@@ -12480,6 +16631,7 @@ export namespace Prisma {
     companies?: CompanyUncheckedUpdateManyWithoutErpNestedInput
     endpoints?: EndpointUncheckedUpdateManyWithoutErpNestedInput
     fieldSchemas?: ERPFieldSchemaUncheckedUpdateManyWithoutErpNestedInput
+    playbooks?: PlaybookUncheckedUpdateManyWithoutErpNestedInput
   }
 
   export type ERPCreateManyInput = {
@@ -12596,7 +16748,9 @@ export namespace Prisma {
     group?: string
     requiresClient?: boolean
     isModification?: boolean
+    notes?: string
     erp: ERPCreateNestedOneWithoutEndpointsInput
+    playbookSteps?: PlaybookStepCreateNestedManyWithoutEndpointInput
   }
 
   export type EndpointUncheckedCreateInput = {
@@ -12611,6 +16765,8 @@ export namespace Prisma {
     group?: string
     requiresClient?: boolean
     isModification?: boolean
+    notes?: string
+    playbookSteps?: PlaybookStepUncheckedCreateNestedManyWithoutEndpointInput
   }
 
   export type EndpointUpdateInput = {
@@ -12623,7 +16779,9 @@ export namespace Prisma {
     group?: StringFieldUpdateOperationsInput | string
     requiresClient?: BoolFieldUpdateOperationsInput | boolean
     isModification?: BoolFieldUpdateOperationsInput | boolean
+    notes?: StringFieldUpdateOperationsInput | string
     erp?: ERPUpdateOneRequiredWithoutEndpointsNestedInput
+    playbookSteps?: PlaybookStepUpdateManyWithoutEndpointNestedInput
   }
 
   export type EndpointUncheckedUpdateInput = {
@@ -12638,6 +16796,8 @@ export namespace Prisma {
     group?: StringFieldUpdateOperationsInput | string
     requiresClient?: BoolFieldUpdateOperationsInput | boolean
     isModification?: BoolFieldUpdateOperationsInput | boolean
+    notes?: StringFieldUpdateOperationsInput | string
+    playbookSteps?: PlaybookStepUncheckedUpdateManyWithoutEndpointNestedInput
   }
 
   export type EndpointCreateManyInput = {
@@ -12652,6 +16812,7 @@ export namespace Prisma {
     group?: string
     requiresClient?: boolean
     isModification?: boolean
+    notes?: string
   }
 
   export type EndpointUpdateManyMutationInput = {
@@ -12664,6 +16825,7 @@ export namespace Prisma {
     group?: StringFieldUpdateOperationsInput | string
     requiresClient?: BoolFieldUpdateOperationsInput | boolean
     isModification?: BoolFieldUpdateOperationsInput | boolean
+    notes?: StringFieldUpdateOperationsInput | string
   }
 
   export type EndpointUncheckedUpdateManyInput = {
@@ -12678,6 +16840,7 @@ export namespace Prisma {
     group?: StringFieldUpdateOperationsInput | string
     requiresClient?: BoolFieldUpdateOperationsInput | boolean
     isModification?: BoolFieldUpdateOperationsInput | boolean
+    notes?: StringFieldUpdateOperationsInput | string
   }
 
   export type CompanyCreateInput = {
@@ -12686,6 +16849,7 @@ export namespace Prisma {
     environments?: JsonNullValueInput | InputJsonValue
     authType?: string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: string
     createdAt?: Date | string
     erp: ERPCreateNestedOneWithoutCompaniesInput
     testClients?: TestClientCreateNestedManyWithoutCompanyInput
@@ -12699,6 +16863,7 @@ export namespace Prisma {
     environments?: JsonNullValueInput | InputJsonValue
     authType?: string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: string
     createdAt?: Date | string
     testClients?: TestClientUncheckedCreateNestedManyWithoutCompanyInput
   }
@@ -12709,6 +16874,7 @@ export namespace Prisma {
     environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     erp?: ERPUpdateOneRequiredWithoutCompaniesNestedInput
     testClients?: TestClientUpdateManyWithoutCompanyNestedInput
@@ -12722,6 +16888,7 @@ export namespace Prisma {
     environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     testClients?: TestClientUncheckedUpdateManyWithoutCompanyNestedInput
   }
@@ -12734,6 +16901,7 @@ export namespace Prisma {
     environments?: JsonNullValueInput | InputJsonValue
     authType?: string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: string
     createdAt?: Date | string
   }
 
@@ -12743,6 +16911,7 @@ export namespace Prisma {
     environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -12754,6 +16923,7 @@ export namespace Prisma {
     environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -12813,6 +16983,7 @@ export namespace Prisma {
     name: string
     context: string
     systemPrompt?: string
+    embeddingProvider?: string
     createdAt?: Date | string
     chunks?: EmbeddingChunkCreateNestedManyWithoutCollectionInput
   }
@@ -12822,6 +16993,7 @@ export namespace Prisma {
     name: string
     context: string
     systemPrompt?: string
+    embeddingProvider?: string
     createdAt?: Date | string
     chunks?: EmbeddingChunkUncheckedCreateNestedManyWithoutCollectionInput
   }
@@ -12830,6 +17002,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     context?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
+    embeddingProvider?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     chunks?: EmbeddingChunkUpdateManyWithoutCollectionNestedInput
   }
@@ -12839,6 +17012,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     context?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
+    embeddingProvider?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     chunks?: EmbeddingChunkUncheckedUpdateManyWithoutCollectionNestedInput
   }
@@ -12848,6 +17022,7 @@ export namespace Prisma {
     name: string
     context: string
     systemPrompt?: string
+    embeddingProvider?: string
     createdAt?: Date | string
   }
 
@@ -12855,6 +17030,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     context?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
+    embeddingProvider?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -12863,6 +17039,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     context?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
+    embeddingProvider?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -12920,6 +17097,204 @@ export namespace Prisma {
   export type SettingUncheckedUpdateManyInput = {
     key?: StringFieldUpdateOperationsInput | string
     value?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PlaybookCreateInput = {
+    name: string
+    description?: string
+    createdAt?: Date | string
+    erp: ERPCreateNestedOneWithoutPlaybooksInput
+    steps?: PlaybookStepCreateNestedManyWithoutPlaybookInput
+    runs?: PlaybookRunCreateNestedManyWithoutPlaybookInput
+  }
+
+  export type PlaybookUncheckedCreateInput = {
+    id?: number
+    erpId: number
+    name: string
+    description?: string
+    createdAt?: Date | string
+    steps?: PlaybookStepUncheckedCreateNestedManyWithoutPlaybookInput
+    runs?: PlaybookRunUncheckedCreateNestedManyWithoutPlaybookInput
+  }
+
+  export type PlaybookUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    erp?: ERPUpdateOneRequiredWithoutPlaybooksNestedInput
+    steps?: PlaybookStepUpdateManyWithoutPlaybookNestedInput
+    runs?: PlaybookRunUpdateManyWithoutPlaybookNestedInput
+  }
+
+  export type PlaybookUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    erpId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    steps?: PlaybookStepUncheckedUpdateManyWithoutPlaybookNestedInput
+    runs?: PlaybookRunUncheckedUpdateManyWithoutPlaybookNestedInput
+  }
+
+  export type PlaybookCreateManyInput = {
+    id?: number
+    erpId: number
+    name: string
+    description?: string
+    createdAt?: Date | string
+  }
+
+  export type PlaybookUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlaybookUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    erpId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlaybookStepCreateInput = {
+    order: number
+    stepName?: string
+    bodyOverride?: string
+    responseCapture?: string
+    playbook: PlaybookCreateNestedOneWithoutStepsInput
+    endpoint: EndpointCreateNestedOneWithoutPlaybookStepsInput
+  }
+
+  export type PlaybookStepUncheckedCreateInput = {
+    id?: number
+    playbookId: number
+    order: number
+    endpointId: number
+    stepName?: string
+    bodyOverride?: string
+    responseCapture?: string
+  }
+
+  export type PlaybookStepUpdateInput = {
+    order?: IntFieldUpdateOperationsInput | number
+    stepName?: StringFieldUpdateOperationsInput | string
+    bodyOverride?: StringFieldUpdateOperationsInput | string
+    responseCapture?: StringFieldUpdateOperationsInput | string
+    playbook?: PlaybookUpdateOneRequiredWithoutStepsNestedInput
+    endpoint?: EndpointUpdateOneRequiredWithoutPlaybookStepsNestedInput
+  }
+
+  export type PlaybookStepUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    playbookId?: IntFieldUpdateOperationsInput | number
+    order?: IntFieldUpdateOperationsInput | number
+    endpointId?: IntFieldUpdateOperationsInput | number
+    stepName?: StringFieldUpdateOperationsInput | string
+    bodyOverride?: StringFieldUpdateOperationsInput | string
+    responseCapture?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PlaybookStepCreateManyInput = {
+    id?: number
+    playbookId: number
+    order: number
+    endpointId: number
+    stepName?: string
+    bodyOverride?: string
+    responseCapture?: string
+  }
+
+  export type PlaybookStepUpdateManyMutationInput = {
+    order?: IntFieldUpdateOperationsInput | number
+    stepName?: StringFieldUpdateOperationsInput | string
+    bodyOverride?: StringFieldUpdateOperationsInput | string
+    responseCapture?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PlaybookStepUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    playbookId?: IntFieldUpdateOperationsInput | number
+    order?: IntFieldUpdateOperationsInput | number
+    endpointId?: IntFieldUpdateOperationsInput | number
+    stepName?: StringFieldUpdateOperationsInput | string
+    bodyOverride?: StringFieldUpdateOperationsInput | string
+    responseCapture?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PlaybookRunCreateInput = {
+    companyId: number
+    clientId?: number | null
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: string
+    steps?: JsonNullValueInput | InputJsonValue
+    playbook: PlaybookCreateNestedOneWithoutRunsInput
+  }
+
+  export type PlaybookRunUncheckedCreateInput = {
+    id?: number
+    playbookId: number
+    companyId: number
+    clientId?: number | null
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: string
+    steps?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type PlaybookRunUpdateInput = {
+    companyId?: IntFieldUpdateOperationsInput | number
+    clientId?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    steps?: JsonNullValueInput | InputJsonValue
+    playbook?: PlaybookUpdateOneRequiredWithoutRunsNestedInput
+  }
+
+  export type PlaybookRunUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    playbookId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    clientId?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    steps?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type PlaybookRunCreateManyInput = {
+    id?: number
+    playbookId: number
+    companyId: number
+    clientId?: number | null
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: string
+    steps?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type PlaybookRunUpdateManyMutationInput = {
+    companyId?: IntFieldUpdateOperationsInput | number
+    clientId?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    steps?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type PlaybookRunUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    playbookId?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    clientId?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    steps?: JsonNullValueInput | InputJsonValue
   }
 
   export type RequestHistoryCreateInput = {
@@ -13114,6 +17489,12 @@ export namespace Prisma {
     none?: ERPFieldSchemaWhereInput
   }
 
+  export type PlaybookListRelationFilter = {
+    every?: PlaybookWhereInput
+    some?: PlaybookWhereInput
+    none?: PlaybookWhereInput
+  }
+
   export type CompanyOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -13123,6 +17504,10 @@ export namespace Prisma {
   }
 
   export type ERPFieldSchemaOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PlaybookOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -13303,6 +17688,16 @@ export namespace Prisma {
     _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
+  export type PlaybookStepListRelationFilter = {
+    every?: PlaybookStepWhereInput
+    some?: PlaybookStepWhereInput
+    none?: PlaybookStepWhereInput
+  }
+
+  export type PlaybookStepOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type EndpointCountOrderByAggregateInput = {
     id?: SortOrder
     erpId?: SortOrder
@@ -13315,6 +17710,7 @@ export namespace Prisma {
     group?: SortOrder
     requiresClient?: SortOrder
     isModification?: SortOrder
+    notes?: SortOrder
   }
 
   export type EndpointAvgOrderByAggregateInput = {
@@ -13335,6 +17731,7 @@ export namespace Prisma {
     group?: SortOrder
     requiresClient?: SortOrder
     isModification?: SortOrder
+    notes?: SortOrder
   }
 
   export type EndpointMinOrderByAggregateInput = {
@@ -13349,6 +17746,7 @@ export namespace Prisma {
     group?: SortOrder
     requiresClient?: SortOrder
     isModification?: SortOrder
+    notes?: SortOrder
   }
 
   export type EndpointSumOrderByAggregateInput = {
@@ -13398,6 +17796,7 @@ export namespace Prisma {
     environments?: SortOrder
     authType?: SortOrder
     authConfig?: SortOrder
+    notes?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -13412,6 +17811,7 @@ export namespace Prisma {
     erpId?: SortOrder
     baseUrl?: SortOrder
     authType?: SortOrder
+    notes?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -13421,6 +17821,7 @@ export namespace Prisma {
     erpId?: SortOrder
     baseUrl?: SortOrder
     authType?: SortOrder
+    notes?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -13507,6 +17908,7 @@ export namespace Prisma {
     name?: SortOrder
     context?: SortOrder
     systemPrompt?: SortOrder
+    embeddingProvider?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -13519,6 +17921,7 @@ export namespace Prisma {
     name?: SortOrder
     context?: SortOrder
     systemPrompt?: SortOrder
+    embeddingProvider?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -13527,6 +17930,7 @@ export namespace Prisma {
     name?: SortOrder
     context?: SortOrder
     systemPrompt?: SortOrder
+    embeddingProvider?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -13580,6 +17984,174 @@ export namespace Prisma {
   export type SettingMinOrderByAggregateInput = {
     key?: SortOrder
     value?: SortOrder
+  }
+
+  export type PlaybookRunListRelationFilter = {
+    every?: PlaybookRunWhereInput
+    some?: PlaybookRunWhereInput
+    none?: PlaybookRunWhereInput
+  }
+
+  export type PlaybookRunOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PlaybookCountOrderByAggregateInput = {
+    id?: SortOrder
+    erpId?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PlaybookAvgOrderByAggregateInput = {
+    id?: SortOrder
+    erpId?: SortOrder
+  }
+
+  export type PlaybookMaxOrderByAggregateInput = {
+    id?: SortOrder
+    erpId?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PlaybookMinOrderByAggregateInput = {
+    id?: SortOrder
+    erpId?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type PlaybookSumOrderByAggregateInput = {
+    id?: SortOrder
+    erpId?: SortOrder
+  }
+
+  export type PlaybookScalarRelationFilter = {
+    is?: PlaybookWhereInput
+    isNot?: PlaybookWhereInput
+  }
+
+  export type EndpointScalarRelationFilter = {
+    is?: EndpointWhereInput
+    isNot?: EndpointWhereInput
+  }
+
+  export type PlaybookStepCountOrderByAggregateInput = {
+    id?: SortOrder
+    playbookId?: SortOrder
+    order?: SortOrder
+    endpointId?: SortOrder
+    stepName?: SortOrder
+    bodyOverride?: SortOrder
+    responseCapture?: SortOrder
+  }
+
+  export type PlaybookStepAvgOrderByAggregateInput = {
+    id?: SortOrder
+    playbookId?: SortOrder
+    order?: SortOrder
+    endpointId?: SortOrder
+  }
+
+  export type PlaybookStepMaxOrderByAggregateInput = {
+    id?: SortOrder
+    playbookId?: SortOrder
+    order?: SortOrder
+    endpointId?: SortOrder
+    stepName?: SortOrder
+    bodyOverride?: SortOrder
+    responseCapture?: SortOrder
+  }
+
+  export type PlaybookStepMinOrderByAggregateInput = {
+    id?: SortOrder
+    playbookId?: SortOrder
+    order?: SortOrder
+    endpointId?: SortOrder
+    stepName?: SortOrder
+    bodyOverride?: SortOrder
+    responseCapture?: SortOrder
+  }
+
+  export type PlaybookStepSumOrderByAggregateInput = {
+    id?: SortOrder
+    playbookId?: SortOrder
+    order?: SortOrder
+    endpointId?: SortOrder
+  }
+
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type PlaybookRunCountOrderByAggregateInput = {
+    id?: SortOrder
+    playbookId?: SortOrder
+    companyId?: SortOrder
+    clientId?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrder
+    status?: SortOrder
+    steps?: SortOrder
+  }
+
+  export type PlaybookRunAvgOrderByAggregateInput = {
+    id?: SortOrder
+    playbookId?: SortOrder
+    companyId?: SortOrder
+    clientId?: SortOrder
+  }
+
+  export type PlaybookRunMaxOrderByAggregateInput = {
+    id?: SortOrder
+    playbookId?: SortOrder
+    companyId?: SortOrder
+    clientId?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrder
+    status?: SortOrder
+  }
+
+  export type PlaybookRunMinOrderByAggregateInput = {
+    id?: SortOrder
+    playbookId?: SortOrder
+    companyId?: SortOrder
+    clientId?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrder
+    status?: SortOrder
+  }
+
+  export type PlaybookRunSumOrderByAggregateInput = {
+    id?: SortOrder
+    playbookId?: SortOrder
+    companyId?: SortOrder
+    clientId?: SortOrder
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type RequestHistoryCountOrderByAggregateInput = {
@@ -13681,6 +18253,13 @@ export namespace Prisma {
     connect?: ERPFieldSchemaWhereUniqueInput | ERPFieldSchemaWhereUniqueInput[]
   }
 
+  export type PlaybookCreateNestedManyWithoutErpInput = {
+    create?: XOR<PlaybookCreateWithoutErpInput, PlaybookUncheckedCreateWithoutErpInput> | PlaybookCreateWithoutErpInput[] | PlaybookUncheckedCreateWithoutErpInput[]
+    connectOrCreate?: PlaybookCreateOrConnectWithoutErpInput | PlaybookCreateOrConnectWithoutErpInput[]
+    createMany?: PlaybookCreateManyErpInputEnvelope
+    connect?: PlaybookWhereUniqueInput | PlaybookWhereUniqueInput[]
+  }
+
   export type CompanyUncheckedCreateNestedManyWithoutErpInput = {
     create?: XOR<CompanyCreateWithoutErpInput, CompanyUncheckedCreateWithoutErpInput> | CompanyCreateWithoutErpInput[] | CompanyUncheckedCreateWithoutErpInput[]
     connectOrCreate?: CompanyCreateOrConnectWithoutErpInput | CompanyCreateOrConnectWithoutErpInput[]
@@ -13700,6 +18279,13 @@ export namespace Prisma {
     connectOrCreate?: ERPFieldSchemaCreateOrConnectWithoutErpInput | ERPFieldSchemaCreateOrConnectWithoutErpInput[]
     createMany?: ERPFieldSchemaCreateManyErpInputEnvelope
     connect?: ERPFieldSchemaWhereUniqueInput | ERPFieldSchemaWhereUniqueInput[]
+  }
+
+  export type PlaybookUncheckedCreateNestedManyWithoutErpInput = {
+    create?: XOR<PlaybookCreateWithoutErpInput, PlaybookUncheckedCreateWithoutErpInput> | PlaybookCreateWithoutErpInput[] | PlaybookUncheckedCreateWithoutErpInput[]
+    connectOrCreate?: PlaybookCreateOrConnectWithoutErpInput | PlaybookCreateOrConnectWithoutErpInput[]
+    createMany?: PlaybookCreateManyErpInputEnvelope
+    connect?: PlaybookWhereUniqueInput | PlaybookWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -13752,6 +18338,20 @@ export namespace Prisma {
     deleteMany?: ERPFieldSchemaScalarWhereInput | ERPFieldSchemaScalarWhereInput[]
   }
 
+  export type PlaybookUpdateManyWithoutErpNestedInput = {
+    create?: XOR<PlaybookCreateWithoutErpInput, PlaybookUncheckedCreateWithoutErpInput> | PlaybookCreateWithoutErpInput[] | PlaybookUncheckedCreateWithoutErpInput[]
+    connectOrCreate?: PlaybookCreateOrConnectWithoutErpInput | PlaybookCreateOrConnectWithoutErpInput[]
+    upsert?: PlaybookUpsertWithWhereUniqueWithoutErpInput | PlaybookUpsertWithWhereUniqueWithoutErpInput[]
+    createMany?: PlaybookCreateManyErpInputEnvelope
+    set?: PlaybookWhereUniqueInput | PlaybookWhereUniqueInput[]
+    disconnect?: PlaybookWhereUniqueInput | PlaybookWhereUniqueInput[]
+    delete?: PlaybookWhereUniqueInput | PlaybookWhereUniqueInput[]
+    connect?: PlaybookWhereUniqueInput | PlaybookWhereUniqueInput[]
+    update?: PlaybookUpdateWithWhereUniqueWithoutErpInput | PlaybookUpdateWithWhereUniqueWithoutErpInput[]
+    updateMany?: PlaybookUpdateManyWithWhereWithoutErpInput | PlaybookUpdateManyWithWhereWithoutErpInput[]
+    deleteMany?: PlaybookScalarWhereInput | PlaybookScalarWhereInput[]
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -13802,6 +18402,20 @@ export namespace Prisma {
     deleteMany?: ERPFieldSchemaScalarWhereInput | ERPFieldSchemaScalarWhereInput[]
   }
 
+  export type PlaybookUncheckedUpdateManyWithoutErpNestedInput = {
+    create?: XOR<PlaybookCreateWithoutErpInput, PlaybookUncheckedCreateWithoutErpInput> | PlaybookCreateWithoutErpInput[] | PlaybookUncheckedCreateWithoutErpInput[]
+    connectOrCreate?: PlaybookCreateOrConnectWithoutErpInput | PlaybookCreateOrConnectWithoutErpInput[]
+    upsert?: PlaybookUpsertWithWhereUniqueWithoutErpInput | PlaybookUpsertWithWhereUniqueWithoutErpInput[]
+    createMany?: PlaybookCreateManyErpInputEnvelope
+    set?: PlaybookWhereUniqueInput | PlaybookWhereUniqueInput[]
+    disconnect?: PlaybookWhereUniqueInput | PlaybookWhereUniqueInput[]
+    delete?: PlaybookWhereUniqueInput | PlaybookWhereUniqueInput[]
+    connect?: PlaybookWhereUniqueInput | PlaybookWhereUniqueInput[]
+    update?: PlaybookUpdateWithWhereUniqueWithoutErpInput | PlaybookUpdateWithWhereUniqueWithoutErpInput[]
+    updateMany?: PlaybookUpdateManyWithWhereWithoutErpInput | PlaybookUpdateManyWithWhereWithoutErpInput[]
+    deleteMany?: PlaybookScalarWhereInput | PlaybookScalarWhereInput[]
+  }
+
   export type ERPCreateNestedOneWithoutFieldSchemasInput = {
     create?: XOR<ERPCreateWithoutFieldSchemasInput, ERPUncheckedCreateWithoutFieldSchemasInput>
     connectOrCreate?: ERPCreateOrConnectWithoutFieldSchemasInput
@@ -13834,12 +18448,54 @@ export namespace Prisma {
     connect?: ERPWhereUniqueInput
   }
 
+  export type PlaybookStepCreateNestedManyWithoutEndpointInput = {
+    create?: XOR<PlaybookStepCreateWithoutEndpointInput, PlaybookStepUncheckedCreateWithoutEndpointInput> | PlaybookStepCreateWithoutEndpointInput[] | PlaybookStepUncheckedCreateWithoutEndpointInput[]
+    connectOrCreate?: PlaybookStepCreateOrConnectWithoutEndpointInput | PlaybookStepCreateOrConnectWithoutEndpointInput[]
+    createMany?: PlaybookStepCreateManyEndpointInputEnvelope
+    connect?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+  }
+
+  export type PlaybookStepUncheckedCreateNestedManyWithoutEndpointInput = {
+    create?: XOR<PlaybookStepCreateWithoutEndpointInput, PlaybookStepUncheckedCreateWithoutEndpointInput> | PlaybookStepCreateWithoutEndpointInput[] | PlaybookStepUncheckedCreateWithoutEndpointInput[]
+    connectOrCreate?: PlaybookStepCreateOrConnectWithoutEndpointInput | PlaybookStepCreateOrConnectWithoutEndpointInput[]
+    createMany?: PlaybookStepCreateManyEndpointInputEnvelope
+    connect?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+  }
+
   export type ERPUpdateOneRequiredWithoutEndpointsNestedInput = {
     create?: XOR<ERPCreateWithoutEndpointsInput, ERPUncheckedCreateWithoutEndpointsInput>
     connectOrCreate?: ERPCreateOrConnectWithoutEndpointsInput
     upsert?: ERPUpsertWithoutEndpointsInput
     connect?: ERPWhereUniqueInput
     update?: XOR<XOR<ERPUpdateToOneWithWhereWithoutEndpointsInput, ERPUpdateWithoutEndpointsInput>, ERPUncheckedUpdateWithoutEndpointsInput>
+  }
+
+  export type PlaybookStepUpdateManyWithoutEndpointNestedInput = {
+    create?: XOR<PlaybookStepCreateWithoutEndpointInput, PlaybookStepUncheckedCreateWithoutEndpointInput> | PlaybookStepCreateWithoutEndpointInput[] | PlaybookStepUncheckedCreateWithoutEndpointInput[]
+    connectOrCreate?: PlaybookStepCreateOrConnectWithoutEndpointInput | PlaybookStepCreateOrConnectWithoutEndpointInput[]
+    upsert?: PlaybookStepUpsertWithWhereUniqueWithoutEndpointInput | PlaybookStepUpsertWithWhereUniqueWithoutEndpointInput[]
+    createMany?: PlaybookStepCreateManyEndpointInputEnvelope
+    set?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    disconnect?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    delete?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    connect?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    update?: PlaybookStepUpdateWithWhereUniqueWithoutEndpointInput | PlaybookStepUpdateWithWhereUniqueWithoutEndpointInput[]
+    updateMany?: PlaybookStepUpdateManyWithWhereWithoutEndpointInput | PlaybookStepUpdateManyWithWhereWithoutEndpointInput[]
+    deleteMany?: PlaybookStepScalarWhereInput | PlaybookStepScalarWhereInput[]
+  }
+
+  export type PlaybookStepUncheckedUpdateManyWithoutEndpointNestedInput = {
+    create?: XOR<PlaybookStepCreateWithoutEndpointInput, PlaybookStepUncheckedCreateWithoutEndpointInput> | PlaybookStepCreateWithoutEndpointInput[] | PlaybookStepUncheckedCreateWithoutEndpointInput[]
+    connectOrCreate?: PlaybookStepCreateOrConnectWithoutEndpointInput | PlaybookStepCreateOrConnectWithoutEndpointInput[]
+    upsert?: PlaybookStepUpsertWithWhereUniqueWithoutEndpointInput | PlaybookStepUpsertWithWhereUniqueWithoutEndpointInput[]
+    createMany?: PlaybookStepCreateManyEndpointInputEnvelope
+    set?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    disconnect?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    delete?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    connect?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    update?: PlaybookStepUpdateWithWhereUniqueWithoutEndpointInput | PlaybookStepUpdateWithWhereUniqueWithoutEndpointInput[]
+    updateMany?: PlaybookStepUpdateManyWithWhereWithoutEndpointInput | PlaybookStepUpdateManyWithWhereWithoutEndpointInput[]
+    deleteMany?: PlaybookStepScalarWhereInput | PlaybookStepScalarWhereInput[]
   }
 
   export type ERPCreateNestedOneWithoutCompaniesInput = {
@@ -13946,6 +18602,150 @@ export namespace Prisma {
     upsert?: PostmanCollectionUpsertWithoutChunksInput
     connect?: PostmanCollectionWhereUniqueInput
     update?: XOR<XOR<PostmanCollectionUpdateToOneWithWhereWithoutChunksInput, PostmanCollectionUpdateWithoutChunksInput>, PostmanCollectionUncheckedUpdateWithoutChunksInput>
+  }
+
+  export type ERPCreateNestedOneWithoutPlaybooksInput = {
+    create?: XOR<ERPCreateWithoutPlaybooksInput, ERPUncheckedCreateWithoutPlaybooksInput>
+    connectOrCreate?: ERPCreateOrConnectWithoutPlaybooksInput
+    connect?: ERPWhereUniqueInput
+  }
+
+  export type PlaybookStepCreateNestedManyWithoutPlaybookInput = {
+    create?: XOR<PlaybookStepCreateWithoutPlaybookInput, PlaybookStepUncheckedCreateWithoutPlaybookInput> | PlaybookStepCreateWithoutPlaybookInput[] | PlaybookStepUncheckedCreateWithoutPlaybookInput[]
+    connectOrCreate?: PlaybookStepCreateOrConnectWithoutPlaybookInput | PlaybookStepCreateOrConnectWithoutPlaybookInput[]
+    createMany?: PlaybookStepCreateManyPlaybookInputEnvelope
+    connect?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+  }
+
+  export type PlaybookRunCreateNestedManyWithoutPlaybookInput = {
+    create?: XOR<PlaybookRunCreateWithoutPlaybookInput, PlaybookRunUncheckedCreateWithoutPlaybookInput> | PlaybookRunCreateWithoutPlaybookInput[] | PlaybookRunUncheckedCreateWithoutPlaybookInput[]
+    connectOrCreate?: PlaybookRunCreateOrConnectWithoutPlaybookInput | PlaybookRunCreateOrConnectWithoutPlaybookInput[]
+    createMany?: PlaybookRunCreateManyPlaybookInputEnvelope
+    connect?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+  }
+
+  export type PlaybookStepUncheckedCreateNestedManyWithoutPlaybookInput = {
+    create?: XOR<PlaybookStepCreateWithoutPlaybookInput, PlaybookStepUncheckedCreateWithoutPlaybookInput> | PlaybookStepCreateWithoutPlaybookInput[] | PlaybookStepUncheckedCreateWithoutPlaybookInput[]
+    connectOrCreate?: PlaybookStepCreateOrConnectWithoutPlaybookInput | PlaybookStepCreateOrConnectWithoutPlaybookInput[]
+    createMany?: PlaybookStepCreateManyPlaybookInputEnvelope
+    connect?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+  }
+
+  export type PlaybookRunUncheckedCreateNestedManyWithoutPlaybookInput = {
+    create?: XOR<PlaybookRunCreateWithoutPlaybookInput, PlaybookRunUncheckedCreateWithoutPlaybookInput> | PlaybookRunCreateWithoutPlaybookInput[] | PlaybookRunUncheckedCreateWithoutPlaybookInput[]
+    connectOrCreate?: PlaybookRunCreateOrConnectWithoutPlaybookInput | PlaybookRunCreateOrConnectWithoutPlaybookInput[]
+    createMany?: PlaybookRunCreateManyPlaybookInputEnvelope
+    connect?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+  }
+
+  export type ERPUpdateOneRequiredWithoutPlaybooksNestedInput = {
+    create?: XOR<ERPCreateWithoutPlaybooksInput, ERPUncheckedCreateWithoutPlaybooksInput>
+    connectOrCreate?: ERPCreateOrConnectWithoutPlaybooksInput
+    upsert?: ERPUpsertWithoutPlaybooksInput
+    connect?: ERPWhereUniqueInput
+    update?: XOR<XOR<ERPUpdateToOneWithWhereWithoutPlaybooksInput, ERPUpdateWithoutPlaybooksInput>, ERPUncheckedUpdateWithoutPlaybooksInput>
+  }
+
+  export type PlaybookStepUpdateManyWithoutPlaybookNestedInput = {
+    create?: XOR<PlaybookStepCreateWithoutPlaybookInput, PlaybookStepUncheckedCreateWithoutPlaybookInput> | PlaybookStepCreateWithoutPlaybookInput[] | PlaybookStepUncheckedCreateWithoutPlaybookInput[]
+    connectOrCreate?: PlaybookStepCreateOrConnectWithoutPlaybookInput | PlaybookStepCreateOrConnectWithoutPlaybookInput[]
+    upsert?: PlaybookStepUpsertWithWhereUniqueWithoutPlaybookInput | PlaybookStepUpsertWithWhereUniqueWithoutPlaybookInput[]
+    createMany?: PlaybookStepCreateManyPlaybookInputEnvelope
+    set?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    disconnect?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    delete?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    connect?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    update?: PlaybookStepUpdateWithWhereUniqueWithoutPlaybookInput | PlaybookStepUpdateWithWhereUniqueWithoutPlaybookInput[]
+    updateMany?: PlaybookStepUpdateManyWithWhereWithoutPlaybookInput | PlaybookStepUpdateManyWithWhereWithoutPlaybookInput[]
+    deleteMany?: PlaybookStepScalarWhereInput | PlaybookStepScalarWhereInput[]
+  }
+
+  export type PlaybookRunUpdateManyWithoutPlaybookNestedInput = {
+    create?: XOR<PlaybookRunCreateWithoutPlaybookInput, PlaybookRunUncheckedCreateWithoutPlaybookInput> | PlaybookRunCreateWithoutPlaybookInput[] | PlaybookRunUncheckedCreateWithoutPlaybookInput[]
+    connectOrCreate?: PlaybookRunCreateOrConnectWithoutPlaybookInput | PlaybookRunCreateOrConnectWithoutPlaybookInput[]
+    upsert?: PlaybookRunUpsertWithWhereUniqueWithoutPlaybookInput | PlaybookRunUpsertWithWhereUniqueWithoutPlaybookInput[]
+    createMany?: PlaybookRunCreateManyPlaybookInputEnvelope
+    set?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    disconnect?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    delete?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    connect?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    update?: PlaybookRunUpdateWithWhereUniqueWithoutPlaybookInput | PlaybookRunUpdateWithWhereUniqueWithoutPlaybookInput[]
+    updateMany?: PlaybookRunUpdateManyWithWhereWithoutPlaybookInput | PlaybookRunUpdateManyWithWhereWithoutPlaybookInput[]
+    deleteMany?: PlaybookRunScalarWhereInput | PlaybookRunScalarWhereInput[]
+  }
+
+  export type PlaybookStepUncheckedUpdateManyWithoutPlaybookNestedInput = {
+    create?: XOR<PlaybookStepCreateWithoutPlaybookInput, PlaybookStepUncheckedCreateWithoutPlaybookInput> | PlaybookStepCreateWithoutPlaybookInput[] | PlaybookStepUncheckedCreateWithoutPlaybookInput[]
+    connectOrCreate?: PlaybookStepCreateOrConnectWithoutPlaybookInput | PlaybookStepCreateOrConnectWithoutPlaybookInput[]
+    upsert?: PlaybookStepUpsertWithWhereUniqueWithoutPlaybookInput | PlaybookStepUpsertWithWhereUniqueWithoutPlaybookInput[]
+    createMany?: PlaybookStepCreateManyPlaybookInputEnvelope
+    set?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    disconnect?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    delete?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    connect?: PlaybookStepWhereUniqueInput | PlaybookStepWhereUniqueInput[]
+    update?: PlaybookStepUpdateWithWhereUniqueWithoutPlaybookInput | PlaybookStepUpdateWithWhereUniqueWithoutPlaybookInput[]
+    updateMany?: PlaybookStepUpdateManyWithWhereWithoutPlaybookInput | PlaybookStepUpdateManyWithWhereWithoutPlaybookInput[]
+    deleteMany?: PlaybookStepScalarWhereInput | PlaybookStepScalarWhereInput[]
+  }
+
+  export type PlaybookRunUncheckedUpdateManyWithoutPlaybookNestedInput = {
+    create?: XOR<PlaybookRunCreateWithoutPlaybookInput, PlaybookRunUncheckedCreateWithoutPlaybookInput> | PlaybookRunCreateWithoutPlaybookInput[] | PlaybookRunUncheckedCreateWithoutPlaybookInput[]
+    connectOrCreate?: PlaybookRunCreateOrConnectWithoutPlaybookInput | PlaybookRunCreateOrConnectWithoutPlaybookInput[]
+    upsert?: PlaybookRunUpsertWithWhereUniqueWithoutPlaybookInput | PlaybookRunUpsertWithWhereUniqueWithoutPlaybookInput[]
+    createMany?: PlaybookRunCreateManyPlaybookInputEnvelope
+    set?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    disconnect?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    delete?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    connect?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    update?: PlaybookRunUpdateWithWhereUniqueWithoutPlaybookInput | PlaybookRunUpdateWithWhereUniqueWithoutPlaybookInput[]
+    updateMany?: PlaybookRunUpdateManyWithWhereWithoutPlaybookInput | PlaybookRunUpdateManyWithWhereWithoutPlaybookInput[]
+    deleteMany?: PlaybookRunScalarWhereInput | PlaybookRunScalarWhereInput[]
+  }
+
+  export type PlaybookCreateNestedOneWithoutStepsInput = {
+    create?: XOR<PlaybookCreateWithoutStepsInput, PlaybookUncheckedCreateWithoutStepsInput>
+    connectOrCreate?: PlaybookCreateOrConnectWithoutStepsInput
+    connect?: PlaybookWhereUniqueInput
+  }
+
+  export type EndpointCreateNestedOneWithoutPlaybookStepsInput = {
+    create?: XOR<EndpointCreateWithoutPlaybookStepsInput, EndpointUncheckedCreateWithoutPlaybookStepsInput>
+    connectOrCreate?: EndpointCreateOrConnectWithoutPlaybookStepsInput
+    connect?: EndpointWhereUniqueInput
+  }
+
+  export type PlaybookUpdateOneRequiredWithoutStepsNestedInput = {
+    create?: XOR<PlaybookCreateWithoutStepsInput, PlaybookUncheckedCreateWithoutStepsInput>
+    connectOrCreate?: PlaybookCreateOrConnectWithoutStepsInput
+    upsert?: PlaybookUpsertWithoutStepsInput
+    connect?: PlaybookWhereUniqueInput
+    update?: XOR<XOR<PlaybookUpdateToOneWithWhereWithoutStepsInput, PlaybookUpdateWithoutStepsInput>, PlaybookUncheckedUpdateWithoutStepsInput>
+  }
+
+  export type EndpointUpdateOneRequiredWithoutPlaybookStepsNestedInput = {
+    create?: XOR<EndpointCreateWithoutPlaybookStepsInput, EndpointUncheckedCreateWithoutPlaybookStepsInput>
+    connectOrCreate?: EndpointCreateOrConnectWithoutPlaybookStepsInput
+    upsert?: EndpointUpsertWithoutPlaybookStepsInput
+    connect?: EndpointWhereUniqueInput
+    update?: XOR<XOR<EndpointUpdateToOneWithWhereWithoutPlaybookStepsInput, EndpointUpdateWithoutPlaybookStepsInput>, EndpointUncheckedUpdateWithoutPlaybookStepsInput>
+  }
+
+  export type PlaybookCreateNestedOneWithoutRunsInput = {
+    create?: XOR<PlaybookCreateWithoutRunsInput, PlaybookUncheckedCreateWithoutRunsInput>
+    connectOrCreate?: PlaybookCreateOrConnectWithoutRunsInput
+    connect?: PlaybookWhereUniqueInput
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
+  export type PlaybookUpdateOneRequiredWithoutRunsNestedInput = {
+    create?: XOR<PlaybookCreateWithoutRunsInput, PlaybookUncheckedCreateWithoutRunsInput>
+    connectOrCreate?: PlaybookCreateOrConnectWithoutRunsInput
+    upsert?: PlaybookUpsertWithoutRunsInput
+    connect?: PlaybookWhereUniqueInput
+    update?: XOR<XOR<PlaybookUpdateToOneWithWhereWithoutRunsInput, PlaybookUpdateWithoutRunsInput>, PlaybookUncheckedUpdateWithoutRunsInput>
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -14116,12 +18916,38 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type CompanyCreateWithoutErpInput = {
     name: string
     baseUrl?: string
     environments?: JsonNullValueInput | InputJsonValue
     authType?: string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: string
     createdAt?: Date | string
     testClients?: TestClientCreateNestedManyWithoutCompanyInput
   }
@@ -14133,6 +18959,7 @@ export namespace Prisma {
     environments?: JsonNullValueInput | InputJsonValue
     authType?: string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: string
     createdAt?: Date | string
     testClients?: TestClientUncheckedCreateNestedManyWithoutCompanyInput
   }
@@ -14157,6 +18984,8 @@ export namespace Prisma {
     group?: string
     requiresClient?: boolean
     isModification?: boolean
+    notes?: string
+    playbookSteps?: PlaybookStepCreateNestedManyWithoutEndpointInput
   }
 
   export type EndpointUncheckedCreateWithoutErpInput = {
@@ -14170,6 +18999,8 @@ export namespace Prisma {
     group?: string
     requiresClient?: boolean
     isModification?: boolean
+    notes?: string
+    playbookSteps?: PlaybookStepUncheckedCreateNestedManyWithoutEndpointInput
   }
 
   export type EndpointCreateOrConnectWithoutErpInput = {
@@ -14215,6 +19046,33 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type PlaybookCreateWithoutErpInput = {
+    name: string
+    description?: string
+    createdAt?: Date | string
+    steps?: PlaybookStepCreateNestedManyWithoutPlaybookInput
+    runs?: PlaybookRunCreateNestedManyWithoutPlaybookInput
+  }
+
+  export type PlaybookUncheckedCreateWithoutErpInput = {
+    id?: number
+    name: string
+    description?: string
+    createdAt?: Date | string
+    steps?: PlaybookStepUncheckedCreateNestedManyWithoutPlaybookInput
+    runs?: PlaybookRunUncheckedCreateNestedManyWithoutPlaybookInput
+  }
+
+  export type PlaybookCreateOrConnectWithoutErpInput = {
+    where: PlaybookWhereUniqueInput
+    create: XOR<PlaybookCreateWithoutErpInput, PlaybookUncheckedCreateWithoutErpInput>
+  }
+
+  export type PlaybookCreateManyErpInputEnvelope = {
+    data: PlaybookCreateManyErpInput | PlaybookCreateManyErpInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CompanyUpsertWithWhereUniqueWithoutErpInput = {
     where: CompanyWhereUniqueInput
     update: XOR<CompanyUpdateWithoutErpInput, CompanyUncheckedUpdateWithoutErpInput>
@@ -14242,6 +19100,7 @@ export namespace Prisma {
     environments?: JsonFilter<"Company">
     authType?: StringFilter<"Company"> | string
     authConfig?: JsonFilter<"Company">
+    notes?: StringFilter<"Company"> | string
     createdAt?: DateTimeFilter<"Company"> | Date | string
   }
 
@@ -14276,6 +19135,7 @@ export namespace Prisma {
     group?: StringFilter<"Endpoint"> | string
     requiresClient?: BoolFilter<"Endpoint"> | boolean
     isModification?: BoolFilter<"Endpoint"> | boolean
+    notes?: StringFilter<"Endpoint"> | string
   }
 
   export type ERPFieldSchemaUpsertWithWhereUniqueWithoutErpInput = {
@@ -14310,11 +19170,39 @@ export namespace Prisma {
     responsePath?: StringFilter<"ERPFieldSchema"> | string
   }
 
+  export type PlaybookUpsertWithWhereUniqueWithoutErpInput = {
+    where: PlaybookWhereUniqueInput
+    update: XOR<PlaybookUpdateWithoutErpInput, PlaybookUncheckedUpdateWithoutErpInput>
+    create: XOR<PlaybookCreateWithoutErpInput, PlaybookUncheckedCreateWithoutErpInput>
+  }
+
+  export type PlaybookUpdateWithWhereUniqueWithoutErpInput = {
+    where: PlaybookWhereUniqueInput
+    data: XOR<PlaybookUpdateWithoutErpInput, PlaybookUncheckedUpdateWithoutErpInput>
+  }
+
+  export type PlaybookUpdateManyWithWhereWithoutErpInput = {
+    where: PlaybookScalarWhereInput
+    data: XOR<PlaybookUpdateManyMutationInput, PlaybookUncheckedUpdateManyWithoutErpInput>
+  }
+
+  export type PlaybookScalarWhereInput = {
+    AND?: PlaybookScalarWhereInput | PlaybookScalarWhereInput[]
+    OR?: PlaybookScalarWhereInput[]
+    NOT?: PlaybookScalarWhereInput | PlaybookScalarWhereInput[]
+    id?: IntFilter<"Playbook"> | number
+    erpId?: IntFilter<"Playbook"> | number
+    name?: StringFilter<"Playbook"> | string
+    description?: StringFilter<"Playbook"> | string
+    createdAt?: DateTimeFilter<"Playbook"> | Date | string
+  }
+
   export type ERPCreateWithoutFieldSchemasInput = {
     name: string
     createdAt?: Date | string
     companies?: CompanyCreateNestedManyWithoutErpInput
     endpoints?: EndpointCreateNestedManyWithoutErpInput
+    playbooks?: PlaybookCreateNestedManyWithoutErpInput
   }
 
   export type ERPUncheckedCreateWithoutFieldSchemasInput = {
@@ -14323,6 +19211,7 @@ export namespace Prisma {
     createdAt?: Date | string
     companies?: CompanyUncheckedCreateNestedManyWithoutErpInput
     endpoints?: EndpointUncheckedCreateNestedManyWithoutErpInput
+    playbooks?: PlaybookUncheckedCreateNestedManyWithoutErpInput
   }
 
   export type ERPCreateOrConnectWithoutFieldSchemasInput = {
@@ -14346,6 +19235,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     companies?: CompanyUpdateManyWithoutErpNestedInput
     endpoints?: EndpointUpdateManyWithoutErpNestedInput
+    playbooks?: PlaybookUpdateManyWithoutErpNestedInput
   }
 
   export type ERPUncheckedUpdateWithoutFieldSchemasInput = {
@@ -14354,6 +19244,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     companies?: CompanyUncheckedUpdateManyWithoutErpNestedInput
     endpoints?: EndpointUncheckedUpdateManyWithoutErpNestedInput
+    playbooks?: PlaybookUncheckedUpdateManyWithoutErpNestedInput
   }
 
   export type ERPCreateWithoutEndpointsInput = {
@@ -14361,6 +19252,7 @@ export namespace Prisma {
     createdAt?: Date | string
     companies?: CompanyCreateNestedManyWithoutErpInput
     fieldSchemas?: ERPFieldSchemaCreateNestedManyWithoutErpInput
+    playbooks?: PlaybookCreateNestedManyWithoutErpInput
   }
 
   export type ERPUncheckedCreateWithoutEndpointsInput = {
@@ -14369,11 +19261,39 @@ export namespace Prisma {
     createdAt?: Date | string
     companies?: CompanyUncheckedCreateNestedManyWithoutErpInput
     fieldSchemas?: ERPFieldSchemaUncheckedCreateNestedManyWithoutErpInput
+    playbooks?: PlaybookUncheckedCreateNestedManyWithoutErpInput
   }
 
   export type ERPCreateOrConnectWithoutEndpointsInput = {
     where: ERPWhereUniqueInput
     create: XOR<ERPCreateWithoutEndpointsInput, ERPUncheckedCreateWithoutEndpointsInput>
+  }
+
+  export type PlaybookStepCreateWithoutEndpointInput = {
+    order: number
+    stepName?: string
+    bodyOverride?: string
+    responseCapture?: string
+    playbook: PlaybookCreateNestedOneWithoutStepsInput
+  }
+
+  export type PlaybookStepUncheckedCreateWithoutEndpointInput = {
+    id?: number
+    playbookId: number
+    order: number
+    stepName?: string
+    bodyOverride?: string
+    responseCapture?: string
+  }
+
+  export type PlaybookStepCreateOrConnectWithoutEndpointInput = {
+    where: PlaybookStepWhereUniqueInput
+    create: XOR<PlaybookStepCreateWithoutEndpointInput, PlaybookStepUncheckedCreateWithoutEndpointInput>
+  }
+
+  export type PlaybookStepCreateManyEndpointInputEnvelope = {
+    data: PlaybookStepCreateManyEndpointInput | PlaybookStepCreateManyEndpointInput[]
+    skipDuplicates?: boolean
   }
 
   export type ERPUpsertWithoutEndpointsInput = {
@@ -14392,6 +19312,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     companies?: CompanyUpdateManyWithoutErpNestedInput
     fieldSchemas?: ERPFieldSchemaUpdateManyWithoutErpNestedInput
+    playbooks?: PlaybookUpdateManyWithoutErpNestedInput
   }
 
   export type ERPUncheckedUpdateWithoutEndpointsInput = {
@@ -14400,6 +19321,36 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     companies?: CompanyUncheckedUpdateManyWithoutErpNestedInput
     fieldSchemas?: ERPFieldSchemaUncheckedUpdateManyWithoutErpNestedInput
+    playbooks?: PlaybookUncheckedUpdateManyWithoutErpNestedInput
+  }
+
+  export type PlaybookStepUpsertWithWhereUniqueWithoutEndpointInput = {
+    where: PlaybookStepWhereUniqueInput
+    update: XOR<PlaybookStepUpdateWithoutEndpointInput, PlaybookStepUncheckedUpdateWithoutEndpointInput>
+    create: XOR<PlaybookStepCreateWithoutEndpointInput, PlaybookStepUncheckedCreateWithoutEndpointInput>
+  }
+
+  export type PlaybookStepUpdateWithWhereUniqueWithoutEndpointInput = {
+    where: PlaybookStepWhereUniqueInput
+    data: XOR<PlaybookStepUpdateWithoutEndpointInput, PlaybookStepUncheckedUpdateWithoutEndpointInput>
+  }
+
+  export type PlaybookStepUpdateManyWithWhereWithoutEndpointInput = {
+    where: PlaybookStepScalarWhereInput
+    data: XOR<PlaybookStepUpdateManyMutationInput, PlaybookStepUncheckedUpdateManyWithoutEndpointInput>
+  }
+
+  export type PlaybookStepScalarWhereInput = {
+    AND?: PlaybookStepScalarWhereInput | PlaybookStepScalarWhereInput[]
+    OR?: PlaybookStepScalarWhereInput[]
+    NOT?: PlaybookStepScalarWhereInput | PlaybookStepScalarWhereInput[]
+    id?: IntFilter<"PlaybookStep"> | number
+    playbookId?: IntFilter<"PlaybookStep"> | number
+    order?: IntFilter<"PlaybookStep"> | number
+    endpointId?: IntFilter<"PlaybookStep"> | number
+    stepName?: StringFilter<"PlaybookStep"> | string
+    bodyOverride?: StringFilter<"PlaybookStep"> | string
+    responseCapture?: StringFilter<"PlaybookStep"> | string
   }
 
   export type ERPCreateWithoutCompaniesInput = {
@@ -14407,6 +19358,7 @@ export namespace Prisma {
     createdAt?: Date | string
     endpoints?: EndpointCreateNestedManyWithoutErpInput
     fieldSchemas?: ERPFieldSchemaCreateNestedManyWithoutErpInput
+    playbooks?: PlaybookCreateNestedManyWithoutErpInput
   }
 
   export type ERPUncheckedCreateWithoutCompaniesInput = {
@@ -14415,6 +19367,7 @@ export namespace Prisma {
     createdAt?: Date | string
     endpoints?: EndpointUncheckedCreateNestedManyWithoutErpInput
     fieldSchemas?: ERPFieldSchemaUncheckedCreateNestedManyWithoutErpInput
+    playbooks?: PlaybookUncheckedCreateNestedManyWithoutErpInput
   }
 
   export type ERPCreateOrConnectWithoutCompaniesInput = {
@@ -14461,6 +19414,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endpoints?: EndpointUpdateManyWithoutErpNestedInput
     fieldSchemas?: ERPFieldSchemaUpdateManyWithoutErpNestedInput
+    playbooks?: PlaybookUpdateManyWithoutErpNestedInput
   }
 
   export type ERPUncheckedUpdateWithoutCompaniesInput = {
@@ -14469,6 +19423,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endpoints?: EndpointUncheckedUpdateManyWithoutErpNestedInput
     fieldSchemas?: ERPFieldSchemaUncheckedUpdateManyWithoutErpNestedInput
+    playbooks?: PlaybookUncheckedUpdateManyWithoutErpNestedInput
   }
 
   export type TestClientUpsertWithWhereUniqueWithoutCompanyInput = {
@@ -14504,6 +19459,7 @@ export namespace Prisma {
     environments?: JsonNullValueInput | InputJsonValue
     authType?: string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: string
     createdAt?: Date | string
     erp: ERPCreateNestedOneWithoutCompaniesInput
   }
@@ -14516,6 +19472,7 @@ export namespace Prisma {
     environments?: JsonNullValueInput | InputJsonValue
     authType?: string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: string
     createdAt?: Date | string
   }
 
@@ -14541,6 +19498,7 @@ export namespace Prisma {
     environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     erp?: ERPUpdateOneRequiredWithoutCompaniesNestedInput
   }
@@ -14553,6 +19511,7 @@ export namespace Prisma {
     environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -14579,6 +19538,7 @@ export namespace Prisma {
     name: string
     context: string
     systemPrompt?: string
+    embeddingProvider?: string
     createdAt?: Date | string
   }
 
@@ -14587,6 +19547,7 @@ export namespace Prisma {
     name: string
     context: string
     systemPrompt?: string
+    embeddingProvider?: string
     createdAt?: Date | string
   }
 
@@ -14610,6 +19571,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     context?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
+    embeddingProvider?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -14618,7 +19580,334 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     context?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
+    embeddingProvider?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ERPCreateWithoutPlaybooksInput = {
+    name: string
+    createdAt?: Date | string
+    companies?: CompanyCreateNestedManyWithoutErpInput
+    endpoints?: EndpointCreateNestedManyWithoutErpInput
+    fieldSchemas?: ERPFieldSchemaCreateNestedManyWithoutErpInput
+  }
+
+  export type ERPUncheckedCreateWithoutPlaybooksInput = {
+    id?: number
+    name: string
+    createdAt?: Date | string
+    companies?: CompanyUncheckedCreateNestedManyWithoutErpInput
+    endpoints?: EndpointUncheckedCreateNestedManyWithoutErpInput
+    fieldSchemas?: ERPFieldSchemaUncheckedCreateNestedManyWithoutErpInput
+  }
+
+  export type ERPCreateOrConnectWithoutPlaybooksInput = {
+    where: ERPWhereUniqueInput
+    create: XOR<ERPCreateWithoutPlaybooksInput, ERPUncheckedCreateWithoutPlaybooksInput>
+  }
+
+  export type PlaybookStepCreateWithoutPlaybookInput = {
+    order: number
+    stepName?: string
+    bodyOverride?: string
+    responseCapture?: string
+    endpoint: EndpointCreateNestedOneWithoutPlaybookStepsInput
+  }
+
+  export type PlaybookStepUncheckedCreateWithoutPlaybookInput = {
+    id?: number
+    order: number
+    endpointId: number
+    stepName?: string
+    bodyOverride?: string
+    responseCapture?: string
+  }
+
+  export type PlaybookStepCreateOrConnectWithoutPlaybookInput = {
+    where: PlaybookStepWhereUniqueInput
+    create: XOR<PlaybookStepCreateWithoutPlaybookInput, PlaybookStepUncheckedCreateWithoutPlaybookInput>
+  }
+
+  export type PlaybookStepCreateManyPlaybookInputEnvelope = {
+    data: PlaybookStepCreateManyPlaybookInput | PlaybookStepCreateManyPlaybookInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type PlaybookRunCreateWithoutPlaybookInput = {
+    companyId: number
+    clientId?: number | null
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: string
+    steps?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type PlaybookRunUncheckedCreateWithoutPlaybookInput = {
+    id?: number
+    companyId: number
+    clientId?: number | null
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: string
+    steps?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type PlaybookRunCreateOrConnectWithoutPlaybookInput = {
+    where: PlaybookRunWhereUniqueInput
+    create: XOR<PlaybookRunCreateWithoutPlaybookInput, PlaybookRunUncheckedCreateWithoutPlaybookInput>
+  }
+
+  export type PlaybookRunCreateManyPlaybookInputEnvelope = {
+    data: PlaybookRunCreateManyPlaybookInput | PlaybookRunCreateManyPlaybookInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ERPUpsertWithoutPlaybooksInput = {
+    update: XOR<ERPUpdateWithoutPlaybooksInput, ERPUncheckedUpdateWithoutPlaybooksInput>
+    create: XOR<ERPCreateWithoutPlaybooksInput, ERPUncheckedCreateWithoutPlaybooksInput>
+    where?: ERPWhereInput
+  }
+
+  export type ERPUpdateToOneWithWhereWithoutPlaybooksInput = {
+    where?: ERPWhereInput
+    data: XOR<ERPUpdateWithoutPlaybooksInput, ERPUncheckedUpdateWithoutPlaybooksInput>
+  }
+
+  export type ERPUpdateWithoutPlaybooksInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    companies?: CompanyUpdateManyWithoutErpNestedInput
+    endpoints?: EndpointUpdateManyWithoutErpNestedInput
+    fieldSchemas?: ERPFieldSchemaUpdateManyWithoutErpNestedInput
+  }
+
+  export type ERPUncheckedUpdateWithoutPlaybooksInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    companies?: CompanyUncheckedUpdateManyWithoutErpNestedInput
+    endpoints?: EndpointUncheckedUpdateManyWithoutErpNestedInput
+    fieldSchemas?: ERPFieldSchemaUncheckedUpdateManyWithoutErpNestedInput
+  }
+
+  export type PlaybookStepUpsertWithWhereUniqueWithoutPlaybookInput = {
+    where: PlaybookStepWhereUniqueInput
+    update: XOR<PlaybookStepUpdateWithoutPlaybookInput, PlaybookStepUncheckedUpdateWithoutPlaybookInput>
+    create: XOR<PlaybookStepCreateWithoutPlaybookInput, PlaybookStepUncheckedCreateWithoutPlaybookInput>
+  }
+
+  export type PlaybookStepUpdateWithWhereUniqueWithoutPlaybookInput = {
+    where: PlaybookStepWhereUniqueInput
+    data: XOR<PlaybookStepUpdateWithoutPlaybookInput, PlaybookStepUncheckedUpdateWithoutPlaybookInput>
+  }
+
+  export type PlaybookStepUpdateManyWithWhereWithoutPlaybookInput = {
+    where: PlaybookStepScalarWhereInput
+    data: XOR<PlaybookStepUpdateManyMutationInput, PlaybookStepUncheckedUpdateManyWithoutPlaybookInput>
+  }
+
+  export type PlaybookRunUpsertWithWhereUniqueWithoutPlaybookInput = {
+    where: PlaybookRunWhereUniqueInput
+    update: XOR<PlaybookRunUpdateWithoutPlaybookInput, PlaybookRunUncheckedUpdateWithoutPlaybookInput>
+    create: XOR<PlaybookRunCreateWithoutPlaybookInput, PlaybookRunUncheckedCreateWithoutPlaybookInput>
+  }
+
+  export type PlaybookRunUpdateWithWhereUniqueWithoutPlaybookInput = {
+    where: PlaybookRunWhereUniqueInput
+    data: XOR<PlaybookRunUpdateWithoutPlaybookInput, PlaybookRunUncheckedUpdateWithoutPlaybookInput>
+  }
+
+  export type PlaybookRunUpdateManyWithWhereWithoutPlaybookInput = {
+    where: PlaybookRunScalarWhereInput
+    data: XOR<PlaybookRunUpdateManyMutationInput, PlaybookRunUncheckedUpdateManyWithoutPlaybookInput>
+  }
+
+  export type PlaybookRunScalarWhereInput = {
+    AND?: PlaybookRunScalarWhereInput | PlaybookRunScalarWhereInput[]
+    OR?: PlaybookRunScalarWhereInput[]
+    NOT?: PlaybookRunScalarWhereInput | PlaybookRunScalarWhereInput[]
+    id?: IntFilter<"PlaybookRun"> | number
+    playbookId?: IntFilter<"PlaybookRun"> | number
+    companyId?: IntFilter<"PlaybookRun"> | number
+    clientId?: IntNullableFilter<"PlaybookRun"> | number | null
+    startedAt?: DateTimeFilter<"PlaybookRun"> | Date | string
+    endedAt?: DateTimeNullableFilter<"PlaybookRun"> | Date | string | null
+    status?: StringFilter<"PlaybookRun"> | string
+    steps?: JsonFilter<"PlaybookRun">
+  }
+
+  export type PlaybookCreateWithoutStepsInput = {
+    name: string
+    description?: string
+    createdAt?: Date | string
+    erp: ERPCreateNestedOneWithoutPlaybooksInput
+    runs?: PlaybookRunCreateNestedManyWithoutPlaybookInput
+  }
+
+  export type PlaybookUncheckedCreateWithoutStepsInput = {
+    id?: number
+    erpId: number
+    name: string
+    description?: string
+    createdAt?: Date | string
+    runs?: PlaybookRunUncheckedCreateNestedManyWithoutPlaybookInput
+  }
+
+  export type PlaybookCreateOrConnectWithoutStepsInput = {
+    where: PlaybookWhereUniqueInput
+    create: XOR<PlaybookCreateWithoutStepsInput, PlaybookUncheckedCreateWithoutStepsInput>
+  }
+
+  export type EndpointCreateWithoutPlaybookStepsInput = {
+    name: string
+    method?: string
+    pathTemplate: string
+    bodyTemplate?: string
+    headers?: string
+    sortOrder?: number
+    group?: string
+    requiresClient?: boolean
+    isModification?: boolean
+    notes?: string
+    erp: ERPCreateNestedOneWithoutEndpointsInput
+  }
+
+  export type EndpointUncheckedCreateWithoutPlaybookStepsInput = {
+    id?: number
+    erpId: number
+    name: string
+    method?: string
+    pathTemplate: string
+    bodyTemplate?: string
+    headers?: string
+    sortOrder?: number
+    group?: string
+    requiresClient?: boolean
+    isModification?: boolean
+    notes?: string
+  }
+
+  export type EndpointCreateOrConnectWithoutPlaybookStepsInput = {
+    where: EndpointWhereUniqueInput
+    create: XOR<EndpointCreateWithoutPlaybookStepsInput, EndpointUncheckedCreateWithoutPlaybookStepsInput>
+  }
+
+  export type PlaybookUpsertWithoutStepsInput = {
+    update: XOR<PlaybookUpdateWithoutStepsInput, PlaybookUncheckedUpdateWithoutStepsInput>
+    create: XOR<PlaybookCreateWithoutStepsInput, PlaybookUncheckedCreateWithoutStepsInput>
+    where?: PlaybookWhereInput
+  }
+
+  export type PlaybookUpdateToOneWithWhereWithoutStepsInput = {
+    where?: PlaybookWhereInput
+    data: XOR<PlaybookUpdateWithoutStepsInput, PlaybookUncheckedUpdateWithoutStepsInput>
+  }
+
+  export type PlaybookUpdateWithoutStepsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    erp?: ERPUpdateOneRequiredWithoutPlaybooksNestedInput
+    runs?: PlaybookRunUpdateManyWithoutPlaybookNestedInput
+  }
+
+  export type PlaybookUncheckedUpdateWithoutStepsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    erpId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    runs?: PlaybookRunUncheckedUpdateManyWithoutPlaybookNestedInput
+  }
+
+  export type EndpointUpsertWithoutPlaybookStepsInput = {
+    update: XOR<EndpointUpdateWithoutPlaybookStepsInput, EndpointUncheckedUpdateWithoutPlaybookStepsInput>
+    create: XOR<EndpointCreateWithoutPlaybookStepsInput, EndpointUncheckedCreateWithoutPlaybookStepsInput>
+    where?: EndpointWhereInput
+  }
+
+  export type EndpointUpdateToOneWithWhereWithoutPlaybookStepsInput = {
+    where?: EndpointWhereInput
+    data: XOR<EndpointUpdateWithoutPlaybookStepsInput, EndpointUncheckedUpdateWithoutPlaybookStepsInput>
+  }
+
+  export type EndpointUpdateWithoutPlaybookStepsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    method?: StringFieldUpdateOperationsInput | string
+    pathTemplate?: StringFieldUpdateOperationsInput | string
+    bodyTemplate?: StringFieldUpdateOperationsInput | string
+    headers?: StringFieldUpdateOperationsInput | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    group?: StringFieldUpdateOperationsInput | string
+    requiresClient?: BoolFieldUpdateOperationsInput | boolean
+    isModification?: BoolFieldUpdateOperationsInput | boolean
+    notes?: StringFieldUpdateOperationsInput | string
+    erp?: ERPUpdateOneRequiredWithoutEndpointsNestedInput
+  }
+
+  export type EndpointUncheckedUpdateWithoutPlaybookStepsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    erpId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    method?: StringFieldUpdateOperationsInput | string
+    pathTemplate?: StringFieldUpdateOperationsInput | string
+    bodyTemplate?: StringFieldUpdateOperationsInput | string
+    headers?: StringFieldUpdateOperationsInput | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    group?: StringFieldUpdateOperationsInput | string
+    requiresClient?: BoolFieldUpdateOperationsInput | boolean
+    isModification?: BoolFieldUpdateOperationsInput | boolean
+    notes?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PlaybookCreateWithoutRunsInput = {
+    name: string
+    description?: string
+    createdAt?: Date | string
+    erp: ERPCreateNestedOneWithoutPlaybooksInput
+    steps?: PlaybookStepCreateNestedManyWithoutPlaybookInput
+  }
+
+  export type PlaybookUncheckedCreateWithoutRunsInput = {
+    id?: number
+    erpId: number
+    name: string
+    description?: string
+    createdAt?: Date | string
+    steps?: PlaybookStepUncheckedCreateNestedManyWithoutPlaybookInput
+  }
+
+  export type PlaybookCreateOrConnectWithoutRunsInput = {
+    where: PlaybookWhereUniqueInput
+    create: XOR<PlaybookCreateWithoutRunsInput, PlaybookUncheckedCreateWithoutRunsInput>
+  }
+
+  export type PlaybookUpsertWithoutRunsInput = {
+    update: XOR<PlaybookUpdateWithoutRunsInput, PlaybookUncheckedUpdateWithoutRunsInput>
+    create: XOR<PlaybookCreateWithoutRunsInput, PlaybookUncheckedCreateWithoutRunsInput>
+    where?: PlaybookWhereInput
+  }
+
+  export type PlaybookUpdateToOneWithWhereWithoutRunsInput = {
+    where?: PlaybookWhereInput
+    data: XOR<PlaybookUpdateWithoutRunsInput, PlaybookUncheckedUpdateWithoutRunsInput>
+  }
+
+  export type PlaybookUpdateWithoutRunsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    erp?: ERPUpdateOneRequiredWithoutPlaybooksNestedInput
+    steps?: PlaybookStepUpdateManyWithoutPlaybookNestedInput
+  }
+
+  export type PlaybookUncheckedUpdateWithoutRunsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    erpId?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    steps?: PlaybookStepUncheckedUpdateManyWithoutPlaybookNestedInput
   }
 
   export type CompanyCreateManyErpInput = {
@@ -14628,6 +19917,7 @@ export namespace Prisma {
     environments?: JsonNullValueInput | InputJsonValue
     authType?: string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: string
     createdAt?: Date | string
   }
 
@@ -14642,6 +19932,7 @@ export namespace Prisma {
     group?: string
     requiresClient?: boolean
     isModification?: boolean
+    notes?: string
   }
 
   export type ERPFieldSchemaCreateManyErpInput = {
@@ -14656,12 +19947,20 @@ export namespace Prisma {
     responsePath?: string
   }
 
+  export type PlaybookCreateManyErpInput = {
+    id?: number
+    name: string
+    description?: string
+    createdAt?: Date | string
+  }
+
   export type CompanyUpdateWithoutErpInput = {
     name?: StringFieldUpdateOperationsInput | string
     baseUrl?: StringFieldUpdateOperationsInput | string
     environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     testClients?: TestClientUpdateManyWithoutCompanyNestedInput
   }
@@ -14673,6 +19972,7 @@ export namespace Prisma {
     environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     testClients?: TestClientUncheckedUpdateManyWithoutCompanyNestedInput
   }
@@ -14684,6 +19984,7 @@ export namespace Prisma {
     environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
     authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -14697,6 +19998,8 @@ export namespace Prisma {
     group?: StringFieldUpdateOperationsInput | string
     requiresClient?: BoolFieldUpdateOperationsInput | boolean
     isModification?: BoolFieldUpdateOperationsInput | boolean
+    notes?: StringFieldUpdateOperationsInput | string
+    playbookSteps?: PlaybookStepUpdateManyWithoutEndpointNestedInput
   }
 
   export type EndpointUncheckedUpdateWithoutErpInput = {
@@ -14710,6 +20013,8 @@ export namespace Prisma {
     group?: StringFieldUpdateOperationsInput | string
     requiresClient?: BoolFieldUpdateOperationsInput | boolean
     isModification?: BoolFieldUpdateOperationsInput | boolean
+    notes?: StringFieldUpdateOperationsInput | string
+    playbookSteps?: PlaybookStepUncheckedUpdateManyWithoutEndpointNestedInput
   }
 
   export type EndpointUncheckedUpdateManyWithoutErpInput = {
@@ -14723,6 +20028,7 @@ export namespace Prisma {
     group?: StringFieldUpdateOperationsInput | string
     requiresClient?: BoolFieldUpdateOperationsInput | boolean
     isModification?: BoolFieldUpdateOperationsInput | boolean
+    notes?: StringFieldUpdateOperationsInput | string
   }
 
   export type ERPFieldSchemaUpdateWithoutErpInput = {
@@ -14758,6 +20064,65 @@ export namespace Prisma {
     sourceEndpointId?: NullableIntFieldUpdateOperationsInput | number | null
     endpointParam?: StringFieldUpdateOperationsInput | string
     responsePath?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PlaybookUpdateWithoutErpInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    steps?: PlaybookStepUpdateManyWithoutPlaybookNestedInput
+    runs?: PlaybookRunUpdateManyWithoutPlaybookNestedInput
+  }
+
+  export type PlaybookUncheckedUpdateWithoutErpInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    steps?: PlaybookStepUncheckedUpdateManyWithoutPlaybookNestedInput
+    runs?: PlaybookRunUncheckedUpdateManyWithoutPlaybookNestedInput
+  }
+
+  export type PlaybookUncheckedUpdateManyWithoutErpInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlaybookStepCreateManyEndpointInput = {
+    id?: number
+    playbookId: number
+    order: number
+    stepName?: string
+    bodyOverride?: string
+    responseCapture?: string
+  }
+
+  export type PlaybookStepUpdateWithoutEndpointInput = {
+    order?: IntFieldUpdateOperationsInput | number
+    stepName?: StringFieldUpdateOperationsInput | string
+    bodyOverride?: StringFieldUpdateOperationsInput | string
+    responseCapture?: StringFieldUpdateOperationsInput | string
+    playbook?: PlaybookUpdateOneRequiredWithoutStepsNestedInput
+  }
+
+  export type PlaybookStepUncheckedUpdateWithoutEndpointInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    playbookId?: IntFieldUpdateOperationsInput | number
+    order?: IntFieldUpdateOperationsInput | number
+    stepName?: StringFieldUpdateOperationsInput | string
+    bodyOverride?: StringFieldUpdateOperationsInput | string
+    responseCapture?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PlaybookStepUncheckedUpdateManyWithoutEndpointInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    playbookId?: IntFieldUpdateOperationsInput | number
+    order?: IntFieldUpdateOperationsInput | number
+    stepName?: StringFieldUpdateOperationsInput | string
+    bodyOverride?: StringFieldUpdateOperationsInput | string
+    responseCapture?: StringFieldUpdateOperationsInput | string
   }
 
   export type TestClientCreateManyCompanyInput = {
@@ -14799,6 +20164,80 @@ export namespace Prisma {
   export type EmbeddingChunkUncheckedUpdateManyWithoutCollectionInput = {
     id?: IntFieldUpdateOperationsInput | number
     text?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PlaybookStepCreateManyPlaybookInput = {
+    id?: number
+    order: number
+    endpointId: number
+    stepName?: string
+    bodyOverride?: string
+    responseCapture?: string
+  }
+
+  export type PlaybookRunCreateManyPlaybookInput = {
+    id?: number
+    companyId: number
+    clientId?: number | null
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: string
+    steps?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type PlaybookStepUpdateWithoutPlaybookInput = {
+    order?: IntFieldUpdateOperationsInput | number
+    stepName?: StringFieldUpdateOperationsInput | string
+    bodyOverride?: StringFieldUpdateOperationsInput | string
+    responseCapture?: StringFieldUpdateOperationsInput | string
+    endpoint?: EndpointUpdateOneRequiredWithoutPlaybookStepsNestedInput
+  }
+
+  export type PlaybookStepUncheckedUpdateWithoutPlaybookInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    order?: IntFieldUpdateOperationsInput | number
+    endpointId?: IntFieldUpdateOperationsInput | number
+    stepName?: StringFieldUpdateOperationsInput | string
+    bodyOverride?: StringFieldUpdateOperationsInput | string
+    responseCapture?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PlaybookStepUncheckedUpdateManyWithoutPlaybookInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    order?: IntFieldUpdateOperationsInput | number
+    endpointId?: IntFieldUpdateOperationsInput | number
+    stepName?: StringFieldUpdateOperationsInput | string
+    bodyOverride?: StringFieldUpdateOperationsInput | string
+    responseCapture?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type PlaybookRunUpdateWithoutPlaybookInput = {
+    companyId?: IntFieldUpdateOperationsInput | number
+    clientId?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    steps?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type PlaybookRunUncheckedUpdateWithoutPlaybookInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    clientId?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    steps?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type PlaybookRunUncheckedUpdateManyWithoutPlaybookInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    companyId?: IntFieldUpdateOperationsInput | number
+    clientId?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    steps?: JsonNullValueInput | InputJsonValue
   }
 
 
