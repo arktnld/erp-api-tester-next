@@ -19,5 +19,11 @@ export interface RecordExecutionData {
 }
 
 export function recordExecution(data: RecordExecutionData) {
-  return prisma.requestHistory.create({ data })
+  return prisma.requestHistory.create({
+    data: {
+      ...data,
+      endpointId: Number(data.endpointId),
+      testClientId: data.testClientId ? Number(data.testClientId) : null,
+    },
+  })
 }
