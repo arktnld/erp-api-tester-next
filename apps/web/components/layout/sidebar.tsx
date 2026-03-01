@@ -4,7 +4,22 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Server, Building2, FlaskConical, History, MessageSquare, BookOpen, ListChecks, Settings } from 'lucide-react'
 import { UserButton } from '@clerk/nextjs'
+import { useEffect, useState } from 'react'
 import { TourButton } from '@/components/ui/tour-button'
+
+function ThemedUserButton() {
+  const [isDark, setIsDark] = useState(true)
+  useEffect(() => {
+    const check = () => setIsDark(document.documentElement.getAttribute('data-theme') !== 'light')
+    check()
+    const obs = new MutationObserver(check)
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => obs.disconnect()
+  }, [])
+  const dark = { colorBackground: '#1c1c1e', colorText: '#e4e4e7', colorTextSecondary: '#a1a1aa', colorInputBackground: '#2c2c2e', colorPrimary: '#4f8ef7', colorNeutral: '#e4e4e7' }
+  const light = { colorBackground: '#ffffff', colorText: '#18181b', colorTextSecondary: '#71717a', colorInputBackground: '#f4f4f5', colorPrimary: '#4f8ef7', colorNeutral: '#18181b' }
+  return <UserButton afterSignOutUrl="/sign-in" appearance={{ variables: isDark ? dark : light }} />
+}
 
 type SidebarERP = {
   id: number
@@ -120,7 +135,7 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
           justifyContent: 'space-between',
         }}
       >
-        <UserButton afterSignOutUrl="/sign-in" />
+        <ThemedUserButton />
         <div style={{ display: 'flex', gap: 4 }}>
           <TourButton />
         </div>
