@@ -145,16 +145,23 @@ export async function retrieveContext(
 
   const queryVec = await embedQuery(question, storedProvider, embeddingKey)
 
-  const rows = await prisma.$queryRaw<{ text: string }[]>`
-    SELECT text
+  const SIMILARITY_THRESHOLD = 0.55 // cosine distance: 0=identical, 1=orthogonal, 2=opposite
+
+  const rows = await prisma.$queryRaw<{ text: string; score: number }[]>`
+    SELECT text, (embedding <=> ${JSON.stringify(queryVec)}::vector) as score
     FROM "EmbeddingChunk"
     WHERE "collectionId" = ${collectionId}
+      AND (embedding <=> ${JSON.stringify(queryVec)}::vector) < ${SIMILARITY_THRESHOLD}
     ORDER BY embedding <=> ${JSON.stringify(queryVec)}::vector
     LIMIT ${topK}
   `
 
-  const chunks = rows.map(r => r.text)
-  return { context: chunks.join('\n\n'), chunks, mode: 'semantic' }
+  if (rows.length === 0) {
+    return { context: '', chunks: [], mode: 'skipped' }
+  }
+
+  const chunks = rows.map(r => `[${(1 - r.score).toFixed(2)}] ${r.text}`)
+  return { context: chunks.map(c => c.replace(/^\[[^\]]+\] /, '')).join('\n\n'), chunks, mode: 'semantic' }
 }
 
 export async function deleteCollection(id: number) {
