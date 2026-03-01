@@ -3,8 +3,10 @@
 import { useState } from 'react'
 
 export function useExport(cardRef: React.RefObject<HTMLDivElement | null>) {
-  const [capturing, setCapturing] = useState(false)
+  const [copyCapturing, setCopyCapturing] = useState(false)
+  const [downloadCapturing, setDownloadCapturing] = useState(false)
   const [imageCopied, setImageCopied] = useState(false)
+  const capturing = copyCapturing || downloadCapturing
 
   async function capture() {
     if (!cardRef.current) return null
@@ -13,7 +15,7 @@ export function useExport(cardRef: React.RefObject<HTMLDivElement | null>) {
   }
 
   async function copyImage() {
-    setCapturing(true)
+    setCopyCapturing(true)
     try {
       // ClipboardItem requires HTTPS — fall back to download on HTTP
       if (typeof ClipboardItem === 'undefined' || !navigator.clipboard?.write) {
@@ -33,12 +35,12 @@ export function useExport(cardRef: React.RefObject<HTMLDivElement | null>) {
       setImageCopied(true)
       setTimeout(() => setImageCopied(false), 1800)
     } finally {
-      setCapturing(false)
+      setCopyCapturing(false)
     }
   }
 
   async function downloadPng() {
-    setCapturing(true)
+    setDownloadCapturing(true)
     try {
       const dataUrl = await capture()
       if (!dataUrl) return
@@ -47,9 +49,9 @@ export function useExport(cardRef: React.RefObject<HTMLDivElement | null>) {
       a.download = `resultado-api-${Date.now()}.png`
       a.click()
     } finally {
-      setCapturing(false)
+      setDownloadCapturing(false)
     }
   }
 
-  return { capturing, imageCopied, copyImage, downloadPng }
+  return { capturing, copyCapturing, downloadCapturing, imageCopied, copyImage, downloadPng }
 }

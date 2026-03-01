@@ -122,7 +122,7 @@ function ActionsMenu({ response, curlString, erpName, companyName }: {
   const [curlCopied, setCurlCopied] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
-  const { capturing, imageCopied, copyImage, downloadPng } = useExport(cardRef)
+  const { capturing, copyCapturing, downloadCapturing, imageCopied, copyImage, downloadPng } = useExport(cardRef)
 
   const exportData: ExportData = {
     method: response.method, url: response.url, erpName, companyName,
@@ -180,17 +180,14 @@ function ActionsMenu({ response, curlString, erpName, companyName }: {
             <button
               style={{ ...menuItemStyle, color: imageCopied ? 'var(--status-success)' : 'var(--text)' }}
               disabled={capturing}
-              onClick={async () => {
-                await copyImage()
-                setTimeout(() => setOpen(false), 1200)
-              }}
+              onClick={async () => { await copyImage(); setTimeout(() => setOpen(false), 1200) }}
             >
-              {capturing ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : imageCopied ? <Check size={13} /> : <ImageIcon size={13} />}
-              {capturing ? 'Processando...' : imageCopied ? 'Copiado!' : 'Copiar imagem'}
+              {copyCapturing ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : imageCopied ? <Check size={13} /> : <ImageIcon size={13} />}
+              {copyCapturing ? 'Processando...' : imageCopied ? 'Copiado!' : 'Copiar imagem'}
             </button>
             <button style={menuItemStyle} disabled={capturing} onClick={async () => { await downloadPng(); setOpen(false) }}>
-              {capturing ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <Download size={13} />}
-              {capturing ? 'Processando...' : 'Baixar PNG'}
+              {downloadCapturing ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <Download size={13} />}
+              {downloadCapturing ? 'Processando...' : 'Baixar PNG'}
             </button>
           </div>
         )}
