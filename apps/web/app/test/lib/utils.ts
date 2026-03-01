@@ -12,8 +12,8 @@ export function generateCurl(
   const parts: string[] = [`curl -X ${endpoint.method} '${url}'`]
 
   let bodyFields: Record<string, string> = {}
-  try {
-    const authConfig = JSON.parse(company.authConfig || '{}') as Record<string, string>
+  {
+    const authConfig = (company.authConfig ?? {}) as Record<string, string>
     if (company.authType === 'bearer' && authConfig.token) {
       parts.push(`  -H 'Authorization: Bearer ${authConfig.token}'`)
     } else if (company.authType === 'api_key' && authConfig.header && authConfig.value) {
@@ -28,7 +28,7 @@ export function generateCurl(
     } else if (company.authType === 'body_fields') {
       bodyFields = authConfig
     }
-  } catch {}
+  }
 
   try {
     const endpointHeaders = JSON.parse(endpoint.headers || '{}') as Record<string, string>

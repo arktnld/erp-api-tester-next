@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
 
     const endpoint = await prisma.endpoint.findUniqueOrThrow({ where: { id: endpointId } })
 
-    let company: { id: number; name: string; baseUrl: string; authType: string; authConfig: string | null; erp: { name: string } }
+    let company: { id: number; name: string; baseUrl: string; authType: string; authConfig: unknown; erp: { name: string } }
     let fields: Record<string, string> = {}
     let clientName = ''
 
@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
         },
       })
       company = client.company
-      fields = JSON.parse(client.fieldsData) as Record<string, string>
+      fields = client.fieldsData as Record<string, string>
       clientName = client.name
     } else {
       if (!companyId) throw new Error('companyId é obrigatório quando clientId não informado')
@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
 
     // body_fields: injeta authConfig como campos de substituição no body
     if (company.authType === 'body_fields') {
-      const bodyFields = JSON.parse(company.authConfig || '{}') as Record<string, string>
+      const bodyFields = (company.authConfig ?? {}) as Record<string, string>
       Object.assign(fields, bodyFields)
     }
 
@@ -141,10 +141,7 @@ export async function POST(req: NextRequest) {
       string,
       string
     >
-    const authConfig = JSON.parse(company.authConfig || '{}') as Record<
-      string,
-      string
-    >
+    const authConfig = (company.authConfig ?? {}) as Record<string, string>
 
     // Build auth headers
     const authHeaders: Record<string, string> = {}

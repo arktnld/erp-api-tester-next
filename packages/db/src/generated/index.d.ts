@@ -5191,9 +5191,7 @@ export namespace Prisma {
     name: string | null
     erpId: number | null
     baseUrl: string | null
-    environments: string | null
     authType: string | null
-    authConfig: string | null
     createdAt: Date | null
   }
 
@@ -5202,9 +5200,7 @@ export namespace Prisma {
     name: string | null
     erpId: number | null
     baseUrl: string | null
-    environments: string | null
     authType: string | null
-    authConfig: string | null
     createdAt: Date | null
   }
 
@@ -5236,9 +5232,7 @@ export namespace Prisma {
     name?: true
     erpId?: true
     baseUrl?: true
-    environments?: true
     authType?: true
-    authConfig?: true
     createdAt?: true
   }
 
@@ -5247,9 +5241,7 @@ export namespace Prisma {
     name?: true
     erpId?: true
     baseUrl?: true
-    environments?: true
     authType?: true
-    authConfig?: true
     createdAt?: true
   }
 
@@ -5356,9 +5348,9 @@ export namespace Prisma {
     name: string
     erpId: number
     baseUrl: string
-    environments: string
+    environments: JsonValue
     authType: string
-    authConfig: string
+    authConfig: JsonValue
     createdAt: Date
     _count: CompanyCountAggregateOutputType | null
     _avg: CompanyAvgAggregateOutputType | null
@@ -5454,9 +5446,9 @@ export namespace Prisma {
       name: string
       erpId: number
       baseUrl: string
-      environments: string
+      environments: Prisma.JsonValue
       authType: string
-      authConfig: string
+      authConfig: Prisma.JsonValue
       createdAt: Date
     }, ExtArgs["result"]["company"]>
     composites: {}
@@ -5887,9 +5879,9 @@ export namespace Prisma {
     readonly name: FieldRef<"Company", 'String'>
     readonly erpId: FieldRef<"Company", 'Int'>
     readonly baseUrl: FieldRef<"Company", 'String'>
-    readonly environments: FieldRef<"Company", 'String'>
+    readonly environments: FieldRef<"Company", 'Json'>
     readonly authType: FieldRef<"Company", 'String'>
-    readonly authConfig: FieldRef<"Company", 'String'>
+    readonly authConfig: FieldRef<"Company", 'Json'>
     readonly createdAt: FieldRef<"Company", 'DateTime'>
   }
     
@@ -6355,7 +6347,6 @@ export namespace Prisma {
     id: number | null
     name: string | null
     companyId: number | null
-    fieldsData: string | null
     createdAt: Date | null
   }
 
@@ -6363,7 +6354,6 @@ export namespace Prisma {
     id: number | null
     name: string | null
     companyId: number | null
-    fieldsData: string | null
     createdAt: Date | null
   }
 
@@ -6391,7 +6381,6 @@ export namespace Prisma {
     id?: true
     name?: true
     companyId?: true
-    fieldsData?: true
     createdAt?: true
   }
 
@@ -6399,7 +6388,6 @@ export namespace Prisma {
     id?: true
     name?: true
     companyId?: true
-    fieldsData?: true
     createdAt?: true
   }
 
@@ -6502,7 +6490,7 @@ export namespace Prisma {
     id: number
     name: string
     companyId: number
-    fieldsData: string
+    fieldsData: JsonValue
     createdAt: Date
     _count: TestClientCountAggregateOutputType | null
     _avg: TestClientAvgAggregateOutputType | null
@@ -6580,7 +6568,7 @@ export namespace Prisma {
       id: number
       name: string
       companyId: number
-      fieldsData: string
+      fieldsData: Prisma.JsonValue
       createdAt: Date
     }, ExtArgs["result"]["testClient"]>
     composites: {}
@@ -7009,7 +6997,7 @@ export namespace Prisma {
     readonly id: FieldRef<"TestClient", 'Int'>
     readonly name: FieldRef<"TestClient", 'String'>
     readonly companyId: FieldRef<"TestClient", 'Int'>
-    readonly fieldsData: FieldRef<"TestClient", 'String'>
+    readonly fieldsData: FieldRef<"TestClient", 'Json'>
     readonly createdAt: FieldRef<"TestClient", 'DateTime'>
   }
     
@@ -11734,6 +11722,13 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
   export const QueryMode: {
     default: 'default',
     insensitive: 'insensitive'
@@ -11748,6 +11743,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -11801,6 +11805,20 @@ export namespace Prisma {
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -12051,9 +12069,9 @@ export namespace Prisma {
     name?: StringFilter<"Company"> | string
     erpId?: IntFilter<"Company"> | number
     baseUrl?: StringFilter<"Company"> | string
-    environments?: StringFilter<"Company"> | string
+    environments?: JsonFilter<"Company">
     authType?: StringFilter<"Company"> | string
-    authConfig?: StringFilter<"Company"> | string
+    authConfig?: JsonFilter<"Company">
     createdAt?: DateTimeFilter<"Company"> | Date | string
     erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
     testClients?: TestClientListRelationFilter
@@ -12080,9 +12098,9 @@ export namespace Prisma {
     name?: StringFilter<"Company"> | string
     erpId?: IntFilter<"Company"> | number
     baseUrl?: StringFilter<"Company"> | string
-    environments?: StringFilter<"Company"> | string
+    environments?: JsonFilter<"Company">
     authType?: StringFilter<"Company"> | string
-    authConfig?: StringFilter<"Company"> | string
+    authConfig?: JsonFilter<"Company">
     createdAt?: DateTimeFilter<"Company"> | Date | string
     erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
     testClients?: TestClientListRelationFilter
@@ -12112,9 +12130,9 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"Company"> | string
     erpId?: IntWithAggregatesFilter<"Company"> | number
     baseUrl?: StringWithAggregatesFilter<"Company"> | string
-    environments?: StringWithAggregatesFilter<"Company"> | string
+    environments?: JsonWithAggregatesFilter<"Company">
     authType?: StringWithAggregatesFilter<"Company"> | string
-    authConfig?: StringWithAggregatesFilter<"Company"> | string
+    authConfig?: JsonWithAggregatesFilter<"Company">
     createdAt?: DateTimeWithAggregatesFilter<"Company"> | Date | string
   }
 
@@ -12125,7 +12143,7 @@ export namespace Prisma {
     id?: IntFilter<"TestClient"> | number
     name?: StringFilter<"TestClient"> | string
     companyId?: IntFilter<"TestClient"> | number
-    fieldsData?: StringFilter<"TestClient"> | string
+    fieldsData?: JsonFilter<"TestClient">
     createdAt?: DateTimeFilter<"TestClient"> | Date | string
     company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
   }
@@ -12146,7 +12164,7 @@ export namespace Prisma {
     NOT?: TestClientWhereInput | TestClientWhereInput[]
     name?: StringFilter<"TestClient"> | string
     companyId?: IntFilter<"TestClient"> | number
-    fieldsData?: StringFilter<"TestClient"> | string
+    fieldsData?: JsonFilter<"TestClient">
     createdAt?: DateTimeFilter<"TestClient"> | Date | string
     company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
   }, "id">
@@ -12171,7 +12189,7 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"TestClient"> | number
     name?: StringWithAggregatesFilter<"TestClient"> | string
     companyId?: IntWithAggregatesFilter<"TestClient"> | number
-    fieldsData?: StringWithAggregatesFilter<"TestClient"> | string
+    fieldsData?: JsonWithAggregatesFilter<"TestClient">
     createdAt?: DateTimeWithAggregatesFilter<"TestClient"> | Date | string
   }
 
@@ -12665,9 +12683,9 @@ export namespace Prisma {
   export type CompanyCreateInput = {
     name: string
     baseUrl?: string
-    environments?: string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: string
-    authConfig?: string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     erp: ERPCreateNestedOneWithoutCompaniesInput
     testClients?: TestClientCreateNestedManyWithoutCompanyInput
@@ -12678,9 +12696,9 @@ export namespace Prisma {
     name: string
     erpId: number
     baseUrl?: string
-    environments?: string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: string
-    authConfig?: string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     testClients?: TestClientUncheckedCreateNestedManyWithoutCompanyInput
   }
@@ -12688,9 +12706,9 @@ export namespace Prisma {
   export type CompanyUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
     baseUrl?: StringFieldUpdateOperationsInput | string
-    environments?: StringFieldUpdateOperationsInput | string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     erp?: ERPUpdateOneRequiredWithoutCompaniesNestedInput
     testClients?: TestClientUpdateManyWithoutCompanyNestedInput
@@ -12701,9 +12719,9 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     erpId?: IntFieldUpdateOperationsInput | number
     baseUrl?: StringFieldUpdateOperationsInput | string
-    environments?: StringFieldUpdateOperationsInput | string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     testClients?: TestClientUncheckedUpdateManyWithoutCompanyNestedInput
   }
@@ -12713,18 +12731,18 @@ export namespace Prisma {
     name: string
     erpId: number
     baseUrl?: string
-    environments?: string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: string
-    authConfig?: string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
   }
 
   export type CompanyUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
     baseUrl?: StringFieldUpdateOperationsInput | string
-    environments?: StringFieldUpdateOperationsInput | string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -12733,15 +12751,15 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     erpId?: IntFieldUpdateOperationsInput | number
     baseUrl?: StringFieldUpdateOperationsInput | string
-    environments?: StringFieldUpdateOperationsInput | string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TestClientCreateInput = {
     name: string
-    fieldsData?: string
+    fieldsData?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     company: CompanyCreateNestedOneWithoutTestClientsInput
   }
@@ -12750,13 +12768,13 @@ export namespace Prisma {
     id?: number
     name: string
     companyId: number
-    fieldsData?: string
+    fieldsData?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
   }
 
   export type TestClientUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
-    fieldsData?: StringFieldUpdateOperationsInput | string
+    fieldsData?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     company?: CompanyUpdateOneRequiredWithoutTestClientsNestedInput
   }
@@ -12765,7 +12783,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     companyId?: IntFieldUpdateOperationsInput | number
-    fieldsData?: StringFieldUpdateOperationsInput | string
+    fieldsData?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -12773,13 +12791,13 @@ export namespace Prisma {
     id?: number
     name: string
     companyId: number
-    fieldsData?: string
+    fieldsData?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
   }
 
   export type TestClientUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
-    fieldsData?: StringFieldUpdateOperationsInput | string
+    fieldsData?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -12787,7 +12805,7 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     companyId?: IntFieldUpdateOperationsInput | number
-    fieldsData?: StringFieldUpdateOperationsInput | string
+    fieldsData?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -13338,6 +13356,29 @@ export namespace Prisma {
     erpId?: SortOrder
     sortOrder?: SortOrder
   }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type TestClientListRelationFilter = {
     every?: TestClientWhereInput
@@ -13370,9 +13411,7 @@ export namespace Prisma {
     name?: SortOrder
     erpId?: SortOrder
     baseUrl?: SortOrder
-    environments?: SortOrder
     authType?: SortOrder
-    authConfig?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -13381,15 +13420,39 @@ export namespace Prisma {
     name?: SortOrder
     erpId?: SortOrder
     baseUrl?: SortOrder
-    environments?: SortOrder
     authType?: SortOrder
-    authConfig?: SortOrder
     createdAt?: SortOrder
   }
 
   export type CompanySumOrderByAggregateInput = {
     id?: SortOrder
     erpId?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type CompanyScalarRelationFilter = {
@@ -13414,7 +13477,6 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     companyId?: SortOrder
-    fieldsData?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -13422,7 +13484,6 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     companyId?: SortOrder
-    fieldsData?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -14031,13 +14092,36 @@ export namespace Prisma {
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type CompanyCreateWithoutErpInput = {
     name: string
     baseUrl?: string
-    environments?: string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: string
-    authConfig?: string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     testClients?: TestClientCreateNestedManyWithoutCompanyInput
   }
@@ -14046,9 +14130,9 @@ export namespace Prisma {
     id?: number
     name: string
     baseUrl?: string
-    environments?: string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: string
-    authConfig?: string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     testClients?: TestClientUncheckedCreateNestedManyWithoutCompanyInput
   }
@@ -14155,9 +14239,9 @@ export namespace Prisma {
     name?: StringFilter<"Company"> | string
     erpId?: IntFilter<"Company"> | number
     baseUrl?: StringFilter<"Company"> | string
-    environments?: StringFilter<"Company"> | string
+    environments?: JsonFilter<"Company">
     authType?: StringFilter<"Company"> | string
-    authConfig?: StringFilter<"Company"> | string
+    authConfig?: JsonFilter<"Company">
     createdAt?: DateTimeFilter<"Company"> | Date | string
   }
 
@@ -14340,14 +14424,14 @@ export namespace Prisma {
 
   export type TestClientCreateWithoutCompanyInput = {
     name: string
-    fieldsData?: string
+    fieldsData?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
   }
 
   export type TestClientUncheckedCreateWithoutCompanyInput = {
     id?: number
     name: string
-    fieldsData?: string
+    fieldsData?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
   }
 
@@ -14410,16 +14494,16 @@ export namespace Prisma {
     id?: IntFilter<"TestClient"> | number
     name?: StringFilter<"TestClient"> | string
     companyId?: IntFilter<"TestClient"> | number
-    fieldsData?: StringFilter<"TestClient"> | string
+    fieldsData?: JsonFilter<"TestClient">
     createdAt?: DateTimeFilter<"TestClient"> | Date | string
   }
 
   export type CompanyCreateWithoutTestClientsInput = {
     name: string
     baseUrl?: string
-    environments?: string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: string
-    authConfig?: string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     erp: ERPCreateNestedOneWithoutCompaniesInput
   }
@@ -14429,9 +14513,9 @@ export namespace Prisma {
     name: string
     erpId: number
     baseUrl?: string
-    environments?: string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: string
-    authConfig?: string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
   }
 
@@ -14454,9 +14538,9 @@ export namespace Prisma {
   export type CompanyUpdateWithoutTestClientsInput = {
     name?: StringFieldUpdateOperationsInput | string
     baseUrl?: StringFieldUpdateOperationsInput | string
-    environments?: StringFieldUpdateOperationsInput | string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     erp?: ERPUpdateOneRequiredWithoutCompaniesNestedInput
   }
@@ -14466,9 +14550,9 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     erpId?: IntFieldUpdateOperationsInput | number
     baseUrl?: StringFieldUpdateOperationsInput | string
-    environments?: StringFieldUpdateOperationsInput | string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -14541,9 +14625,9 @@ export namespace Prisma {
     id?: number
     name: string
     baseUrl?: string
-    environments?: string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: string
-    authConfig?: string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
   }
 
@@ -14575,9 +14659,9 @@ export namespace Prisma {
   export type CompanyUpdateWithoutErpInput = {
     name?: StringFieldUpdateOperationsInput | string
     baseUrl?: StringFieldUpdateOperationsInput | string
-    environments?: StringFieldUpdateOperationsInput | string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     testClients?: TestClientUpdateManyWithoutCompanyNestedInput
   }
@@ -14586,9 +14670,9 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     baseUrl?: StringFieldUpdateOperationsInput | string
-    environments?: StringFieldUpdateOperationsInput | string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     testClients?: TestClientUncheckedUpdateManyWithoutCompanyNestedInput
   }
@@ -14597,9 +14681,9 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     baseUrl?: StringFieldUpdateOperationsInput | string
-    environments?: StringFieldUpdateOperationsInput | string
+    environments?: JsonNullValueInput | InputJsonValue
     authType?: StringFieldUpdateOperationsInput | string
-    authConfig?: StringFieldUpdateOperationsInput | string
+    authConfig?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -14679,27 +14763,27 @@ export namespace Prisma {
   export type TestClientCreateManyCompanyInput = {
     id?: number
     name: string
-    fieldsData?: string
+    fieldsData?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
   }
 
   export type TestClientUpdateWithoutCompanyInput = {
     name?: StringFieldUpdateOperationsInput | string
-    fieldsData?: StringFieldUpdateOperationsInput | string
+    fieldsData?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TestClientUncheckedUpdateWithoutCompanyInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    fieldsData?: StringFieldUpdateOperationsInput | string
+    fieldsData?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type TestClientUncheckedUpdateManyWithoutCompanyInput = {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
-    fieldsData?: StringFieldUpdateOperationsInput | string
+    fieldsData?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

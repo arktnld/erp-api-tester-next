@@ -16,7 +16,7 @@ type FieldSchema = {
 type TestClient = {
   id: number
   name: string
-  fieldsData: string
+  fieldsData: unknown
 }
 type ERP = {
   id: number
@@ -85,7 +85,7 @@ export function CompanyDetailClient({ company }: { company: Company }) {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12 }}>
           {company.testClients.map((client) => {
-            const fields = JSON.parse(client.fieldsData) as Record<string, string>
+            const fields = client.fieldsData as unknown as Record<string, string>
             return (
               <div key={client.id} style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: 16 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>

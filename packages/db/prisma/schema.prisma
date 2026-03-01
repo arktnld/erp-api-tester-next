@@ -51,9 +51,9 @@ model Company {
   name        String
   erpId       Int
   baseUrl      String       @default("")
-  environments String       @default("[]")
+  environments Json         @default("[]")
   authType     String       @default("none")
-  authConfig   String       @default("{}")
+  authConfig   Json         @default("{}")
   createdAt   DateTime     @default(now())
   erp         ERP          @relation(fields: [erpId], references: [id])
   testClients TestClient[]
@@ -63,7 +63,7 @@ model TestClient {
   id         Int      @id @default(autoincrement())
   name       String
   companyId  Int
-  fieldsData String   @default("{}")
+  fieldsData Json     @default("{}")
   createdAt  DateTime @default(now())
   company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }

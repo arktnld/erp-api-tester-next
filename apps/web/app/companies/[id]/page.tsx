@@ -10,5 +10,6 @@ export default async function CompanyDetailPage({
 }) {
   const { id } = await params
   const company = await getCompany(Number(id))
-  return <CompanyDetailClient company={company} />
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return <CompanyDetailClient company={company as any} />
 }

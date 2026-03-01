@@ -14,5 +14,6 @@ export default async function EditClientPage({
     getCompany(Number(id)),
     getTestClient(Number(clientId)),
   ])
-  return <ClientBuilder company={company} client={client} />
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return <ClientBuilder company={company as any} client={client as any} />
 }

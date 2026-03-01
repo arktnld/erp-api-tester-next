@@ -10,15 +10,15 @@ export type Endpoint = {
   isModification: boolean
 }
 
-export type TestClient = { id: number; name: string; fieldsData: string }
+export type TestClient = { id: number; name: string; fieldsData: Record<string, string> }
 
 export type Company = {
   id: number
   name: string
   baseUrl: string
-  environments: string
+  environments: Environment[]
   authType: string
-  authConfig: string | null
+  authConfig: Record<string, string> | null
   testClients: TestClient[]
 }
 

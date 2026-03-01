@@ -54,10 +54,10 @@ export function TestPage({
   const endpoint = erp?.endpoints.find((ep) => ep.id === endpointId)
   const client = company?.testClients.find((tc) => tc.id === clientId)
 
-  const companyEnvironments: Environment[] = company ? JSON.parse(company.environments || '[]') : []
+  const companyEnvironments: Environment[] = company ? (company.environments ?? []) : []
   const activeUrl = environmentUrl ?? company?.baseUrl ?? ''
-  const fields = client ? (JSON.parse(client.fieldsData) as Record<string, string>) : {}
-  const bodyFields = company?.authType === 'body_fields' ? JSON.parse(company.authConfig || '{}') as Record<string, string> : {}
+  const fields = client ? client.fieldsData : {}
+  const bodyFields = company?.authType === 'body_fields' ? (company.authConfig ?? {}) : {}
   const allFields = { ...fields, ...bodyFields }
   const resolvedUrl = endpoint && company ? `${activeUrl}${substitute(endpoint.pathTemplate, allFields)}` : ''
   const resolvedBody = endpoint?.bodyTemplate?.trim() ? substitute(endpoint.bodyTemplate, allFields) : ''

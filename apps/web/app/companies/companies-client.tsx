@@ -18,9 +18,9 @@ type Company = {
   name: string
   erpId: number
   baseUrl: string
-  environments: string
+  environments: unknown
   authType: string
-  authConfig: string
+  authConfig: unknown
   erp: { id: number; name: string }
   _count: { testClients: number }
 }
@@ -79,12 +79,12 @@ export function CompaniesClient({
     setName(company?.name ?? '')
     setErpId(company?.erpId?.toString() ?? (erps[0]?.id?.toString() ?? ''))
     setBaseUrl(company?.baseUrl ?? '')
-    const envs: Environment[] = company?.environments ? JSON.parse(company.environments) : []
+    const envs: Environment[] = company?.environments ? (company.environments as Environment[]) : []
     setEnvironments(envs)
     setNewEnvName(nextEnvSuggestion(envs))
     setNewEnvUrl('')
     setAuthType(company?.authType ?? 'none')
-    setAuthConfig(company?.authConfig ?? '{}')
+    setAuthConfig(company?.authConfig ? JSON.stringify(company.authConfig) : '{}')
     setSheet({ open: true, company })
   }
 

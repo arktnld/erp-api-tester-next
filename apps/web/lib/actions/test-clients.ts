@@ -10,7 +10,9 @@ export async function createTestClient(data: {
   fieldsData: string
 }) {
   const parsed = TestClientSchema.parse(data)
-  await prisma.testClient.create({ data: parsed })
+  await prisma.testClient.create({
+    data: { ...parsed, fieldsData: JSON.parse(parsed.fieldsData) },
+  })
   revalidatePath(`/companies/${parsed.companyId}`)
 }
 
@@ -20,7 +22,10 @@ export async function updateTestClient(
   data: { name: string; fieldsData: string }
 ) {
   const parsed = TestClientSchema.omit({ companyId: true }).parse(data)
-  await prisma.testClient.update({ where: { id }, data: parsed })
+  await prisma.testClient.update({
+    where: { id },
+    data: { ...parsed, fieldsData: JSON.parse(parsed.fieldsData) },
+  })
   revalidatePath(`/companies/${companyId}`)
 }
 

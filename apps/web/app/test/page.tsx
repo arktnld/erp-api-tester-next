@@ -29,7 +29,8 @@ export default async function TestRoute({
   })
   return (
     <TestPage
-      erps={erps}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      erps={erps as any}
       initialCompanyId={params.companyId ? Number(params.companyId) : undefined}
       initialEndpointId={params.endpointId ? Number(params.endpointId) : undefined}
       initialClientId={params.clientId ? Number(params.clientId) : undefined}

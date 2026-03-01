@@ -51,9 +51,9 @@ model Company {
   name         String
   erpId        Int
   baseUrl      String       @default("")
-  environments String       @default("[]")
+  environments Json         @default("[]")
   authType     String       @default("none")
-  authConfig   String       @default("{}")
+  authConfig   Json         @default("{}")
   createdAt    DateTime     @default(now())
   erp          ERP          @relation(fields: [erpId], references: [id])
   testClients  TestClient[]
@@ -63,7 +63,7 @@ model TestClient {
   id         Int      @id @default(autoincrement())
   name       String
   companyId  Int
-  fieldsData String   @default("{}")
+  fieldsData Json     @default("{}")
   createdAt  DateTime @default(now())
   company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
@@ -83,6 +83,8 @@ model EmbeddingChunk {
   text         String                      @db.Text
   embedding    Unsupported("vector(1536)")
   collection   PostmanCollection           @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@index([collectionId])
 }
 
 model Setting {
@@ -108,4 +110,10 @@ model RequestHistory {
   endpointId      Int?
   testClientId    Int?
   createdAt       DateTime @default(now())
+
+  @@index([companyId])
+  @@index([endpointId])
+  @@index([testClientId])
+  @@index([createdAt])
+  @@index([statusCode])
 }

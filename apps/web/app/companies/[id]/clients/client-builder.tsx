@@ -38,12 +38,12 @@ type Company = {
   baseUrl: string
   authType: string
   erp: ERP
-  testClients: { id: number; name: string; fieldsData: string }[]
+  testClients: { id: number; name: string; fieldsData: unknown }[]
 }
 type TestClient = {
   id: number
   name: string
-  fieldsData: string
+  fieldsData: unknown
 }
 
 function flattenJson(obj: unknown, prefix = ''): Array<{ key: string; value: string }> {
@@ -67,7 +67,7 @@ export function ClientBuilder({ company, client }: { company: Company; client?: 
   // Form state
   const [clientName, setClientName] = useState(client?.name ?? '')
   const [fieldValues, setFieldValues] = useState<Record<string, string>>(() => {
-    const parsed = client ? (JSON.parse(client.fieldsData) as Record<string, string>) : {}
+    const parsed = client ? (client.fieldsData as unknown as Record<string, string>) : {}
     const defaults: Record<string, string> = {}
     company.erp.fieldSchemas.forEach((fs) => {
       defaults[fs.fieldName] = parsed[fs.fieldName] ?? ''
