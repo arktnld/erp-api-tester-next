@@ -43,6 +43,7 @@ model Endpoint {
   group          String  @default("")
   requiresClient  Boolean @default(true)
   isModification  Boolean @default(false)
+  notes           String  @default("") @db.Text
   erp             ERP     @relation(fields: [erpId], references: [id], onDelete: Cascade)
 }
 
@@ -54,6 +55,7 @@ model Company {
   environments Json         @default("[]")
   authType     String       @default("none")
   authConfig   Json         @default("{}")
+  notes        String       @default("") @db.Text
   createdAt   DateTime     @default(now())
   erp         ERP          @relation(fields: [erpId], references: [id])
   testClients TestClient[]
