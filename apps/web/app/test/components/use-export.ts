@@ -24,6 +24,14 @@ export function useExport(cardRef: React.RefObject<HTMLDivElement | null>) {
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
       setImageCopied(true)
       setTimeout(() => setImageCopied(false), 1800)
+    } catch {
+      // fallback: download if clipboard not supported
+      const dataUrl = await capture()
+      if (!dataUrl) return
+      const a = document.createElement('a')
+      a.href = dataUrl
+      a.download = `resultado-api-${Date.now()}.png`
+      a.click()
     } finally {
       setCopyCapturing(false)
     }
