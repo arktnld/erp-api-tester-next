@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { Space_Grotesk } from 'next/font/google'
 import { Sidebar } from '@/components/layout/sidebar'
 import { CommandPalette } from '@/components/ui/command-palette'
@@ -39,6 +40,9 @@ export default async function RootLayout({
 
   return (
     <html lang="pt-BR" className={spaceGrotesk.variable}>
+      <Script id="theme-init" strategy="beforeInteractive">{`
+        (function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light')})()
+      `}</Script>
       <body>
         <CommandPalette erps={erps} />
         <Sidebar erps={erps} />

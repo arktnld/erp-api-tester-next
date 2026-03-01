@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Server, Building2, FlaskConical, History, MessageSquare, BookOpen, ListChecks } from 'lucide-react'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 
 type SidebarERP = {
   id: number
@@ -110,13 +111,19 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
       {/* Footer */}
       <div
         style={{
-          padding: '12px 16px',
+          padding: '8px 12px',
           borderTop: '1px solid var(--border)',
-          fontSize: 11,
-          color: 'var(--text-subtle)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        © {new Date().getFullYear()} Jarbis
+        <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>
+          © {new Date().getFullYear()} Jarbis
+        </span>
+        <div data-tour="theme-toggle">
+          <ThemeToggle />
+        </div>
       </div>
     </aside>
   )
