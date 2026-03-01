@@ -199,7 +199,7 @@ export function ChatPanel({
                         </button>
                         {expandedRag === i && (
                           <div style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: 6, zIndex: 10, backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: 12, width: 380, maxHeight: 320, overflowY: 'auto', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
-                            <p style={{ fontSize: 10, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8 }}>Trechos consultados · {rag.count}</p>
+                            <p style={{ fontSize: 10, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8 }}>Origem · {rag.count}</p>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                               {rag.chunks.map((chunk, ci) => (
                                 <div key={ci} style={{ backgroundColor: 'var(--surface-2)', borderRadius: 6, padding: '8px 10px', fontSize: 11, fontFamily: 'monospace', color: 'var(--text-muted)', lineHeight: 1.5, borderLeft: '2px solid var(--border)' }}>
