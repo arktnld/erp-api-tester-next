@@ -15,7 +15,7 @@ export function getCompanyWithAuth(id: number) {
 
 export function getTestClientWithCompany(id: string) {
   return prisma.testClient.findUniqueOrThrow({
-    where: { id },
+    where: { id: Number(id) },
     include: { company: { select: companyAuthSelect } },
   })
 }
