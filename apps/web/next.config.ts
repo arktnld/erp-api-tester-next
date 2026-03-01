@@ -3,6 +3,9 @@ import type { NextConfig } from 'next'
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   serverExternalPackages: ['@prisma/client', '@erp/db'],
+  serverActions: {
+    bodySizeLimit: '10mb',
+  },
   async headers() {
     return [
       {
