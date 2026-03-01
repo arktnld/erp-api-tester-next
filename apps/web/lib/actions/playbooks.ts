@@ -152,7 +152,7 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
 
       results.push({
         stepId: step.id,
-        stepName: step.stepName || `Step ${step.order + 1}`,
+        stepName: step.stepName,
         endpointName: step.endpoint.name,
         status: result.statusCode >= 200 && result.statusCode < 300 ? 'ok' : 'error',
         statusCode: result.statusCode,
@@ -165,7 +165,7 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
     } catch (err) {
       results.push({
         stepId: step.id,
-        stepName: step.stepName || `Step ${step.order + 1}`,
+        stepName: step.stepName,
         endpointName: step.endpoint.name,
         status: 'error',
         statusCode: 0,

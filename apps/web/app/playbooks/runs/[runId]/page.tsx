@@ -71,7 +71,7 @@ export default async function RunResultPage({ params }: { params: Promise<{ runI
                 : <XCircle size={15} color="#ef4444" />}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <span style={{ fontWeight: 500, fontSize: 13 }}>
-                  Step {i + 1}{step.stepName ? `: ${step.stepName}` : ''}
+                  {step.stepName || `Step ${i + 1}`}
                 </span>
                 <span style={{ marginLeft: 8, fontSize: 12, color: 'var(--text-muted)' }}>
                   {step.endpointName}
