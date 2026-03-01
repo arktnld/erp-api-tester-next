@@ -1,5 +1,7 @@
 import type { Endpoint, Company } from './types'
 import { substitute, tryPrettyJson } from '@/lib/utils'
+import { buildAuthHeaders } from '@/lib/auth'
+import { mergeFields } from '@/lib/fields'
 export { substitute, tryPrettyJson }
 
 export function generateCurl(
@@ -8,26 +10,13 @@ export function generateCurl(
   fields: Record<string, string>,
   customBody?: string
 ): string {
-  const url = `${company.baseUrl}${substitute(endpoint.pathTemplate, fields)}`
+  const allFields = mergeFields(fields, company)
+  const url = `${company.baseUrl}${substitute(endpoint.pathTemplate, allFields)}`
   const parts: string[] = [`curl -X ${endpoint.method} '${url}'`]
 
-  let bodyFields: Record<string, string> = {}
-  {
-    const authConfig = (company.authConfig ?? {}) as Record<string, string>
-    if (company.authType === 'bearer' && authConfig.token) {
-      parts.push(`  -H 'Authorization: Bearer ${authConfig.token}'`)
-    } else if (company.authType === 'api_key' && authConfig.header && authConfig.value) {
-      parts.push(`  -H '${authConfig.header}: ${authConfig.value}'`)
-    } else if (company.authType === 'basic' && authConfig.username && authConfig.password) {
-      const encoded = btoa(`${authConfig.username}:${authConfig.password}`)
-      parts.push(`  -H 'Authorization: Basic ${encoded}'`)
-    } else if (company.authType === 'custom_headers') {
-      for (const [k, v] of Object.entries(authConfig)) {
-        parts.push(`  -H '${k}: ${v}'`)
-      }
-    } else if (company.authType === 'body_fields') {
-      bodyFields = authConfig
-    }
+  const authHeaders = buildAuthHeaders(company)
+  for (const [k, v] of Object.entries(authHeaders)) {
+    parts.push(`  -H '${k}: ${v}'`)
   }
 
   try {
@@ -37,7 +26,6 @@ export function generateCurl(
     }
   } catch {}
 
-  const allFields = { ...bodyFields, ...fields }
   const body = customBody
     ? substitute(customBody, allFields)
     : (endpoint.bodyTemplate?.trim() ? substitute(endpoint.bodyTemplate, allFields) : '')

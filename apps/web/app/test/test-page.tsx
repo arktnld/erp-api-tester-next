@@ -7,6 +7,7 @@ import { TestSelectors } from './components/test-selectors'
 import { TestRequest } from './components/test-request'
 import { TestResponse } from './components/test-response'
 import { substitute, generateCurl, findErpIdForCompany } from './lib/utils'
+import { mergeFields } from '@/lib/fields'
 import type { ERP, Environment, ExecuteResponse } from './lib/types'
 
 function detectLanguage(headersJson: string): 'json' | 'xml' | 'text' {
@@ -57,8 +58,7 @@ export function TestPage({
   const companyEnvironments: Environment[] = company ? (company.environments ?? []) : []
   const activeUrl = environmentUrl ?? company?.baseUrl ?? ''
   const fields = client ? client.fieldsData : {}
-  const bodyFields = company?.authType === 'body_fields' ? (company.authConfig ?? {}) : {}
-  const allFields = { ...fields, ...bodyFields }
+  const allFields = mergeFields(fields as Record<string, string>, company)
   const resolvedUrl = endpoint && company ? `${activeUrl}${substitute(endpoint.pathTemplate, allFields)}` : ''
   const resolvedBody = endpoint?.bodyTemplate?.trim() ? substitute(endpoint.bodyTemplate, allFields) : ''
   const needsClient = endpoint?.requiresClient !== false
