@@ -56,10 +56,9 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
           gap: 8,
         }}
       >
-        <span style={{ fontFamily: 'monospace', fontSize: 19, fontWeight: 700, letterSpacing: '-1px', lineHeight: 1 }}>
-          <span style={{ color: 'var(--text-muted)' }}>/</span>
-          <span style={{ color: 'var(--accent)' }}>*</span>
-        </span>
+        <div style={{ width: 30, height: 30, borderRadius: 7, backgroundColor: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <span style={{ fontFamily: 'monospace', fontSize: 13, fontWeight: 700, letterSpacing: '-1px', color: '#fff', lineHeight: 1 }}>/*</span>
+        </div>
         <span style={{ fontFamily: 'var(--font-logo)', fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>
           <span style={{ color: 'var(--accent)' }}>ERP</span>
           <span style={{ color: 'var(--text)' }}> Tester</span>
