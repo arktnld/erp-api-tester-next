@@ -129,7 +129,15 @@ export function ChatPanel({
               {msg.role === 'user' ? <User size={13} color="white" /> : <Bot size={13} color="var(--accent)" />}
             </div>
             <div style={{ maxWidth: '75%', display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <div style={{ backgroundColor: msg.role === 'user' ? 'var(--accent)' : 'var(--surface)', border: msg.role === 'assistant' ? '1px solid var(--border)' : 'none', borderRadius: msg.role === 'user' ? '12px 4px 12px 12px' : '4px 12px 12px 12px', padding: '10px 14px', fontSize: 13, lineHeight: 1.7, color: msg.role === 'user' ? 'white' : 'var(--text)', wordBreak: 'break-word' }}>
+              <div style={{ position: 'relative', backgroundColor: msg.role === 'user' ? 'var(--accent)' : 'var(--surface)', border: msg.role === 'assistant' ? '1px solid var(--border)' : 'none', borderRadius: msg.role === 'user' ? '12px 4px 12px 12px' : '4px 12px 12px 12px', padding: '10px 14px', fontSize: 13, lineHeight: 1.7, color: msg.role === 'user' ? 'white' : 'var(--text)', wordBreak: 'break-word' }}>
+                {msg.role === 'assistant' && msg.content && (
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(msg.content); setCopiedIdx(i); setTimeout(() => setCopiedIdx(null), 2000) }}
+                    style={{ position: 'absolute', top: 6, right: 6, padding: 4, background: 'none', border: 'none', cursor: 'pointer', color: copiedIdx === i ? 'var(--status-success)' : 'var(--text-subtle)', opacity: 0.5, borderRadius: 4, display: 'flex' }}
+                  >
+                    {copiedIdx === i ? <Check size={12} /> : <Copy size={12} />}
+                  </button>
+                )}
                 {msg.content
                   ? msg.role === 'assistant'
                     ? <ReactMarkdown
@@ -174,17 +182,6 @@ export function ChatPanel({
               </div>
               {msg.role === 'assistant' && msg.content && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(msg.content)
-                      setCopiedIdx(i)
-                      setTimeout(() => setCopiedIdx(null), 2000)
-                    }}
-                    style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '2px 8px', fontSize: 11, color: copiedIdx === i ? 'var(--status-success)' : 'var(--text-subtle)', background: 'none', border: 'none', cursor: 'pointer', borderRadius: 4 }}
-                  >
-                    {copiedIdx === i ? <Check size={11} /> : <Copy size={11} />}
-                    {copiedIdx === i ? 'Copiado' : 'Copiar'}
-                  </button>
                   {ragInfos.has(i) && (() => {
                     const rag = ragInfos.get(i)!
                     if (rag.chunks.length === 0) return null
