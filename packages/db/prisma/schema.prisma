@@ -69,12 +69,13 @@ model TestClient {
 }
 
 model PostmanCollection {
-  id           Int              @id @default(autoincrement())
-  name         String
-  context      String           @db.Text
-  systemPrompt String           @default("")
-  createdAt    DateTime         @default(now())
-  chunks       EmbeddingChunk[]
+  id                Int              @id @default(autoincrement())
+  name              String
+  context           String           @db.Text
+  systemPrompt      String           @default("")
+  embeddingProvider String           @default("openai")
+  createdAt         DateTime         @default(now())
+  chunks            EmbeddingChunk[]
 }
 
 model EmbeddingChunk {

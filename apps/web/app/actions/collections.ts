@@ -68,7 +68,7 @@ async function embedQuery(
 export async function getCollections() {
   return prisma.postmanCollection.findMany({
     orderBy: { createdAt: 'desc' },
-    select: { id: true, name: true, systemPrompt: true, createdAt: true },
+    select: { id: true, name: true, systemPrompt: true, embeddingProvider: true, createdAt: true },
   })
 }
 
@@ -85,7 +85,8 @@ export async function saveCollection(
   embeddingKey: string,
   systemPrompt = ''
 ) {
-  const col = await prisma.postmanCollection.create({ data: { name, context, systemPrompt } })
+  const storedProvider = embeddingKey ? embeddingProvider : 'openai'
+  const col = await prisma.postmanCollection.create({ data: { name, context, systemPrompt, embeddingProvider: storedProvider } })
 
   let embeddingsCount = 0
   let embeddingsError: string | null = null
@@ -121,22 +122,28 @@ export type RagResult = {
 export async function retrieveContext(
   collectionId: number,
   question: string,
-  embeddingProvider: EmbeddingProvider,
-  embeddingKey: string,
+  _embeddingProvider: EmbeddingProvider,
+  embeddingKeys: { openai: string; gemini: string },
   topK = 10
 ): Promise<RagResult> {
-  const count = await prisma.embeddingChunk.count({ where: { collectionId } })
+  const col = await prisma.postmanCollection.findUnique({
+    where: { id: collectionId },
+    select: { context: true, embeddingProvider: true, chunks: { select: { id: true }, take: 1 } },
+  })
 
-  if (count === 0) {
-    const col = await prisma.postmanCollection.findUnique({
-      where: { id: collectionId },
-      select: { context: true },
-    })
+  if (!col || col.chunks.length === 0) {
     const context = col?.context ?? ''
     return { context, chunks: [context], mode: 'fallback' }
   }
 
-  const queryVec = await embedQuery(question, embeddingProvider, embeddingKey)
+  const storedProvider = (col.embeddingProvider ?? 'openai') as EmbeddingProvider
+  const embeddingKey = storedProvider === 'gemini' ? embeddingKeys.gemini : embeddingKeys.openai
+
+  if (!embeddingKey) {
+    return { context: col.context, chunks: [col.context], mode: 'fallback' }
+  }
+
+  const queryVec = await embedQuery(question, storedProvider, embeddingKey)
 
   const rows = await prisma.$queryRaw<{ text: string }[]>`
     SELECT text

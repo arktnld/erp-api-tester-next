@@ -17,21 +17,16 @@ export async function POST(req: NextRequest) {
     customPrompt = '',
   } = await req.json()
 
-  // RAG retrieval
+  // RAG retrieval — always attempt if collection selected; uses the provider stored with the collection
   let systemContext = ''
   let ragResult: RagResult = { context: '', chunks: [], mode: 'skipped' }
   if (collectionId) {
-    const ep: EmbeddingProvider = embeddingProvider
-    const eKey =
-      ep === 'gemini'
-        ? (geminiKey || process.env.GEMINI_API_KEY)
-        : (openaiKey || process.env.OPENAI_API_KEY)
-
-    if (eKey) {
-      const lastUser = [...messages].reverse().find((m: { role: string }) => m.role === 'user')?.content ?? ''
-      ragResult = await retrieveContext(collectionId, lastUser, ep, eKey)
-      systemContext = ragResult.context
-    }
+    const lastUser = [...messages].reverse().find((m: { role: string }) => m.role === 'user')?.content ?? ''
+    ragResult = await retrieveContext(collectionId, lastUser, embeddingProvider, {
+      openai: openaiKey || process.env.OPENAI_API_KEY || '',
+      gemini: geminiKey || process.env.GEMINI_API_KEY || '',
+    })
+    systemContext = ragResult.context
   }
 
   const basePrompt = systemContext
