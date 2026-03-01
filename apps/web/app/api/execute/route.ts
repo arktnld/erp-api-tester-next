@@ -5,6 +5,7 @@ import { request as httpsRequest } from 'node:https'
 import type { ContentCategory } from '@/app/test/lib/types'
 import { substitute } from '@/lib/utils'
 import { ExecuteSchema } from '@/lib/actions/schemas'
+import { validatePublicUrl } from '@/lib/security'
 
 function getContentCategory(mimeType: string): ContentCategory {
   const m = mimeType.toLowerCase().split(';')[0].trim()
@@ -169,6 +170,13 @@ export async function POST(req: NextRequest) {
     }
 
     const url = `${environmentUrl ?? company.baseUrl}${resolvedPath}`
+
+    try {
+      validatePublicUrl(url)
+    } catch (err) {
+      return NextResponse.json({ error: String(err) }, { status: 400 })
+    }
+
     const requestHeaders: Record<string, string> = {
       ...(resolvedBody != null && !endpointHeaders['Content-Type'] ? { 'Content-Type': 'application/json' } : {}),
       ...endpointHeaders,
