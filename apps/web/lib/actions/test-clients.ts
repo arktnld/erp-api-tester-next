@@ -2,14 +2,16 @@
 
 import { prisma } from '@erp/db'
 import { revalidatePath } from 'next/cache'
+import { TestClientSchema } from './schemas'
 
 export async function createTestClient(data: {
   name: string
   companyId: number
   fieldsData: string
 }) {
-  await prisma.testClient.create({ data })
-  revalidatePath(`/companies/${data.companyId}`)
+  const parsed = TestClientSchema.parse(data)
+  await prisma.testClient.create({ data: parsed })
+  revalidatePath(`/companies/${parsed.companyId}`)
 }
 
 export async function updateTestClient(
@@ -17,7 +19,8 @@ export async function updateTestClient(
   companyId: number,
   data: { name: string; fieldsData: string }
 ) {
-  await prisma.testClient.update({ where: { id }, data })
+  const parsed = TestClientSchema.omit({ companyId: true }).parse(data)
+  await prisma.testClient.update({ where: { id }, data: parsed })
   revalidatePath(`/companies/${companyId}`)
 }
 

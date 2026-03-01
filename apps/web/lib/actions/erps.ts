@@ -2,6 +2,7 @@
 
 import { prisma } from '@erp/db'
 import { revalidatePath } from 'next/cache'
+import { ERPSchema } from './schemas'
 
 export async function getERPs() {
   return prisma.eRP.findMany({
@@ -23,12 +24,14 @@ export async function getERP(id: number) {
 }
 
 export async function createERP(data: { name: string }) {
-  await prisma.eRP.create({ data })
+  const parsed = ERPSchema.parse(data)
+  await prisma.eRP.create({ data: parsed })
   revalidatePath('/erps')
 }
 
 export async function updateERP(id: number, data: { name: string }) {
-  await prisma.eRP.update({ where: { id }, data })
+  const parsed = ERPSchema.parse(data)
+  await prisma.eRP.update({ where: { id }, data: parsed })
   revalidatePath('/erps')
   revalidatePath(`/erps/${id}`)
 }

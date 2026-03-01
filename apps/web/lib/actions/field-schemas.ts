@@ -2,6 +2,7 @@
 
 import { prisma } from '@erp/db'
 import { revalidatePath } from 'next/cache'
+import { FieldSchemaSchema } from './schemas'
 
 export async function createFieldSchema(data: {
   erpId: number
@@ -13,8 +14,9 @@ export async function createFieldSchema(data: {
   endpointParam?: string
   responsePath?: string
 }) {
-  await prisma.eRPFieldSchema.create({ data })
-  revalidatePath(`/erps/${data.erpId}`)
+  const parsed = FieldSchemaSchema.parse(data)
+  await prisma.eRPFieldSchema.create({ data: parsed })
+  revalidatePath(`/erps/${parsed.erpId}`)
 }
 
 export async function updateFieldSchema(
@@ -30,7 +32,8 @@ export async function updateFieldSchema(
     responsePath?: string
   }
 ) {
-  await prisma.eRPFieldSchema.update({ where: { id }, data })
+  const parsed = FieldSchemaSchema.omit({ erpId: true }).parse(data)
+  await prisma.eRPFieldSchema.update({ where: { id }, data: parsed })
   revalidatePath(`/erps/${erpId}`)
 }
 

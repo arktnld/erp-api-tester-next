@@ -1,6 +1,7 @@
 'use server'
 
 import { prisma } from '@erp/db'
+import { SettingsSchema } from './schemas'
 
 const SETTING_KEYS = ['anthropic_api_key', 'openai_api_key', 'gemini_api_key', 'chat_provider', 'embedding_provider'] as const
 
@@ -19,9 +20,10 @@ export async function getSettings(): Promise<Settings> {
 }
 
 export async function saveSettings(data: Partial<Settings>) {
+  const parsed = SettingsSchema.parse(data)
   await Promise.all(
-    Object.entries(data).map(([key, value]) =>
-      prisma.setting.upsert({ where: { key }, update: { value }, create: { key, value } })
+    Object.entries(parsed).filter(([, v]) => v !== undefined).map(([key, value]) =>
+      prisma.setting.upsert({ where: { key }, update: { value: value! }, create: { key, value: value! } })
     )
   )
 }

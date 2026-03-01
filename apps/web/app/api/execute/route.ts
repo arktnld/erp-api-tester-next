@@ -4,6 +4,7 @@ import { request as httpRequest } from 'node:http'
 import { request as httpsRequest } from 'node:https'
 import type { ContentCategory } from '@/app/test/lib/types'
 import { substitute } from '@/lib/utils'
+import { ExecuteSchema } from '@/lib/actions/schemas'
 
 function getContentCategory(mimeType: string): ContentCategory {
   const m = mimeType.toLowerCase().split(';')[0].trim()
@@ -85,8 +86,14 @@ function httpFetch(
 
 
 export async function POST(req: NextRequest) {
+  let parsed: ReturnType<typeof ExecuteSchema.parse>
   try {
-    const { endpointId, clientId, companyId, environmentUrl, rawBody: customBody, inlineFields } = await req.json()
+    parsed = ExecuteSchema.parse(await req.json())
+  } catch (err) {
+    return NextResponse.json({ error: 'Payload inválido', details: String(err) }, { status: 400 })
+  }
+  try {
+    const { endpointId, clientId, companyId, environmentUrl, rawBody: customBody, inlineFields } = parsed
 
     const endpoint = await prisma.endpoint.findUniqueOrThrow({ where: { id: endpointId } })
 
@@ -107,6 +114,7 @@ export async function POST(req: NextRequest) {
       fields = JSON.parse(client.fieldsData) as Record<string, string>
       clientName = client.name
     } else {
+      if (!companyId) throw new Error('companyId é obrigatório quando clientId não informado')
       company = await prisma.company.findUniqueOrThrow({
         where: { id: companyId },
         select: { id: true, name: true, baseUrl: true, authType: true, authConfig: true, erp: { select: { name: true } } },
@@ -198,7 +206,7 @@ export async function POST(req: NextRequest) {
         companyName: company.name,
         companyId: company.id,
         endpointId: endpoint.id,
-        testClientId: clientId ?? null,
+        testClientId: clientId ?? undefined,
         endpointName: endpoint.name,
         clientName: clientName,
         method: endpoint.method,

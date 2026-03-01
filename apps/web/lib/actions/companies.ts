@@ -2,6 +2,7 @@
 
 import { prisma } from '@erp/db'
 import { revalidatePath } from 'next/cache'
+import { CompanySchema } from './schemas'
 
 export async function getCompanies() {
   return prisma.company.findMany({
@@ -36,7 +37,8 @@ export async function createCompany(data: {
   authType: string
   authConfig: string
 }) {
-  await prisma.company.create({ data })
+  const parsed = CompanySchema.parse(data)
+  await prisma.company.create({ data: parsed })
   revalidatePath('/companies')
 }
 
@@ -44,7 +46,8 @@ export async function updateCompany(
   id: number,
   data: { name: string; erpId: number; baseUrl: string; environments: string; authType: string; authConfig: string }
 ) {
-  await prisma.company.update({ where: { id }, data })
+  const parsed = CompanySchema.parse(data)
+  await prisma.company.update({ where: { id }, data: parsed })
   revalidatePath('/companies')
   revalidatePath(`/companies/${id}`)
 }

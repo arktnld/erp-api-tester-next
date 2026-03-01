@@ -2,6 +2,7 @@
 
 import { prisma } from '@erp/db'
 import { revalidatePath } from 'next/cache'
+import { EndpointSchema } from './schemas'
 
 export async function createEndpoint(data: {
   erpId: number
@@ -14,8 +15,9 @@ export async function createEndpoint(data: {
   requiresClient: boolean
   isModification: boolean
 }) {
-  await prisma.endpoint.create({ data })
-  revalidatePath(`/erps/${data.erpId}`)
+  const parsed = EndpointSchema.parse(data)
+  await prisma.endpoint.create({ data: parsed })
+  revalidatePath(`/erps/${parsed.erpId}`)
 }
 
 export async function updateEndpoint(
@@ -32,7 +34,8 @@ export async function updateEndpoint(
     isModification: boolean
   }
 ) {
-  await prisma.endpoint.update({ where: { id }, data })
+  const parsed = EndpointSchema.omit({ erpId: true }).parse(data)
+  await prisma.endpoint.update({ where: { id }, data: parsed })
   revalidatePath(`/erps/${erpId}`)
 }
 
