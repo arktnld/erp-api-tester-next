@@ -77,7 +77,7 @@ const labelStyle: React.CSSProperties = {
   display: 'block',
 }
 
-export function HomeImport({ erps }: { erps: ERP[] }) {
+export function HomeImport({ erps, canAdmin }: { erps: ERP[]; canAdmin?: boolean }) {
   const [open, setOpen] = useState(false)
   const [curl, setCurl] = useState('')
   const [parsed, setParsed] = useState<ParsedCurl | null>(null)
@@ -86,6 +86,7 @@ export function HomeImport({ erps }: { erps: ERP[] }) {
   const [erpId, setErpId] = useState<number | ''>(erps[0]?.id ?? '')
   const [isPending, startTransition] = useTransition()
   const [done, setDone] = useState(false)
+  if (!canAdmin) return null
 
   function handleClose() {
     setOpen(false)

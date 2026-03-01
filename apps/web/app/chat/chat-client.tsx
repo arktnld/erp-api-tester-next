@@ -162,6 +162,7 @@ export function ChatClient({ initialCollections, erps, initialSettings, defaultS
         geminiKey={geminiKey}
         erps={erps}
         onImportCurl={openImport}
+        canImport={canEdit}
       />
     </div>
   )

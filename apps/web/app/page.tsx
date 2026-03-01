@@ -4,6 +4,8 @@ import { prisma } from '@erp/db'
 import { MethodBadge, StatusBadge } from '@/components/ui/badge'
 import { RotateCcw, Building2 } from 'lucide-react'
 import { HomeImport } from './home-import'
+import { getCurrentRole } from '@/lib/require-role'
+import { canAdmin as checkCanAdmin } from '@/lib/roles'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,7 +13,7 @@ export default async function Dashboard() {
   const count = await prisma.eRP.count()
   if (count === 0) redirect('/setup')
 
-  const [recentHistory, companies, erpCount, endpointCount, erps] = await Promise.all([
+  const [recentHistory, companies, erpCount, endpointCount, erps, role] = await Promise.all([
     prisma.requestHistory.findMany({
       orderBy: { createdAt: 'desc' },
       take: 10,
@@ -37,7 +39,9 @@ export default async function Dashboard() {
     prisma.eRP.count(),
     prisma.endpoint.count(),
     prisma.eRP.findMany({ orderBy: { name: 'asc' }, select: { id: true, name: true } }),
+    getCurrentRole(),
   ])
+  const isAdmin = checkCanAdmin(role)
 
   // Collect unique recent companies from history (for quick access shortcuts)
   const seenIds = new Set<number>()
@@ -60,7 +64,7 @@ export default async function Dashboard() {
     <div style={{ padding: '32px 40px', maxWidth: 900 }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
         <h1 style={{ fontSize: 20, fontWeight: 600 }}>Início</h1>
-        <HomeImport erps={erps} />
+        <HomeImport erps={erps} canAdmin={isAdmin} />
       </div>
       <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 32 }}>
         Acesso rápido e histórico recente

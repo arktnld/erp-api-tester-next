@@ -22,6 +22,7 @@ export function ChatPanel({
   geminiKey,
   erps,
   onImportCurl,
+  canImport,
 }: {
   activeCol: ColMeta | undefined
   provider: Provider
@@ -31,6 +32,7 @@ export function ChatPanel({
   geminiKey: string
   erps: ERP[]
   onImportCurl: (curlText: string) => void
+  canImport?: boolean
 }) {
   const [messages, setMessages] = useState<Message[]>([{ role: 'assistant', content: WELCOME }])
   const [ragInfos, setRagInfos] = useState<Map<number, RagInfo>>(new Map())
@@ -153,7 +155,7 @@ export function ChatPanel({
                               return (
                                 <div style={{ margin: '8px 0' }}>
                                   <pre style={{ backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, padding: '10px 12px', fontSize: 11, fontFamily: 'monospace', overflowX: 'auto', whiteSpace: 'pre-wrap', wordBreak: 'break-all', margin: 0 }}>{clean}</pre>
-                                  {isCurl && erps.length > 0 && (
+                                  {isCurl && erps.length > 0 && canImport && (
                                     <button onClick={() => onImportCurl(clean)} style={{ marginTop: 6, padding: '4px 10px', fontSize: 11, fontWeight: 500, backgroundColor: 'var(--accent)', color: 'white', border: 'none', borderRadius: 5, cursor: 'pointer' }}>
                                       ↓ Importar endpoint
                                     </button>
