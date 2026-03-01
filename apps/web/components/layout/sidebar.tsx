@@ -16,6 +16,8 @@ type SidebarERP = {
 export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
   const pathname = usePathname()
 
+  if (pathname.startsWith('/sign-in')) return null
+
   const nav = [
     { href: '/', label: 'Home', icon: LayoutDashboard },
     { href: '/test', label: 'Testar API', icon: FlaskConical },

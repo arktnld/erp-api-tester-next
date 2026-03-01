@@ -4,7 +4,7 @@ import { Space_Grotesk } from 'next/font/google'
 import { ClerkProvider } from '@clerk/nextjs'
 import { Sidebar } from '@/components/layout/sidebar'
 import { CommandPalette } from '@/components/ui/command-palette'
-import { PageTransition } from '@/components/layout/page-transition'
+import { MainContent } from '@/components/layout/main-content'
 import { prisma } from '@erp/db'
 import './globals.css'
 
@@ -48,15 +48,7 @@ export default async function RootLayout({
       <body>
         <CommandPalette erps={erps} />
         <Sidebar erps={erps} />
-        <main
-          style={{
-            marginLeft: 220,
-            minHeight: '100vh',
-            backgroundColor: 'var(--background)',
-          }}
-        >
-          <PageTransition>{children}</PageTransition>
-        </main>
+        <MainContent>{children}</MainContent>
       </body>
     </html>
     </ClerkProvider>
