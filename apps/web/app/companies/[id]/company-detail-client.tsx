@@ -1,8 +1,8 @@
 'use client'
 
-import { useTransition } from 'react'
+import { useTransition, useState } from 'react'
 import Link from 'next/link'
-import { ChevronLeft, Plus, Pencil, Trash2, User } from 'lucide-react'
+import { ChevronLeft, Plus, Pencil, Trash2, User, Copy, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { deleteTestClient } from '@/lib/actions/test-clients'
 import { useRole } from '@/lib/role-context'
@@ -29,9 +29,60 @@ type Company = {
   name: string
   baseUrl: string
   authType: string
+  authConfig: unknown
   notes: string
   erp: ERP
   testClients: TestClient[]
+}
+
+function CopyButton({ value, label }: { value: string; label: string }) {
+  const [copied, setCopied] = useState(false)
+
+  function handleCopy() {
+    navigator.clipboard.writeText(value).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    })
+  }
+
+  return (
+    <button
+      onClick={handleCopy}
+      title={`Copiar ${label}`}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        fontSize: 11,
+        padding: '2px 8px',
+        borderRadius: 4,
+        border: '1px solid var(--border)',
+        backgroundColor: copied ? 'color-mix(in srgb, var(--status-success) 12%, transparent)' : 'var(--surface-2)',
+        color: copied ? 'var(--status-success)' : 'var(--text-muted)',
+        cursor: 'pointer',
+        transition: 'all 0.15s',
+        flexShrink: 0,
+      }}
+    >
+      {copied ? <Check size={10} /> : <Copy size={10} />}
+      {label}
+    </button>
+  )
+}
+
+function AuthCopyButtons({ authType, authConfig }: { authType: string; authConfig: unknown }) {
+  if (authType === 'none' || !authConfig) return null
+  const config = authConfig as Record<string, string>
+  const entries = Object.entries(config).filter(([, v]) => typeof v === 'string' && v)
+  if (entries.length === 0) return null
+
+  return (
+    <>
+      {entries.map(([key, value]) => (
+        <CopyButton key={key} value={value} label={`Copiar ${key}`} />
+      ))}
+    </>
+  )
 }
 
 export function CompanyDetailClient({ company }: { company: Company }) {
@@ -67,6 +118,7 @@ export function CompanyDetailClient({ company }: { company: Company }) {
                 {company.authType}
               </span>
             )}
+            <AuthCopyButtons authType={company.authType} authConfig={company.authConfig} />
             <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
               {company.testClients.length} cliente{company.testClients.length !== 1 ? 's' : ''}
             </span>
@@ -124,11 +176,16 @@ export function CompanyDetailClient({ company }: { company: Company }) {
                 {company.erp.fieldSchemas.length > 0 && (
                   <div style={{ backgroundColor: 'var(--surface-2)', borderRadius: 6, padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {company.erp.fieldSchemas.map((fs) => (
-                      <div key={fs.fieldName} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                      <div key={fs.fieldName} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12 }}>
                         <span style={{ color: 'var(--text-muted)' }}>{fs.label}</span>
-                        <span style={{ fontFamily: 'monospace', color: fields[fs.fieldName] ? 'var(--text)' : 'var(--text-subtle)' }}>
-                          {fields[fs.fieldName] || '—'}
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span style={{ fontFamily: 'monospace', color: fields[fs.fieldName] ? 'var(--text)' : 'var(--text-subtle)' }}>
+                            {fields[fs.fieldName] || '—'}
+                          </span>
+                          {fields[fs.fieldName] && (
+                            <CopyButton value={fields[fs.fieldName]} label="" />
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
