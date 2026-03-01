@@ -4,6 +4,7 @@ import OpenAI from 'openai'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { retrieveContext } from '@/app/actions/collections'
 import type { EmbeddingProvider, RagResult } from '@/app/actions/collections'
+import { CHAT_PROVIDERS } from '@/lib/providers'
 
 export async function POST(req: NextRequest) {
   const {
@@ -57,7 +58,7 @@ ${systemContext}`
 
     const genai = new GoogleGenerativeAI(key)
     const model = genai.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: CHAT_PROVIDERS.gemini.model,
       systemInstruction: system,
     })
 
@@ -90,7 +91,7 @@ ${systemContext}`
 
     const client = new OpenAI({ apiKey: key })
     const stream = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: CHAT_PROVIDERS.openai.model,
       stream: true,
       messages: [{ role: 'system', content: system }, ...messages],
     })
@@ -114,7 +115,7 @@ ${systemContext}`
 
   const client = new Anthropic({ apiKey: key })
   const anthropicStream = client.messages.stream({
-    model: 'claude-sonnet-4-6',
+    model: CHAT_PROVIDERS.anthropic.model,
     max_tokens: 2048,
     system,
     messages,

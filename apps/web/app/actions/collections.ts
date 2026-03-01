@@ -4,20 +4,21 @@ import { prisma } from '@erp/db'
 import { revalidatePath } from 'next/cache'
 import OpenAI from 'openai'
 import { reciprocalRankFusion } from '@/lib/utils'
-
-export type EmbeddingProvider = 'openai' | 'gemini'
+import { EMBEDDING_PROVIDERS } from '@/lib/providers'
+import type { EmbeddingProvider } from '@/lib/providers'
+export type { EmbeddingProvider }
 
 const DIMENSIONS = 1536
 
 async function geminiEmbedBatch(texts: string[], apiKey: string): Promise<number[][]> {
   return Promise.all(texts.map(async (text) => {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${EMBEDDING_PROVIDERS.gemini.model}:embedContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'models/gemini-embedding-001',
+          model: `models/${EMBEDDING_PROVIDERS.gemini.model}`,
           content: { parts: [{ text }] },
           outputDimensionality: DIMENSIONS,
         }),
@@ -39,18 +40,18 @@ async function generateEmbeddings(
 ): Promise<number[][]> {
   if (provider === 'gemini') {
     const results: number[][] = []
-    for (let i = 0; i < texts.length; i += 20) {
-      results.push(...await geminiEmbedBatch(texts.slice(i, i + 20), apiKey))
+    for (let i = 0; i < texts.length; i += EMBEDDING_PROVIDERS.gemini.batchSize) {
+      results.push(...await geminiEmbedBatch(texts.slice(i, i + EMBEDDING_PROVIDERS.gemini.batchSize), apiKey))
     }
     return results
   }
 
   const client = new OpenAI({ apiKey })
   const results: number[][] = []
-  for (let i = 0; i < texts.length; i += 100) {
+  for (let i = 0; i < texts.length; i += EMBEDDING_PROVIDERS.openai.batchSize) {
     const res = await client.embeddings.create({
-      model: 'text-embedding-3-small',
-      input: texts.slice(i, i + 100),
+      model: EMBEDDING_PROVIDERS.openai.model,
+      input: texts.slice(i, i + EMBEDDING_PROVIDERS.openai.batchSize),
       dimensions: DIMENSIONS,
     })
     results.push(...res.data.map(d => d.embedding))
