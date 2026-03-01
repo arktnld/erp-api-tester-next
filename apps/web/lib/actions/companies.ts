@@ -4,6 +4,7 @@ import { prisma } from '@erp/db'
 import { revalidatePath } from 'next/cache'
 import { CompanySchema } from './schemas'
 import { requireEdit } from '@/lib/require-role'
+import { recordAudit } from '@/lib/audit'
 
 export async function getCompanies() {
   return prisma.company.findMany({
@@ -45,6 +46,7 @@ export async function createCompany(data: {
     data: { ...parsed, environments: JSON.parse(parsed.environments), authConfig: JSON.parse(parsed.authConfig) },
   })
   revalidatePath('/companies')
+  await recordAudit('create', 'company', company.id, company.name)
   return { id: company.id }
 }
 
@@ -60,10 +62,13 @@ export async function updateCompany(
   })
   revalidatePath('/companies')
   revalidatePath(`/companies/${id}`)
+  await recordAudit('update', 'company', id, parsed.name)
 }
 
 export async function deleteCompany(id: number) {
   await requireEdit()
+  const company = await prisma.company.findUniqueOrThrow({ where: { id }, select: { name: true } })
   await prisma.company.delete({ where: { id } })
   revalidatePath('/companies')
+  await recordAudit('delete', 'company', id, company.name)
 }
