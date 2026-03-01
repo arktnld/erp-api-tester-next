@@ -2,42 +2,79 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, X } from 'lucide-react'
+import { Search, X, Zap } from 'lucide-react'
 
 type SidebarEndpoint = { id: number; name: string; method: string; pathTemplate: string }
 type SidebarCompany = { id: number; name: string }
 type SidebarERP = { id: number; name: string; companies: SidebarCompany[]; endpoints: SidebarEndpoint[] }
 
-type Result =
-  | { type: 'erp'; id: number; label: string; sublabel: string; href: string }
-  | { type: 'company'; id: number; label: string; sublabel: string; href: string }
-  | { type: 'endpoint'; id: number; label: string; sublabel: string; href: string }
+type NavResult = { type: 'erp' | 'company' | 'endpoint'; id: number; label: string; sublabel: string; href: string }
+type TestResult = { type: 'test'; endpointId: number; companyId: number; label: string; sublabel: string; href: string }
+type Result = NavResult | TestResult
+
+function matchAll(haystack: string, terms: string[]): boolean {
+  return terms.every((t) => haystack.includes(t))
+}
 
 function buildResults(erps: SidebarERP[], query: string): Result[] {
-  const q = query.toLowerCase()
-  const results: Result[] = []
+  const terms = query.toLowerCase().trim().split(/\s+/).filter(Boolean)
+  if (terms.length === 0) return []
+
+  const testResults: TestResult[] = []
+  const navResults: NavResult[] = []
 
   for (const erp of erps) {
-    if (erp.name.toLowerCase().includes(q)) {
-      results.push({ type: 'erp', id: erp.id, label: erp.name, sublabel: 'ERP', href: `/erps/${erp.id}` })
+    if (matchAll(erp.name.toLowerCase(), terms)) {
+      navResults.push({ type: 'erp', id: erp.id, label: erp.name, sublabel: 'ERP', href: `/erps/${erp.id}` })
     }
+
     for (const company of erp.companies) {
-      if (company.name.toLowerCase().includes(q)) {
-        results.push({ type: 'company', id: company.id, label: company.name, sublabel: erp.name, href: `/companies/${company.id}` })
+      const companyText = company.name.toLowerCase()
+      if (matchAll(companyText, terms)) {
+        navResults.push({ type: 'company', id: company.id, label: company.name, sublabel: erp.name, href: `/companies/${company.id}` })
       }
     }
+
     for (const endpoint of erp.endpoints) {
-      if (endpoint.name.toLowerCase().includes(q) || endpoint.pathTemplate.toLowerCase().includes(q)) {
-        results.push({
-          type: 'endpoint', id: endpoint.id,
+      const epText = `${endpoint.name} ${endpoint.pathTemplate}`.toLowerCase()
+      const epMatchesSome = terms.some((t) => epText.includes(t))
+
+      if (matchAll(epText, terms)) {
+        navResults.push({
+          type: 'endpoint',
+          id: endpoint.id,
           label: `${endpoint.method} ${endpoint.name}`,
           sublabel: endpoint.pathTemplate,
           href: `/test?erpId=${erp.id}&endpointId=${endpoint.id}`,
         })
       }
+
+      // Cross-match: só aparece quando query bate em partes dos dois (endpoint + empresa)
+      if (epMatchesSome) {
+        for (const company of erp.companies) {
+          const companyText = company.name.toLowerCase()
+          const companyMatchesSome = terms.some((t) => companyText.includes(t))
+          if (companyMatchesSome && matchAll(`${epText} ${companyText}`, terms)) {
+            testResults.push({
+              type: 'test',
+              endpointId: endpoint.id,
+              companyId: company.id,
+              label: `${endpoint.method} ${endpoint.name}`,
+              sublabel: company.name,
+              href: `/test?endpointId=${endpoint.id}&companyId=${company.id}`,
+            })
+          }
+        }
+      }
     }
   }
-  return results.slice(0, 10)
+
+  // Resultados "testar direto" primeiro
+  return [...testResults, ...navResults].slice(0, 12)
+}
+
+const METHOD_COLOR: Record<string, string> = {
+  GET: '#10b981', POST: '#6366f1', PUT: '#f59e0b', PATCH: '#f59e0b', DELETE: '#ef4444',
 }
 
 export function CommandPalette({ erps }: { erps: SidebarERP[] }) {
@@ -88,7 +125,7 @@ export function CommandPalette({ erps }: { erps: SidebarERP[] }) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{ width: 560, backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.4)', overflow: 'hidden' }}
+        style={{ width: 580, backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, boxShadow: '0 20px 60px rgba(0,0,0,0.4)', overflow: 'hidden' }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', borderBottom: results.length > 0 ? '1px solid var(--border)' : 'none' }}>
           <Search size={16} color="var(--text-muted)" />
@@ -97,38 +134,74 @@ export function CommandPalette({ erps }: { erps: SidebarERP[] }) {
             value={query}
             onChange={(e) => { setQuery(e.target.value); setSelected(0) }}
             onKeyDown={handleKeyDown}
-            placeholder="Buscar ERPs, empresas, endpoints..."
+            placeholder="endpoint, empresa, ERP... (ex: autorizar empresa x)"
             style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: 'var(--text)', fontSize: 14 }}
           />
-          <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)', padding: 2 }}>
-            <X size={14} />
-          </button>
+          {query && (
+            <button onClick={() => setQuery('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)', padding: 2 }}>
+              <X size={14} />
+            </button>
+          )}
         </div>
+
         {results.length > 0 && (
-          <div style={{ maxHeight: 320, overflowY: 'auto' }}>
-            {results.map((r, i) => (
-              <div
-                key={`${r.type}-${r.id}`}
-                onClick={() => navigate(r.href)}
-                style={{
-                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  padding: '10px 16px', cursor: 'pointer',
-                  backgroundColor: i === selected ? 'var(--surface-2)' : 'transparent',
-                  borderBottom: i < results.length - 1 ? '1px solid var(--border)' : 'none',
-                }}
-              >
-                <div>
-                  <span style={{ fontSize: 13, color: 'var(--text)' }}>{r.label}</span>
-                  <span style={{ fontSize: 12, color: 'var(--text-subtle)', marginLeft: 8, fontFamily: r.type === 'endpoint' ? 'monospace' : 'inherit' }}>{r.sublabel}</span>
+          <div style={{ maxHeight: 360, overflowY: 'auto' }}>
+            {results.map((r, i) => {
+              const key = r.type === 'test' ? `test-${r.endpointId}-${r.companyId}` : `${r.type}-${r.id}`
+              const isTest = r.type === 'test'
+              const method = r.label.split(' ')[0]
+              const methodColor = METHOD_COLOR[method] ?? 'var(--text-muted)'
+
+              return (
+                <div
+                  key={key}
+                  onClick={() => navigate(r.href)}
+                  style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    padding: '10px 16px', cursor: 'pointer',
+                    backgroundColor: i === selected ? 'var(--surface-2)' : 'transparent',
+                    borderBottom: i < results.length - 1 ? '1px solid var(--border)' : 'none',
+                    borderLeft: isTest ? '2px solid var(--accent)' : '2px solid transparent',
+                  }}
+                >
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    {(r.type === 'endpoint' || r.type === 'test') ? (
+                      <span style={{ fontSize: 13, color: 'var(--text)' }}>
+                        <span style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 700, color: methodColor, marginRight: 6 }}>
+                          {method}
+                        </span>
+                        {r.label.slice(method.length + 1)}
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: 13, color: 'var(--text)' }}>{r.label}</span>
+                    )}
+                    <span style={{ fontSize: 12, color: 'var(--text-subtle)', marginLeft: 8, fontFamily: r.type === 'endpoint' ? 'monospace' : 'inherit' }}>
+                      {r.sublabel}
+                    </span>
+                  </div>
+                  {isTest ? (
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, color: 'var(--accent)', padding: '2px 8px', backgroundColor: 'color-mix(in srgb, var(--accent) 12%, transparent)', borderRadius: 4, flexShrink: 0 }}>
+                      <Zap size={10} />
+                      testar
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: 11, color: 'var(--text-subtle)', padding: '2px 6px', backgroundColor: 'var(--surface-2)', borderRadius: 4, flexShrink: 0 }}>{r.type}</span>
+                  )}
                 </div>
-                <span style={{ fontSize: 11, color: 'var(--text-subtle)', padding: '2px 6px', backgroundColor: 'var(--surface-2)', borderRadius: 4 }}>{r.type}</span>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
+
         {query.length >= 1 && results.length === 0 && (
           <div style={{ padding: '20px 16px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>
             Nenhum resultado para &quot;{query}&quot;
+          </div>
+        )}
+
+        {query.length === 0 && (
+          <div style={{ padding: '12px 16px', color: 'var(--text-subtle)', fontSize: 12 }}>
+            Dica: combine endpoint + empresa para ir direto ao teste
           </div>
         )}
       </div>
