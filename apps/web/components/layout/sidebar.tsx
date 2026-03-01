@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Server, Building2, FlaskConical, History, MessageSquare, BookOpen, ListChecks, Settings } from 'lucide-react'
+import { UserButton } from '@clerk/nextjs'
 import { TourButton } from '@/components/ui/tour-button'
 
 type SidebarERP = {
@@ -117,9 +118,7 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
           justifyContent: 'space-between',
         }}
       >
-        <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>
-          © {new Date().getFullYear()} Jarbis
-        </span>
+        <UserButton afterSignOutUrl="/sign-in" />
         <div style={{ display: 'flex', gap: 4 }}>
           <TourButton />
         </div>
