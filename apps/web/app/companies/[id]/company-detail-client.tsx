@@ -35,13 +35,28 @@ type Company = {
   testClients: TestClient[]
 }
 
+function copyText(text: string) {
+  if (navigator.clipboard) {
+    return navigator.clipboard.writeText(text)
+  }
+  // Fallback para HTTP (sem HTTPS clipboard API)
+  const el = document.createElement('textarea')
+  el.value = text
+  el.style.cssText = 'position:fixed;opacity:0'
+  document.body.appendChild(el)
+  el.select()
+  document.execCommand('copy')
+  document.body.removeChild(el)
+  return Promise.resolve()
+}
+
 function CopyButton({ value, label }: { value: string; label: string }) {
   const [copied, setCopied] = useState(false)
 
   function handleCopy() {
-    navigator.clipboard.writeText(value).then(() => {
+    copyText(value).then(() => {
       setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
+      setTimeout(() => setCopied(false), 1800)
     })
   }
 
@@ -56,7 +71,7 @@ function CopyButton({ value, label }: { value: string; label: string }) {
         fontSize: 11,
         padding: '2px 8px',
         borderRadius: 4,
-        border: '1px solid var(--border)',
+        border: `1px solid ${copied ? 'var(--status-success)' : 'var(--border)'}`,
         backgroundColor: copied ? 'color-mix(in srgb, var(--status-success) 12%, transparent)' : 'var(--surface-2)',
         color: copied ? 'var(--status-success)' : 'var(--text-muted)',
         cursor: 'pointer',
@@ -65,24 +80,17 @@ function CopyButton({ value, label }: { value: string; label: string }) {
       }}
     >
       {copied ? <Check size={10} /> : <Copy size={10} />}
-      {label}
+      {copied ? 'Copiado!' : label}
     </button>
   )
 }
 
-function AuthCopyButtons({ authType, authConfig }: { authType: string; authConfig: unknown }) {
+function AuthCopyButton({ authType, authConfig }: { authType: string; authConfig: unknown }) {
   if (authType === 'none' || !authConfig) return null
-  const config = authConfig as Record<string, string>
-  const entries = Object.entries(config).filter(([, v]) => typeof v === 'string' && v)
-  if (entries.length === 0) return null
-
-  return (
-    <>
-      {entries.map(([key, value]) => (
-        <CopyButton key={key} value={value} label={`Copiar ${key}`} />
-      ))}
-    </>
-  )
+  const config = authConfig as Record<string, unknown>
+  if (Object.keys(config).length === 0) return null
+  const json = JSON.stringify(config, null, 2)
+  return <CopyButton value={json} label="Copiar token" />
 }
 
 export function CompanyDetailClient({ company }: { company: Company }) {
@@ -118,7 +126,7 @@ export function CompanyDetailClient({ company }: { company: Company }) {
                 {company.authType}
               </span>
             )}
-            <AuthCopyButtons authType={company.authType} authConfig={company.authConfig} />
+            <AuthCopyButton authType={company.authType} authConfig={company.authConfig} />
             <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>
               {company.testClients.length} cliente{company.testClients.length !== 1 ? 's' : ''}
             </span>
