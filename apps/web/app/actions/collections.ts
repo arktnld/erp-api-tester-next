@@ -84,10 +84,11 @@ export async function saveCollection(
   chunks: string[],
   embeddingProvider: EmbeddingProvider,
   embeddingKey: string,
-  systemPrompt = ''
+  systemPrompt = '',
+  rawJson?: unknown
 ) {
   const storedProvider = embeddingKey ? embeddingProvider : 'openai'
-  const col = await prisma.postmanCollection.create({ data: { name, context, systemPrompt, embeddingProvider: storedProvider } })
+  const col = await prisma.postmanCollection.create({ data: { name, context, systemPrompt, embeddingProvider: storedProvider, rawJson: rawJson ?? undefined } })
 
   let embeddingsCount = 0
   let embeddingsError: string | null = null
