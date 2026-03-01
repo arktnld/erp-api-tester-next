@@ -47,6 +47,36 @@ function StepRow({ done, active, label, detail, error }: { done: boolean; active
 
 function parsePostman(json: Record<string, unknown>): { context: string; chunks: string[] } {
   const chunks: string[] = []
+
+  function extractPath(url: unknown): string {
+    const raw = typeof url === 'string' ? url : (url as Record<string, unknown>)?.raw as string ?? ''
+    const m = raw.match(/\/webservice\/.+/)
+    return m ? m[0].split('?')[0] : raw
+  }
+
+  function parseBodyFields(bodyRaw: string): string[] {
+    const withComment: string[] = []
+    const pattern = /"(\w+)"\s*:[^,\n\r]+,?\s*\/\/([^\n\r]+)/g
+    let m: RegExpExecArray | null
+    while ((m = pattern.exec(bodyRaw)) !== null) withComment.push(`${m[1]} (${m[2].trim()})`)
+    if (withComment.length > 0) return withComment
+    try { return Object.keys(JSON.parse(bodyRaw)) } catch { return [] }
+  }
+
+  function parseResponseFields(responses: unknown[]): string[] {
+    for (const r of responses) {
+      const body = (r as Record<string, unknown>).body as string
+      if (!body) continue
+      try {
+        const parsed = JSON.parse(body)
+        const rows = parsed.registros ?? parsed.data ?? parsed
+        const obj = Array.isArray(rows) ? rows[0] : rows
+        if (obj && typeof obj === 'object') return Object.keys(obj).slice(0, 20)
+      } catch {}
+    }
+    return []
+  }
+
   function processItems(items: unknown[], prefix = '') {
     for (const item of items) {
       const i = item as Record<string, unknown>
@@ -54,24 +84,25 @@ function parsePostman(json: Record<string, unknown>): { context: string; chunks:
         processItems(i.item as unknown[], `${prefix}${i.name as string} / `)
       } else if (i.request) {
         const req = i.request as Record<string, unknown>
-        const url = req.url
-        const rawUrl = typeof url === 'string' ? url : (url as Record<string, unknown>)?.raw as string ?? ''
+        const path = extractPath(req.url)
         const method = (req.method as string) ?? 'GET'
         const name = `${prefix}${i.name as string}`
         const bodyRaw = ((req.body as Record<string, unknown>)?.raw as string) ?? ''
-        const description = (req.description as string) ?? ''
-        let chunk = `${method} ${rawUrl} — ${name}`
-        if (description) chunk += `\n  ${description}`
-        if (bodyRaw) {
-          try {
-            const keys = Object.keys(JSON.parse(bodyRaw))
-            if (keys.length) chunk += `\n  Campos: ${keys.join(', ')}`
-          } catch {}
-        }
+        const responses = (i.response as unknown[]) ?? []
+
+        let chunk = `${method} ${path} — ${name}`
+
+        const bodyFields = parseBodyFields(bodyRaw)
+        if (bodyFields.length > 0) chunk += `\nCampos: ${bodyFields.slice(0, 20).join(', ')}`
+
+        const respFields = parseResponseFields(responses)
+        if (respFields.length > 0) chunk += `\nRetorno: ${respFields.join(', ')}`
+
         chunks.push(chunk)
       }
     }
   }
+
   if (Array.isArray(json.item)) processItems(json.item as unknown[])
   const colName = (json.info as Record<string, string>)?.name ?? 'Coleção'
   const context = `Coleção: ${colName}\nTotal: ${chunks.length} endpoints\n\n` + chunks.join('\n\n')
