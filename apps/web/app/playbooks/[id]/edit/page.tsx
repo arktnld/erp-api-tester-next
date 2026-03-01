@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'Editar Playbook' }
+
 import { prisma } from '@erp/db'
 import { PlaybookEditClient } from './playbook-edit-client'
 import { getPlaybook } from '@/lib/actions/playbooks'

@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'Chat IA' }
+
 import { getCollections } from '@/app/actions/collections'
 import { getSettings } from '@/lib/actions/settings'
 import { ChatClient } from './chat-client'

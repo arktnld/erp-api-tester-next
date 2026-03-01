@@ -40,5 +40,5 @@ else
 fi
 
 echo ""
-echo "==> Deploy concluído! App rodando em http://$SERVER:3000"
+echo "==> Deploy concluído! App rodando em http://$SERVER:9000"
 REMOTE

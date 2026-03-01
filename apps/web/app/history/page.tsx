@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'Histórico' }
+
 import { prisma, Prisma } from '@erp/db'
 import { HistoryClient } from './history-client'
 

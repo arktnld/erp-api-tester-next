@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'Setup' }
+
 'use client'
 
 import { useState, useTransition } from 'react'

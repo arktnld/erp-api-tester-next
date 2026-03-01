@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'Execução' }
+
 import Link from 'next/link'
 import { ChevronLeft, CheckCircle2, XCircle, Clock, Building2, Server } from 'lucide-react'
 import { getPlaybookRun } from '@/lib/actions/playbooks'

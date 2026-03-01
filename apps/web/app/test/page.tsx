@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'Testar API' }
+
 import { prisma } from '@erp/db'
 import { TestPage } from './test-page'
 

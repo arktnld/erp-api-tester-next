@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'Editar Cliente' }
+
 import { getCompany } from '@/lib/actions/companies'
 import { getTestClient } from '@/lib/actions/test-clients'
 import { ClientBuilder } from '../../client-builder'

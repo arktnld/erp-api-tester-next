@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'Playbooks' }
+
 import Link from 'next/link'
 import { Plus, Play, Pencil } from 'lucide-react'
 import { getPlaybooks } from '@/lib/actions/playbooks'

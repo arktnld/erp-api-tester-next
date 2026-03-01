@@ -12,7 +12,7 @@ DB_USER="erp_user"
 DB_PASS="$(openssl rand -base64 24)"
 
 echo "==> Conectando em $SERVER..."
-ssh "$SERVER" bash -s << REMOTE
+ssh "$SERVER" bash -s <<REMOTE
 set -e
 
 echo "--- Atualizando pacotes ---"

@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'Empresas' }
+
 import { prisma } from '@erp/db'
 import { getCompanies } from '@/lib/actions/companies'
 import { CompaniesClient } from './companies-client'

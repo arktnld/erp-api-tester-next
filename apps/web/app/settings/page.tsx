@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'Configurações' }
+
 import { Download } from 'lucide-react'
 import { auth, currentUser } from '@clerk/nextjs/server'
 import { getRole, canAdmin } from '@/lib/roles'

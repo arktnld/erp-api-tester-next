@@ -16,7 +16,7 @@ const spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: 'ERP API Tester',
+  title: { template: '%s · /ERP Tester', default: '/ERP Tester' },
   description: 'Internal API testing tool for ERP systems',
 }
 

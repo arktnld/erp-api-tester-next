@@ -1,3 +1,6 @@
+import type { Metadata } from 'next'
+export const metadata: Metadata = { title: 'ERP' }
+
 import { getERP } from '@/lib/actions/erps'
 import { ERPDetailClient } from './erp-detail-client'
 

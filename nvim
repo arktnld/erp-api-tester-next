@@ -1,0 +1,1729 @@
+{
+  "payload": {
+    "agendamentos": [
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "08:00",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "08:30",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423301,
+          "nome": "Luciana de Souza Rodrigues Penhalbel",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Nutricionista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "09:00",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "09:00",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "09:30",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "10:00",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423301,
+          "nome": "Luciana de Souza Rodrigues Penhalbel",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Nutricionista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "11:00",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423301,
+          "nome": "Luciana de Souza Rodrigues Penhalbel",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Nutricionista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "12:00",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423301,
+          "nome": "Luciana de Souza Rodrigues Penhalbel",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Nutricionista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "13:00",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423297,
+          "nome": "Mário Hamada",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico proctologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "14:20",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423186,
+          "nome": "Raphaela Carneiro Vasconcelos",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "14:30",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "14:30",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "15:00",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423303,
+          "nome": "Polissonografia",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "15:30",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423186,
+          "nome": "Raphaela Carneiro Vasconcelos",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "15:30",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "15:30",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423303,
+          "nome": "Polissonografia",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "15:45",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423303,
+          "nome": "Polissonografia",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "16:00",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "16:00",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423303,
+          "nome": "Polissonografia",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "16:30",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "16:30",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423300,
+          "nome": "Dirceu Alves da silva Júnior Mezzarano",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico cardiologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "17:00",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "17:00",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423302,
+          "nome": "Audiometria",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Fonoaudiólogo"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "25/02/2026",
+        "hora": "18:00",
+        "diaSemana": "Qua"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "08:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "08:30",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423301,
+          "nome": "Luciana de Souza Rodrigues Penhalbel",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Nutricionista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "09:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "09:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "09:30",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423301,
+          "nome": "Luciana de Souza Rodrigues Penhalbel",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Nutricionista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "10:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "10:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423301,
+          "nome": "Luciana de Souza Rodrigues Penhalbel",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Nutricionista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "11:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423186,
+          "nome": "Raphaela Carneiro Vasconcelos",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "11:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423295,
+          "nome": "Luís Fernando Antunes Pinheiro",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico otorrinolaringologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "11:30",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423301,
+          "nome": "Luciana de Souza Rodrigues Penhalbel",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Nutricionista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "12:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423301,
+          "nome": "Luciana de Souza Rodrigues Penhalbel",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Nutricionista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "13:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423186,
+          "nome": "Raphaela Carneiro Vasconcelos",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "14:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "14:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "14:30",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423186,
+          "nome": "Raphaela Carneiro Vasconcelos",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "15:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "15:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423295,
+          "nome": "Luís Fernando Antunes Pinheiro",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico otorrinolaringologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "15:20",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423303,
+          "nome": "Polissonografia",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "15:28",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423186,
+          "nome": "Raphaela Carneiro Vasconcelos",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "15:30",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "15:30",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423295,
+          "nome": "Luís Fernando Antunes Pinheiro",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico otorrinolaringologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "15:40",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423303,
+          "nome": "Polissonografia",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "15:43",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423303,
+          "nome": "Polissonografia",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "15:58",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "16:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423303,
+          "nome": "Polissonografia",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "16:13",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423303,
+          "nome": "Polissonografia",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "16:28",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423300,
+          "nome": "Dirceu Alves da silva Júnior Mezzarano",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico cardiologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "16:30",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "16:30",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423302,
+          "nome": "Audiometria",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Fonoaudiólogo"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "17:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "17:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423302,
+          "nome": "Audiometria",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Fonoaudiólogo"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "26/02/2026",
+        "hora": "18:00",
+        "diaSemana": "Qui"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "08:30",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "09:00",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423294,
+          "nome": "José Eduardo Antunes Pinheiro",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico otorrinolaringologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "09:20",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "09:30",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "10:00",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423294,
+          "nome": "José Eduardo Antunes Pinheiro",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico otorrinolaringologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "11:00",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423294,
+          "nome": "José Eduardo Antunes Pinheiro",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico otorrinolaringologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "11:20",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423294,
+          "nome": "José Eduardo Antunes Pinheiro",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico otorrinolaringologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "11:40",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423294,
+          "nome": "José Eduardo Antunes Pinheiro",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico otorrinolaringologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "14:15",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "14:30",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423294,
+          "nome": "José Eduardo Antunes Pinheiro",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico otorrinolaringologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "14:55",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "15:00",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423294,
+          "nome": "José Eduardo Antunes Pinheiro",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico otorrinolaringologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "15:15",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423303,
+          "nome": "Polissonografia",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "15:30",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "15:30",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423294,
+          "nome": "José Eduardo Antunes Pinheiro",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico otorrinolaringologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "15:35",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423303,
+          "nome": "Polissonografia",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "15:45",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423303,
+          "nome": "Polissonografia",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "16:00",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "16:00",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423303,
+          "nome": "Polissonografia",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "16:15",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423297,
+          "nome": "Mário Hamada",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico proctologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "16:20",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423303,
+          "nome": "Polissonografia",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico neurologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "16:30",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "16:30",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423297,
+          "nome": "Mário Hamada",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico proctologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "16:40",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423297,
+          "nome": "Mário Hamada",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Médico proctologista"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "17:00",
+        "diaSemana": "Sex"
+      },
+      {
+        "localProDoctor": {
+          "codigo": 1,
+          "nome": "PINHEIRO & PENHALBEL - SERVICOS MEDICOS",
+          "estadoRegistro": 0
+        },
+        "usuario": {
+          "codigo": 423305,
+          "nome": "Ricardo Pagani Carvalho",
+          "especialidade": {
+            "codigo": 0,
+            "nome": "Cirurgião dentista em geral"
+          },
+          "cpf": null,
+          "cns": null,
+          "orientacao": null
+        },
+        "data": "27/02/2026",
+        "hora": "17:00",
+        "diaSemana": "Sex"
+      }
+    ]
+  },
+  "message": null
+}

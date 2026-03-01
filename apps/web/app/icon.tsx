@@ -10,23 +10,24 @@ export default function Icon() {
         style={{
           width: 32,
           height: 32,
-          background: '#0d0d0d',
+          background: '#111',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          borderRadius: 7,
         }}
       >
         <span
           style={{
-            color: '#6366f1',
-            fontSize: 14,
-            fontWeight: 700,
             fontFamily: 'monospace',
-            letterSpacing: '-1px',
+            fontSize: 10,
+            fontWeight: 900,
+            color: '#4f8ef7',
+            letterSpacing: '-0.5px',
             lineHeight: 1,
           }}
         >
-          {'</>'}
+          /ERP
         </span>
       </div>
     ),
