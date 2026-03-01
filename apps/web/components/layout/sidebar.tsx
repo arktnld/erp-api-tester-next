@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Server, Building2, FlaskConical, History, MessageSquare, BookOpen, ListChecks, Settings } from 'lucide-react'
 import { UserButton } from '@clerk/nextjs'
+import { dark } from '@clerk/themes'
 import { useEffect, useState } from 'react'
 import { TourButton } from '@/components/ui/tour-button'
 
@@ -16,33 +17,7 @@ function ThemedUserButton() {
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
     return () => obs.disconnect()
   }, [])
-  const vars = isDark
-    ? { colorBackground: '#1c1c1e', colorText: '#e4e4e7', colorTextSecondary: '#a1a1aa', colorInputBackground: '#2c2c2e', colorPrimary: '#4f8ef7', colorNeutral: '#e4e4e7' }
-    : { colorBackground: '#ffffff', colorText: '#18181b', colorTextSecondary: '#71717a', colorInputBackground: '#f4f4f5', colorPrimary: '#4f8ef7', colorNeutral: '#18181b' }
-  const bg = isDark ? '#1c1c1e' : '#ffffff'
-  const bgAlt = isDark ? '#141414' : '#f4f4f5'
-  const text = isDark ? '#e4e4e7' : '#18181b'
-  const border = isDark ? '#2c2c2e' : '#e4e4e7'
-  const elements = {
-    card: { backgroundColor: bg, boxShadow: isDark ? '0 4px 32px rgba(0,0,0,0.7)' : undefined },
-    navbar: { backgroundColor: bgAlt, borderRight: `1px solid ${border}` },
-    navbarButton: { color: text },
-    navbarButtonIcon: { color: text },
-    pageScrollBox: { backgroundColor: bg },
-    page: { backgroundColor: bg },
-    profileSection: { borderTop: `1px solid ${border}` },
-    profileSectionTitle: { color: text },
-    profileSectionTitleText: { color: text },
-    profileSectionContent: { color: text },
-    profileSectionPrimaryButton: { color: text },
-    accordionTriggerButton: { color: text },
-    headerTitle: { color: text },
-    headerSubtitle: { color: isDark ? '#a1a1aa' : '#71717a' },
-    formFieldLabel: { color: text },
-    formFieldInput: { backgroundColor: isDark ? '#2c2c2e' : '#f4f4f5', color: text, borderColor: border },
-    badge: { backgroundColor: isDark ? '#2c2c2e' : '#e4e4e7', color: text },
-  }
-  return <UserButton afterSignOutUrl="/sign-in" appearance={{ variables: vars, elements }} />
+  return <UserButton afterSignOutUrl="/sign-in" appearance={{ baseTheme: isDark ? dark : undefined }} />
 }
 
 type SidebarERP = {
