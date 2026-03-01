@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Endpoint" ADD COLUMN IF NOT EXISTS "notes" TEXT NOT NULL DEFAULT '';
