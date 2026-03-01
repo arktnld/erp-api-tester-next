@@ -55,10 +55,10 @@ export default async function Dashboard() {
   ]
 
   const quickActions = [
-    { href: '/test', label: 'Testar API', desc: 'Disparar requisições', icon: FlaskConical, accent: true },
-    { href: '/chat', label: 'Chat IA', desc: 'Assistente inteligente', icon: MessageSquare, accent: false },
-    { href: '/playbooks', label: 'Playbooks', desc: 'Fluxos automatizados', icon: ListChecks, accent: false },
-    { href: '/history', label: 'Histórico', desc: 'Todas as requisições', icon: History, accent: false },
+    { href: '/test', label: 'Testar API', desc: 'Disparar requisições', icon: FlaskConical },
+    { href: '/chat', label: 'Chat IA', desc: 'Assistente inteligente', icon: MessageSquare },
+    { href: '/playbooks', label: 'Playbooks', desc: 'Fluxos automatizados', icon: ListChecks },
+    { href: '/history', label: 'Histórico', desc: 'Todas as requisições', icon: History },
   ]
 
   return (
@@ -74,7 +74,7 @@ export default async function Dashboard() {
 
       {/* Quick actions */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 28 }}>
-        {quickActions.map(({ href, label, desc, icon: Icon, accent }) => (
+        {quickActions.map(({ href, label, desc, icon: Icon }) => (
           <Link
             key={href}
             href={href}
@@ -83,20 +83,18 @@ export default async function Dashboard() {
               alignItems: 'center',
               gap: 12,
               padding: '14px 16px',
-              backgroundColor: accent ? 'var(--accent)' : 'var(--surface)',
-              border: `1px solid ${accent ? 'var(--accent)' : 'var(--border)'}`,
+              backgroundColor: 'var(--surface)',
+              border: '1px solid var(--border)',
               borderRadius: 10,
               textDecoration: 'none',
-              color: accent ? '#fff' : 'var(--text)',
+              color: 'var(--text)',
               transition: 'opacity 0.1s',
             }}
           >
-            <Icon size={18} style={{ flexShrink: 0, opacity: accent ? 1 : 0.7 }} />
+            <Icon size={18} style={{ flexShrink: 0, opacity: 0.7 }} />
             <div>
               <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 1 }}>{label}</p>
-              <p style={{ fontSize: 11, opacity: accent ? 0.85 : undefined, color: accent ? undefined : 'var(--text-muted)' }}>
-                {desc}
-              </p>
+              <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{desc}</p>
             </div>
           </Link>
         ))}
