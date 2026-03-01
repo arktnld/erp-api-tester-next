@@ -115,3 +115,63 @@ input::placeholder, textarea::placeholder {
 .btn-md { height: 36px; padding: 0 16px; font-size: 14px; }
 .btn-lg { height: 44px; padding: 0 20px; font-size: 16px; }
 .btn-icon { height: 32px; width: 32px; padding: 0; }
+
+/* Driver.js tour — theme overrides */
+.driver-popover {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+  border-radius: 10px !important;
+  min-width: 280px !important;
+  max-width: 340px !important;
+}
+.driver-popover-title {
+  color: var(--text) !important;
+  font-size: 15px !important;
+}
+.driver-popover-description {
+  color: var(--text-muted) !important;
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+}
+.driver-popover-close-btn {
+  color: var(--text-subtle) !important;
+}
+.driver-popover-close-btn:hover,
+.driver-popover-close-btn:focus {
+  color: var(--text) !important;
+}
+.driver-popover-progress-text {
+  color: var(--text-subtle) !important;
+  font-size: 12px !important;
+}
+.driver-popover-footer button {
+  background-color: var(--surface-2) !important;
+  color: var(--text-muted) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 5px !important;
+  padding: 5px 12px !important;
+  font-size: 12px !important;
+  text-shadow: none !important;
+}
+.driver-popover-footer button:hover,
+.driver-popover-footer button:focus {
+  background-color: var(--border) !important;
+  color: var(--text) !important;
+}
+.driver-popover-next-btn {
+  background-color: var(--accent) !important;
+  color: #fff !important;
+  border-color: var(--accent) !important;
+}
+.driver-popover-next-btn:hover,
+.driver-popover-next-btn:focus {
+  background-color: var(--accent-hover) !important;
+  border-color: var(--accent-hover) !important;
+}
+/* Arrows: only set the visible side's color */
+.driver-popover-arrow-side-left  { border-left-color:   var(--surface) !important; }
+.driver-popover-arrow-side-right { border-right-color:  var(--surface) !important; }
+.driver-popover-arrow-side-top   { border-top-color:    var(--surface) !important; }
+.driver-popover-arrow-side-bottom{ border-bottom-color: var(--surface) !important; }
