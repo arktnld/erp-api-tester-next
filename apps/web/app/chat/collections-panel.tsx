@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { Plus, Trash2, FileUp, Zap, Loader2, CheckCircle2, Pencil, Check, X } from 'lucide-react'
 import { saveCollection, deleteCollection, updateCollectionPrompt } from '@/app/actions/collections'
 import { inputStyle as baseInput } from '@/lib/styles'
+import { useRole } from '@/lib/role-context'
 
 type ColMeta = { id: number; name: string; systemPrompt: string; createdAt: Date }
 type EmbeddingProvider = 'openai' | 'gemini'
@@ -174,6 +175,7 @@ export function CollectionsPanel({
   const [savingPrompt, setSavingPrompt] = useState(false)
 
   const activeCol = collections.find(c => c.id === activeId)
+  const { canEdit } = useRole()
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -295,9 +297,11 @@ export function CollectionsPanel({
       <div style={{ padding: '14px 14px 10px', borderBottom: '1px solid var(--border)', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
           <span style={{ fontSize: 11, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Coleções</span>
-          <button onClick={() => setShowForm(f => !f)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', padding: 2 }}>
-            <Plus size={14} />
-          </button>
+          {canEdit && (
+            <button onClick={() => setShowForm(f => !f)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', padding: 2 }}>
+              <Plus size={14} />
+            </button>
+          )}
         </div>
         <Collapse open={showForm}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8, paddingTop: 2 }}>
@@ -343,9 +347,11 @@ export function CollectionsPanel({
             <span style={{ flex: 1, fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: activeId === col.id ? 'var(--text)' : 'var(--text-muted)', fontWeight: activeId === col.id ? 500 : 400 }}>
               {col.name}
             </span>
-            <button onClick={e => handleDelete(col.id, e)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)', display: 'flex', padding: 2, flexShrink: 0, opacity: 0.6 }}>
-              <Trash2 size={12} />
-            </button>
+            {canEdit && (
+              <button onClick={e => handleDelete(col.id, e)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)', display: 'flex', padding: 2, flexShrink: 0, opacity: 0.6 }}>
+                <Trash2 size={12} />
+              </button>
+            )}
           </div>
         ))}
       </div>
@@ -355,13 +361,15 @@ export function CollectionsPanel({
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: editingPrompt ? 8 : 0 }}>
             <span style={{ fontSize: 10, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Prompt</span>
             {!editingPrompt ? (
-              <button
-                onClick={() => setEditingPrompt(true)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: promptDraft ? 'var(--accent)' : 'var(--text-subtle)', display: 'flex', alignItems: 'center', gap: 4, padding: 2, fontSize: 11 }}
-              >
-                <Pencil size={11} />
-                <span>{promptDraft ? 'Editar' : 'Adicionar'}</span>
-              </button>
+              canEdit && (
+                <button
+                  onClick={() => setEditingPrompt(true)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: promptDraft ? 'var(--accent)' : 'var(--text-subtle)', display: 'flex', alignItems: 'center', gap: 4, padding: 2, fontSize: 11 }}
+                >
+                  <Pencil size={11} />
+                  <span>{promptDraft ? 'Editar' : 'Adicionar'}</span>
+                </button>
+              )
             ) : (
               <div style={{ display: 'flex', gap: 4 }}>
                 <button onClick={() => { setEditingPrompt(false); setPromptDraft(activeCol?.systemPrompt ?? '') }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)', display: 'flex', padding: 2 }}>
