@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Server, Building2, FlaskConical, History, MessageSquare, BookOpen } from 'lucide-react'
+import { LayoutDashboard, Server, Building2, FlaskConical, History, MessageSquare, BookOpen, ListChecks } from 'lucide-react'
 
 type SidebarERP = {
   id: number
@@ -21,6 +21,7 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
     { href: '/erps', label: 'ERPs', icon: Server },
     { href: '/companies', label: 'Empresas', icon: Building2 },
     { href: '/history', label: 'Histórico', icon: History },
+    { href: '/playbooks', label: 'Playbooks', icon: ListChecks },
     { href: '/docs', label: 'Como usar', icon: BookOpen },
   ]
 
