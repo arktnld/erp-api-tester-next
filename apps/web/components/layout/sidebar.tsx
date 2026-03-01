@@ -53,7 +53,7 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
           borderBottom: '1px solid var(--border)',
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
+          gap: 0,
         }}
       >
         <span style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 900, letterSpacing: '-0.03em', color: 'var(--accent)' }}>/ERP</span>
