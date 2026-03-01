@@ -149,6 +149,15 @@ export async function retrieveContext(
   const SIMILARITY_THRESHOLD = 0.55 // cosine distance: 0=identical, 1=orthogonal, 2=opposite
   const FETCH_K = topK * 3 // fetch more candidates so RRF has room to rerank
 
+  // Build OR query for BM25: "como puxar titulos" → "como | puxar | titulos"
+  // Strips accents so "títulos" matches "titulos" in the index
+  const ftsWords = question
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // strip accents
+    .toLowerCase()
+    .split(/\W+/)
+    .filter(w => w.length > 2)
+  const ftsQuery = ftsWords.join(' | ')
+
   const [vecRows, bm25Rows] = await Promise.all([
     prisma.$queryRaw<{ text: string; score: number }[]>`
       SELECT text, (embedding <=> ${JSON.stringify(queryVec)}::vector) as score
@@ -158,14 +167,16 @@ export async function retrieveContext(
       ORDER BY embedding <=> ${JSON.stringify(queryVec)}::vector
       LIMIT ${FETCH_K}
     `,
-    prisma.$queryRaw<{ text: string }[]>`
-      SELECT text
-      FROM "EmbeddingChunk"
-      WHERE "collectionId" = ${collectionId}
-        AND to_tsvector('simple', text) @@ plainto_tsquery('simple', ${question})
-      ORDER BY ts_rank(to_tsvector('simple', text), plainto_tsquery('simple', ${question})) DESC
-      LIMIT ${FETCH_K}
-    `.catch(() => [] as { text: string }[]),
+    ftsQuery
+      ? prisma.$queryRaw<{ text: string }[]>`
+          SELECT text
+          FROM "EmbeddingChunk"
+          WHERE "collectionId" = ${collectionId}
+            AND to_tsvector('simple', unaccent(text)) @@ to_tsquery('simple', unaccent(${ftsQuery}))
+          ORDER BY ts_rank(to_tsvector('simple', unaccent(text)), to_tsquery('simple', unaccent(${ftsQuery}))) DESC
+          LIMIT ${FETCH_K}
+        `.catch(() => [] as { text: string }[])
+      : Promise.resolve([] as { text: string }[]),
   ])
 
   if (vecRows.length === 0 && bm25Rows.length === 0) {
