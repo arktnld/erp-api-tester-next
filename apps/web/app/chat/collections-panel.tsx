@@ -391,7 +391,7 @@ export function CollectionsPanel({
               style={{ ...inputStyle, fontFamily: 'inherit', fontSize: 11, resize: 'none', lineHeight: 1.5 }}
             />
           ) : promptDraft ? (
-            <p style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5, margin: '4px 0 0', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+            <p style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.5, margin: '4px 0 0', ...(canEdit ? { overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' } : {}) }}>
               {promptDraft}
             </p>
           ) : null}
