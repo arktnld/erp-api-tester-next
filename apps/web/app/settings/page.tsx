@@ -1,5 +1,5 @@
 import { Download } from 'lucide-react'
-import { auth } from '@clerk/nextjs/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
 import { getRole, canAdmin } from '@/lib/roles'
 import { getSettings } from '@/lib/actions/settings'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
@@ -17,8 +17,12 @@ const sectionTitle: React.CSSProperties = {
 }
 
 export default async function SettingsPage() {
-  const [{ sessionClaims }, settings] = await Promise.all([auth(), getSettings()])
-  const role = getRole(sessionClaims?.metadata as Record<string, unknown>)
+  const [{ sessionClaims }, settings, user] = await Promise.all([auth(), getSettings(), currentUser()])
+  // sessionClaims.metadata works if Clerk JWT template includes publicMetadata.
+  // currentUser().publicMetadata is the authoritative fallback.
+  const metaFromJwt = sessionClaims?.metadata as Record<string, unknown> | undefined
+  const metaFromUser = user?.publicMetadata as Record<string, unknown> | undefined
+  const role = getRole(metaFromJwt ?? metaFromUser)
   const isAdmin = canAdmin(role)
   const users = isAdmin ? await listUsers() : []
 
