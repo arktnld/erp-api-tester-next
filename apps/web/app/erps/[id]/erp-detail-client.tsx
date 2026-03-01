@@ -2,7 +2,9 @@
 
 import { useState, useTransition, useEffect } from 'react'
 import Link from 'next/link'
-import { ChevronLeft, Plus, Trash2, Pencil, ArrowUp, ArrowDown, Zap } from 'lucide-react'
+import { ChevronLeft, Plus, Trash2, Pencil, GripVertical, Zap } from 'lucide-react'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import type { DropResult } from '@hello-pangea/dnd'
 import { MethodBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -113,11 +115,11 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
   const [fsEndpointParam, setFsEndpointParam] = useState('')
   const [fsResponsePath, setFsResponsePath] = useState('')
 
-  const moveEndpoint = (index: number, dir: -1 | 1) => {
+  const onDragEnd = (result: DropResult) => {
+    if (!result.destination) return
     const next = [...endpoints]
-    const swapIndex = index + dir
-    if (swapIndex < 0 || swapIndex >= next.length) return
-    ;[next[index], next[swapIndex]] = [next[swapIndex], next[index]]
+    const [moved] = next.splice(result.source.index, 1)
+    next.splice(result.destination.index, 0, moved)
     setEndpoints(next)
     startTransition(() => reorderEndpoints(erp.id, next.map((ep) => ep.id)))
   }
@@ -178,46 +180,56 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
               Nenhum endpoint cadastrado.
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {endpoints.map((ep, i) => (
-                <div key={ep.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8 }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                    <Button variant="ghost" size="sm" onClick={() => moveEndpoint(i, -1)} disabled={i === 0} style={{ padding: '2px 4px', opacity: i === 0 ? 0.2 : 1 }}>
-                      <ArrowUp size={11} />
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => moveEndpoint(i, 1)} disabled={i === endpoints.length - 1} style={{ padding: '2px 4px', opacity: i === endpoints.length - 1 ? 0.2 : 1 }}>
-                      <ArrowDown size={11} />
-                    </Button>
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="endpoints">
+                {(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {endpoints.map((ep, i) => (
+                      <Draggable key={ep.id} draggableId={String(ep.id)} index={i}>
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, ...provided.draggableProps.style }}
+                          >
+                            <div {...provided.dragHandleProps} style={{ cursor: 'grab', color: 'var(--text-subtle)', display: 'flex', alignItems: 'center' }}>
+                              <GripVertical size={16} />
+                            </div>
+                            <MethodBadge method={ep.method} />
+                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <span style={{ fontFamily: 'monospace', fontSize: 13 }}>{ep.pathTemplate}</span>
+                                <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{ep.name}</span>
+                              </div>
+                              {(ep.group || ep.requiresClient || ep.isModification) && (
+                                <div style={{ display: 'flex', gap: 6 }}>
+                                  {ep.group && (() => {
+                                    const c = getGroupColor(ep.group)
+                                    return <span style={{ fontSize: 11, fontWeight: 500, color: c.text, backgroundColor: c.bg, border: `1px solid ${c.border}`, borderRadius: 4, padding: '2px 8px' }}>{ep.group}</span>
+                                  })()}
+                                  {ep.isModification && <span style={{ fontSize: 11, fontWeight: 500, color: '#f59e0b', backgroundColor: '#f59e0b18', border: '1px solid #f59e0b44', borderRadius: 4, padding: '2px 8px' }}>modificação</span>}
+                                  {ep.requiresClient && <span style={{ fontSize: 11, fontWeight: 500, color: '#888', backgroundColor: '#88888818', border: '1px solid #88888844', borderRadius: 4, padding: '2px 8px' }}>cliente teste</span>}
+                                </div>
+                              )}
+                              {ep.notes && (
+                                <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                                  {ep.notes}
+                                </p>
+                              )}
+                            </div>
+                            <div style={{ display: 'flex', gap: 2 }}>
+                              <Button variant="ghost" size="sm" onClick={() => openEndpointSheet(ep)}><Pencil size={13} /></Button>
+                              <Button variant="ghost" size="sm" onClick={() => startTransition(() => deleteEndpoint(ep.id, erp.id))}><Trash2 size={13} /></Button>
+                            </div>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
                   </div>
-                  <MethodBadge method={ep.method} />
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <span style={{ fontFamily: 'monospace', fontSize: 13 }}>{ep.pathTemplate}</span>
-                      <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{ep.name}</span>
-                    </div>
-                    {(ep.group || ep.requiresClient || ep.isModification) && (
-                      <div style={{ display: 'flex', gap: 6 }}>
-                        {ep.group && (() => {
-                          const c = getGroupColor(ep.group)
-                          return <span style={{ fontSize: 11, fontWeight: 500, color: c.text, backgroundColor: c.bg, border: `1px solid ${c.border}`, borderRadius: 4, padding: '2px 8px' }}>{ep.group}</span>
-                        })()}
-                        {ep.isModification && <span style={{ fontSize: 11, fontWeight: 500, color: '#f59e0b', backgroundColor: '#f59e0b18', border: '1px solid #f59e0b44', borderRadius: 4, padding: '2px 8px' }}>modificação</span>}
-                        {ep.requiresClient && <span style={{ fontSize: 11, fontWeight: 500, color: '#888', backgroundColor: '#88888818', border: '1px solid #88888844', borderRadius: 4, padding: '2px 8px' }}>cliente teste</span>}
-                      </div>
-                    )}
-                    {ep.notes && (
-                      <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                        {ep.notes}
-                      </p>
-                    )}
-                  </div>
-                  <div style={{ display: 'flex', gap: 2 }}>
-                    <Button variant="ghost" size="sm" onClick={() => openEndpointSheet(ep)}><Pencil size={13} /></Button>
-                    <Button variant="ghost" size="sm" onClick={() => startTransition(() => deleteEndpoint(ep.id, erp.id))}><Trash2 size={13} /></Button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           )}
         </div>
       )}
