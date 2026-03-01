@@ -174,17 +174,18 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
             borderBottom: '1px solid #d1d9e0',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span
               style={{
                 fontFamily: 'monospace',
-                fontSize: 13,
-                fontWeight: 700,
+                fontSize: 22,
+                fontWeight: 900,
                 color: '#0969da',
-                letterSpacing: '-1px',
+                lineHeight: 1,
+                marginRight: -2,
               }}
             >
-              {'</>'}
+              /
             </span>
             <span
               style={{
