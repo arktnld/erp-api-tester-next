@@ -52,6 +52,7 @@ function copyText(text: string) {
 
 function CopyButton({ value, label }: { value: string; label: string }) {
   const [copied, setCopied] = useState(false)
+  const hasLabel = label !== ''
 
   function handleCopy() {
     copyText(value).then(() => {
@@ -63,13 +64,13 @@ function CopyButton({ value, label }: { value: string; label: string }) {
   return (
     <button
       onClick={handleCopy}
-      title={`Copiar ${label}`}
+      title={`Copiar ${label || 'valor'}`}
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 4,
+        gap: hasLabel ? 4 : 0,
         fontSize: 11,
-        padding: '2px 8px',
+        padding: hasLabel ? '2px 8px' : '2px 5px',
         borderRadius: 4,
         border: `1px solid ${copied ? 'var(--status-success)' : 'var(--border)'}`,
         backgroundColor: copied ? 'color-mix(in srgb, var(--status-success) 12%, transparent)' : 'var(--surface-2)',
@@ -80,7 +81,12 @@ function CopyButton({ value, label }: { value: string; label: string }) {
       }}
     >
       {copied ? <Check size={10} /> : <Copy size={10} />}
-      {copied ? 'Copiado!' : label}
+      {hasLabel && (
+        <span style={{ display: 'inline-grid' }}>
+          <span style={{ gridArea: '1/1', visibility: copied ? 'visible' : 'hidden' }}>Copiado!</span>
+          <span style={{ gridArea: '1/1', visibility: copied ? 'hidden' : 'visible' }}>{label}</span>
+        </span>
+      )}
     </button>
   )
 }
