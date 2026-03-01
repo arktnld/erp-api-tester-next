@@ -36,17 +36,19 @@ export async function createCompany(data: {
   environments: string
   authType: string
   authConfig: string
+  notes: string
 }) {
   const parsed = CompanySchema.parse(data)
-  await prisma.company.create({
+  const company = await prisma.company.create({
     data: { ...parsed, environments: JSON.parse(parsed.environments), authConfig: JSON.parse(parsed.authConfig) },
   })
   revalidatePath('/companies')
+  return { id: company.id }
 }
 
 export async function updateCompany(
   id: number,
-  data: { name: string; erpId: number; baseUrl: string; environments: string; authType: string; authConfig: string }
+  data: { name: string; erpId: number; baseUrl: string; environments: string; authType: string; authConfig: string; notes: string }
 ) {
   const parsed = CompanySchema.parse(data)
   await prisma.company.update({

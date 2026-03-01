@@ -21,6 +21,7 @@ type Company = {
   environments: unknown
   authType: string
   authConfig: unknown
+  notes: string
   erp: { id: number; name: string }
   _count: { testClients: number }
 }
@@ -73,6 +74,7 @@ export function CompaniesClient({
   const [newEnvUrl, setNewEnvUrl] = useState('')
   const [authType, setAuthType] = useState('none')
   const [authConfig, setAuthConfig] = useState('{}')
+  const [notes, setNotes] = useState('')
   const [isPending, startTransition] = useTransition()
 
   const openSheet = (company?: Company) => {
@@ -85,6 +87,7 @@ export function CompaniesClient({
     setNewEnvUrl('')
     setAuthType(company?.authType ?? 'none')
     setAuthConfig(company?.authConfig ? JSON.stringify(company.authConfig) : '{}')
+    setNotes(company?.notes ?? '')
     setSheet({ open: true, company })
   }
 
@@ -232,9 +235,10 @@ export function CompaniesClient({
                   environments: environmentsJson,
                   authType,
                   authConfig,
+                  notes,
                 })
               } else {
-                await createCompany({ name, erpId: Number(erpId), baseUrl, environments: environmentsJson, authType, authConfig })
+                await createCompany({ name, erpId: Number(erpId), baseUrl, environments: environmentsJson, authType, authConfig, notes })
               }
               setSheet({ open: false })
             })
@@ -325,6 +329,15 @@ export function CompaniesClient({
               />
             </>
           )}
+
+          <label style={labelStyle}>Notas <span style={{ color: 'var(--text-subtle)' }}>(opcional)</span></label>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Observações sobre esta empresa..."
+            rows={3}
+            style={textareaStyle}
+          />
 
           <Button
             type="submit"

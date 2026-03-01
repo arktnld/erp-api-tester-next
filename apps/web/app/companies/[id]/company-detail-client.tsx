@@ -28,6 +28,7 @@ type Company = {
   name: string
   baseUrl: string
   authType: string
+  notes: string
   erp: ERP
   testClients: TestClient[]
 }
@@ -68,6 +69,11 @@ export function CompanyDetailClient({ company }: { company: Company }) {
               {company.testClients.length} cliente{company.testClients.length !== 1 ? 's' : ''}
             </span>
           </div>
+          {company.notes && (
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 8, maxWidth: 600 }}>
+              {company.notes}
+            </p>
+          )}
         </div>
         <Link href={`/companies/${company.id}/clients/new`}>
           <Button><Plus size={14} /> Novo Cliente</Button>

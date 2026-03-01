@@ -11,6 +11,7 @@ export const CompanySchema = z.object({
   environments: z.string().default('[]'),
   authType: z.enum(['none', 'bearer', 'api_key', 'basic', 'custom_headers', 'body_fields']),
   authConfig: z.string().default('{}'),
+  notes: z.string().default(''),
 })
 
 export const EndpointSchema = z.object({
