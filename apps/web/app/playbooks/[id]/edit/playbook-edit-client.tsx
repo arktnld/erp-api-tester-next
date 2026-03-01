@@ -1,0 +1,153 @@
+'use client'
+
+import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { ChevronLeft, Plus, Trash2, GripVertical } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { createPlaybook, updatePlaybook, upsertPlaybookSteps } from '@/lib/actions/playbooks'
+import { formLabel as labelStyle, selectStyle } from '@/lib/styles'
+
+type Endpoint = { id: number; name: string; method: string }
+type ERP = { id: number; name: string; endpoints: Endpoint[] }
+type StepForm = { id?: number; order: number; endpointId: number; stepName: string; bodyOverride: string; responseCapture: string }
+
+type Props = {
+  erps: ERP[]
+  playbook?: {
+    id: number
+    erpId: number
+    name: string
+    description: string
+    steps: Array<{ id: number; order: number; endpointId: number; stepName: string; bodyOverride: string; responseCapture: string; endpoint: { id: number; name: string; method: string } }>
+  }
+}
+
+export function PlaybookEditClient({ erps, playbook }: Props) {
+  const router = useRouter()
+  const [, startTransition] = useTransition()
+
+  const [name, setName] = useState(playbook?.name ?? '')
+  const [erpId, setErpId] = useState(playbook?.erpId ?? erps[0]?.id ?? 0)
+  const [description, setDescription] = useState(playbook?.description ?? '')
+  const [steps, setSteps] = useState<StepForm[]>(
+    playbook?.steps.map((s) => ({ id: s.id, order: s.order, endpointId: s.endpointId, stepName: s.stepName, bodyOverride: s.bodyOverride, responseCapture: s.responseCapture })) ?? []
+  )
+
+  const selectedErp = erps.find((e) => e.id === erpId)
+
+  const addStep = () => {
+    const firstEndpoint = selectedErp?.endpoints[0]
+    if (!firstEndpoint) return
+    setSteps([...steps, { order: steps.length, endpointId: firstEndpoint.id, stepName: '', bodyOverride: '', responseCapture: '' }])
+  }
+
+  const updateStep = (i: number, field: keyof StepForm, value: string | number) => {
+    const next = [...steps]
+    next[i] = { ...next[i], [field]: value }
+    setSteps(next)
+  }
+
+  const removeStep = (i: number) => setSteps(steps.filter((_, idx) => idx !== i))
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    startTransition(async () => {
+      let id = playbook?.id
+      if (id) {
+        await updatePlaybook(id, { name, erpId, description })
+      } else {
+        const result = await createPlaybook({ name, erpId, description })
+        id = result.id
+      }
+      await upsertPlaybookSteps(id!, steps.map((s, i) => ({ ...s, order: i })))
+      router.push('/playbooks')
+    })
+  }
+
+  const textareaStyle: React.CSSProperties = {
+    width: '100%', padding: '8px 12px', backgroundColor: 'var(--surface-2)',
+    border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)',
+    fontSize: 12, fontFamily: 'monospace', outline: 'none', resize: 'vertical',
+  }
+
+  return (
+    <div style={{ padding: '32px 40px', maxWidth: 720 }}>
+      <Link href="/playbooks" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--text-muted)', fontSize: 13, textDecoration: 'none', marginBottom: 20 }}>
+        <ChevronLeft size={14} /> Playbooks
+      </Link>
+
+      <h1 style={{ fontSize: 20, fontWeight: 600, marginBottom: 28 }}>{playbook ? 'Editar Playbook' : 'Novo Playbook'}</h1>
+
+      <form onSubmit={handleSubmit}>
+        <label style={labelStyle}>Nome</label>
+        <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Login + Consulta" required />
+
+        <label style={labelStyle}>ERP</label>
+        <select style={selectStyle} value={erpId} onChange={(e) => setErpId(Number(e.target.value))}>
+          {erps.map((erp) => <option key={erp.id} value={erp.id}>{erp.name}</option>)}
+        </select>
+
+        <label style={labelStyle}>Descrição <span style={{ color: 'var(--text-subtle)' }}>(opcional)</span></label>
+        <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Autentica e consulta o cliente..." rows={2} style={textareaStyle} />
+
+        <div style={{ borderTop: '1px solid var(--border)', marginTop: 24, paddingTop: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+            <p style={{ fontSize: 13, fontWeight: 600 }}>Steps ({steps.length})</p>
+            <Button type="button" variant="ghost" onClick={addStep} disabled={!selectedErp?.endpoints.length}>
+              <Plus size={13} /> Adicionar Step
+            </Button>
+          </div>
+
+          {steps.length === 0 && (
+            <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13, backgroundColor: 'var(--surface-2)', borderRadius: 8, border: '1px solid var(--border)' }}>
+              Nenhum step. Clique em &quot;Adicionar Step&quot; para começar.
+            </div>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {steps.map((step, i) => (
+              <div key={i} style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                  <GripVertical size={14} color="var(--text-subtle)" />
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>STEP {i + 1}</span>
+                  <div style={{ flex: 1 }} />
+                  <Button type="button" variant="ghost" size="sm" onClick={() => removeStep(i)}><Trash2 size={12} /></Button>
+                </div>
+
+                <label style={labelStyle}>Endpoint</label>
+                <select style={selectStyle} value={step.endpointId} onChange={(e) => updateStep(i, 'endpointId', Number(e.target.value))}>
+                  {selectedErp?.endpoints.map((ep) => (
+                    <option key={ep.id} value={ep.id}>{ep.method} {ep.name}</option>
+                  ))}
+                </select>
+
+                <label style={labelStyle}>Nome do step <span style={{ color: 'var(--text-subtle)' }}>(opcional)</span></label>
+                <Input value={step.stepName} onChange={(e) => updateStep(i, 'stepName', e.target.value)} placeholder="Autenticação" />
+
+                <label style={labelStyle}>Body override <span style={{ color: 'var(--text-subtle)' }}>(JSON, opcional)</span></label>
+                <textarea value={step.bodyOverride} onChange={(e) => updateStep(i, 'bodyOverride', e.target.value)} rows={3} placeholder={'{"login": "{cpf}"}'} style={textareaStyle} />
+
+                <label style={labelStyle}>
+                  Response capture <span style={{ color: 'var(--text-subtle)' }}>{'{"}campo": "path.da.resposta{"}'}</span>
+                </label>
+                <textarea
+                  value={step.responseCapture}
+                  onChange={(e) => updateStep(i, 'responseCapture', e.target.value)}
+                  rows={2}
+                  placeholder={'{"token": "data.access_token"}'}
+                  style={textareaStyle}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <Button type="submit" style={{ width: '100%', marginTop: 24 }}>
+          {playbook ? 'Salvar Playbook' : 'Criar Playbook'}
+        </Button>
+      </form>
+    </div>
+  )
+}
