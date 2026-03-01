@@ -119,6 +119,7 @@ function ActionsMenu({ response, curlString, erpName, companyName }: {
 }) {
   const [open, setOpen] = useState(false)
   const [outputCopied, setOutputCopied] = useState(false)
+  const canCopyImage = typeof ClipboardItem !== 'undefined' && !!navigator.clipboard?.write
   const [curlCopied, setCurlCopied] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
@@ -177,14 +178,16 @@ function ActionsMenu({ response, curlString, erpName, companyName }: {
               </button>
             )}
             <div style={{ height: 1, backgroundColor: 'var(--border)', margin: '4px 0' }} />
-            <button
-              style={{ ...menuItemStyle, color: imageCopied ? 'var(--status-success)' : 'var(--text)' }}
-              disabled={capturing}
-              onClick={async () => { await copyImage(); setTimeout(() => setOpen(false), 1200) }}
-            >
-              {copyCapturing ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : imageCopied ? <Check size={13} /> : <ImageIcon size={13} />}
-              {copyCapturing ? 'Processando...' : imageCopied ? 'Copiado!' : 'Copiar imagem'}
-            </button>
+            {canCopyImage && (
+              <button
+                style={{ ...menuItemStyle, color: imageCopied ? 'var(--status-success)' : 'var(--text)' }}
+                disabled={capturing}
+                onClick={async () => { await copyImage(); setTimeout(() => setOpen(false), 1200) }}
+              >
+                {copyCapturing ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : imageCopied ? <Check size={13} /> : <ImageIcon size={13} />}
+                {copyCapturing ? 'Processando...' : imageCopied ? 'Copiado!' : 'Copiar imagem'}
+              </button>
+            )}
             <button style={menuItemStyle} disabled={capturing} onClick={async () => { await downloadPng(); setOpen(false) }}>
               {downloadCapturing ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <Download size={13} />}
               {downloadCapturing ? 'Processando...' : 'Baixar PNG'}
