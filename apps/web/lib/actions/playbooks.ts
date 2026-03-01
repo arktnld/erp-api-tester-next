@@ -106,6 +106,8 @@ type StepResult = {
   stepName: string
   status: 'ok' | 'error'
   statusCode: number
+  method: string
+  url: string
   responseBody: string
   capturedFields: Record<string, string>
   durationMs: number
@@ -147,6 +149,8 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
         stepName: step.stepName || `Step ${step.order + 1}`,
         status: result.statusCode >= 200 && result.statusCode < 300 ? 'ok' : 'error',
         statusCode: result.statusCode,
+        method: result.method,
+        url: result.url,
         responseBody: result.responseBody,
         capturedFields: captured,
         durationMs: result.durationMs,
@@ -178,6 +182,9 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
 export async function getPlaybookRun(id: number) {
   return prisma.playbookRun.findUniqueOrThrow({
     where: { id },
-    include: { playbook: { select: { id: true, name: true } } },
+    include: {
+      playbook: { select: { id: true, name: true, erp: { select: { name: true } } } },
+      company: { select: { name: true } },
+    },
   })
 }

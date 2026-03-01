@@ -50,17 +50,18 @@ model Endpoint {
 }
 
 model Company {
-  id           Int          @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   name         String
   erpId        Int
-  baseUrl      String       @default("")
-  environments Json         @default("[]")
-  authType     String       @default("none")
-  authConfig   Json         @default("{}")
-  notes        String       @default("") @db.Text
-  createdAt    DateTime     @default(now())
-  erp          ERP          @relation(fields: [erpId], references: [id])
+  baseUrl      String        @default("")
+  environments Json          @default("[]")
+  authType     String        @default("none")
+  authConfig   Json          @default("{}")
+  notes        String        @default("") @db.Text
+  createdAt    DateTime      @default(now())
+  erp          ERP           @relation(fields: [erpId], references: [id])
   testClients  TestClient[]
+  playbookRuns PlaybookRun[]
 }
 
 model TestClient {
@@ -130,6 +131,7 @@ model PlaybookRun {
   status     String    @default("running")
   steps      Json      @default("[]")
   playbook   Playbook  @relation(fields: [playbookId], references: [id])
+  company    Company   @relation(fields: [companyId], references: [id])
 }
 
 model RequestHistory {

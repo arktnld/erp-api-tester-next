@@ -59,8 +59,9 @@ model Company {
   authConfig   Json         @default("{}")
   notes        String       @default("") @db.Text
   createdAt   DateTime     @default(now())
-  erp         ERP          @relation(fields: [erpId], references: [id])
-  testClients TestClient[]
+  erp          ERP           @relation(fields: [erpId], references: [id])
+  testClients  TestClient[]
+  playbookRuns PlaybookRun[]
 }
 
 model TestClient {
@@ -130,6 +131,7 @@ model PlaybookRun {
   status     String    @default("running")
   steps      Json      @default("[]")
   playbook   Playbook  @relation(fields: [playbookId], references: [id])
+  company    Company   @relation(fields: [companyId], references: [id])
 }
 
 model RequestHistory {

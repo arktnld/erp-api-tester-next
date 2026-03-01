@@ -1936,10 +1936,12 @@ export namespace Prisma {
 
   export type CompanyCountOutputType = {
     testClients: number
+    playbookRuns: number
   }
 
   export type CompanyCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     testClients?: boolean | CompanyCountOutputTypeCountTestClientsArgs
+    playbookRuns?: boolean | CompanyCountOutputTypeCountPlaybookRunsArgs
   }
 
   // Custom InputTypes
@@ -1958,6 +1960,13 @@ export namespace Prisma {
    */
   export type CompanyCountOutputTypeCountTestClientsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TestClientWhereInput
+  }
+
+  /**
+   * CompanyCountOutputType without action
+   */
+  export type CompanyCountOutputTypeCountPlaybookRunsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PlaybookRunWhereInput
   }
 
 
@@ -5816,6 +5825,7 @@ export namespace Prisma {
     createdAt?: boolean
     erp?: boolean | ERPDefaultArgs<ExtArgs>
     testClients?: boolean | Company$testClientsArgs<ExtArgs>
+    playbookRuns?: boolean | Company$playbookRunsArgs<ExtArgs>
     _count?: boolean | CompanyCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["company"]>
 
@@ -5861,6 +5871,7 @@ export namespace Prisma {
   export type CompanyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     erp?: boolean | ERPDefaultArgs<ExtArgs>
     testClients?: boolean | Company$testClientsArgs<ExtArgs>
+    playbookRuns?: boolean | Company$playbookRunsArgs<ExtArgs>
     _count?: boolean | CompanyCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CompanyIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5875,6 +5886,7 @@ export namespace Prisma {
     objects: {
       erp: Prisma.$ERPPayload<ExtArgs>
       testClients: Prisma.$TestClientPayload<ExtArgs>[]
+      playbookRuns: Prisma.$PlaybookRunPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -6282,6 +6294,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     erp<T extends ERPDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ERPDefaultArgs<ExtArgs>>): Prisma__ERPClient<$Result.GetResult<Prisma.$ERPPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     testClients<T extends Company$testClientsArgs<ExtArgs> = {}>(args?: Subset<T, Company$testClientsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TestClientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    playbookRuns<T extends Company$playbookRunsArgs<ExtArgs> = {}>(args?: Subset<T, Company$playbookRunsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PlaybookRunPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6737,6 +6750,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: TestClientScalarFieldEnum | TestClientScalarFieldEnum[]
+  }
+
+  /**
+   * Company.playbookRuns
+   */
+  export type Company$playbookRunsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PlaybookRun
+     */
+    select?: PlaybookRunSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PlaybookRun
+     */
+    omit?: PlaybookRunOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PlaybookRunInclude<ExtArgs> | null
+    where?: PlaybookRunWhereInput
+    orderBy?: PlaybookRunOrderByWithRelationInput | PlaybookRunOrderByWithRelationInput[]
+    cursor?: PlaybookRunWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PlaybookRunScalarFieldEnum | PlaybookRunScalarFieldEnum[]
   }
 
   /**
@@ -13350,6 +13387,7 @@ export namespace Prisma {
     status?: boolean
     steps?: boolean
     playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["playbookRun"]>
 
   export type PlaybookRunSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -13362,6 +13400,7 @@ export namespace Prisma {
     status?: boolean
     steps?: boolean
     playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["playbookRun"]>
 
   export type PlaybookRunSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -13374,6 +13413,7 @@ export namespace Prisma {
     status?: boolean
     steps?: boolean
     playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["playbookRun"]>
 
   export type PlaybookRunSelectScalar = {
@@ -13390,18 +13430,22 @@ export namespace Prisma {
   export type PlaybookRunOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "playbookId" | "companyId" | "clientId" | "startedAt" | "endedAt" | "status" | "steps", ExtArgs["result"]["playbookRun"]>
   export type PlaybookRunInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
   }
   export type PlaybookRunIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
   }
   export type PlaybookRunIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
+    company?: boolean | CompanyDefaultArgs<ExtArgs>
   }
 
   export type $PlaybookRunPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "PlaybookRun"
     objects: {
       playbook: Prisma.$PlaybookPayload<ExtArgs>
+      company: Prisma.$CompanyPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: number
@@ -13807,6 +13851,7 @@ export namespace Prisma {
   export interface Prisma__PlaybookRunClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     playbook<T extends PlaybookDefaultArgs<ExtArgs> = {}>(args?: Subset<T, PlaybookDefaultArgs<ExtArgs>>): Prisma__PlaybookClient<$Result.GetResult<Prisma.$PlaybookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    company<T extends CompanyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CompanyDefaultArgs<ExtArgs>>): Prisma__CompanyClient<$Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -16009,6 +16054,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Company"> | Date | string
     erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
     testClients?: TestClientListRelationFilter
+    playbookRuns?: PlaybookRunListRelationFilter
   }
 
   export type CompanyOrderByWithRelationInput = {
@@ -16023,6 +16069,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     erp?: ERPOrderByWithRelationInput
     testClients?: TestClientOrderByRelationAggregateInput
+    playbookRuns?: PlaybookRunOrderByRelationAggregateInput
   }
 
   export type CompanyWhereUniqueInput = Prisma.AtLeast<{
@@ -16040,6 +16087,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Company"> | Date | string
     erp?: XOR<ERPScalarRelationFilter, ERPWhereInput>
     testClients?: TestClientListRelationFilter
+    playbookRuns?: PlaybookRunListRelationFilter
   }, "id">
 
   export type CompanyOrderByWithAggregationInput = {
@@ -16423,6 +16471,7 @@ export namespace Prisma {
     status?: StringFilter<"PlaybookRun"> | string
     steps?: JsonFilter<"PlaybookRun">
     playbook?: XOR<PlaybookScalarRelationFilter, PlaybookWhereInput>
+    company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
   }
 
   export type PlaybookRunOrderByWithRelationInput = {
@@ -16435,6 +16484,7 @@ export namespace Prisma {
     status?: SortOrder
     steps?: SortOrder
     playbook?: PlaybookOrderByWithRelationInput
+    company?: CompanyOrderByWithRelationInput
   }
 
   export type PlaybookRunWhereUniqueInput = Prisma.AtLeast<{
@@ -16450,6 +16500,7 @@ export namespace Prisma {
     status?: StringFilter<"PlaybookRun"> | string
     steps?: JsonFilter<"PlaybookRun">
     playbook?: XOR<PlaybookScalarRelationFilter, PlaybookWhereInput>
+    company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
   }, "id">
 
   export type PlaybookRunOrderByWithAggregationInput = {
@@ -16853,6 +16904,7 @@ export namespace Prisma {
     createdAt?: Date | string
     erp: ERPCreateNestedOneWithoutCompaniesInput
     testClients?: TestClientCreateNestedManyWithoutCompanyInput
+    playbookRuns?: PlaybookRunCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateInput = {
@@ -16866,6 +16918,7 @@ export namespace Prisma {
     notes?: string
     createdAt?: Date | string
     testClients?: TestClientUncheckedCreateNestedManyWithoutCompanyInput
+    playbookRuns?: PlaybookRunUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUpdateInput = {
@@ -16878,6 +16931,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     erp?: ERPUpdateOneRequiredWithoutCompaniesNestedInput
     testClients?: TestClientUpdateManyWithoutCompanyNestedInput
+    playbookRuns?: PlaybookRunUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateInput = {
@@ -16891,6 +16945,7 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     testClients?: TestClientUncheckedUpdateManyWithoutCompanyNestedInput
+    playbookRuns?: PlaybookRunUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyCreateManyInput = {
@@ -17225,13 +17280,13 @@ export namespace Prisma {
   }
 
   export type PlaybookRunCreateInput = {
-    companyId: number
     clientId?: number | null
     startedAt?: Date | string
     endedAt?: Date | string | null
     status?: string
     steps?: JsonNullValueInput | InputJsonValue
     playbook: PlaybookCreateNestedOneWithoutRunsInput
+    company: CompanyCreateNestedOneWithoutPlaybookRunsInput
   }
 
   export type PlaybookRunUncheckedCreateInput = {
@@ -17246,13 +17301,13 @@ export namespace Prisma {
   }
 
   export type PlaybookRunUpdateInput = {
-    companyId?: IntFieldUpdateOperationsInput | number
     clientId?: NullableIntFieldUpdateOperationsInput | number | null
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     steps?: JsonNullValueInput | InputJsonValue
     playbook?: PlaybookUpdateOneRequiredWithoutRunsNestedInput
+    company?: CompanyUpdateOneRequiredWithoutPlaybookRunsNestedInput
   }
 
   export type PlaybookRunUncheckedUpdateInput = {
@@ -17278,7 +17333,6 @@ export namespace Prisma {
   }
 
   export type PlaybookRunUpdateManyMutationInput = {
-    companyId?: IntFieldUpdateOperationsInput | number
     clientId?: NullableIntFieldUpdateOperationsInput | number | null
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -17784,7 +17838,17 @@ export namespace Prisma {
     none?: TestClientWhereInput
   }
 
+  export type PlaybookRunListRelationFilter = {
+    every?: PlaybookRunWhereInput
+    some?: PlaybookRunWhereInput
+    none?: PlaybookRunWhereInput
+  }
+
   export type TestClientOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type PlaybookRunOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -17984,16 +18048,6 @@ export namespace Prisma {
   export type SettingMinOrderByAggregateInput = {
     key?: SortOrder
     value?: SortOrder
-  }
-
-  export type PlaybookRunListRelationFilter = {
-    every?: PlaybookRunWhereInput
-    some?: PlaybookRunWhereInput
-    none?: PlaybookRunWhereInput
-  }
-
-  export type PlaybookRunOrderByRelationAggregateInput = {
-    _count?: SortOrder
   }
 
   export type PlaybookCountOrderByAggregateInput = {
@@ -18511,11 +18565,25 @@ export namespace Prisma {
     connect?: TestClientWhereUniqueInput | TestClientWhereUniqueInput[]
   }
 
+  export type PlaybookRunCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<PlaybookRunCreateWithoutCompanyInput, PlaybookRunUncheckedCreateWithoutCompanyInput> | PlaybookRunCreateWithoutCompanyInput[] | PlaybookRunUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: PlaybookRunCreateOrConnectWithoutCompanyInput | PlaybookRunCreateOrConnectWithoutCompanyInput[]
+    createMany?: PlaybookRunCreateManyCompanyInputEnvelope
+    connect?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+  }
+
   export type TestClientUncheckedCreateNestedManyWithoutCompanyInput = {
     create?: XOR<TestClientCreateWithoutCompanyInput, TestClientUncheckedCreateWithoutCompanyInput> | TestClientCreateWithoutCompanyInput[] | TestClientUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: TestClientCreateOrConnectWithoutCompanyInput | TestClientCreateOrConnectWithoutCompanyInput[]
     createMany?: TestClientCreateManyCompanyInputEnvelope
     connect?: TestClientWhereUniqueInput | TestClientWhereUniqueInput[]
+  }
+
+  export type PlaybookRunUncheckedCreateNestedManyWithoutCompanyInput = {
+    create?: XOR<PlaybookRunCreateWithoutCompanyInput, PlaybookRunUncheckedCreateWithoutCompanyInput> | PlaybookRunCreateWithoutCompanyInput[] | PlaybookRunUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: PlaybookRunCreateOrConnectWithoutCompanyInput | PlaybookRunCreateOrConnectWithoutCompanyInput[]
+    createMany?: PlaybookRunCreateManyCompanyInputEnvelope
+    connect?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
   }
 
   export type ERPUpdateOneRequiredWithoutCompaniesNestedInput = {
@@ -18540,6 +18608,20 @@ export namespace Prisma {
     deleteMany?: TestClientScalarWhereInput | TestClientScalarWhereInput[]
   }
 
+  export type PlaybookRunUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<PlaybookRunCreateWithoutCompanyInput, PlaybookRunUncheckedCreateWithoutCompanyInput> | PlaybookRunCreateWithoutCompanyInput[] | PlaybookRunUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: PlaybookRunCreateOrConnectWithoutCompanyInput | PlaybookRunCreateOrConnectWithoutCompanyInput[]
+    upsert?: PlaybookRunUpsertWithWhereUniqueWithoutCompanyInput | PlaybookRunUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: PlaybookRunCreateManyCompanyInputEnvelope
+    set?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    disconnect?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    delete?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    connect?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    update?: PlaybookRunUpdateWithWhereUniqueWithoutCompanyInput | PlaybookRunUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: PlaybookRunUpdateManyWithWhereWithoutCompanyInput | PlaybookRunUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: PlaybookRunScalarWhereInput | PlaybookRunScalarWhereInput[]
+  }
+
   export type TestClientUncheckedUpdateManyWithoutCompanyNestedInput = {
     create?: XOR<TestClientCreateWithoutCompanyInput, TestClientUncheckedCreateWithoutCompanyInput> | TestClientCreateWithoutCompanyInput[] | TestClientUncheckedCreateWithoutCompanyInput[]
     connectOrCreate?: TestClientCreateOrConnectWithoutCompanyInput | TestClientCreateOrConnectWithoutCompanyInput[]
@@ -18552,6 +18634,20 @@ export namespace Prisma {
     update?: TestClientUpdateWithWhereUniqueWithoutCompanyInput | TestClientUpdateWithWhereUniqueWithoutCompanyInput[]
     updateMany?: TestClientUpdateManyWithWhereWithoutCompanyInput | TestClientUpdateManyWithWhereWithoutCompanyInput[]
     deleteMany?: TestClientScalarWhereInput | TestClientScalarWhereInput[]
+  }
+
+  export type PlaybookRunUncheckedUpdateManyWithoutCompanyNestedInput = {
+    create?: XOR<PlaybookRunCreateWithoutCompanyInput, PlaybookRunUncheckedCreateWithoutCompanyInput> | PlaybookRunCreateWithoutCompanyInput[] | PlaybookRunUncheckedCreateWithoutCompanyInput[]
+    connectOrCreate?: PlaybookRunCreateOrConnectWithoutCompanyInput | PlaybookRunCreateOrConnectWithoutCompanyInput[]
+    upsert?: PlaybookRunUpsertWithWhereUniqueWithoutCompanyInput | PlaybookRunUpsertWithWhereUniqueWithoutCompanyInput[]
+    createMany?: PlaybookRunCreateManyCompanyInputEnvelope
+    set?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    disconnect?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    delete?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    connect?: PlaybookRunWhereUniqueInput | PlaybookRunWhereUniqueInput[]
+    update?: PlaybookRunUpdateWithWhereUniqueWithoutCompanyInput | PlaybookRunUpdateWithWhereUniqueWithoutCompanyInput[]
+    updateMany?: PlaybookRunUpdateManyWithWhereWithoutCompanyInput | PlaybookRunUpdateManyWithWhereWithoutCompanyInput[]
+    deleteMany?: PlaybookRunScalarWhereInput | PlaybookRunScalarWhereInput[]
   }
 
   export type CompanyCreateNestedOneWithoutTestClientsInput = {
@@ -18736,6 +18832,12 @@ export namespace Prisma {
     connect?: PlaybookWhereUniqueInput
   }
 
+  export type CompanyCreateNestedOneWithoutPlaybookRunsInput = {
+    create?: XOR<CompanyCreateWithoutPlaybookRunsInput, CompanyUncheckedCreateWithoutPlaybookRunsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutPlaybookRunsInput
+    connect?: CompanyWhereUniqueInput
+  }
+
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
   }
@@ -18746,6 +18848,14 @@ export namespace Prisma {
     upsert?: PlaybookUpsertWithoutRunsInput
     connect?: PlaybookWhereUniqueInput
     update?: XOR<XOR<PlaybookUpdateToOneWithWhereWithoutRunsInput, PlaybookUpdateWithoutRunsInput>, PlaybookUncheckedUpdateWithoutRunsInput>
+  }
+
+  export type CompanyUpdateOneRequiredWithoutPlaybookRunsNestedInput = {
+    create?: XOR<CompanyCreateWithoutPlaybookRunsInput, CompanyUncheckedCreateWithoutPlaybookRunsInput>
+    connectOrCreate?: CompanyCreateOrConnectWithoutPlaybookRunsInput
+    upsert?: CompanyUpsertWithoutPlaybookRunsInput
+    connect?: CompanyWhereUniqueInput
+    update?: XOR<XOR<CompanyUpdateToOneWithWhereWithoutPlaybookRunsInput, CompanyUpdateWithoutPlaybookRunsInput>, CompanyUncheckedUpdateWithoutPlaybookRunsInput>
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -18950,6 +19060,7 @@ export namespace Prisma {
     notes?: string
     createdAt?: Date | string
     testClients?: TestClientCreateNestedManyWithoutCompanyInput
+    playbookRuns?: PlaybookRunCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutErpInput = {
@@ -18962,6 +19073,7 @@ export namespace Prisma {
     notes?: string
     createdAt?: Date | string
     testClients?: TestClientUncheckedCreateNestedManyWithoutCompanyInput
+    playbookRuns?: PlaybookRunUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutErpInput = {
@@ -19398,6 +19510,35 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type PlaybookRunCreateWithoutCompanyInput = {
+    clientId?: number | null
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: string
+    steps?: JsonNullValueInput | InputJsonValue
+    playbook: PlaybookCreateNestedOneWithoutRunsInput
+  }
+
+  export type PlaybookRunUncheckedCreateWithoutCompanyInput = {
+    id?: number
+    playbookId: number
+    clientId?: number | null
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: string
+    steps?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type PlaybookRunCreateOrConnectWithoutCompanyInput = {
+    where: PlaybookRunWhereUniqueInput
+    create: XOR<PlaybookRunCreateWithoutCompanyInput, PlaybookRunUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type PlaybookRunCreateManyCompanyInputEnvelope = {
+    data: PlaybookRunCreateManyCompanyInput | PlaybookRunCreateManyCompanyInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ERPUpsertWithoutCompaniesInput = {
     update: XOR<ERPUpdateWithoutCompaniesInput, ERPUncheckedUpdateWithoutCompaniesInput>
     create: XOR<ERPCreateWithoutCompaniesInput, ERPUncheckedCreateWithoutCompaniesInput>
@@ -19453,6 +19594,36 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"TestClient"> | Date | string
   }
 
+  export type PlaybookRunUpsertWithWhereUniqueWithoutCompanyInput = {
+    where: PlaybookRunWhereUniqueInput
+    update: XOR<PlaybookRunUpdateWithoutCompanyInput, PlaybookRunUncheckedUpdateWithoutCompanyInput>
+    create: XOR<PlaybookRunCreateWithoutCompanyInput, PlaybookRunUncheckedCreateWithoutCompanyInput>
+  }
+
+  export type PlaybookRunUpdateWithWhereUniqueWithoutCompanyInput = {
+    where: PlaybookRunWhereUniqueInput
+    data: XOR<PlaybookRunUpdateWithoutCompanyInput, PlaybookRunUncheckedUpdateWithoutCompanyInput>
+  }
+
+  export type PlaybookRunUpdateManyWithWhereWithoutCompanyInput = {
+    where: PlaybookRunScalarWhereInput
+    data: XOR<PlaybookRunUpdateManyMutationInput, PlaybookRunUncheckedUpdateManyWithoutCompanyInput>
+  }
+
+  export type PlaybookRunScalarWhereInput = {
+    AND?: PlaybookRunScalarWhereInput | PlaybookRunScalarWhereInput[]
+    OR?: PlaybookRunScalarWhereInput[]
+    NOT?: PlaybookRunScalarWhereInput | PlaybookRunScalarWhereInput[]
+    id?: IntFilter<"PlaybookRun"> | number
+    playbookId?: IntFilter<"PlaybookRun"> | number
+    companyId?: IntFilter<"PlaybookRun"> | number
+    clientId?: IntNullableFilter<"PlaybookRun"> | number | null
+    startedAt?: DateTimeFilter<"PlaybookRun"> | Date | string
+    endedAt?: DateTimeNullableFilter<"PlaybookRun"> | Date | string | null
+    status?: StringFilter<"PlaybookRun"> | string
+    steps?: JsonFilter<"PlaybookRun">
+  }
+
   export type CompanyCreateWithoutTestClientsInput = {
     name: string
     baseUrl?: string
@@ -19462,6 +19633,7 @@ export namespace Prisma {
     notes?: string
     createdAt?: Date | string
     erp: ERPCreateNestedOneWithoutCompaniesInput
+    playbookRuns?: PlaybookRunCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyUncheckedCreateWithoutTestClientsInput = {
@@ -19474,6 +19646,7 @@ export namespace Prisma {
     authConfig?: JsonNullValueInput | InputJsonValue
     notes?: string
     createdAt?: Date | string
+    playbookRuns?: PlaybookRunUncheckedCreateNestedManyWithoutCompanyInput
   }
 
   export type CompanyCreateOrConnectWithoutTestClientsInput = {
@@ -19501,6 +19674,7 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     erp?: ERPUpdateOneRequiredWithoutCompaniesNestedInput
+    playbookRuns?: PlaybookRunUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutTestClientsInput = {
@@ -19513,6 +19687,7 @@ export namespace Prisma {
     authConfig?: JsonNullValueInput | InputJsonValue
     notes?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    playbookRuns?: PlaybookRunUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type EmbeddingChunkUpdateWithWhereUniqueWithoutCollectionInput = {
@@ -19634,12 +19809,12 @@ export namespace Prisma {
   }
 
   export type PlaybookRunCreateWithoutPlaybookInput = {
-    companyId: number
     clientId?: number | null
     startedAt?: Date | string
     endedAt?: Date | string | null
     status?: string
     steps?: JsonNullValueInput | InputJsonValue
+    company: CompanyCreateNestedOneWithoutPlaybookRunsInput
   }
 
   export type PlaybookRunUncheckedCreateWithoutPlaybookInput = {
@@ -19720,20 +19895,6 @@ export namespace Prisma {
   export type PlaybookRunUpdateManyWithWhereWithoutPlaybookInput = {
     where: PlaybookRunScalarWhereInput
     data: XOR<PlaybookRunUpdateManyMutationInput, PlaybookRunUncheckedUpdateManyWithoutPlaybookInput>
-  }
-
-  export type PlaybookRunScalarWhereInput = {
-    AND?: PlaybookRunScalarWhereInput | PlaybookRunScalarWhereInput[]
-    OR?: PlaybookRunScalarWhereInput[]
-    NOT?: PlaybookRunScalarWhereInput | PlaybookRunScalarWhereInput[]
-    id?: IntFilter<"PlaybookRun"> | number
-    playbookId?: IntFilter<"PlaybookRun"> | number
-    companyId?: IntFilter<"PlaybookRun"> | number
-    clientId?: IntNullableFilter<"PlaybookRun"> | number | null
-    startedAt?: DateTimeFilter<"PlaybookRun"> | Date | string
-    endedAt?: DateTimeNullableFilter<"PlaybookRun"> | Date | string | null
-    status?: StringFilter<"PlaybookRun"> | string
-    steps?: JsonFilter<"PlaybookRun">
   }
 
   export type PlaybookCreateWithoutStepsInput = {
@@ -19882,6 +20043,36 @@ export namespace Prisma {
     create: XOR<PlaybookCreateWithoutRunsInput, PlaybookUncheckedCreateWithoutRunsInput>
   }
 
+  export type CompanyCreateWithoutPlaybookRunsInput = {
+    name: string
+    baseUrl?: string
+    environments?: JsonNullValueInput | InputJsonValue
+    authType?: string
+    authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: string
+    createdAt?: Date | string
+    erp: ERPCreateNestedOneWithoutCompaniesInput
+    testClients?: TestClientCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyUncheckedCreateWithoutPlaybookRunsInput = {
+    id?: number
+    name: string
+    erpId: number
+    baseUrl?: string
+    environments?: JsonNullValueInput | InputJsonValue
+    authType?: string
+    authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: string
+    createdAt?: Date | string
+    testClients?: TestClientUncheckedCreateNestedManyWithoutCompanyInput
+  }
+
+  export type CompanyCreateOrConnectWithoutPlaybookRunsInput = {
+    where: CompanyWhereUniqueInput
+    create: XOR<CompanyCreateWithoutPlaybookRunsInput, CompanyUncheckedCreateWithoutPlaybookRunsInput>
+  }
+
   export type PlaybookUpsertWithoutRunsInput = {
     update: XOR<PlaybookUpdateWithoutRunsInput, PlaybookUncheckedUpdateWithoutRunsInput>
     create: XOR<PlaybookCreateWithoutRunsInput, PlaybookUncheckedCreateWithoutRunsInput>
@@ -19908,6 +20099,42 @@ export namespace Prisma {
     description?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     steps?: PlaybookStepUncheckedUpdateManyWithoutPlaybookNestedInput
+  }
+
+  export type CompanyUpsertWithoutPlaybookRunsInput = {
+    update: XOR<CompanyUpdateWithoutPlaybookRunsInput, CompanyUncheckedUpdateWithoutPlaybookRunsInput>
+    create: XOR<CompanyCreateWithoutPlaybookRunsInput, CompanyUncheckedCreateWithoutPlaybookRunsInput>
+    where?: CompanyWhereInput
+  }
+
+  export type CompanyUpdateToOneWithWhereWithoutPlaybookRunsInput = {
+    where?: CompanyWhereInput
+    data: XOR<CompanyUpdateWithoutPlaybookRunsInput, CompanyUncheckedUpdateWithoutPlaybookRunsInput>
+  }
+
+  export type CompanyUpdateWithoutPlaybookRunsInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    environments?: JsonNullValueInput | InputJsonValue
+    authType?: StringFieldUpdateOperationsInput | string
+    authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    erp?: ERPUpdateOneRequiredWithoutCompaniesNestedInput
+    testClients?: TestClientUpdateManyWithoutCompanyNestedInput
+  }
+
+  export type CompanyUncheckedUpdateWithoutPlaybookRunsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    erpId?: IntFieldUpdateOperationsInput | number
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    environments?: JsonNullValueInput | InputJsonValue
+    authType?: StringFieldUpdateOperationsInput | string
+    authConfig?: JsonNullValueInput | InputJsonValue
+    notes?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    testClients?: TestClientUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyCreateManyErpInput = {
@@ -19963,6 +20190,7 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     testClients?: TestClientUpdateManyWithoutCompanyNestedInput
+    playbookRuns?: PlaybookRunUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateWithoutErpInput = {
@@ -19975,6 +20203,7 @@ export namespace Prisma {
     notes?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     testClients?: TestClientUncheckedUpdateManyWithoutCompanyNestedInput
+    playbookRuns?: PlaybookRunUncheckedUpdateManyWithoutCompanyNestedInput
   }
 
   export type CompanyUncheckedUpdateManyWithoutErpInput = {
@@ -20132,6 +20361,16 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type PlaybookRunCreateManyCompanyInput = {
+    id?: number
+    playbookId: number
+    clientId?: number | null
+    startedAt?: Date | string
+    endedAt?: Date | string | null
+    status?: string
+    steps?: JsonNullValueInput | InputJsonValue
+  }
+
   export type TestClientUpdateWithoutCompanyInput = {
     name?: StringFieldUpdateOperationsInput | string
     fieldsData?: JsonNullValueInput | InputJsonValue
@@ -20150,6 +20389,35 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     fieldsData?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PlaybookRunUpdateWithoutCompanyInput = {
+    clientId?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    steps?: JsonNullValueInput | InputJsonValue
+    playbook?: PlaybookUpdateOneRequiredWithoutRunsNestedInput
+  }
+
+  export type PlaybookRunUncheckedUpdateWithoutCompanyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    playbookId?: IntFieldUpdateOperationsInput | number
+    clientId?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    steps?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type PlaybookRunUncheckedUpdateManyWithoutCompanyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    playbookId?: IntFieldUpdateOperationsInput | number
+    clientId?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    steps?: JsonNullValueInput | InputJsonValue
   }
 
   export type EmbeddingChunkUpdateWithoutCollectionInput = {
@@ -20212,12 +20480,12 @@ export namespace Prisma {
   }
 
   export type PlaybookRunUpdateWithoutPlaybookInput = {
-    companyId?: IntFieldUpdateOperationsInput | number
     clientId?: NullableIntFieldUpdateOperationsInput | number | null
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     steps?: JsonNullValueInput | InputJsonValue
+    company?: CompanyUpdateOneRequiredWithoutPlaybookRunsNestedInput
   }
 
   export type PlaybookRunUncheckedUpdateWithoutPlaybookInput = {
