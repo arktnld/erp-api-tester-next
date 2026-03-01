@@ -108,6 +108,7 @@ export function ChatPanel({
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <style>{`.msg-bubble .copy-btn { opacity: 0; transition: opacity 0.15s } .msg-bubble:hover .copy-btn { opacity: 0.5 }`}</style>
       <div style={{ padding: '11px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
         <Bot size={16} color="var(--accent)" />
         <span style={{ fontSize: 14, fontWeight: 600 }}>Chat IA</span>
@@ -129,11 +130,12 @@ export function ChatPanel({
               {msg.role === 'user' ? <User size={13} color="white" /> : <Bot size={13} color="var(--accent)" />}
             </div>
             <div style={{ maxWidth: '75%', display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <div style={{ position: 'relative', backgroundColor: msg.role === 'user' ? 'var(--accent)' : 'var(--surface)', border: msg.role === 'assistant' ? '1px solid var(--border)' : 'none', borderRadius: msg.role === 'user' ? '12px 4px 12px 12px' : '4px 12px 12px 12px', padding: '10px 14px', fontSize: 13, lineHeight: 1.7, color: msg.role === 'user' ? 'white' : 'var(--text)', wordBreak: 'break-word' }}>
+              <div className={msg.role === 'assistant' ? 'msg-bubble' : undefined} style={{ position: 'relative', backgroundColor: msg.role === 'user' ? 'var(--accent)' : 'var(--surface)', border: msg.role === 'assistant' ? '1px solid var(--border)' : 'none', borderRadius: msg.role === 'user' ? '12px 4px 12px 12px' : '4px 12px 12px 12px', padding: '10px 14px', fontSize: 13, lineHeight: 1.7, color: msg.role === 'user' ? 'white' : 'var(--text)', wordBreak: 'break-word' }}>
                 {msg.role === 'assistant' && msg.content && (
                   <button
+                    className="copy-btn"
                     onClick={() => { navigator.clipboard.writeText(msg.content); setCopiedIdx(i); setTimeout(() => setCopiedIdx(null), 2000) }}
-                    style={{ position: 'absolute', top: 6, right: 6, padding: 4, background: 'none', border: 'none', cursor: 'pointer', color: copiedIdx === i ? 'var(--status-success)' : 'var(--text-subtle)', opacity: 0.5, borderRadius: 4, display: 'flex' }}
+                    style={{ position: 'absolute', top: 6, right: 6, padding: 4, background: 'none', border: 'none', cursor: 'pointer', color: copiedIdx === i ? 'var(--status-success)' : 'var(--text-subtle)', borderRadius: 4, display: 'flex' }}
                   >
                     {copiedIdx === i ? <Check size={12} /> : <Copy size={12} />}
                   </button>
