@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Space_Grotesk } from 'next/font/google'
 import { Sidebar } from '@/components/layout/sidebar'
+import { CommandPalette } from '@/components/ui/command-palette'
 import { PageTransition } from '@/components/layout/page-transition'
 import { prisma } from '@erp/db'
 import './globals.css'
@@ -31,7 +32,7 @@ export default async function RootLayout({
       },
       endpoints: {
         orderBy: { sortOrder: 'asc' },
-        select: { id: true, name: true, method: true },
+        select: { id: true, name: true, method: true, pathTemplate: true },
       },
     },
   })
@@ -39,6 +40,7 @@ export default async function RootLayout({
   return (
     <html lang="pt-BR" className={spaceGrotesk.variable}>
       <body>
+        <CommandPalette erps={erps} />
         <Sidebar erps={erps} />
         <main
           style={{
