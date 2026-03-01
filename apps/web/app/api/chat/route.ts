@@ -51,7 +51,7 @@ ${systemContext}`
   const ragHeaders = {
     'X-Rag-Mode': ragResult.mode,
     'X-Rag-Count': String(ragResult.chunks.length),
-    'X-Rag-Chunks': JSON.stringify(ragResult.chunks.map(c => c.slice(0, 200))),
+    'X-Rag-Chunks': encodeURIComponent(JSON.stringify(ragResult.chunks.map(c => c.slice(0, 200)))),
     'Access-Control-Expose-Headers': 'X-Rag-Mode, X-Rag-Count, X-Rag-Chunks',
   }
 

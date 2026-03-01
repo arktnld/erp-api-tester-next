@@ -79,7 +79,7 @@ export function ChatPanel({
       }
       const ragMode = (res.headers.get('X-Rag-Mode') ?? 'skipped') as RagInfo['mode']
       const ragCount = Number(res.headers.get('X-Rag-Count') ?? 0)
-      const ragChunks: string[] = JSON.parse(res.headers.get('X-Rag-Chunks') ?? '[]')
+      const ragChunks: string[] = JSON.parse(decodeURIComponent(res.headers.get('X-Rag-Chunks') ?? '%5B%5D'))
 
       const reader = res.body!.getReader()
       const decoder = new TextDecoder()
