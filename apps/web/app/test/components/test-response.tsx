@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Play, Loader2, Copy, Check, Download } from 'lucide-react'
 import { StatusBadge } from '@/components/ui/badge'
 import { JsonTree } from './json-tree'
-import { tryPrettyJson } from '../lib/utils'
+import { tryPrettyJson, tryPrettyXml } from '@/lib/utils'
 import type { ExecuteResponse, ExportData } from '../lib/types'
 import { ExportButton } from './export-button'
 import dynamic from 'next/dynamic'
@@ -166,14 +166,13 @@ export function TestResponse({ response, loading, erpName = '', companyName = ''
           if (response.contentCategory === 'image') return <ImageContent response={response} />
           if (response.isBinary) return <BinaryContent response={response} />
           if (response.contentCategory === 'xml' || response.contentCategory === 'html') {
-            const lang = 'xml'
             return (
               <CodeBlock
-                language={lang}
+                language="xml"
                 customStyle={{ borderRadius: 8, fontSize: 12, backgroundColor: 'var(--surface-2)', lineHeight: 1.7 }}
                 wrapLongLines
               >
-                {response.responseBody}
+                {tryPrettyXml(response.responseBody)}
               </CodeBlock>
             )
           }
