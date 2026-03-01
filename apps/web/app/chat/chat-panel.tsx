@@ -187,23 +187,22 @@ export function ChatPanel({
                   </button>
                   {ragInfos.has(i) && (() => {
                     const rag = ragInfos.get(i)!
-                    const modeColor = rag.mode === 'semantic' ? 'var(--status-success)' : rag.mode === 'fallback' ? 'var(--accent)' : 'var(--text-subtle)'
-                    const modeLabel = rag.mode === 'semantic' ? `RAG · ${rag.count} trechos` : rag.mode === 'fallback' ? 'RAG · fallback (sem embeddings)' : 'RAG · não consultado'
+                    if (rag.chunks.length === 0) return null
                     return (
                       <div style={{ position: 'relative' }}>
                         <button
                           onClick={() => setExpandedRag(expandedRag === i ? null : i)}
-                          style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '2px 8px', fontSize: 11, color: modeColor, background: 'none', border: `1px solid ${modeColor}`, borderRadius: 4, cursor: rag.mode !== 'skipped' ? 'pointer' : 'default', opacity: 0.8 }}
+                          style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '2px 6px', fontSize: 11, color: 'var(--text-subtle)', background: 'none', border: '1px solid var(--border)', borderRadius: 4, cursor: 'pointer', opacity: 0.6 }}
                         >
-                          {modeLabel}
-                          {rag.mode !== 'skipped' && <ChevronDown size={10} style={{ transform: expandedRag === i ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />}
+                          RAG
+                          <ChevronDown size={10} style={{ transform: expandedRag === i ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
                         </button>
-                        {expandedRag === i && rag.chunks.length > 0 && (
+                        {expandedRag === i && (
                           <div style={{ position: 'absolute', bottom: '100%', left: 0, marginBottom: 6, zIndex: 10, backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: 12, width: 380, maxHeight: 320, overflowY: 'auto', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
-                            <p style={{ fontSize: 10, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8 }}>Trechos consultados</p>
+                            <p style={{ fontSize: 10, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 8 }}>Trechos consultados · {rag.count}</p>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                               {rag.chunks.map((chunk, ci) => (
-                                <div key={ci} style={{ backgroundColor: 'var(--surface-2)', borderRadius: 6, padding: '8px 10px', fontSize: 11, fontFamily: 'monospace', color: 'var(--text-muted)', lineHeight: 1.5, borderLeft: '2px solid var(--accent)' }}>
+                                <div key={ci} style={{ backgroundColor: 'var(--surface-2)', borderRadius: 6, padding: '8px 10px', fontSize: 11, fontFamily: 'monospace', color: 'var(--text-muted)', lineHeight: 1.5, borderLeft: '2px solid var(--border)' }}>
                                   {chunk}
                                 </div>
                               ))}
