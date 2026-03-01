@@ -28,6 +28,14 @@
   --status-success: #10b981;
   --status-warning: #f59e0b;
   --status-error: #ef4444;
+
+  /* JSON syntax */
+  --json-key: #d19a66;
+  --json-string: #98c379;
+  --json-number: #61afef;
+  --json-bool: #56b6c2;
+  --json-null: #abb2bf;
+  --json-punct: #abb2bf;
 }
 
 /* Light theme overrides */
@@ -45,6 +53,14 @@
   --status-success: #16a34a;
   --status-warning: #d97706;
   --status-error: #dc2626;
+
+  /* JSON syntax */
+  --json-key: #b05e00;
+  --json-string: #1a6e35;
+  --json-number: #1565c0;
+  --json-bool: #6d28d9;
+  --json-null: #64748b;
+  --json-punct: #64748b;
 }
 
 * {

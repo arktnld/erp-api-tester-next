@@ -179,10 +179,10 @@ export function TestResponse({ response, loading, erpName = '', companyName = ''
           let parsed: unknown = null
           try { parsed = JSON.parse(response.responseBody) } catch {}
           return (
-            <div style={{ backgroundColor: 'var(--surface-2)', borderRadius: 8, padding: '14px 16px', fontFamily: 'monospace', fontSize: 12, lineHeight: 1.7, color: '#abb2bf', overflow: 'auto' }}>
+            <div style={{ backgroundColor: 'var(--surface-2)', borderRadius: 8, padding: '14px 16px', fontFamily: 'monospace', fontSize: 12, lineHeight: 1.7, color: 'var(--json-punct)', overflow: 'auto' }}>
               {parsed !== null && parsed !== undefined
                 ? <JsonTree value={parsed} />
-                : <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: '#abb2bf' }}>{response.responseBody}</pre>
+                : <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: 'var(--text)' }}>{response.responseBody}</pre>
               }
             </div>
           )
