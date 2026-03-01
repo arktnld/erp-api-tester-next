@@ -17,21 +17,20 @@ export function useExport(cardRef: React.RefObject<HTMLDivElement | null>) {
   async function copyImage() {
     setCopyCapturing(true)
     try {
-      const { toBlob } = await import('html-to-image')
-      if (!cardRef.current) return
-      const blob = await toBlob(cardRef.current, { pixelRatio: 2, skipFonts: true })
-      if (!blob) return
-      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
-      setImageCopied(true)
-      setTimeout(() => setImageCopied(false), 1800)
-    } catch {
-      // fallback: download if clipboard not supported
-      const dataUrl = await capture()
-      if (!dataUrl) return
-      const a = document.createElement('a')
-      a.href = dataUrl
-      a.download = `resultado-api-${Date.now()}.png`
-      a.click()
+      if (window.isSecureContext) {
+        const { toBlob } = await import('html-to-image')
+        if (!cardRef.current) return
+        const blob = await toBlob(cardRef.current, { pixelRatio: 2, skipFonts: true })
+        if (!blob) return
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+        setImageCopied(true)
+        setTimeout(() => setImageCopied(false), 1800)
+      } else {
+        // HTTP fallback: open image in new tab so user can copy/save
+        const dataUrl = await capture()
+        if (!dataUrl) return
+        window.open(dataUrl, '_blank')
+      }
     } finally {
       setCopyCapturing(false)
     }
