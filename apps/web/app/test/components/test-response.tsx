@@ -122,7 +122,7 @@ function ActionsMenu({ response, curlString, erpName, companyName }: {
   const [curlCopied, setCurlCopied] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
-  const { capturing, copyImage, downloadPng } = useExport(cardRef)
+  const { capturing, imageCopied, copyImage, downloadPng } = useExport(cardRef)
 
   const exportData: ExportData = {
     method: response.method, url: response.url, erpName, companyName,
@@ -177,12 +177,20 @@ function ActionsMenu({ response, curlString, erpName, companyName }: {
               </button>
             )}
             <div style={{ height: 1, backgroundColor: 'var(--border)', margin: '4px 0' }} />
-            <button style={menuItemStyle} onClick={() => { copyImage(); setOpen(false) }} disabled={capturing}>
-              {capturing ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <ImageIcon size={13} />}
-              Copiar imagem
+            <button
+              style={{ ...menuItemStyle, color: imageCopied ? 'var(--status-success)' : 'var(--text)' }}
+              disabled={capturing}
+              onClick={async () => {
+                await copyImage()
+                setTimeout(() => setOpen(false), 1200)
+              }}
+            >
+              {capturing ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : imageCopied ? <Check size={13} /> : <ImageIcon size={13} />}
+              {capturing ? 'Processando...' : imageCopied ? 'Copiado!' : 'Copiar imagem'}
             </button>
-            <button style={menuItemStyle} onClick={() => { downloadPng(); setOpen(false) }} disabled={capturing}>
-              <Download size={13} /> Baixar PNG
+            <button style={menuItemStyle} disabled={capturing} onClick={async () => { await downloadPng(); setOpen(false) }}>
+              {capturing ? <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} /> : <Download size={13} />}
+              {capturing ? 'Processando...' : 'Baixar PNG'}
             </button>
           </div>
         )}
