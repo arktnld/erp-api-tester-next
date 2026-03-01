@@ -3,6 +3,7 @@
 import { prisma } from '@erp/db'
 import { revalidatePath } from 'next/cache'
 import OpenAI from 'openai'
+import { reciprocalRankFusion } from '@/lib/utils'
 
 export type EmbeddingProvider = 'openai' | 'gemini'
 
@@ -146,22 +147,42 @@ export async function retrieveContext(
   const queryVec = await embedQuery(question, storedProvider, embeddingKey)
 
   const SIMILARITY_THRESHOLD = 0.55 // cosine distance: 0=identical, 1=orthogonal, 2=opposite
+  const FETCH_K = topK * 3 // fetch more candidates so RRF has room to rerank
 
-  const rows = await prisma.$queryRaw<{ text: string; score: number }[]>`
-    SELECT text, (embedding <=> ${JSON.stringify(queryVec)}::vector) as score
-    FROM "EmbeddingChunk"
-    WHERE "collectionId" = ${collectionId}
-      AND (embedding <=> ${JSON.stringify(queryVec)}::vector) < ${SIMILARITY_THRESHOLD}
-    ORDER BY embedding <=> ${JSON.stringify(queryVec)}::vector
-    LIMIT ${topK}
-  `
+  const [vecRows, bm25Rows] = await Promise.all([
+    prisma.$queryRaw<{ text: string; score: number }[]>`
+      SELECT text, (embedding <=> ${JSON.stringify(queryVec)}::vector) as score
+      FROM "EmbeddingChunk"
+      WHERE "collectionId" = ${collectionId}
+        AND (embedding <=> ${JSON.stringify(queryVec)}::vector) < ${SIMILARITY_THRESHOLD}
+      ORDER BY embedding <=> ${JSON.stringify(queryVec)}::vector
+      LIMIT ${FETCH_K}
+    `,
+    prisma.$queryRaw<{ text: string }[]>`
+      SELECT text
+      FROM "EmbeddingChunk"
+      WHERE "collectionId" = ${collectionId}
+        AND to_tsvector('simple', text) @@ plainto_tsquery('simple', ${question})
+      ORDER BY ts_rank(to_tsvector('simple', text), plainto_tsquery('simple', ${question})) DESC
+      LIMIT ${FETCH_K}
+    `.catch(() => [] as { text: string }[]),
+  ])
 
-  if (rows.length === 0) {
+  if (vecRows.length === 0 && bm25Rows.length === 0) {
     return { context: '', chunks: [], mode: 'skipped' }
   }
 
-  const chunks = rows.map(r => `[${(1 - r.score).toFixed(2)}] ${r.text}`)
-  return { context: chunks.map(c => c.replace(/^\[[^\]]+\] /, '')).join('\n\n'), chunks, mode: 'semantic' }
+  const vecScoreMap = new Map(vecRows.map(r => [r.text, r.score]))
+  const merged = reciprocalRankFusion(vecRows, bm25Rows, topK)
+  const mode = vecRows.length > 0 ? 'semantic' : 'fallback'
+
+  const chunks = merged.map(r => {
+    const vecScore = vecScoreMap.get(r.text)
+    const annotation = vecScore !== undefined ? `[${(1 - vecScore).toFixed(2)}]` : '[bm25]'
+    return `${annotation} ${r.text}`
+  })
+
+  return { context: merged.map(r => r.text).join('\n\n'), chunks, mode }
 }
 
 export async function deleteCollection(id: number) {
