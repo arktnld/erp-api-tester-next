@@ -288,7 +288,7 @@ export function TestSelectors({
         <div style={{ padding: '10px 14px 6px', borderBottom: '1px solid var(--border)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '2px 4px', fontSize: 11 }}>
           {erp && <span style={{ color: 'var(--text-muted)' }}>{erp.name}</span>}
           {company && <><span style={{ color: 'var(--text-subtle)' }}>›</span><span style={{ color: 'var(--text-muted)' }}>{company.name}</span></>}
-          {selectedEndpoint && <><span style={{ color: 'var(--text-subtle)' }}>›</span><span style={{ color: METHOD_COLORS[selectedEndpoint.method] ?? 'var(--text-muted)', fontFamily: 'monospace' }}>{selectedEndpoint.method}</span><span style={{ color: 'var(--text-muted)' }}> {selectedEndpoint.name}</span></>}
+          {selectedEndpoint && <><span style={{ color: 'var(--text-subtle)' }}>›</span><span style={{ color: 'var(--text-muted)' }}>{selectedEndpoint.name}</span></>}
           {selectedClient && <><span style={{ color: 'var(--text-subtle)' }}>›</span><span style={{ color: 'var(--text-muted)' }}>{selectedClient.name}</span></>}
         </div>
       )}
@@ -353,7 +353,6 @@ export function TestSelectors({
         <SectionHeader
           number={3} label="Endpoint"
           selectedLabel={selectedEndpoint?.name}
-          selectedExtra={selectedEndpoint && <MethodTag method={selectedEndpoint.method} />}
           open={open.endpoint}
           disabled={!erpId}
           onToggle={() => toggle('endpoint')}
