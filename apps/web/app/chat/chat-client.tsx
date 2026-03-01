@@ -52,7 +52,7 @@ function parseCurl(input: string): ParsedCurl | { error: string } {
   } catch (e) { return { error: String(e) } }
 }
 
-export function ChatClient({ initialCollections, erps, initialSettings, defaultSystemPrompt = '' }: { initialCollections: ColMeta[]; erps: ERP[]; initialSettings: Settings; defaultSystemPrompt?: string }) {
+export function ChatClient({ initialCollections, erps, initialSettings, defaultSystemPrompt = '', canEdit = true }: { initialCollections: ColMeta[]; erps: ERP[]; initialSettings: Settings; defaultSystemPrompt?: string; canEdit?: boolean }) {
   const [collections, setCollections] = useState<ColMeta[]>(initialCollections)
   const [activeId, setActiveId] = useState<number | null>(null)
 
@@ -149,6 +149,7 @@ export function ChatClient({ initialCollections, erps, initialSettings, defaultS
           openaiKey={openaiKey}
           geminiKey={geminiKey}
           defaultSystemPrompt={defaultSystemPrompt}
+          canEdit={canEdit}
         />
       </div>
 

@@ -4,7 +4,6 @@ import { useState, useRef } from 'react'
 import { Plus, Trash2, FileUp, Zap, Loader2, CheckCircle2, Pencil, Check, X } from 'lucide-react'
 import { saveCollection, deleteCollection, updateCollectionPrompt } from '@/app/actions/collections'
 import { inputStyle as baseInput } from '@/lib/styles'
-import { useRole } from '@/lib/role-context'
 
 type ColMeta = { id: number; name: string; systemPrompt: string; createdAt: Date }
 type EmbeddingProvider = 'openai' | 'gemini'
@@ -150,6 +149,7 @@ export function CollectionsPanel({
   openaiKey,
   geminiKey,
   defaultSystemPrompt,
+  canEdit = true,
 }: {
   collections: ColMeta[]
   onCollectionsChange: React.Dispatch<React.SetStateAction<ColMeta[]>>
@@ -159,6 +159,7 @@ export function CollectionsPanel({
   openaiKey: string
   geminiKey: string
   defaultSystemPrompt: string
+  canEdit?: boolean
 }) {
   const [showForm, setShowForm] = useState(false)
   const [newName, setNewName] = useState('')
@@ -175,7 +176,6 @@ export function CollectionsPanel({
   const [savingPrompt, setSavingPrompt] = useState(false)
 
   const activeCol = collections.find(c => c.id === activeId)
-  const { canEdit } = useRole()
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
