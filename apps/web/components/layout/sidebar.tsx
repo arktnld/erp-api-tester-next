@@ -19,15 +19,15 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
   if (pathname.startsWith('/sign-in')) return null
 
   const nav = [
-    { href: '/', label: 'Home', icon: LayoutDashboard },
-    { href: '/test', label: 'Testar API', icon: FlaskConical },
-    { href: '/chat', label: 'Chat IA', icon: MessageSquare },
+    { href: '/', label: 'Home', icon: LayoutDashboard, tourId: 'home' },
+    { href: '/test', label: 'Testar API', icon: FlaskConical, tourId: 'test' },
+    { href: '/chat', label: 'Chat IA', icon: MessageSquare, tourId: 'chat' },
     { href: '/erps', label: 'ERPs', icon: Server, tourId: 'erps' },
-    { href: '/companies', label: 'Empresas', icon: Building2 },
+    { href: '/companies', label: 'Empresas', icon: Building2, tourId: 'companies' },
     { href: '/history', label: 'Histórico', icon: History, tourId: 'history' },
     { href: '/playbooks', label: 'Playbooks', icon: ListChecks, tourId: 'playbooks' },
-    { href: '/docs', label: 'Como usar', icon: BookOpen },
-    { href: '/settings', label: 'Configurações', icon: Settings },
+    { href: '/docs', label: 'Como usar', icon: BookOpen, tourId: 'docs' },
+    { href: '/settings', label: 'Configurações', icon: Settings, tourId: 'settings' },
   ]
 
   return (
@@ -112,6 +112,7 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
 
       {/* Footer */}
       <div
+        data-tour="footer"
         style={{
           padding: '8px 12px',
           borderTop: '1px solid var(--border)',
