@@ -56,17 +56,17 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
           gap: 8,
         }}
       >
-        <span
-          style={{
-            fontFamily: 'monospace',
-            fontSize: 15,
-            fontWeight: 700,
-            color: 'var(--accent)',
-            letterSpacing: '-1px',
-          }}
-        >
-          {'</>'}
-        </span>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="10" cy="10" r="3" fill="var(--accent)" />
+          <line x1="2" y1="10" x2="7" y2="10" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" opacity="0.55" />
+          <line x1="13" y1="10" x2="18" y2="10" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" opacity="0.55" />
+          <line x1="10" y1="2" x2="10" y2="7" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" opacity="0.55" />
+          <line x1="10" y1="13" x2="10" y2="18" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" opacity="0.55" />
+          <circle cx="2" cy="10" r="1.5" fill="var(--accent)" opacity="0.45" />
+          <circle cx="18" cy="10" r="1.5" fill="var(--accent)" opacity="0.45" />
+          <circle cx="10" cy="2" r="1.5" fill="var(--accent)" opacity="0.45" />
+          <circle cx="10" cy="18" r="1.5" fill="var(--accent)" opacity="0.45" />
+        </svg>
         <span style={{
           fontFamily: 'var(--font-logo)',
           fontSize: 18,
