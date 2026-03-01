@@ -194,7 +194,7 @@ export function ChatPanel({
                           onClick={() => setExpandedRag(expandedRag === i ? null : i)}
                           style={{ display: 'flex', alignItems: 'center', gap: 3, padding: '2px 6px', fontSize: 11, color: 'var(--text-subtle)', background: 'none', border: '1px solid var(--border)', borderRadius: 4, cursor: 'pointer', opacity: 0.6 }}
                         >
-                          RAG
+                          origem
                           <ChevronDown size={10} style={{ transform: expandedRag === i ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
                         </button>
                         {expandedRag === i && (
