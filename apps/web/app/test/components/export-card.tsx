@@ -174,31 +174,9 @@ export const ExportCard = forwardRef<HTMLDivElement, { data: ExportData }>(
             borderBottom: '1px solid #d1d9e0',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span
-              style={{
-                fontFamily: 'monospace',
-                fontSize: 22,
-                fontWeight: 900,
-                color: '#0969da',
-                lineHeight: 1,
-                marginRight: -2,
-              }}
-            >
-              /
-            </span>
-            <span
-              style={{
-                fontFamily: "'Space Grotesk', sans-serif",
-                fontSize: 14,
-                fontWeight: 700,
-                letterSpacing: '-0.02em',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              <span style={{ color: '#0969da' }}>ERP</span>
-              <span style={{ color: '#1f2328' }}> Tester</span>
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 16, fontWeight: 900, letterSpacing: '-0.03em', color: '#0969da' }}>/ERP</span>
+            <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 14, fontWeight: 700, letterSpacing: '-0.02em', color: '#1f2328', whiteSpace: 'nowrap' }}> Tester</span>
           </div>
           <span style={{ fontSize: 11, color: '#59636e', fontFamily: 'monospace' }}>
             {formatTimestamp(data.timestamp)}
