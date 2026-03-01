@@ -56,19 +56,10 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
           gap: 8,
         }}
       >
-        <svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <g clipPath="url(#logo-clip)">
-            <path d="M32 0C14.3269 0 0 14.3269 0 32H32V0Z" fill="#F44336"/>
-            <path d="M32 0V32H64C64 14.3269 49.6731 0 32 0Z" fill="var(--text)"/>
-            <path d="M0 32C0 49.6731 14.3269 64 32 64V32H0Z" fill="var(--text)"/>
-            <path d="M32 64C49.6731 64 64 49.6731 64 32H32V64Z" fill="#F44336"/>
-          </g>
-          <defs>
-            <clipPath id="logo-clip">
-              <circle cx="32" cy="32" r="32"/>
-            </clipPath>
-          </defs>
-        </svg>
+        <span style={{ fontFamily: 'monospace', fontSize: 19, fontWeight: 700, letterSpacing: '-1px', lineHeight: 1 }}>
+          <span style={{ color: 'var(--text-muted)' }}>/</span>
+          <span style={{ color: 'var(--accent)' }}>*</span>
+        </span>
         <span style={{ fontFamily: 'var(--font-logo)', fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em' }}>
           <span style={{ color: 'var(--accent)' }}>ERP</span>
           <span style={{ color: 'var(--text)' }}> Tester</span>
