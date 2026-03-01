@@ -3,6 +3,7 @@
 import { prisma } from '@erp/db'
 import { revalidatePath } from 'next/cache'
 import { extractFields } from '@/lib/playbook-utils'
+import { requireEdit } from '@/lib/require-role'
 
 export { extractFields }
 
@@ -49,18 +50,21 @@ export async function getPlaybook(id: number) {
 }
 
 export async function createPlaybook(data: { name: string; erpId: number; description: string }) {
+  await requireEdit()
   const pb = await prisma.playbook.create({ data })
   revalidatePath('/playbooks')
   return { id: pb.id }
 }
 
 export async function updatePlaybook(id: number, data: { name: string; erpId: number; description: string }) {
+  await requireEdit()
   await prisma.playbook.update({ where: { id }, data })
   revalidatePath('/playbooks')
   revalidatePath(`/playbooks/${id}/edit`)
 }
 
 export async function deletePlaybook(id: number) {
+  await requireEdit()
   await prisma.playbook.delete({ where: { id } })
   revalidatePath('/playbooks')
 }

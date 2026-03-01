@@ -3,6 +3,7 @@
 import { prisma } from '@erp/db'
 import { revalidatePath } from 'next/cache'
 import { CompanySchema } from './schemas'
+import { requireEdit } from '@/lib/require-role'
 
 export async function getCompanies() {
   return prisma.company.findMany({
@@ -38,6 +39,7 @@ export async function createCompany(data: {
   authConfig: string
   notes: string
 }) {
+  await requireEdit()
   const parsed = CompanySchema.parse(data)
   const company = await prisma.company.create({
     data: { ...parsed, environments: JSON.parse(parsed.environments), authConfig: JSON.parse(parsed.authConfig) },
@@ -50,6 +52,7 @@ export async function updateCompany(
   id: number,
   data: { name: string; erpId: number; baseUrl: string; environments: string; authType: string; authConfig: string; notes: string }
 ) {
+  await requireEdit()
   const parsed = CompanySchema.parse(data)
   await prisma.company.update({
     where: { id },
@@ -60,6 +63,7 @@ export async function updateCompany(
 }
 
 export async function deleteCompany(id: number) {
+  await requireEdit()
   await prisma.company.delete({ where: { id } })
   revalidatePath('/companies')
 }
