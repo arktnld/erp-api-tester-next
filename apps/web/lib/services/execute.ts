@@ -13,8 +13,8 @@ import type { ContentCategory } from '@/app/test/lib/types'
 export class ValidationError extends Error {}
 
 export interface ExecuteParams {
-  endpointId: string
-  clientId?: string | null
+  endpointId: number
+  clientId?: number | null
   companyId?: number | null
   environmentUrl?: string | null
   rawBody?: string | null

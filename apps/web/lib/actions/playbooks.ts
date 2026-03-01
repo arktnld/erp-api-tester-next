@@ -137,9 +137,9 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
   for (const step of playbook.steps) {
     try {
       const result = await executeRequest({
-        endpointId: String(step.endpointId),
+        endpointId: step.endpointId,
         companyId: clientId ? undefined : companyId,
-        clientId: clientId ? String(clientId) : undefined,
+        clientId: clientId ?? undefined,
         rawBody: step.bodyOverride || null,
         inlineFields: { ...capturedFields },
       })

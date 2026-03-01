@@ -4,8 +4,8 @@ export interface RecordExecutionData {
   erpName: string
   companyName: string
   companyId: number
-  endpointId: string
-  testClientId?: string
+  endpointId: number
+  testClientId?: number
   endpointName: string
   clientName: string
   method: string
@@ -19,11 +19,5 @@ export interface RecordExecutionData {
 }
 
 export function recordExecution(data: RecordExecutionData) {
-  return prisma.requestHistory.create({
-    data: {
-      ...data,
-      endpointId: Number(data.endpointId),
-      testClientId: data.testClientId ? Number(data.testClientId) : null,
-    },
-  })
+  return prisma.requestHistory.create({ data })
 }

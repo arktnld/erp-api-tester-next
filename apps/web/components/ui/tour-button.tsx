@@ -2,15 +2,12 @@
 
 import { HelpCircle } from 'lucide-react'
 import { Button } from './button'
+import 'driver.js/dist/driver.css'
 
 export function TourButton() {
   async function startTour() {
     // Dynamic import to avoid SSR issues (driver.js accesses DOM)
-    const [{ driver }, { default: DriverCSS }] = await Promise.all([
-      import('driver.js'),
-      import('driver.js/dist/driver.css'),
-    ])
-    void DriverCSS
+    const { driver } = await import('driver.js')
 
     const driverObj = driver({
       showProgress: true,
