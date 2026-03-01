@@ -1,34 +1,49 @@
+import * as React from 'react'
+import { Slot } from '@radix-ui/react-slot'
+import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
-import { ButtonHTMLAttributes, CSSProperties, forwardRef } from 'react'
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'default' | 'ghost' | 'danger'
-  size?: 'sm' | 'md'
+const buttonVariants = cva(
+  'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer',
+  {
+    variants: {
+      variant: {
+        default: 'btn-default',
+        ghost: 'btn-ghost',
+        danger: 'btn-danger',
+      },
+      size: {
+        default: 'btn-md',
+        sm: 'btn-sm',
+        lg: 'btn-lg',
+        icon: 'btn-icon',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  }
+)
+
+interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
 }
 
-const sizeStyles: Record<string, CSSProperties> = {
-  sm: { height: 28, padding: '0 10px', fontSize: 12 },
-  md: { height: 36, padding: '0 16px', fontSize: 14 },
-}
-
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'default', size = 'md', style, ...props }, ref) => {
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : 'button'
     return (
-      <button
+      <Comp
+        className={cn(buttonVariants({ variant, size }), className)}
         ref={ref}
-        className={cn(
-          'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer',
-          {
-            'btn-default': variant === 'default',
-            'btn-ghost': variant === 'ghost',
-            'btn-danger': variant === 'danger',
-          },
-          className
-        )}
-        style={{ ...sizeStyles[size], ...style }}
         {...props}
       />
     )
   }
 )
 Button.displayName = 'Button'
+
+export { Button, buttonVariants }

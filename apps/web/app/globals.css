@@ -76,3 +76,9 @@ input::placeholder, textarea::placeholder {
 .btn-ghost:hover:not(:disabled) { color: var(--text); background-color: var(--surface-2); }
 .btn-danger { background-color: color-mix(in srgb, var(--status-error) 10%, transparent); color: var(--status-error); }
 .btn-danger:hover:not(:disabled) { background-color: color-mix(in srgb, var(--status-error) 20%, transparent); }
+
+/* Button sizes */
+.btn-sm { height: 28px; padding: 0 10px; font-size: 12px; }
+.btn-md { height: 36px; padding: 0 16px; font-size: 14px; }
+.btn-lg { height: 44px; padding: 0 20px; font-size: 16px; }
+.btn-icon { height: 32px; width: 32px; padding: 0; }
