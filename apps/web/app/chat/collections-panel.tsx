@@ -356,7 +356,7 @@ export function CollectionsPanel({
         ))}
       </div>
 
-      {activeId && (
+      {activeId && canEdit && (
         <div style={{ borderTop: '1px solid var(--border)', padding: '10px 14px', flexShrink: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: editingPrompt ? 8 : 0 }}>
             <span style={{ fontSize: 10, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>Prompt</span>
