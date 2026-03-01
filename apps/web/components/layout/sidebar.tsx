@@ -16,9 +16,17 @@ function ThemedUserButton() {
     obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
     return () => obs.disconnect()
   }, [])
-  const dark = { colorBackground: '#1c1c1e', colorText: '#e4e4e7', colorTextSecondary: '#a1a1aa', colorInputBackground: '#2c2c2e', colorPrimary: '#4f8ef7', colorNeutral: '#e4e4e7' }
-  const light = { colorBackground: '#ffffff', colorText: '#18181b', colorTextSecondary: '#71717a', colorInputBackground: '#f4f4f5', colorPrimary: '#4f8ef7', colorNeutral: '#18181b' }
-  return <UserButton afterSignOutUrl="/sign-in" appearance={{ variables: isDark ? dark : light }} />
+  const vars = isDark
+    ? { colorBackground: '#1c1c1e', colorText: '#e4e4e7', colorTextSecondary: '#a1a1aa', colorInputBackground: '#2c2c2e', colorPrimary: '#4f8ef7', colorNeutral: '#e4e4e7' }
+    : { colorBackground: '#ffffff', colorText: '#18181b', colorTextSecondary: '#71717a', colorInputBackground: '#f4f4f5', colorPrimary: '#4f8ef7', colorNeutral: '#18181b' }
+  const elements = {
+    card: { backgroundColor: isDark ? '#1c1c1e' : '#ffffff', boxShadow: isDark ? '0 4px 24px rgba(0,0,0,0.6)' : undefined },
+    modalContent: { backgroundColor: isDark ? '#141414' : '#f4f4f5' },
+    navbar: { backgroundColor: isDark ? '#1c1c1e' : '#ffffff' },
+    navbarButton: { color: isDark ? '#e4e4e7' : '#18181b' },
+    pageScrollBox: { backgroundColor: isDark ? '#141414' : '#f4f4f5' },
+  }
+  return <UserButton afterSignOutUrl="/sign-in" appearance={{ variables: vars, elements }} />
 }
 
 type SidebarERP = {
