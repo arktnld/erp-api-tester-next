@@ -1,6 +1,5 @@
 'use client'
 
-import type React from 'react'
 import dynamic from 'next/dynamic'
 import { tryPrettyJson } from '../lib/utils'
 import { sectionLabel } from '@/lib/styles'
@@ -18,10 +17,9 @@ interface TestRequestProps {
   editorLanguage: EditorLanguage
   onBodyModeChange: (mode: 'form' | 'raw') => void
   onRawBodyChange: (value: string) => void
-  assertionsSlot?: React.ReactNode
 }
 
-export function TestRequest({ response, resolvedBody, bodyMode, rawBody, editorLanguage, onBodyModeChange, onRawBodyChange, assertionsSlot }: TestRequestProps) {
+export function TestRequest({ response, resolvedBody, bodyMode, rawBody, editorLanguage, onBodyModeChange, onRawBodyChange }: TestRequestProps) {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--border)', overflow: 'hidden' }}>
       <div style={{ flex: 1, overflow: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -114,12 +112,6 @@ export function TestRequest({ response, resolvedBody, bodyMode, rawBody, editorL
             </div>
           )}
         </div>
-
-        {assertionsSlot && (
-          <div style={{ marginTop: 8 }}>
-            {assertionsSlot}
-          </div>
-        )}
       </div>
     </div>
   )
