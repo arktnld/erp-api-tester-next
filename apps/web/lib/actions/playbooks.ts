@@ -104,6 +104,7 @@ export async function upsertPlaybookSteps(
 type StepResult = {
   stepId: number
   stepName: string
+  endpointName: string
   status: 'ok' | 'error'
   statusCode: number
   method: string
@@ -118,7 +119,12 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
 
   const playbook = await prisma.playbook.findUniqueOrThrow({
     where: { id: playbookId },
-    include: { steps: { orderBy: { order: 'asc' } } },
+    include: {
+      steps: {
+        orderBy: { order: 'asc' },
+        include: { endpoint: { select: { name: true } } },
+      },
+    },
   })
 
   const run = await prisma.playbookRun.create({
@@ -147,6 +153,7 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
       results.push({
         stepId: step.id,
         stepName: step.stepName || `Step ${step.order + 1}`,
+        endpointName: step.endpoint.name,
         status: result.statusCode >= 200 && result.statusCode < 300 ? 'ok' : 'error',
         statusCode: result.statusCode,
         method: result.method,
@@ -159,8 +166,11 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
       results.push({
         stepId: step.id,
         stepName: step.stepName || `Step ${step.order + 1}`,
+        endpointName: step.endpoint.name,
         status: 'error',
         statusCode: 0,
+        method: '',
+        url: '',
         responseBody: String(err),
         capturedFields: {},
         durationMs: 0,

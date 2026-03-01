@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic'
 type StepResult = {
   stepId: number
   stepName: string
+  endpointName: string
   status: 'ok' | 'error'
   statusCode: number
   method: string
@@ -68,8 +69,15 @@ export default async function RunResultPage({ params }: { params: Promise<{ runI
               {step.status === 'ok'
                 ? <CheckCircle2 size={15} color="#10b981" />
                 : <XCircle size={15} color="#ef4444" />}
-              <span style={{ fontWeight: 500, fontSize: 13 }}>Step {i + 1}{step.stepName ? `: ${step.stepName}` : ''}</span>
-              <span style={{ marginLeft: 'auto', fontSize: 12, color: 'var(--text-muted)' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ fontWeight: 500, fontSize: 13 }}>
+                  Step {i + 1}{step.stepName ? `: ${step.stepName}` : ''}
+                </span>
+                <span style={{ marginLeft: 8, fontSize: 12, color: 'var(--text-muted)' }}>
+                  {step.endpointName}
+                </span>
+              </div>
+              <span style={{ fontSize: 12, color: 'var(--text-muted)', flexShrink: 0 }}>
                 {step.durationMs}ms
               </span>
             </div>
