@@ -8,6 +8,9 @@ import { TestRequest } from './components/test-request'
 import { TestResponse } from './components/test-response'
 import { substitute, generateCurl, findErpIdForCompany } from './lib/utils'
 import type { ERP, Environment, ExecuteResponse } from './lib/types'
+import { TestAssertions } from './components/test-assertions'
+import { runAssertions } from './lib/assertions'
+import type { Assertion, AssertionResult } from './lib/assertions'
 
 function detectLanguage(headersJson: string): 'json' | 'xml' | 'text' {
   try {
@@ -45,6 +48,8 @@ export function TestPage({
   const [curlCopied, setCurlCopied] = useState(false)
   const [bodyMode, setBodyMode] = useState<'form' | 'raw'>('form')
   const [rawBody, setRawBody] = useState('')
+  const [assertions, setAssertions] = useState<Assertion[]>([])
+  const [assertionResults, setAssertionResults] = useState<AssertionResult[]>([])
   const [showCancel, setShowCancel] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
   const cancelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -88,6 +93,11 @@ export function TestPage({
       })
       const data = await res.json()
       setResponse(data)
+      if (data?.responseBody && assertions.length > 0) {
+        setAssertionResults(runAssertions(data.responseBody, assertions))
+      } else {
+        setAssertionResults([])
+      }
     } catch (err) {
       if ((err as Error).name !== 'AbortError') throw err
     } finally {
@@ -168,6 +178,13 @@ export function TestPage({
           editorLanguage={editorLanguage}
           onBodyModeChange={setBodyMode}
           onRawBodyChange={setRawBody}
+          assertionsSlot={
+            <TestAssertions
+              assertions={assertions}
+              results={assertionResults}
+              onChange={setAssertions}
+            />
+          }
         />
         <TestResponse
           response={response}
