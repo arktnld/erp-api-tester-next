@@ -6,6 +6,7 @@ import type { ContentCategory } from '@/app/test/lib/types'
 import { substitute } from '@/lib/utils'
 import { ExecuteSchema } from '@/lib/actions/schemas'
 import { validatePublicUrl } from '@/lib/security'
+import { logger } from '@/lib/logger'
 
 function getContentCategory(mimeType: string): ContentCategory {
   const m = mimeType.toLowerCase().split(';')[0].trim()
@@ -180,6 +181,8 @@ export async function POST(req: NextRequest) {
       ...authHeaders,
     }
 
+    logger.info({ endpointId, url, method: endpoint.method }, 'execute start')
+
     const startMs = Date.now()
     let statusCode = 0
     let responseBody = ''
@@ -201,9 +204,11 @@ export async function POST(req: NextRequest) {
     } catch (err: unknown) {
       statusCode = 0
       responseBody = JSON.stringify({ error: String(err) })
+      logger.warn({ url, err: String(err) }, 'execute http error')
     }
 
     const durationMs = Date.now() - startMs
+    logger.info({ url, statusCode, durationMs }, 'execute complete')
 
     await prisma.requestHistory.create({
       data: {
@@ -240,6 +245,7 @@ export async function POST(req: NextRequest) {
       isBinary,
     })
   } catch (err: unknown) {
+    logger.error({ err: String(err) }, 'execute server error')
     return NextResponse.json(
       { error: String(err) },
       { status: 500 }
