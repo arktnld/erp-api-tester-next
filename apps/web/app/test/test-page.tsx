@@ -62,8 +62,24 @@ export function TestPage({
   const needsClient = endpoint?.requiresClient !== false
   const canExecute = !!(erpId && companyId && endpointId && (!needsClient || clientId))
   const editorLanguage = detectLanguage(endpoint?.headers ?? '{}')
+  // Header names whose values should be fully masked
+  const sensitiveHeaderKeys: Set<string> = (() => {
+    const cfg = company?.authConfig as Record<string, string> | null
+    switch (company?.authType) {
+      case 'bearer':
+      case 'basic':
+        return new Set(['Authorization'])
+      case 'api_key':
+        return cfg?.header ? new Set([cfg.header]) : new Set<string>()
+      case 'custom_headers':
+        return cfg ? new Set(Object.keys(cfg)) : new Set<string>()
+      default:
+        return new Set<string>()
+    }
+  })()
+  // Body field values to mask (body_fields auth injects them literally into the body)
   const sensitiveValues: Set<string> = new Set(
-    company?.authConfig
+    company?.authType === 'body_fields' && company?.authConfig
       ? Object.values(company.authConfig as Record<string, string>).filter(
           (v) => typeof v === 'string' && v.length > 4
         )
@@ -160,6 +176,7 @@ export function TestPage({
           rawBody={rawBody}
           editorLanguage={editorLanguage}
           sensitiveValues={sensitiveValues}
+          sensitiveHeaderKeys={sensitiveHeaderKeys}
           onBodyModeChange={setBodyMode}
           onRawBodyChange={setRawBody}
         />

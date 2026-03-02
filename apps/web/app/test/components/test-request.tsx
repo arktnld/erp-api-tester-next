@@ -18,20 +18,27 @@ interface TestRequestProps {
   rawBody: string
   editorLanguage: EditorLanguage
   sensitiveValues: Set<string>
+  sensitiveHeaderKeys: Set<string>
   onBodyModeChange: (mode: 'form' | 'raw') => void
   onRawBodyChange: (value: string) => void
 }
 
-export function TestRequest({ response, resolvedBody, bodyMode, rawBody, editorLanguage, sensitiveValues, onBodyModeChange, onRawBodyChange }: TestRequestProps) {
+export function TestRequest({ response, resolvedBody, bodyMode, rawBody, editorLanguage, sensitiveValues, sensitiveHeaderKeys, onBodyModeChange, onRawBodyChange }: TestRequestProps) {
   const [showSensitive, setShowSensitive] = useState(false)
+  const hasSensitive = sensitiveHeaderKeys.size > 0 || sensitiveValues.size > 0
 
   useEffect(() => {
     setShowSensitive(false)
-  }, [sensitiveValues.size])
+  }, [sensitiveHeaderKeys.size, sensitiveValues.size])
 
-  function maskValue(value: string): string {
-    if (showSensitive || sensitiveValues.size === 0) return value
-    let result = value
+  function maskHeaderValue(key: string, value: string): string {
+    if (showSensitive) return value
+    return sensitiveHeaderKeys.has(key) ? '••••••••' : value
+  }
+
+  function maskBodyValue(text: string): string {
+    if (showSensitive || sensitiveValues.size === 0) return text
+    let result = text
     for (const secret of sensitiveValues) {
       result = result.replaceAll(secret, '••••••••')
     }
@@ -45,7 +52,7 @@ export function TestRequest({ response, resolvedBody, bodyMode, rawBody, editorL
         <div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
             <p style={{ ...sectionLabel, marginBottom: 0 }}>Headers</p>
-            {sensitiveValues.size > 0 && (
+            {hasSensitive && (
               <button
                 onClick={() => setShowSensitive(s => !s)}
                 style={{
@@ -71,7 +78,7 @@ export function TestRequest({ response, resolvedBody, bodyMode, rawBody, editorL
                 {Object.entries(response.requestHeaders ?? {}).map(([k, v]) => (
                   <tr key={k} style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '5px 0', fontFamily: 'monospace', fontSize: 12, color: 'var(--text-muted)', width: '40%', paddingRight: 12 }}>{k}</td>
-                    <td style={{ padding: '5px 0', fontFamily: 'monospace', fontSize: 12, wordBreak: 'break-all' }}>{maskValue(v)}</td>
+                    <td style={{ padding: '5px 0', fontFamily: 'monospace', fontSize: 12, wordBreak: 'break-all' }}>{maskHeaderValue(k, v)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -118,7 +125,7 @@ export function TestRequest({ response, resolvedBody, bodyMode, rawBody, editorL
                 language="json"
                 customStyle={{ margin: 0, borderRadius: 8, fontSize: 12, backgroundColor: 'var(--surface-2)' }}
               >
-                {maskValue(tryPrettyJson(resolvedBody))}
+                {maskBodyValue(tryPrettyJson(resolvedBody))}
               </CodeBlock>
             ) : (
               <p style={{ fontSize: 12, color: 'var(--text-subtle)' }}>Nenhum body para este endpoint.</p>
