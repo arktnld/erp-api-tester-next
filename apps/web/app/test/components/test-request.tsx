@@ -1,5 +1,7 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { tryPrettyJson } from '../lib/utils'
 import { sectionLabel } from '@/lib/styles'
@@ -15,24 +17,61 @@ interface TestRequestProps {
   bodyMode: 'form' | 'raw'
   rawBody: string
   editorLanguage: EditorLanguage
+  sensitiveValues: Set<string>
   onBodyModeChange: (mode: 'form' | 'raw') => void
   onRawBodyChange: (value: string) => void
 }
 
-export function TestRequest({ response, resolvedBody, bodyMode, rawBody, editorLanguage, onBodyModeChange, onRawBodyChange }: TestRequestProps) {
+export function TestRequest({ response, resolvedBody, bodyMode, rawBody, editorLanguage, sensitiveValues, onBodyModeChange, onRawBodyChange }: TestRequestProps) {
+  const [showSensitive, setShowSensitive] = useState(false)
+
+  useEffect(() => {
+    setShowSensitive(false)
+  }, [sensitiveValues.size])
+
+  function maskValue(value: string): string {
+    if (showSensitive || sensitiveValues.size === 0) return value
+    let result = value
+    for (const secret of sensitiveValues) {
+      result = result.replaceAll(secret, '••••••••')
+    }
+    return result
+  }
+
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--border)', overflow: 'hidden' }}>
       <div style={{ flex: 1, overflow: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
         {/* Headers */}
         <div>
-          <p style={sectionLabel}>Headers</p>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+            <p style={{ ...sectionLabel, marginBottom: 0 }}>Headers</p>
+            {sensitiveValues.size > 0 && (
+              <button
+                onClick={() => setShowSensitive(s => !s)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--text-muted)',
+                  fontSize: 11,
+                  padding: '2px 4px',
+                }}
+              >
+                {showSensitive ? <Eye size={12} /> : <EyeOff size={12} />}
+                {showSensitive ? 'Ocultar' : 'Revelar'}
+              </button>
+            )}
+          </div>
           {response ? (
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <tbody>
                 {Object.entries(response.requestHeaders ?? {}).map(([k, v]) => (
                   <tr key={k} style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '5px 0', fontFamily: 'monospace', fontSize: 12, color: 'var(--text-muted)', width: '40%', paddingRight: 12 }}>{k}</td>
-                    <td style={{ padding: '5px 0', fontFamily: 'monospace', fontSize: 12, wordBreak: 'break-all' }}>{v}</td>
+                    <td style={{ padding: '5px 0', fontFamily: 'monospace', fontSize: 12, wordBreak: 'break-all' }}>{maskValue(v)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -79,7 +118,7 @@ export function TestRequest({ response, resolvedBody, bodyMode, rawBody, editorL
                 language="json"
                 customStyle={{ margin: 0, borderRadius: 8, fontSize: 12, backgroundColor: 'var(--surface-2)' }}
               >
-                {tryPrettyJson(resolvedBody)}
+                {maskValue(tryPrettyJson(resolvedBody))}
               </CodeBlock>
             ) : (
               <p style={{ fontSize: 12, color: 'var(--text-subtle)' }}>Nenhum body para este endpoint.</p>

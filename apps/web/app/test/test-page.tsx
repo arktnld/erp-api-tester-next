@@ -62,6 +62,13 @@ export function TestPage({
   const needsClient = endpoint?.requiresClient !== false
   const canExecute = !!(erpId && companyId && endpointId && (!needsClient || clientId))
   const editorLanguage = detectLanguage(endpoint?.headers ?? '{}')
+  const sensitiveValues: Set<string> = new Set(
+    company?.authConfig
+      ? Object.values(company.authConfig as Record<string, string>).filter(
+          (v) => typeof v === 'string' && v.length > 4
+        )
+      : []
+  )
 
   const execute = async () => {
     if (!canExecute) return
@@ -152,6 +159,7 @@ export function TestPage({
           bodyMode={bodyMode}
           rawBody={rawBody}
           editorLanguage={editorLanguage}
+          sensitiveValues={sensitiveValues}
           onBodyModeChange={setBodyMode}
           onRawBodyChange={setRawBody}
         />
