@@ -2,19 +2,16 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = { title: 'Playbooks' }
 
 import Link from 'next/link'
-import { Plus, Play, Pencil } from 'lucide-react'
+import { Play } from 'lucide-react'
 import { getPlaybooks } from '@/lib/actions/playbooks'
 import { PageHeader } from '@/components/ui/page-header'
 import { Button } from '@/components/ui/button'
-import { DeleteButton } from './delete-button'
-import { getCurrentRole } from '@/lib/require-role'
-import { canAdmin as checkCanEdit } from '@/lib/roles'
+import { NewPlaybookButton, CreatePlaybookLink, PlaybookEditActions } from './playbooks-actions'
 
 export const dynamic = 'force-dynamic'
 
 export default async function PlaybooksPage() {
-  const [playbooks, role] = await Promise.all([getPlaybooks(), getCurrentRole()])
-  const canEdit = checkCanEdit(role)
+  const playbooks = await getPlaybooks()
 
   const byErp = new Map<number, { erpName: string; items: typeof playbooks }>()
   for (const pb of playbooks) {
@@ -27,19 +24,13 @@ export default async function PlaybooksPage() {
       <PageHeader
         title="Playbooks"
         description="Sequências de requisições com encadeamento de respostas"
-        action={
-          canEdit ? (
-            <Link href="/playbooks/new">
-              <Button><Plus size={14} /> Novo Playbook</Button>
-            </Link>
-          ) : undefined
-        }
+        action={<NewPlaybookButton />}
       />
 
       {playbooks.length === 0 ? (
         <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: 40, textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>
           Nenhum playbook criado.{' '}
-          {canEdit && <Link href="/playbooks/new" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Criar agora</Link>}
+          <CreatePlaybookLink />
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -60,14 +51,7 @@ export default async function PlaybooksPage() {
                       <Link href={`/playbooks/${pb.id}/run`}>
                         <Button variant="ghost" size="sm"><Play size={13} /></Button>
                       </Link>
-                      {canEdit && (
-                        <>
-                          <Link href={`/playbooks/${pb.id}/edit`}>
-                            <Button variant="ghost" size="sm"><Pencil size={13} /></Button>
-                          </Link>
-                          <DeleteButton id={pb.id} />
-                        </>
-                      )}
+                      <PlaybookEditActions id={pb.id} />
                     </div>
                   </div>
                 ))}

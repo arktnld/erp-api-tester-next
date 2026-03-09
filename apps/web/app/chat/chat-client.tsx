@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRole } from '@/lib/role-context'
 import { importCurlEndpoint } from '@/app/actions/import-curl'
 import { type Settings } from '@/lib/actions/settings'
 import { inputStyle as baseInput } from '@/lib/styles'
@@ -52,7 +53,8 @@ function parseCurl(input: string): ParsedCurl | { error: string } {
   } catch (e) { return { error: String(e) } }
 }
 
-export function ChatClient({ initialCollections, erps, initialSettings, defaultSystemPrompt = '', canEdit = true }: { initialCollections: ColMeta[]; erps: ERP[]; initialSettings: Settings; defaultSystemPrompt?: string; canEdit?: boolean }) {
+export function ChatClient({ initialCollections, erps, initialSettings, defaultSystemPrompt = '' }: { initialCollections: ColMeta[]; erps: ERP[]; initialSettings: Settings; defaultSystemPrompt?: string }) {
+  const { canAdmin: canEdit } = useRole()
   const [collections, setCollections] = useState<ColMeta[]>(initialCollections)
   const [activeId, setActiveId] = useState<number | null>(null)
 

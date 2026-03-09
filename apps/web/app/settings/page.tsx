@@ -2,13 +2,9 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = { title: 'Configurações' }
 
 import { Download } from 'lucide-react'
-import { auth, currentUser } from '@clerk/nextjs/server'
-import { getRole, canAdmin } from '@/lib/roles'
 import { getSettings } from '@/lib/actions/settings'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
-import { AISettingsForm } from './ai-settings-form'
-import { UsersSection } from './users-section'
-import { listUsers } from './actions'
+import { AdminSections } from './admin-sections'
 
 const sectionTitle: React.CSSProperties = {
   fontSize: 13,
@@ -20,14 +16,7 @@ const sectionTitle: React.CSSProperties = {
 }
 
 export default async function SettingsPage() {
-  const [{ sessionClaims }, settings, user] = await Promise.all([auth(), getSettings(), currentUser()])
-  // sessionClaims.metadata works if Clerk JWT template includes publicMetadata.
-  // currentUser().publicMetadata is the authoritative fallback.
-  const metaFromJwt = sessionClaims?.metadata as Record<string, unknown> | undefined
-  const metaFromUser = user?.publicMetadata as Record<string, unknown> | undefined
-  const role = getRole(metaFromJwt ?? metaFromUser)
-  const isAdmin = canAdmin(role)
-  const users = isAdmin ? await listUsers() : []
+  const settings = await getSettings()
 
   return (
     <div style={{ padding: 32, maxWidth: 640 }}>
@@ -46,13 +35,6 @@ export default async function SettingsPage() {
         </div>
       </section>
 
-      {/* Chat IA — admin only */}
-      {isAdmin && (
-        <section style={{ marginBottom: 32 }}>
-          <h2 style={sectionTitle}>Chat IA</h2>
-          <AISettingsForm initial={settings} />
-        </section>
-      )}
 
       {/* Dados */}
       <section style={{ marginBottom: 32 }}>
@@ -73,15 +55,7 @@ export default async function SettingsPage() {
         </div>
       </section>
 
-      {/* Usuários — admin only */}
-      {isAdmin && (
-        <section>
-          <h2 style={sectionTitle}>Usuários</h2>
-          <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '4px 16px' }}>
-            <UsersSection users={users} />
-          </div>
-        </section>
-      )}
+      <AdminSections settings={settings} />
     </div>
   )
 }

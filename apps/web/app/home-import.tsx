@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { Sheet } from '@/components/ui/sheet'
 import { importCurlEndpoint } from './actions/import-curl'
 import { inputStyle } from '@/lib/styles'
+import { useRole } from '@/lib/role-context'
 
 type ERP = { id: number; name: string }
 
@@ -77,7 +78,8 @@ const labelStyle: React.CSSProperties = {
   display: 'block',
 }
 
-export function HomeImport({ erps, canAdmin }: { erps: ERP[]; canAdmin?: boolean }) {
+export function HomeImport({ erps }: { erps: ERP[] }) {
+  const { canAdmin } = useRole()
   const [open, setOpen] = useState(false)
   const [curl, setCurl] = useState('')
   const [parsed, setParsed] = useState<ParsedCurl | null>(null)
