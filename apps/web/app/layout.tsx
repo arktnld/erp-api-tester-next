@@ -7,6 +7,7 @@ import { CommandPalette } from '@/components/ui/command-palette'
 import { MainContent } from '@/components/layout/main-content'
 import { RoleProvider } from '@/lib/role-context'
 import { getCurrentRole } from '@/lib/require-role'
+import { auth } from '@clerk/nextjs/server'
 import { prisma } from '@erp/db'
 import './globals.css'
 
@@ -25,6 +26,8 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const { userId } = await auth()
+
   const [erps, role] = await Promise.all([
     prisma.eRP.findMany({
       orderBy: { name: 'asc' },
@@ -41,7 +44,8 @@ export default async function RootLayout({
         },
       },
     }),
-    getCurrentRole(),
+    // Skip role resolution if no session — middleware already handles redirect
+    userId ? getCurrentRole() : Promise.resolve('viewer' as const),
   ])
 
   return (
@@ -51,7 +55,7 @@ export default async function RootLayout({
         (function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light')})()
       `}</Script>
       <body>
-        <RoleProvider role={role}>
+        <RoleProvider role={userId ? role : 'viewer'}>
           <CommandPalette erps={erps} />
           <Sidebar erps={erps} />
           <MainContent>{children}</MainContent>

@@ -9,10 +9,14 @@ export class UnauthorizedError extends Error {
 }
 
 async function resolveRole() {
-  const { sessionClaims } = await auth()
+  const { sessionClaims, userId } = await auth()
+  // No authenticated user at all — middleware will redirect to sign-in
+  if (!userId) return 'viewer' as const
   const metaFromJwt = sessionClaims?.metadata as Record<string, unknown> | undefined
   if (metaFromJwt?.role) return getRole(metaFromJwt)
-  // Fallback: fetch full user when JWT doesn't carry publicMetadata yet
+  // Fallback: fetch full user when JWT template doesn't carry publicMetadata yet.
+  // Configure the Clerk JWT template to include {{ user.public_metadata }} under
+  // "metadata" to eliminate this extra round-trip and the refresh timing issue.
   const user = await currentUser()
   return getRole(user?.publicMetadata as Record<string, unknown> | undefined)
 }
