@@ -45,3 +45,13 @@ export async function deleteFieldSchema(id: number, erpId: number) {
   await prisma.eRPFieldSchema.delete({ where: { id } })
   revalidatePath(`/erps/${erpId}`)
 }
+
+export async function reorderFieldSchemas(erpId: number, orderedIds: number[]) {
+  await requireAdmin()
+  await Promise.all(
+    orderedIds.map((id, index) =>
+      prisma.eRPFieldSchema.update({ where: { id }, data: { sortOrder: index } })
+    )
+  )
+  revalidatePath(`/erps/${erpId}`)
+}

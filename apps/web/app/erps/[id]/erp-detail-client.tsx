@@ -15,7 +15,7 @@ import {
   updateEndpoint,
   reorderEndpoints,
 } from '@/lib/actions/endpoints'
-import { createFieldSchema, updateFieldSchema, deleteFieldSchema } from '@/lib/actions/field-schemas'
+import { createFieldSchema, updateFieldSchema, deleteFieldSchema, reorderFieldSchemas } from '@/lib/actions/field-schemas'
 import { formLabel as labelStyle, selectStyle } from '@/lib/styles'
 import { useRole } from '@/lib/role-context'
 
@@ -92,6 +92,8 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
   const [tab, setTab] = useState<'endpoints' | 'fields'>('endpoints')
   const [endpoints, setEndpoints] = useState<Endpoint[]>(erp.endpoints)
   useEffect(() => { setEndpoints(erp.endpoints) }, [erp.endpoints])
+  const [fieldSchemas, setFieldSchemas] = useState<FieldSchema[]>(erp.fieldSchemas)
+  useEffect(() => { setFieldSchemas(erp.fieldSchemas) }, [erp.fieldSchemas])
   const [endpointSheet, setEndpointSheet] = useState<{ open: boolean; endpoint?: Endpoint }>({ open: false })
   const [fieldSheet, setFieldSheet] = useState<{ open: boolean; field?: FieldSchema }>({ open: false })
   const [isPending, startTransition] = useTransition()
@@ -119,11 +121,19 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return
-    const next = [...endpoints]
-    const [moved] = next.splice(result.source.index, 1)
-    next.splice(result.destination.index, 0, moved)
-    setEndpoints(next)
-    startTransition(() => reorderEndpoints(erp.id, next.map((ep) => ep.id)))
+    if (result.type === 'FIELD') {
+      const next = [...fieldSchemas]
+      const [moved] = next.splice(result.source.index, 1)
+      next.splice(result.destination.index, 0, moved)
+      setFieldSchemas(next)
+      startTransition(() => reorderFieldSchemas(erp.id, next.map((fs) => fs.id)))
+    } else {
+      const next = [...endpoints]
+      const [moved] = next.splice(result.source.index, 1)
+      next.splice(result.destination.index, 0, moved)
+      setEndpoints(next)
+      startTransition(() => reorderEndpoints(erp.id, next.map((ep) => ep.id)))
+    }
   }
 
   const openEndpointSheet = (ep?: Endpoint) => {
@@ -252,51 +262,71 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
             Campos definidos aqui aparecem nos clientes de teste. Configure a fonte automática para preencher via API.
           </p>
 
-          {erp.fieldSchemas.length === 0 ? (
+          {fieldSchemas.length === 0 ? (
             <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '32px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>
               Nenhum campo definido.
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {erp.fieldSchemas.map((fs) => {
-                const usedBy = getEndpointsUsingField(fs.fieldName, endpoints)
-                const sourceEp = fs.sourceEndpointId ? endpoints.find(e => e.id === fs.sourceEndpointId) : null
-                return (
-                  <div key={fs.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8 }}>
-                    <code style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '2px 6px', borderRadius: 4, whiteSpace: 'nowrap' }}>
-                      {`{${fs.fieldName}}`}
-                    </code>
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontSize: 13 }}>{fs.label}</span>
-                        <span style={{ fontSize: 11, color: 'var(--text-muted)', padding: '2px 6px', backgroundColor: 'var(--surface-2)', borderRadius: 4 }}>{fs.fieldType}</span>
-                        {fs.required && <span style={{ fontSize: 11, color: '#ef4444', padding: '2px 6px', backgroundColor: '#ef444418', borderRadius: 4 }}>obrigatório</span>}
-                        {sourceEp && (
-                          <span style={{ fontSize: 11, color: '#10b981', padding: '2px 6px', backgroundColor: '#10b98118', border: '1px solid #10b98144', borderRadius: 4, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                            <Zap size={10} /> {sourceEp.name} → {fs.responsePath || '?'}
-                          </span>
-                        )}
-                      </div>
-                      {usedBy.length > 0 && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                          {usedBy.map((ep) => (
-                            <span key={ep.id} style={{ fontSize: 11, color: 'var(--text-muted)', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 4, padding: '1px 6px' }}>
-                              {ep.name}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    {canEdit && (
-                      <div style={{ display: 'flex', gap: 2 }}>
-                        <Button variant="ghost" size="sm" onClick={() => openFieldSheet(fs)}><Pencil size={13} /></Button>
-                        <Button variant="ghost" size="sm" onClick={() => startTransition(() => deleteFieldSchema(fs.id, erp.id))}><Trash2 size={13} /></Button>
-                      </div>
-                    )}
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="fields" type="FIELD">
+                {(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {fieldSchemas.map((fs, i) => {
+                      const usedBy = getEndpointsUsingField(fs.fieldName, endpoints)
+                      const sourceEp = fs.sourceEndpointId ? endpoints.find(e => e.id === fs.sourceEndpointId) : null
+                      return (
+                        <Draggable key={fs.id} draggableId={`field-${fs.id}`} index={i}>
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, ...provided.draggableProps.style }}
+                            >
+                              {canEdit && (
+                                <div {...provided.dragHandleProps} style={{ cursor: 'grab', color: 'var(--text-subtle)', display: 'flex', alignItems: 'center' }}>
+                                  <GripVertical size={16} />
+                                </div>
+                              )}
+                              <code style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '2px 6px', borderRadius: 4, whiteSpace: 'nowrap' }}>
+                                {`{${fs.fieldName}}`}
+                              </code>
+                              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                  <span style={{ fontSize: 13 }}>{fs.label}</span>
+                                  <span style={{ fontSize: 11, color: 'var(--text-muted)', padding: '2px 6px', backgroundColor: 'var(--surface-2)', borderRadius: 4 }}>{fs.fieldType}</span>
+                                  {fs.required && <span style={{ fontSize: 11, color: '#ef4444', padding: '2px 6px', backgroundColor: '#ef444418', borderRadius: 4 }}>obrigatório</span>}
+                                  {sourceEp && (
+                                    <span style={{ fontSize: 11, color: '#10b981', padding: '2px 6px', backgroundColor: '#10b98118', border: '1px solid #10b98144', borderRadius: 4, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                                      <Zap size={10} /> {sourceEp.name} → {fs.responsePath || '?'}
+                                    </span>
+                                  )}
+                                </div>
+                                {usedBy.length > 0 && (
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                                    {usedBy.map((ep) => (
+                                      <span key={ep.id} style={{ fontSize: 11, color: 'var(--text-muted)', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 4, padding: '1px 6px' }}>
+                                        {ep.name}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                              {canEdit && (
+                                <div style={{ display: 'flex', gap: 2 }}>
+                                  <Button variant="ghost" size="sm" onClick={() => openFieldSheet(fs)}><Pencil size={13} /></Button>
+                                  <Button variant="ghost" size="sm" onClick={() => startTransition(() => deleteFieldSchema(fs.id, erp.id))}><Trash2 size={13} /></Button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </Draggable>
+                      )
+                    })}
+                    {provided.placeholder}
                   </div>
-                )
-              })}
-            </div>
+                )}
+              </Droppable>
+            </DragDropContext>
           )}
         </div>
       )}
