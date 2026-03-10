@@ -24,10 +24,8 @@ export function SignInClient() {
         <span style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em', color: '#ededed' }}> Tester</span>
       </div>
 
-      <div className="login-box" style={{ position: 'relative', zIndex: 1 }}>
-        <div className="login-box-inner">
-          <SignIn />
-        </div>
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <SignIn />
       </div>
 
       <p style={{ fontSize: 11, color: '#444', position: 'relative', zIndex: 1 }}>Jarbis © 2026</p>

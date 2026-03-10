@@ -176,31 +176,3 @@ input::placeholder, textarea::placeholder {
 .driver-popover-arrow-side-top   { border-top-color:    var(--surface) !important; }
 .driver-popover-arrow-side-bottom{ border-bottom-color: var(--surface) !important; }
 
-/* Login animated border */
-@property --login-angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-.login-box {
-  border-radius: 12px;
-  padding: 2px;
-  background: conic-gradient(
-    from var(--login-angle),
-    transparent 0%,
-    transparent 60%,
-    #4f46e5 80%,
-    #6366f1 88%,
-    #818cf8 93%,
-    transparent 100%
-  );
-  animation: loginBoxSpin 4s linear infinite;
-}
-@keyframes loginBoxSpin {
-  to { --login-angle: 360deg; }
-}
-.login-box-inner {
-  background: #111111;
-  border-radius: 11px;
-  overflow: hidden;
-}
