@@ -54,7 +54,11 @@ export async function deleteEndpoint(id: number, erpId: number) {
 export async function duplicateEndpoint(id: number, erpId: number) {
   await requireAdmin()
   const original = await prisma.endpoint.findUniqueOrThrow({ where: { id } })
-  const maxOrder = await prisma.endpoint.aggregate({ where: { erpId }, _max: { sortOrder: true } })
+  // Shift all endpoints after the original down by 1
+  await prisma.endpoint.updateMany({
+    where: { erpId, sortOrder: { gt: original.sortOrder } },
+    data: { sortOrder: { increment: 1 } },
+  })
   await prisma.endpoint.create({
     data: {
       erpId: original.erpId,
@@ -67,7 +71,7 @@ export async function duplicateEndpoint(id: number, erpId: number) {
       requiresClient: original.requiresClient,
       isModification: original.isModification,
       notes: original.notes,
-      sortOrder: (maxOrder._max.sortOrder ?? 0) + 1,
+      sortOrder: original.sortOrder + 1,
     },
   })
   revalidatePath(`/erps/${erpId}`)
