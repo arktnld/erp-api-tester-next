@@ -1,6 +1,7 @@
 'use client'
 
 import { SignIn } from '@clerk/nextjs'
+import { LoginParticles } from './login-particles'
 
 export function SignInClient() {
   return (
@@ -13,20 +14,23 @@ export function SignInClient() {
         justifyContent: 'center',
         backgroundColor: '#0a0a0a',
         gap: 28,
+        position: 'relative',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+      <LoginParticles />
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 2, position: 'relative', zIndex: 1 }}>
         <span style={{ fontFamily: 'monospace', fontSize: 26, fontWeight: 900, letterSpacing: '-0.03em', color: '#6366f1' }}>/ERP</span>
         <span style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em', color: '#ededed' }}> Tester</span>
       </div>
 
-      <div className="login-box">
+      <div className="login-box" style={{ position: 'relative', zIndex: 1 }}>
         <div className="login-box-inner">
           <SignIn />
         </div>
       </div>
 
-      <p style={{ fontSize: 11, color: '#333' }}>Jarbis © 2026</p>
+      <p style={{ fontSize: 11, color: '#444', position: 'relative', zIndex: 1 }}>Jarbis © 2026</p>
     </div>
   )
 }
