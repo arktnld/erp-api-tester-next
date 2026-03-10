@@ -12,7 +12,7 @@ export function SignInClient() {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#0a0a0a',
+        backgroundColor: '#070712',
         gap: 28,
         position: 'relative',
       }}
