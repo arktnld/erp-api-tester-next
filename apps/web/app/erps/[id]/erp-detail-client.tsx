@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useEffect } from 'react'
 import Link from 'next/link'
-import { ChevronLeft, Plus, Trash2, Pencil, GripVertical, Zap } from 'lucide-react'
+import { ChevronLeft, Plus, Trash2, Pencil, GripVertical, Zap, Copy } from 'lucide-react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import type { DropResult } from '@hello-pangea/dnd'
 import { MethodBadge } from '@/components/ui/badge'
@@ -14,6 +14,7 @@ import {
   createEndpoint,
   updateEndpoint,
   reorderEndpoints,
+  duplicateEndpoint,
 } from '@/lib/actions/endpoints'
 import { createFieldSchema, updateFieldSchema, deleteFieldSchema, reorderFieldSchemas } from '@/lib/actions/field-schemas'
 import { formLabel as labelStyle, selectStyle } from '@/lib/styles'
@@ -233,6 +234,7 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
                             </div>
                             {canEdit && (
                               <div style={{ display: 'flex', gap: 2 }}>
+                                <Button variant="ghost" size="sm" onClick={() => startTransition(() => duplicateEndpoint(ep.id, erp.id))} title="Duplicar"><Copy size={13} /></Button>
                                 <Button variant="ghost" size="sm" onClick={() => openEndpointSheet(ep)}><Pencil size={13} /></Button>
                                 <Button variant="ghost" size="sm" onClick={() => startTransition(() => deleteEndpoint(ep.id, erp.id))}><Trash2 size={13} /></Button>
                               </div>
