@@ -84,14 +84,14 @@ function FlowCard({ step, stepNum, allSteps }: { step: StepResult; stepNum: numb
   const entries = Object.entries(step.capturedFields)
   if (entries.length === 0) return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div style={{ width: 1, height: 12, background: 'var(--border)' }} />
-      <div style={{ width: 1, height: 12, background: 'var(--border)' }} />
+      <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
+      <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
     </div>
   )
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div style={{ width: 1, height: 12, background: 'var(--border)' }} />
+      <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
       <div style={{ width: '100%', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 16px', background: 'var(--surface-2)', display: 'flex', flexDirection: 'column', gap: 7 }}>
         {/* Title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -132,7 +132,7 @@ function FlowCard({ step, stepNum, allSteps }: { step: StepResult; stepNum: numb
           )
         })}
       </div>
-      <div style={{ width: 1, height: 12, background: 'var(--border)' }} />
+      <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
     </div>
   )
 }
