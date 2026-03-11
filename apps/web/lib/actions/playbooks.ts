@@ -142,14 +142,20 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
   const results: StepResult[] = []
 
   for (const step of playbook.steps) {
-    const injectedFields = { ...capturedFields }
+    const allAvailableFields = { ...capturedFields }
+    // Only show fields actually referenced as {field} in the body template or URL path
+    const template = (step.bodyOverride || '') + (step.endpoint?.name || '')
+    const usedInjectedFields: Record<string, string> = {}
+    for (const [field, value] of Object.entries(allAvailableFields)) {
+      if (template.includes(`{${field}}`)) usedInjectedFields[field] = value
+    }
     try {
       const result = await executeRequest({
         endpointId: step.endpointId,
         companyId: clientId ? undefined : companyId,
         clientId: clientId ?? undefined,
         rawBody: step.bodyOverride || null,
-        inlineFields: injectedFields,
+        inlineFields: allAvailableFields,
       })
 
       let parsedBody: unknown = result.responseBody
@@ -168,7 +174,7 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
         url: result.url,
         responseBody: result.responseBody,
         capturedFields: captured,
-        injectedFields,
+        injectedFields: usedInjectedFields,
         requestBody: result.requestBody,
         requestHeaders: result.requestHeaders,
         durationMs: result.durationMs,
@@ -184,7 +190,7 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
         url: '',
         responseBody: String(err),
         capturedFields: {},
-        injectedFields,
+        injectedFields: usedInjectedFields,
         requestBody: null,
         requestHeaders: {},
         durationMs: 0,
