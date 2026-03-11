@@ -38,8 +38,7 @@ function buildCurl(method: string, url: string, headers: Record<string, string>,
   }
   if (body) {
     try {
-      const pretty = JSON.stringify(JSON.parse(body), null, 2)
-      lines.push(`  -d '${pretty}'`)
+      lines.push(`  -d '${JSON.stringify(JSON.parse(body), null, 2)}'`)
     } catch {
       lines.push(`  -d '${body}'`)
     }
@@ -80,21 +79,66 @@ function InnerTabs({ tabs, children }: { tabs: string[]; children: (active: numb
   )
 }
 
-function StepCard({ step, index, allSteps }: { step: StepResult; index: number; allSteps: StepResult[] }) {
+/** Card between steps showing what was captured and where it goes */
+function FlowCard({ step, stepNum, allSteps }: { step: StepResult; stepNum: number; allSteps: StepResult[] }) {
+  const entries = Object.entries(step.capturedFields)
+  if (entries.length === 0) return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ width: 1, height: 12, background: 'var(--border)' }} />
+      <div style={{ width: 1, height: 12, background: 'var(--border)' }} />
+    </div>
+  )
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ width: 1, height: 12, background: 'var(--border)' }} />
+      <div style={{ width: '100%', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 16px', background: 'var(--surface-2)', display: 'flex', flexDirection: 'column', gap: 7 }}>
+        {/* Title */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+          <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-subtle)', whiteSpace: 'nowrap' }}>
+            Dados capturados · Step {stepNum}
+          </span>
+          <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+        </div>
+
+        {/* Rows */}
+        {entries.map(([field, val]) => {
+          const usedInSteps: number[] = []
+          for (let j = stepNum; j < allSteps.length; j++) {
+            if (field in (allSteps[j].injectedFields ?? {})) usedInSteps.push(j + 1)
+          }
+          return (
+            <div key={field} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontFamily: 'monospace', fontSize: 11, padding: '2px 7px', borderRadius: 4, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', flexShrink: 0 }}>
+                {field}
+              </span>
+              <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-subtle)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>
+                {val.length > 40 ? val.slice(0, 40) + '…' : val}
+              </span>
+              {usedInSteps.length > 0 ? (
+                <>
+                  <span style={{ fontSize: 11, color: 'var(--text-subtle)', flexShrink: 0 }}>→ usado em</span>
+                  {usedInSteps.map((n) => (
+                    <span key={n} style={{ fontFamily: 'monospace', fontSize: 11, padding: '2px 7px', borderRadius: 4, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', flexShrink: 0 }}>
+                      Step {n}
+                    </span>
+                  ))}
+                </>
+              ) : (
+                <span style={{ fontSize: 11, color: 'var(--text-subtle)', fontStyle: 'italic' }}>→ não utilizado</span>
+              )}
+            </div>
+          )
+        })}
+      </div>
+      <div style={{ width: 1, height: 12, background: 'var(--border)' }} />
+    </div>
+  )
+}
+
+function StepCard({ step, index }: { step: StepResult; index: number }) {
   const curl = buildCurl(step.method, step.url, step.requestHeaders ?? {}, step.requestBody)
-
-  // For each captured field, find which future steps use it
-  const capturedUsage: Record<string, number[]> = {}
-  for (const field of Object.keys(step.capturedFields)) {
-    capturedUsage[field] = []
-    for (let j = index + 1; j < allSteps.length; j++) {
-      const injected = allSteps[j].injectedFields ?? {}
-      if (field in injected) capturedUsage[field].push(j + 1)
-    }
-  }
-
-  const hasCaptured = Object.keys(step.capturedFields).length > 0
-  const hasInjected = Object.keys(step.injectedFields ?? {}).length > 0
 
   return (
     <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
@@ -119,40 +163,13 @@ function StepCard({ step, index, allSteps }: { step: StepResult; index: number; 
         </span>
       </div>
 
-      {/* Body */}
-      <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
-
-        {/* Tabs: Request / Resposta / cURL */}
+      {/* Tabs */}
+      <div style={{ padding: 16 }}>
         <InnerTabs tabs={['Request', 'Resposta', 'cURL']}>
           {(active) => (
             <>
               {active === 0 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {/* Injected fields — parâmetros de steps anteriores usados aqui */}
-                  {hasInjected && (
-                    <div style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 6, padding: '10px 14px' }}>
-                      <p style={{ fontSize: 11, fontWeight: 600, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
-                        Parâmetros injetados de steps anteriores
-                      </p>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                        {Object.entries(step.injectedFields ?? {}).map(([field]) => {
-                          const sourceStepIndex = allSteps.slice(0, index).findLastIndex(
-                            (s) => field in s.capturedFields
-                          )
-                          return (
-                            <div key={field} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'monospace', fontSize: 12 }}>
-                              <span style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b', borderRadius: 3, padding: '1px 6px' }}>{'{'}{ field }{'}'}</span>
-                              <span style={{ color: 'var(--text-subtle)', fontSize: 11 }}>capturado em</span>
-                              <span style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', borderRadius: 3, padding: '1px 6px', fontSize: 11 }}>
-                                Step {sourceStepIndex + 1}
-                              </span>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )}
-                  {/* Request Headers */}
                   {Object.keys(step.requestHeaders ?? {}).length > 0 && (
                     <div>
                       <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Headers</p>
@@ -168,7 +185,6 @@ function StepCard({ step, index, allSteps }: { step: StepResult; index: number; 
                       </table>
                     </div>
                   )}
-                  {/* Request Body */}
                   {step.requestBody ? (
                     <div>
                       <p style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Body</p>
@@ -182,48 +198,9 @@ function StepCard({ step, index, allSteps }: { step: StepResult; index: number; 
                 </div>
               )}
               {active === 1 && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {/* Captured fields with path chain */}
-                  {hasCaptured && (
-                    <div style={{ background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 6, padding: '10px 14px' }}>
-                      <p style={{ fontSize: 11, fontWeight: 600, color: '#10b981', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
-                        Campos capturados desta resposta
-                      </p>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-                        {Object.entries(step.capturedFields).map(([field, val]) => (
-                          <div key={field}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'monospace', fontSize: 12 }}>
-                              <span style={{ background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', borderRadius: 3, padding: '1px 6px' }}>{field}</span>
-                              <span style={{ color: 'var(--text-subtle)', fontSize: 11 }}>
-                                {val.length > 50 ? val.slice(0, 50) + '…' : val}
-                              </span>
-                            </div>
-                            {capturedUsage[field]?.length > 0 && (
-                              <div style={{ marginLeft: 12, marginTop: 3, display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--text-subtle)' }}>
-                                <span>↳ usado em</span>
-                                {capturedUsage[field].map((n) => (
-                                  <span key={n} style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', borderRadius: 3, padding: '1px 6px', fontFamily: 'monospace' }}>
-                                    Step {n}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                            {capturedUsage[field]?.length === 0 && (
-                              <div style={{ marginLeft: 12, marginTop: 3, fontSize: 11, color: 'var(--text-subtle)' }}>
-                                ↳ não utilizado nos steps seguintes
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Response body */}
-                  <CodeBlock language="json" customStyle={{ margin: 0, borderRadius: 8, fontSize: 11, backgroundColor: 'var(--surface-2)', maxHeight: 300, overflow: 'auto' }}>
-                    {tryPretty(step.responseBody)}
-                  </CodeBlock>
-                </div>
+                <CodeBlock language="json" customStyle={{ margin: 0, borderRadius: 8, fontSize: 11, backgroundColor: 'var(--surface-2)', maxHeight: 300, overflow: 'auto' }}>
+                  {tryPretty(step.responseBody)}
+                </CodeBlock>
               )}
               {active === 2 && (
                 <div>
@@ -238,7 +215,6 @@ function StepCard({ step, index, allSteps }: { step: StepResult; index: number; 
             </>
           )}
         </InnerTabs>
-
       </div>
     </div>
   )
@@ -252,7 +228,6 @@ export function RunResultClient({ run }: { run: RunMeta & { steps: StepResult[] 
 
   return (
     <div>
-      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
         <h1 style={{ fontSize: 20, fontWeight: 600 }}>{run.playbook.name}</h1>
         <span style={{
@@ -266,22 +241,22 @@ export function RunResultClient({ run }: { run: RunMeta & { steps: StepResult[] 
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28, fontSize: 13, color: 'var(--text-muted)' }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-          <Server size={13} /> {run.playbook.erp.name}
-        </span>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-          <Building2 size={13} /> {run.company.name}
-        </span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><Server size={13} /> {run.playbook.erp.name}</span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><Building2 size={13} /> {run.company.name}</span>
         {totalMs !== null && (
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-            <Clock size={13} /> {totalMs}ms total
-          </span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><Clock size={13} /> {totalMs}ms total</span>
         )}
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
         {run.steps.map((step, i) => (
-          <StepCard key={step.stepId} step={step} index={i} allSteps={run.steps} />
+          <div key={step.stepId}>
+            <StepCard step={step} index={i} />
+            {/* Flow card between steps — not after last */}
+            {i < run.steps.length - 1 && (
+              <FlowCard step={step} stepNum={i + 1} allSteps={run.steps} />
+            )}
+          </div>
         ))}
       </div>
     </div>
