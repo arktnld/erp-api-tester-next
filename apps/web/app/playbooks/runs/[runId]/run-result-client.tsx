@@ -100,6 +100,7 @@ function InitialCard({ fields, clientName, allSteps }: { fields: Record<string, 
             const haystack = (next.requestBody ?? '') + (next.url ?? '')
             if (val && haystack.includes(val)) usedInSteps.push(j + 1)
           }
+          if (usedInSteps.length === 0) return null
           return (
             <div key={field} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               <span style={{ fontFamily: 'monospace', fontSize: 11, padding: '2px 7px', borderRadius: 4, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b', flexShrink: 0 }}>
@@ -108,16 +109,12 @@ function InitialCard({ fields, clientName, allSteps }: { fields: Record<string, 
               <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-subtle)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>
                 {val.length > 40 ? val.slice(0, 40) + '…' : val}
               </span>
-              {usedInSteps.length > 0 ? (
-                <>
-                  <span style={{ fontSize: 11, color: 'var(--text-subtle)', flexShrink: 0 }}>→ usado em</span>
-                  {usedInSteps.map((n) => (
-                    <span key={n} style={{ fontFamily: 'monospace', fontSize: 11, padding: '2px 7px', borderRadius: 4, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', flexShrink: 0 }}>
-                      Step {n}
-                    </span>
-                  ))}
-                </>
-              ) : null}
+              <span style={{ fontSize: 11, color: 'var(--text-subtle)', flexShrink: 0 }}>→ usado em</span>
+              {usedInSteps.map((n) => (
+                <span key={n} style={{ fontFamily: 'monospace', fontSize: 11, padding: '2px 7px', borderRadius: 4, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', flexShrink: 0 }}>
+                  Step {n}
+                </span>
+              ))}
             </div>
           )
         })}
