@@ -101,7 +101,8 @@ function InitialCard({ fields, clientName, allSteps }: { fields: Record<string, 
             <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-subtle)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>
               {val.length > 40 ? val.slice(0, 40) + '…' : val}
             </span>
-            <span style={{ fontSize: 11, color: 'var(--text-subtle)', flexShrink: 0 }}>→ Step 1</span>
+            <span style={{ fontSize: 11, color: 'var(--text-subtle)', flexShrink: 0 }}>→ usado em</span>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, padding: '2px 7px', borderRadius: 4, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', flexShrink: 0 }}>Step 1</span>
           </div>
         ))}
       </div>
