@@ -79,40 +79,30 @@ function InnerTabs({ tabs, children }: { tabs: string[]; children: (active: numb
   )
 }
 
-/** Card between steps showing what was captured and where it goes */
-function FlowCard({ step, stepNum, allSteps }: { step: StepResult; stepNum: number; allSteps: StepResult[] }) {
-  const entries = Object.entries(step.capturedFields)
-  if (entries.length === 0) return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
-      <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
-    </div>
-  )
-
+/** Card before step 1 showing test client fields */
+function InitialCard({ fields, clientName, allSteps }: { fields: Record<string, string>; clientName: string; allSteps: StepResult[] }) {
+  const entries = Object.entries(fields)
+  if (entries.length === 0) return null
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
-      <div style={{ width: '100%', border: '1px solid var(--border)', borderRadius: 8, padding: '10px 16px', background: 'var(--surface-2)', display: 'flex', flexDirection: 'column', gap: 7 }}>
-        {/* Title */}
+      <div style={{ width: '100%', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 8, padding: '10px 16px', background: 'rgba(245,158,11,0.04)', display: 'flex', flexDirection: 'column', gap: 7, marginBottom: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-          <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-subtle)', whiteSpace: 'nowrap' }}>
-            Dados capturados · Step {stepNum}
+          <div style={{ flex: 1, height: 1, background: 'rgba(245,158,11,0.2)' }} />
+          <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#f59e0b', whiteSpace: 'nowrap' }}>
+            Cliente teste · {clientName}
           </span>
-          <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+          <div style={{ flex: 1, height: 1, background: 'rgba(245,158,11,0.2)' }} />
         </div>
-
-        {/* Rows */}
         {entries.map(([field, val]) => {
           const usedInSteps: number[] = []
-          for (let j = stepNum; j < allSteps.length; j++) {
+          for (let j = 0; j < allSteps.length; j++) {
             const next = allSteps[j]
             const haystack = (next.requestBody ?? '') + (next.url ?? '')
             if (val && haystack.includes(val)) usedInSteps.push(j + 1)
           }
           return (
             <div key={field} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <span style={{ fontFamily: 'monospace', fontSize: 11, padding: '2px 7px', borderRadius: 4, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', flexShrink: 0 }}>
+              <span style={{ fontFamily: 'monospace', fontSize: 11, padding: '2px 7px', borderRadius: 4, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b', flexShrink: 0 }}>
                 {field}
               </span>
               <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-subtle)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>
@@ -127,14 +117,84 @@ function FlowCard({ step, stepNum, allSteps }: { step: StepResult; stepNum: numb
                     </span>
                   ))}
                 </>
-              ) : (
+              ) : null}
+            </div>
+          )
+        })}
+      </div>
+      <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
+    </div>
+  )
+}
+
+/** Card between steps showing what was captured and where it goes */
+function FlowCard({ step, stepNum, allSteps, isLast }: { step: StepResult; stepNum: number; allSteps: StepResult[]; isLast?: boolean }) {
+  const entries = Object.entries(step.capturedFields)
+  if (entries.length === 0) {
+    if (isLast) return null
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
+        <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
+      </div>
+    )
+  }
+
+  const borderColor = isLast ? 'rgba(16,185,129,0.4)' : 'var(--border)'
+  const bgColor = isLast ? 'rgba(16,185,129,0.06)' : 'var(--surface-2)'
+  const titleColor = isLast ? '#10b981' : 'var(--text-subtle)'
+  const dividerColor = isLast ? 'rgba(16,185,129,0.2)' : 'var(--border)'
+  const label = isLast ? `Resultado final · Step ${stepNum}` : `Dados capturados · Step ${stepNum}`
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
+      <div style={{ width: '100%', border: `1px solid ${borderColor}`, borderRadius: 8, padding: '10px 16px', background: bgColor, display: 'flex', flexDirection: 'column', gap: 7 }}>
+        {/* Title */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ flex: 1, height: 1, background: dividerColor }} />
+          <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: titleColor, whiteSpace: 'nowrap' }}>
+            {label}
+          </span>
+          <div style={{ flex: 1, height: 1, background: dividerColor }} />
+        </div>
+
+        {/* Rows */}
+        {entries.map(([field, val]) => {
+          const usedInSteps: number[] = []
+          if (!isLast) {
+            for (let j = stepNum; j < allSteps.length; j++) {
+              const next = allSteps[j]
+              const haystack = (next.requestBody ?? '') + (next.url ?? '')
+              if (val && haystack.includes(val)) usedInSteps.push(j + 1)
+            }
+          }
+          return (
+            <div key={field} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontFamily: 'monospace', fontSize: 11, padding: '2px 7px', borderRadius: 4, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', flexShrink: 0 }}>
+                {field}
+              </span>
+              <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-subtle)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>
+                {val.length > 40 ? val.slice(0, 40) + '…' : val}
+              </span>
+              {!isLast && usedInSteps.length > 0 && (
+                <>
+                  <span style={{ fontSize: 11, color: 'var(--text-subtle)', flexShrink: 0 }}>→ usado em</span>
+                  {usedInSteps.map((n) => (
+                    <span key={n} style={{ fontFamily: 'monospace', fontSize: 11, padding: '2px 7px', borderRadius: 4, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', flexShrink: 0 }}>
+                      Step {n}
+                    </span>
+                  ))}
+                </>
+              )}
+              {!isLast && usedInSteps.length === 0 && (
                 <span style={{ fontSize: 11, color: 'var(--text-subtle)', fontStyle: 'italic' }}>→ não utilizado</span>
               )}
             </div>
           )
         })}
       </div>
-      <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
+      {!isLast && <div style={{ width: 1, height: 20, background: 'var(--border)' }} />}
     </div>
   )
 }
@@ -222,7 +282,7 @@ function StepCard({ step, index }: { step: StepResult; index: number }) {
   )
 }
 
-export function RunResultClient({ run }: { run: RunMeta & { steps: StepResult[] } }) {
+export function RunResultClient({ run, clientFields, clientName }: { run: RunMeta & { steps: StepResult[] }; clientFields?: Record<string, string>; clientName?: string }) {
   const allOk = run.status === 'completed'
   const totalMs = run.endedAt
     ? new Date(run.endedAt).getTime() - new Date(run.startedAt).getTime()
@@ -251,15 +311,18 @@ export function RunResultClient({ run }: { run: RunMeta & { steps: StepResult[] 
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-        {run.steps.map((step, i) => (
-          <div key={step.stepId}>
-            <StepCard step={step} index={i} />
-            {/* Flow card between steps — not after last */}
-            {i < run.steps.length - 1 && (
-              <FlowCard step={step} stepNum={i + 1} allSteps={run.steps} />
-            )}
-          </div>
-        ))}
+        {clientFields && clientName && Object.keys(clientFields).length > 0 && (
+          <InitialCard fields={clientFields} clientName={clientName} allSteps={run.steps} />
+        )}
+        {run.steps.map((step, i) => {
+          const isLast = i === run.steps.length - 1
+          return (
+            <div key={step.stepId}>
+              <StepCard step={step} index={i} />
+              <FlowCard step={step} stepNum={i + 1} allSteps={run.steps} isLast={isLast} />
+            </div>
+          )
+        })}
       </div>
     </div>
   )
