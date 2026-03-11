@@ -93,22 +93,17 @@ function InitialCard({ fields, clientName, allSteps }: { fields: Record<string, 
           </span>
           <div style={{ flex: 1, height: 1, background: 'rgba(245,158,11,0.2)' }} />
         </div>
-        {entries.map(([field, val]) => {
-          const step1 = allSteps[0]
-          const haystack1 = (step1?.requestBody ?? '') + (step1?.url ?? '')
-          if (!val || !haystack1.includes(val)) return null
-          return (
-            <div key={field} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-              <span style={{ fontFamily: 'monospace', fontSize: 11, padding: '2px 7px', borderRadius: 4, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b', flexShrink: 0 }}>
-                {field}
-              </span>
-              <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-subtle)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>
-                {val.length > 40 ? val.slice(0, 40) + '…' : val}
-              </span>
-              <span style={{ fontSize: 11, color: 'var(--text-subtle)', flexShrink: 0 }}>→ Step 1</span>
-            </div>
-          )
-        })}
+        {entries.map(([field, val]) => (
+          <div key={field} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, padding: '2px 7px', borderRadius: 4, background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b', flexShrink: 0 }}>
+              {field}
+            </span>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-subtle)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 200 }}>
+              {val.length > 40 ? val.slice(0, 40) + '…' : val}
+            </span>
+            <span style={{ fontSize: 11, color: 'var(--text-subtle)', flexShrink: 0 }}>→ Step 1</span>
+          </div>
+        ))}
       </div>
       <div style={{ width: 1, height: 20, background: 'var(--border)' }} />
     </div>
