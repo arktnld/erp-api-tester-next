@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@erp/db'
 import { MethodBadge, StatusBadge } from '@/components/ui/badge'
-import { RotateCcw, Building2, FlaskConical, MessageSquare, ListChecks, History } from 'lucide-react'
+import { RotateCcw, Building2, FlaskConical, ListChecks, History } from 'lucide-react'
 import { HomeImport } from './home-import'
 
 export const dynamic = 'force-dynamic'
@@ -55,8 +55,7 @@ export default async function Dashboard() {
 
   const quickActions = [
     { href: '/test', label: 'Testar API', desc: 'Disparar requisições', icon: FlaskConical },
-    { href: '/chat', label: 'Chat IA', desc: 'Assistente inteligente', icon: MessageSquare },
-    { href: '/playbooks', label: 'Playbooks', desc: 'Fluxos automatizados', icon: ListChecks },
+{ href: '/playbooks', label: 'Playbooks', desc: 'Fluxos automatizados', icon: ListChecks },
     { href: '/history', label: 'Histórico', desc: 'Todas as requisições', icon: History },
   ]
 

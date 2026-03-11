@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Server, Building2, FlaskConical, History, MessageSquare, BookMarked, ListChecks, Settings } from 'lucide-react'
+import { LayoutDashboard, Server, Building2, FlaskConical, History, BookMarked, ListChecks, Settings } from 'lucide-react'
 import { UserButton } from '@clerk/nextjs'
 import { TourButton } from '@/components/ui/tour-button'
 
@@ -21,8 +21,7 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
   const nav = [
     { href: '/', label: 'Home', icon: LayoutDashboard, tourId: 'home' },
     { href: '/test', label: 'Testar API', icon: FlaskConical, tourId: 'test' },
-    { href: '/chat', label: 'Chat IA', icon: MessageSquare, tourId: 'chat' },
-    { href: '/erps', label: 'ERPs', icon: Server, tourId: 'erps' },
+{ href: '/erps', label: 'ERPs', icon: Server, tourId: 'erps' },
     { href: '/companies', label: 'Empresas', icon: Building2, tourId: 'companies' },
     { href: '/history', label: 'Histórico', icon: History, tourId: 'history' },
     { href: '/playbooks', label: 'Playbooks', icon: ListChecks, tourId: 'playbooks' },

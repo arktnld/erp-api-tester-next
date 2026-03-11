@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Layers, Building2, Users, Zap, Terminal, MessageSquare, History, Info, Lightbulb, AlertTriangle, Link2, LucideIcon } from 'lucide-react'
+import { Layers, Building2, Users, Zap, Terminal, History, Info, Lightbulb, AlertTriangle, Link2, LucideIcon } from 'lucide-react'
 
 const sections: { id: string; label: string; icon: LucideIcon }[] = [
   { id: 'intro',    label: 'O que é',           icon: Info },
@@ -11,7 +11,6 @@ const sections: { id: string; label: string; icon: LucideIcon }[] = [
   { id: 'cliente',  label: 'Clientes de teste',  icon: Users },
   { id: 'testar',   label: 'Testar endpoints',   icon: Terminal },
   { id: 'curl',     label: 'Importar curl',      icon: Terminal },
-  { id: 'chat',     label: 'Chat IA',            icon: MessageSquare },
   { id: 'historico',label: 'Histórico',          icon: History },
 ]
 
@@ -350,52 +349,6 @@ export default function DocsPage() {
             </P>
             <Callout type="info">
               Headers de Authorization e Content-Type são ignorados — eles já são gerenciados pela configuração de autenticação da empresa.
-            </Callout>
-          </FadeSection>
-
-          {/* Chat */}
-          <FadeSection>
-            <H2 id="chat">Chat IA</H2>
-            <P>
-              O Chat IA é um assistente que conhece os endpoints do seu ERP. Pergunte em linguagem natural: <em>"como busco pedidos por data?"</em>, <em>"quais campos são obrigatórios para criar um cliente?"</em>, <em>"me dê um exemplo de body para atualização de NFe"</em>. O assistente responde com base na coleção Postman que você importou.
-            </P>
-            <H3>Configurando uma coleção</H3>
-            <P>
-              Vá em <strong>Chat IA</strong>, clique no <strong>+</strong> ao lado de Coleções, cole ou importe o JSON do Postman. O ERP Tester processa todos os endpoints e gera embeddings — representações matemáticas de cada rota que permitem busca semântica.
-            </P>
-            <H3>Como a busca semântica funciona</H3>
-            <P>
-              Ao fazer uma pergunta, o ERP Tester a transforma em um vetor e compara com todos os endpoints. Os 10 mais similares semanticamente são enviados como contexto para a IA. Em coleções com 1.000+ endpoints, a IA recebe exatamente as rotas relevantes — sem desperdiçar tokens com conteúdo fora do assunto.
-            </P>
-            <H3>Prompt personalizado</H3>
-            <P>
-              Cada coleção pode ter um prompt personalizado salvo no banco. Use para dar contexto que a IA não infere dos endpoints: qual é o ambiente padrão, em que idioma responder, qual é o fluxo de autenticação, o que não existe nessa API. Edite clicando no lápis abaixo da lista de coleções.
-            </P>
-            <H3>Importar endpoint do chat</H3>
-            <P>
-              Quando a IA sugerir um curl na resposta, o botão <strong>↓ Importar endpoint</strong> aparece abaixo do bloco de código. Clique para criar o endpoint direto no banco sem sair do chat.
-            </P>
-            <H3>Provedores disponíveis</H3>
-            <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden', margin: '16px 0 20px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr 1fr', backgroundColor: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
-                {['Provedor', 'Chat', 'Embeddings'].map(h => (
-                  <span key={h} style={{ padding: '8px 14px', fontSize: 11, fontWeight: 700, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{h}</span>
-                ))}
-              </div>
-              {[
-                { p: 'Anthropic', chat: 'Claude Sonnet', emb: '—' },
-                { p: 'OpenAI',    chat: 'GPT-4o mini',   emb: 'text-embedding-3-small' },
-                { p: 'Google',    chat: 'Gemini 2.0 Flash', emb: 'gemini-embedding-001' },
-              ].map((row, i) => (
-                <div key={row.p} style={{ display: 'grid', gridTemplateColumns: '130px 1fr 1fr', borderTop: i > 0 ? '1px solid var(--border)' : 'none' }}>
-                  <span style={{ padding: '11px 14px', fontWeight: 600, color: 'var(--text)', fontSize: 13 }}>{row.p}</span>
-                  <span style={{ padding: '11px 14px', color: 'var(--text-muted)', fontSize: 13 }}>{row.chat}</span>
-                  <span style={{ padding: '11px 14px', color: 'var(--text-muted)', fontFamily: row.emb !== '—' ? 'monospace' : undefined, fontSize: row.emb !== '—' ? 11 : 13 }}>{row.emb}</span>
-                </div>
-              ))}
-            </div>
-            <Callout type="tip">
-              Embeddings do Gemini são gratuitos no Google AI Studio. O chat pode usar um provedor diferente dos embeddings — por exemplo, Gemini para embeddings e Claude para chat.
             </Callout>
           </FadeSection>
 

@@ -103,7 +103,6 @@ export async function getCollectionStructure(id: number) {
 
 export async function updateCollectionPrompt(id: number, systemPrompt: string) {
   await prisma.postmanCollection.update({ where: { id }, data: { systemPrompt } })
-  revalidatePath('/chat')
 }
 
 export async function saveCollection(
@@ -139,7 +138,6 @@ export async function saveCollection(
     }
   }
 
-  revalidatePath('/chat')
   return { id: col.id, embeddingsCount, embeddingsError }
 }
 
@@ -227,5 +225,4 @@ export async function retrieveContext(
 
 export async function deleteCollection(id: number) {
   await prisma.postmanCollection.delete({ where: { id } })
-  revalidatePath('/chat')
 }

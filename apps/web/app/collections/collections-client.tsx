@@ -119,8 +119,7 @@ export function CollectionsClient({
   if (collections.length === 0) {
     return (
       <div style={{ padding: 48, color: 'var(--text-muted)', textAlign: 'center' }}>
-        Nenhuma collection encontrada. Importe uma no{' '}
-        <a href="/chat" style={{ color: 'var(--accent)' }}>Chat IA</a>.
+        Nenhuma collection encontrada.
       </div>
     )
   }
