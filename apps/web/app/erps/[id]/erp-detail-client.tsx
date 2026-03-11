@@ -9,6 +9,7 @@ import { MethodBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Sheet } from '@/components/ui/sheet'
+import { JsonTextarea } from '@/components/ui/json-textarea'
 import {
   deleteEndpoint,
   createEndpoint,
@@ -362,10 +363,10 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
           <Input value={epPath} onChange={(e) => setEpPath(e.target.value)} placeholder="/api/v1/clients/{client_id}" style={{ fontFamily: 'monospace', fontSize: 12 }} required />
 
           <label style={labelStyle}>Body Template (JSON)</label>
-          <textarea value={epBody} onChange={(e) => setEpBody(e.target.value)} placeholder={'{"cpf": "{cpf}"}'} rows={5} style={{ width: '100%', padding: '8px 12px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, fontFamily: 'monospace', outline: 'none', resize: 'vertical' }} />
+          <JsonTextarea value={epBody} onChange={setEpBody} placeholder='{"cpf": "{cpf}"}' rows={5} />
 
           <label style={labelStyle}>Headers Extras (JSON)</label>
-          <textarea value={epHeaders} onChange={(e) => setEpHeaders(e.target.value)} rows={3} style={{ width: '100%', padding: '8px 12px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, fontFamily: 'monospace', outline: 'none', resize: 'vertical' }} />
+          <JsonTextarea value={epHeaders} onChange={setEpHeaders} rows={3} />
 
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, marginTop: 16, cursor: 'pointer' }}>
             <input type="checkbox" checked={epRequiresClient} onChange={(e) => setEpRequiresClient(e.target.checked)} />

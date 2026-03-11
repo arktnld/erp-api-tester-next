@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { createPlaybook, updatePlaybook, upsertPlaybookSteps } from '@/lib/actions/playbooks'
 import { formLabel as labelStyle, selectStyle } from '@/lib/styles'
+import { JsonTextarea } from '@/components/ui/json-textarea'
 
 type Endpoint = { id: number; name: string; method: string }
 type ERP = { id: number; name: string; endpoints: Endpoint[] }
@@ -127,18 +128,12 @@ export function PlaybookEditClient({ erps, playbook }: Props) {
                 <Input value={step.stepName} onChange={(e) => updateStep(i, 'stepName', e.target.value)} placeholder="Autenticação" />
 
                 <label style={labelStyle}>Body override <span style={{ color: 'var(--text-subtle)' }}>(JSON, opcional)</span></label>
-                <textarea value={step.bodyOverride} onChange={(e) => updateStep(i, 'bodyOverride', e.target.value)} rows={3} placeholder={'{"login": "{cpf}"}'} style={textareaStyle} />
+                <JsonTextarea value={step.bodyOverride} onChange={(v) => updateStep(i, 'bodyOverride', v)} rows={3} placeholder='{"login": "{cpf}"}' />
 
                 <label style={labelStyle}>
                   Response capture <span style={{ color: 'var(--text-subtle)' }}>{'{"}campo": "path.da.resposta{"}'}</span>
                 </label>
-                <textarea
-                  value={step.responseCapture}
-                  onChange={(e) => updateStep(i, 'responseCapture', e.target.value)}
-                  rows={2}
-                  placeholder={'{"token": "data.access_token"}'}
-                  style={textareaStyle}
-                />
+                <JsonTextarea value={step.responseCapture} onChange={(v) => updateStep(i, 'responseCapture', v)} rows={2} placeholder='{"token": "data.access_token"}' />
               </div>
             ))}
           </div>

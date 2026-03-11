@@ -23,9 +23,23 @@ interface TestRequestProps {
   onRawBodyChange: (value: string) => void
 }
 
+function isValidJson(text: string): boolean {
+  if (!text.trim()) return true
+  try { JSON.parse(text); return true } catch { return false }
+}
+
 export function TestRequest({ response, resolvedBody, bodyMode, rawBody, editorLanguage, sensitiveValues, sensitiveHeaderKeys, onBodyModeChange, onRawBodyChange }: TestRequestProps) {
   const [showSensitive, setShowSensitive] = useState(false)
+  const [jsonTouched, setJsonTouched] = useState(false)
   const hasSensitive = sensitiveHeaderKeys.size > 0 || sensitiveValues.size > 0
+  const jsonInvalid = jsonTouched && editorLanguage === 'json' && !isValidJson(rawBody)
+
+  function handleEditorBlur() {
+    setJsonTouched(true)
+    if (editorLanguage === 'json' && rawBody.trim() && isValidJson(rawBody)) {
+      onRawBodyChange(tryPrettyJson(rawBody))
+    }
+  }
 
   useEffect(() => {
     setShowSensitive(false)
@@ -132,28 +146,40 @@ export function TestRequest({ response, resolvedBody, bodyMode, rawBody, editorL
             )
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <CodeEditor
-                value={rawBody}
-                onChange={onRawBodyChange}
-                language={editorLanguage}
-                minHeight={180}
-              />
+              <div style={{
+                borderRadius: 8,
+                outline: jsonInvalid ? '1px solid var(--status-error)' : 'none',
+                overflow: 'hidden',
+              }}>
+                <CodeEditor
+                  value={rawBody}
+                  onChange={onRawBodyChange}
+                  onBlur={handleEditorBlur}
+                  language={editorLanguage}
+                  minHeight={180}
+                />
+              </div>
               {editorLanguage === 'json' && (
-                <button
-                  onClick={() => onRawBodyChange(tryPrettyJson(rawBody))}
-                  style={{
-                    alignSelf: 'flex-end',
-                    padding: '3px 10px',
-                    fontSize: 11,
-                    color: 'var(--text-muted)',
-                    background: 'none',
-                    border: '1px solid var(--border)',
-                    borderRadius: 5,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Formatar
-                </button>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  {jsonInvalid
+                    ? <span style={{ fontSize: 11, color: 'var(--status-error)' }}>JSON inválido</span>
+                    : <span />
+                  }
+                  <button
+                    onClick={() => onRawBodyChange(tryPrettyJson(rawBody))}
+                    style={{
+                      padding: '3px 10px',
+                      fontSize: 11,
+                      color: 'var(--text-muted)',
+                      background: 'none',
+                      border: '1px solid var(--border)',
+                      borderRadius: 5,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Formatar
+                  </button>
+                </div>
               )}
             </div>
           )}
