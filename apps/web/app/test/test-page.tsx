@@ -150,6 +150,13 @@ export function TestPage({
         </div>
       )}
 
+      {/* Notes */}
+      {endpoint?.notes && (
+        <div style={{ padding: '6px 16px', backgroundColor: '#6366f118', borderBottom: '1px solid #6366f144', display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#818cf8', flexShrink: 0 }}>
+          💬 {endpoint.notes}
+        </div>
+      )}
+
       {/* Three panes */}
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         <TestSelectors
