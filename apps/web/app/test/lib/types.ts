@@ -8,6 +8,7 @@ export type Endpoint = {
   group: string
   requiresClient: boolean
   isModification: boolean
+  notes: string
 }
 
 export type TestClient = { id: number; name: string; fieldsData: Record<string, string> }
