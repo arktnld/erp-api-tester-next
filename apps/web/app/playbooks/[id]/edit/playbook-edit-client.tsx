@@ -4,11 +4,13 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft, Plus, Trash2, GripVertical } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { createPlaybook, updatePlaybook, upsertPlaybookSteps } from '@/lib/actions/playbooks'
 import { formLabel as labelStyle, selectStyle } from '@/lib/styles'
-import { JsonTextarea } from '@/components/ui/json-textarea'
+
+const CodeEditor = dynamic(() => import('@/components/ui/code-editor').then(m => ({ default: m.CodeEditor })), { ssr: false })
 
 type Endpoint = { id: number; name: string; method: string }
 type ERP = { id: number; name: string; endpoints: Endpoint[] }
@@ -23,6 +25,26 @@ type Props = {
     description: string
     steps: Array<{ id: number; order: number; endpointId: number; stepName: string; bodyOverride: string; responseCapture: string; endpoint: { id: number; name: string; method: string } }>
   }
+}
+
+/** Parse responseCapture JSON and return field names */
+function parseCaptureFields(responseCapture: string): string[] {
+  try {
+    const obj = JSON.parse(responseCapture)
+    if (obj && typeof obj === 'object') return Object.keys(obj)
+  } catch { /* ignore */ }
+  return []
+}
+
+/** Collect all vars captured by steps before index i */
+function availableVars(steps: StepForm[], beforeIndex: number): Array<{ field: string; stepNum: number }> {
+  const result: Array<{ field: string; stepNum: number }> = []
+  for (let i = 0; i < beforeIndex; i++) {
+    for (const field of parseCaptureFields(steps[i].responseCapture)) {
+      result.push({ field, stepNum: i + 1 })
+    }
+  }
+  return result
 }
 
 export function PlaybookEditClient({ erps, playbook }: Props) {
@@ -70,7 +92,7 @@ export function PlaybookEditClient({ erps, playbook }: Props) {
   const textareaStyle: React.CSSProperties = {
     width: '100%', padding: '8px 12px', backgroundColor: 'var(--surface-2)',
     border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)',
-    fontSize: 12, fontFamily: 'monospace', outline: 'none', resize: 'vertical',
+    fontSize: 12, fontFamily: 'inherit', outline: 'none', resize: 'vertical',
   }
 
   return (
@@ -108,34 +130,83 @@ export function PlaybookEditClient({ erps, playbook }: Props) {
           )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {steps.map((step, i) => (
-              <div key={i} style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: 16 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                  <GripVertical size={14} color="var(--text-subtle)" />
-                  <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>STEP {i + 1}</span>
-                  <div style={{ flex: 1 }} />
-                  <Button type="button" variant="ghost" size="sm" onClick={() => removeStep(i)}><Trash2 size={12} /></Button>
+            {steps.map((step, i) => {
+              const vars = availableVars(steps, i)
+              const captureFields = parseCaptureFields(step.responseCapture)
+
+              return (
+                <div key={i} style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: 16 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                    <GripVertical size={14} color="var(--text-subtle)" />
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600 }}>STEP {i + 1}</span>
+                    <div style={{ flex: 1 }} />
+                    <Button type="button" variant="ghost" size="sm" onClick={() => removeStep(i)}><Trash2 size={12} /></Button>
+                  </div>
+
+                  <label style={labelStyle}>Endpoint</label>
+                  <select style={selectStyle} value={step.endpointId} onChange={(e) => updateStep(i, 'endpointId', Number(e.target.value))}>
+                    {selectedErp?.endpoints.map((ep) => (
+                      <option key={ep.id} value={ep.id}>{ep.method} {ep.name}</option>
+                    ))}
+                  </select>
+
+                  <label style={labelStyle}>Nome do step <span style={{ color: 'var(--text-subtle)' }}>(opcional)</span></label>
+                  <Input value={step.stepName} onChange={(e) => updateStep(i, 'stepName', e.target.value)} placeholder="Autenticação" />
+
+                  {/* Body override com CodeEditor */}
+                  <label style={labelStyle}>Body override <span style={{ color: 'var(--text-subtle)' }}>(JSON, opcional)</span></label>
+
+                  {/* Chips de variáveis disponíveis de steps anteriores */}
+                  {vars.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 5, marginBottom: 6 }}>
+                      <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>Disponíveis:</span>
+                      {vars.map(({ field, stepNum }) => (
+                        <button
+                          key={field}
+                          type="button"
+                          title={`Capturado no Step ${stepNum} — clique para copiar`}
+                          onClick={() => navigator.clipboard?.writeText(`{${field}}`)}
+                          style={{ fontSize: 11, fontFamily: 'monospace', padding: '2px 7px', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b', borderRadius: 4, cursor: 'pointer' }}
+                        >
+                          {'{'}{ field }{'}'} · Step {stepNum}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <CodeEditor
+                    value={step.bodyOverride}
+                    onChange={(v) => updateStep(i, 'bodyOverride', v)}
+                    language="json"
+                    minHeight={100}
+                  />
+
+                  {/* Response capture com CodeEditor */}
+                  <label style={{ ...labelStyle, marginTop: 14 }}>
+                    Response capture <span style={{ color: 'var(--text-subtle)' }}>{'{"campo": "path.da.resposta"}'}</span>
+                  </label>
+                  <CodeEditor
+                    value={step.responseCapture}
+                    onChange={(v) => updateStep(i, 'responseCapture', v)}
+                    language="json"
+                    minHeight={80}
+                  />
+
+                  {/* Preview das variáveis que este step vai capturar */}
+                  {captureFields.length > 0 && (
+                    <div style={{ marginTop: 10, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 5 }}>
+                      <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>Captura:</span>
+                      {captureFields.map((field) => (
+                        <span key={field} style={{ fontSize: 11, fontFamily: 'monospace', padding: '2px 7px', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#10b981', borderRadius: 4 }}>
+                          {'{'}{ field }{'}'}
+                        </span>
+                      ))}
+                      <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>disponíveis para os próximos steps</span>
+                    </div>
+                  )}
                 </div>
-
-                <label style={labelStyle}>Endpoint</label>
-                <select style={selectStyle} value={step.endpointId} onChange={(e) => updateStep(i, 'endpointId', Number(e.target.value))}>
-                  {selectedErp?.endpoints.map((ep) => (
-                    <option key={ep.id} value={ep.id}>{ep.method} {ep.name}</option>
-                  ))}
-                </select>
-
-                <label style={labelStyle}>Nome do step <span style={{ color: 'var(--text-subtle)' }}>(opcional)</span></label>
-                <Input value={step.stepName} onChange={(e) => updateStep(i, 'stepName', e.target.value)} placeholder="Autenticação" />
-
-                <label style={labelStyle}>Body override <span style={{ color: 'var(--text-subtle)' }}>(JSON, opcional)</span></label>
-                <JsonTextarea value={step.bodyOverride} onChange={(v) => updateStep(i, 'bodyOverride', v)} rows={3} placeholder='{"login": "{cpf}"}' />
-
-                <label style={labelStyle}>
-                  Response capture <span style={{ color: 'var(--text-subtle)' }}>{'{"}campo": "path.da.resposta{"}'}</span>
-                </label>
-                <JsonTextarea value={step.responseCapture} onChange={(v) => updateStep(i, 'responseCapture', v)} rows={2} placeholder='{"token": "data.access_token"}' />
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
 

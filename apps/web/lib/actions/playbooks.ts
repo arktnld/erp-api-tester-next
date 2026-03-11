@@ -115,6 +115,9 @@ type StepResult = {
   url: string
   responseBody: string
   capturedFields: Record<string, string>
+  injectedFields: Record<string, string>
+  requestBody: string | null
+  requestHeaders: Record<string, string>
   durationMs: number
 }
 
@@ -139,13 +142,14 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
   const results: StepResult[] = []
 
   for (const step of playbook.steps) {
+    const injectedFields = { ...capturedFields }
     try {
       const result = await executeRequest({
         endpointId: step.endpointId,
         companyId: clientId ? undefined : companyId,
         clientId: clientId ?? undefined,
         rawBody: step.bodyOverride || null,
-        inlineFields: { ...capturedFields },
+        inlineFields: injectedFields,
       })
 
       let parsedBody: unknown = result.responseBody
@@ -164,6 +168,9 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
         url: result.url,
         responseBody: result.responseBody,
         capturedFields: captured,
+        injectedFields,
+        requestBody: result.requestBody,
+        requestHeaders: result.requestHeaders,
         durationMs: result.durationMs,
       })
     } catch (err) {
@@ -177,6 +184,9 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
         url: '',
         responseBody: String(err),
         capturedFields: {},
+        injectedFields,
+        requestBody: null,
+        requestHeaders: {},
         durationMs: 0,
       })
       break
