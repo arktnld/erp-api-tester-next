@@ -131,6 +131,7 @@ model PlaybookRun {
   endedAt    DateTime?
   status     String    @default("running")
   steps      Json      @default("[]")
+  shareToken String?   @unique
   playbook   Playbook  @relation(fields: [playbookId], references: [id])
   company    Company   @relation(fields: [companyId], references: [id])
 }

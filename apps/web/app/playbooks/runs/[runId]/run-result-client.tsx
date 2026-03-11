@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { CheckCircle2, XCircle, Clock, Building2, Server, Copy, Check } from 'lucide-react'
+import { useState, useTransition } from 'react'
+import { CheckCircle2, XCircle, Clock, Building2, Server, Copy, Check, Share2 } from 'lucide-react'
+import { generateShareToken } from '@/lib/actions/playbooks'
 import { MethodBadge, StatusBadge } from '@/components/ui/badge'
 import dynamic from 'next/dynamic'
 
@@ -25,6 +26,7 @@ export type StepResult = {
 
 type RunMeta = {
   status: string
+  id: number
   startedAt: Date | string
   endedAt: Date | string | null
   playbook: { name: string; erp: { name: string } }
@@ -266,6 +268,34 @@ function StepCard({ step, index }: { step: StepResult; index: number }) {
   )
 }
 
+function ShareButton({ runId }: { runId: number }) {
+  const [isPending, startTransition] = useTransition()
+  const [copied, setCopied] = useState(false)
+
+  function handleShare() {
+    startTransition(async () => {
+      const token = await generateShareToken(runId)
+      const url = `${window.location.origin}/share/playbook/${token}`
+      await navigator.clipboard.writeText(url)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2500)
+    })
+  }
+
+  return (
+    <button onClick={handleShare} disabled={isPending} style={{
+      display: 'inline-flex', alignItems: 'center', gap: 6,
+      fontSize: 12, fontWeight: 500, padding: '5px 12px', borderRadius: 6,
+      border: '1px solid var(--border)', background: copied ? 'rgba(16,185,129,0.08)' : 'var(--surface-2)',
+      color: copied ? '#10b981' : 'var(--text-muted)', cursor: isPending ? 'wait' : 'pointer',
+      transition: 'all 0.2s',
+    }}>
+      {copied ? <Check size={13} /> : <Share2 size={13} />}
+      {copied ? 'Link copiado!' : isPending ? 'Gerando…' : 'Compartilhar'}
+    </button>
+  )
+}
+
 export function RunResultClient({ run, clientFields, clientName }: { run: RunMeta & { steps: StepResult[] }; clientFields?: Record<string, string>; clientName?: string }) {
   const allOk = run.status === 'completed'
   const totalMs = run.endedAt
@@ -276,14 +306,17 @@ export function RunResultClient({ run, clientFields, clientName }: { run: RunMet
     <div>
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 }}>
         <h1 style={{ fontSize: 20, fontWeight: 600 }}>{run.playbook.name}</h1>
-        <span style={{
-          fontSize: 12, fontWeight: 600, padding: '3px 10px', borderRadius: 20, flexShrink: 0,
-          backgroundColor: allOk ? '#10b98118' : '#ef444418',
-          color: allOk ? '#10b981' : '#ef4444',
-          border: `1px solid ${allOk ? '#10b98144' : '#ef444444'}`,
-        }}>
-          {allOk ? '✓ Concluído' : '✗ Falhou'}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <ShareButton runId={run.id} />
+          <span style={{
+            fontSize: 12, fontWeight: 600, padding: '3px 10px', borderRadius: 20, flexShrink: 0,
+            backgroundColor: allOk ? '#10b98118' : '#ef444418',
+            color: allOk ? '#10b981' : '#ef4444',
+            border: `1px solid ${allOk ? '#10b98144' : '#ef444444'}`,
+          }}>
+            {allOk ? '✓ Concluído' : '✗ Falhou'}
+          </span>
+        </div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 28, fontSize: 13, color: 'var(--text-muted)' }}>

@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playbook — Mockup de Melhorias</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #ededed; font-size: 14px; line-height: 1.5; }
+
+    /* Layout */
+    .page { display: flex; flex-direction: column; gap: 0; }
+
+    /* Tab switcher */
+    .tabs { display: flex; gap: 2px; padding: 20px 40px 0; border-bottom: 1px solid #1f1f1f; background: #0d0d0d; }
+    .tab { padding: 8px 18px; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 6px 6px 0 0; color: #666; border: none; background: none; transition: all .15s; }
+    .tab.active { color: #ededed; background: #111; border: 1px solid #1f1f1f; border-bottom: 1px solid #111; margin-bottom: -1px; }
+    .tab:hover:not(.active) { color: #999; }
+
+    /* Panel */
+    .panel { display: none; padding: 32px 40px; max-width: 900px; }
+    .panel.active { display: block; }
+
+    /* Typography */
+    h1 { font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+    .meta { font-size: 13px; color: #666; display: flex; gap: 16px; margin-bottom: 28px; align-items: center; }
+    .meta-chip { display: inline-flex; align-items: center; gap: 5px; }
+    .label { font-size: 12px; color: #666; font-weight: 500; display: block; margin-bottom: 5px; margin-top: 14px; text-transform: uppercase; letter-spacing: .04em; }
+
+    /* Input / Select */
+    input[type=text], select, textarea {
+      width: 100%; padding: 8px 12px; background: #161616; border: 1px solid #2a2a2a;
+      border-radius: 6px; color: #ededed; font-size: 13px; outline: none;
+      font-family: inherit;
+    }
+    input[type=text]:focus, select:focus { border-color: #6366f1; }
+
+    /* --- STEP card --- */
+    .step-card { background: #111; border: 1px solid #1f1f1f; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
+    .step-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid #1f1f1f; background: #0e0e0e; }
+    .step-num { font-size: 11px; font-weight: 700; color: #555; letter-spacing: .06em; }
+    .step-body { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+
+    /* Code editor mock */
+    .code-editor {
+      background: #1a1a2e;
+      border: 1px solid #2a2a3e;
+      border-radius: 8px;
+      font-family: 'Fira Code', 'Courier New', monospace;
+      font-size: 12px;
+      overflow: hidden;
+    }
+    .editor-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 12px; background: #16162a; border-bottom: 1px solid #2a2a3e;
+    }
+    .editor-lang { font-size: 10px; color: #555; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+    .editor-actions { display: flex; gap: 6px; }
+    .editor-btn { font-size: 10px; padding: 2px 8px; background: none; border: 1px solid #2a2a3e; border-radius: 4px; color: #666; cursor: pointer; }
+    .editor-btn:hover { color: #999; border-color: #3a3a5e; }
+    .editor-content { padding: 12px 14px; line-height: 1.7; }
+
+    /* JSON syntax colors */
+    .j-key    { color: #d19a66; }
+    .j-str    { color: #98c379; }
+    .j-num    { color: #61afef; }
+    .j-bool   { color: #56b6c2; }
+    .j-null   { color: #abb2bf; }
+    .j-punct  { color: #abb2bf; }
+    .j-var    { color: #e5c07b; background: rgba(229,192,123,.1); border-radius: 3px; padding: 0 3px; }
+
+    /* Variable chain */
+    .chain-section { margin-top: 6px; }
+    .chain-title { font-size: 11px; color: #555; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+    .chain-title::after { content: ''; flex: 1; height: 1px; background: #1f1f1f; }
+    .chain-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+    .chain-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11px; font-family: monospace; padding: 3px 8px;
+      border-radius: 4px; border: 1px solid;
+    }
+    .chain-tag.source { background: rgba(99,102,241,.12); border-color: rgba(99,102,241,.3); color: #818cf8; }
+    .chain-tag.capture { background: rgba(16,185,129,.1); border-color: rgba(16,185,129,.3); color: #10b981; }
+    .chain-tag.inject { background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.3); color: #f59e0b; }
+    .chain-arrow { color: #444; font-size: 13px; }
+    .chain-path { color: #555; font-size: 11px; font-family: monospace; }
+
+    /* --- RESULT page --- */
+    .result-step { background: #111; border: 1px solid #1f1f1f; border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
+    .result-step-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid #1f1f1f; }
+    .result-step-header.ok   { background: rgba(16,185,129,.04); }
+    .result-step-header.err  { background: rgba(239,68,68,.04); }
+    .icon-ok  { color: #10b981; font-size: 15px; }
+    .icon-err { color: #ef4444; font-size: 15px; }
+
+    .result-url-bar { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: 1px solid #1f1f1f; background: #0e0e0e; }
+    .method { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+    .m-post { background: rgba(139,92,246,.15); color: #8b5cf6; }
+    .m-get  { background: rgba(16,185,129,.15); color: #10b981; }
+    .status-badge { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+    .s-2xx { background: rgba(16,185,129,.15); color: #10b981; }
+    .s-4xx { background: rgba(239,68,68,.15); color: #ef4444; }
+    .url-text { font-family: monospace; font-size: 12px; color: #666; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .result-body { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+
+    /* Tabs inside step */
+    .inner-tabs { display: flex; gap: 0; border: 1px solid #1f1f1f; border-radius: 6px; overflow: hidden; width: fit-content; }
+    .inner-tab { padding: 4px 12px; font-size: 11px; color: #666; background: none; border: none; cursor: pointer; transition: all .15s; }
+    .inner-tab.active { background: #1f1f1f; color: #ededed; }
+    .inner-tab:hover:not(.active) { color: #999; }
+
+    /* cURL block */
+    .curl-block {
+      background: #0d0d0d; border: 1px solid #1f1f1f; border-radius: 6px;
+      padding: 12px 14px; font-family: monospace; font-size: 11px; color: #aaa;
+      white-space: pre-wrap; word-break: break-all; line-height: 1.6;
+      position: relative;
+    }
+    .curl-copy { position: absolute; top: 8px; right: 8px; font-size: 10px; padding: 2px 8px; background: #1f1f1f; border: 1px solid #2a2a2a; border-radius: 4px; color: #666; cursor: pointer; }
+    .curl-hl { color: #6366f1; }
+    .curl-str { color: #98c379; }
+    .curl-flag { color: #61afef; }
+
+    /* Captured chain in result */
+    .cap-chain { display: flex; align-items: flex-start; gap: 10px; background: rgba(16,185,129,.06); border: 1px solid rgba(16,185,129,.2); border-radius: 6px; padding: 10px 14px; }
+    .cap-chain-icon { color: #10b981; font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+    .cap-chain-content { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+    .cap-chain-title { font-size: 11px; font-weight: 600; color: #10b981; text-transform: uppercase; letter-spacing: .05em; }
+    .cap-chain-row { display: flex; align-items: center; gap: 8px; font-family: monospace; font-size: 12px; }
+    .cap-field { color: #f59e0b; }
+    .cap-from { color: #555; font-size: 11px; }
+    .cap-val { color: #10b981; }
+    .cap-path { color: #555; font-size: 11px; }
+
+    /* Arrow showing "where this variable comes from" */
+    .usage-chain { display: flex; align-items: center; gap: 6px; font-size: 11px; font-family: monospace; margin-top: 2px; }
+    .usage-step { background: rgba(99,102,241,.1); border: 1px solid rgba(99,102,241,.3); color: #818cf8; border-radius: 3px; padding: 1px 6px; }
+    .usage-field { background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.3); color: #f59e0b; border-radius: 3px; padding: 1px 6px; }
+
+    /* Pre/JSON response */
+    .response-pre {
+      background: #0d0d0d; border: 1px solid #1f1f1f; border-radius: 6px;
+      padding: 12px 14px; font-family: monospace; font-size: 11px; color: #ededed;
+      overflow: auto; max-height: 220px; line-height: 1.7;
+    }
+    /* fold indicator */
+    .fold { color: #444; cursor: pointer; user-select: none; }
+    .fold:hover { color: #666; }
+
+    /* Buttons */
+    .btn { padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: background .15s; }
+    .btn-primary { background: #6366f1; color: #fff; }
+    .btn-primary:hover { background: #4f46e5; }
+    .btn-ghost { background: none; color: #666; border: 1px solid #2a2a2a; }
+    .btn-ghost:hover { color: #ededed; border-color: #444; }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+    /* Badges / chips */
+    .badge-ok  { background: rgba(16,185,129,.12); color: #10b981; border: 1px solid rgba(16,185,129,.3); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; }
+    .badge-err { background: rgba(239,68,68,.12); color: #ef4444; border: 1px solid rgba(239,68,68,.3); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; }
+
+    /* Note callout */
+    .note { background: rgba(99,102,241,.07); border: 1px solid rgba(99,102,241,.2); border-radius: 6px; padding: 10px 14px; font-size: 12px; color: #818cf8; margin-bottom: 20px; }
+    .note strong { color: #a5b4fc; }
+
+    .divider { height: 1px; background: #1f1f1f; margin: 24px 0; }
+
+    /* Section annotation (mockup labels) */
+    .annotation { font-size: 10px; color: #6366f1; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; margin-bottom: 8px; border-left: 2px solid #6366f1; padding-left: 8px; }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Tab switcher -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('edit')">✏️ Editar Playbook</button>
+    <button class="tab" onclick="showTab('result')">▶ Resultado da Execução</button>
+  </div>
+
+  <!-- ==================== TAB 1: EDIT ==================== -->
+  <div class="panel active" id="tab-edit">
+
+    <div class="note">
+      <strong>Melhorias nesta tela:</strong> ① JSON com syntax highlight + folding/expand ② Variáveis disponíveis de steps anteriores mostradas inline ③ Visualização do caminho de captura
+    </div>
+
+    <h1>Editar Playbook</h1>
+    <div class="meta">
+      <span class="meta-chip">📦 Totvs Protheus</span>
+      <span class="meta-chip">3 steps</span>
+    </div>
+
+    <label class="label">Nome</label>
+    <input type="text" value="Login → Consulta de Cliente">
+
+    <label class="label">Descrição</label>
+    <textarea rows="2" style="font-family:inherit; resize:vertical">Autentica, captura o token e consulta dados do cliente pelo CPF.</textarea>
+
+    <div class="divider"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <p style="font-size:13px; font-weight:600">Steps (3)</p>
+      <button class="btn btn-ghost btn-sm">+ Adicionar Step</button>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="step-card">
+      <div class="step-header">
+        <span style="color:#444">⠿</span>
+        <span class="step-num">STEP 1</span>
+        <span style="flex:1"></span>
+        <button class="btn btn-ghost btn-sm">🗑</button>
+      </div>
+      <div class="step-body">
+        <div>
+          <label class="label">Endpoint</label>
+          <select><option>POST  /api/v1/auth/login</option></select>
+        </div>
+        <div>
+          <label class="label">Nome do step</label>
+          <input type="text" value="Autenticação">
+        </div>
+
+        <!-- Body override com editor -->
+        <div>
+          <div class="annotation">① JSON com highlight + folding</div>
+          <label class="label">Body override <span style="color:#555">(JSON, opcional)</span></label>
+          <div class="code-editor">
+            <div class="editor-toolbar">
+              <span class="editor-lang">JSON</span>
+              <div class="editor-actions">
+                <button class="editor-btn">{ } Formatar</button>
+                <button class="editor-btn">⊞ Expandir</button>
+              </div>
+            </div>
+            <div class="editor-content">
+<span class="j-punct">{</span><br>
+&nbsp;&nbsp;<span class="j-key">"login"</span><span class="j-punct">: </span><span class="j-str">"<span class="j-var">{cpf}</span>"</span><span class="j-punct">,</span><br>
+&nbsp;&nbsp;<span class="j-key">"senha"</span><span class="j-punct">: </span><span class="j-str">"<span class="j-var">{senha}</span>"</span><br>
+<span class="j-punct">}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Response capture -->
+        <div>
+          <label class="label">Response capture</label>
+          <div class="code-editor">
+            <div class="editor-toolbar">
+              <span class="editor-lang">JSON</span>
+              <div class="editor-actions">
+                <button class="editor-btn">{ } Formatar</button>
+              </div>
+            </div>
+            <div class="editor-content">
+<span class="j-punct">{</span><br>
+&nbsp;&nbsp;<span class="j-key">"token"</span><span class="j-punct">: </span><span class="j-str">"data.access_token"</span><span class="j-punct">,</span><br>
+&nbsp;&nbsp;<span class="j-key">"userId"</span><span class="j-punct">: </span><span class="j-str">"data.user.id"</span><br>
+<span class="j-punct">}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chain: o que este step vai capturar e disponibilizar -->
+        <div class="chain-section">
+          <div class="annotation">② Caminho de captura visualizado</div>
+          <div class="chain-title">Variáveis que este step captura</div>
+          <div class="chain-flow">
+            <span class="chain-tag source">data.access_token</span>
+            <span class="chain-arrow">→</span>
+            <span class="chain-tag capture">token</span>
+            <span style="color:#333; margin: 0 4px">•</span>
+            <span class="chain-tag source">data.user.id</span>
+            <span class="chain-arrow">→</span>
+            <span class="chain-tag capture">userId</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-card">
+      <div class="step-header">
+        <span style="color:#444">⠿</span>
+        <span class="step-num">STEP 2</span>
+        <span style="flex:1"></span>
+        <button class="btn btn-ghost btn-sm">🗑</button>
+      </div>
+      <div class="step-body">
+        <div>
+          <label class="label">Endpoint</label>
+          <select><option>GET  /api/v1/clientes/{cpf}</option></select>
+        </div>
+        <div>
+          <label class="label">Nome do step</label>
+          <input type="text" value="Consulta de Cliente">
+        </div>
+
+        <div>
+          <label class="label">Body override <span style="color:#555">(JSON, opcional)</span></label>
+
+          <!-- Variáveis disponíveis de steps anteriores -->
+          <div class="annotation">③ Variáveis disponíveis de steps anteriores</div>
+          <div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:8px;">
+            <span style="font-size:11px; color:#555; align-self:center;">Disponíveis:</span>
+            <span class="chain-tag inject" title="Capturado no Step 1 via data.access_token">{token} · Step 1</span>
+            <span class="chain-tag inject" title="Capturado no Step 1 via data.user.id">{userId} · Step 1</span>
+          </div>
+
+          <div class="code-editor">
+            <div class="editor-toolbar">
+              <span class="editor-lang">JSON</span>
+              <div class="editor-actions">
+                <button class="editor-btn">{ } Formatar</button>
+              </div>
+            </div>
+            <div class="editor-content">
+<span class="j-punct">{</span><br>
+&nbsp;&nbsp;<span class="j-key">"authorization"</span><span class="j-punct">: </span><span class="j-str">"Bearer <span class="j-var">{token}</span>"</span><br>
+<span class="j-punct">}</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="label">Response capture</label>
+          <div class="code-editor">
+            <div class="editor-toolbar">
+              <span class="editor-lang">JSON</span>
+            </div>
+            <div class="editor-content" style="color:#444; font-style:italic">
+              — vazio —
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%; margin-top:8px">Salvar Playbook</button>
+  </div>
+
+  <!-- ==================== TAB 2: RESULT ==================== -->
+  <div class="panel" id="tab-result">
+
+    <div class="note">
+      <strong>Melhorias nesta tela:</strong> ① cURL de cada step ② Caminho completo do parâmetro (de onde veio, onde foi usado) ③ Tabs Resposta / Request Body / Headers ④ JSON com highlight
+    </div>
+
+    <div style="display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:8px;">
+      <h1>Login → Consulta de Cliente</h1>
+      <span class="badge-ok">✓ Concluído</span>
+    </div>
+    <div class="meta">
+      <span class="meta-chip">📦 Totvs Protheus</span>
+      <span class="meta-chip">🏢 Empresa ABC</span>
+      <span class="meta-chip">⏱ 843ms total</span>
+    </div>
+
+    <!-- STEP 1 Result -->
+    <div class="result-step">
+      <div class="result-step-header ok">
+        <span class="icon-ok">✓</span>
+        <div style="flex:1">
+          <span style="font-weight:500; font-size:13px">Autenticação</span>
+          <span style="margin-left:8px; font-size:12px; color:#555">POST /api/v1/auth/login</span>
+        </div>
+        <span style="font-size:12px; color:#555">312ms</span>
+      </div>
+      <div class="result-url-bar">
+        <span class="method m-post">POST</span>
+        <span class="status-badge s-2xx">200</span>
+        <span class="url-text">https://erp.empresa.com/api/v1/auth/login</span>
+      </div>
+      <div class="result-body">
+
+        <!-- Tabs: cURL / Request / Resposta -->
+        <div>
+          <div class="annotation">① cURL do step</div>
+          <div class="inner-tabs" style="margin-bottom:10px">
+            <button class="inner-tab active">cURL</button>
+            <button class="inner-tab">Request</button>
+            <button class="inner-tab">Resposta</button>
+          </div>
+          <div class="curl-block">
+            <button class="curl-copy">Copiar</button><span class="curl-hl">curl</span> <span class="curl-flag">-X POST</span> <span class="curl-str">'https://erp.empresa.com/api/v1/auth/login'</span> \
+  <span class="curl-flag">-H</span> <span class="curl-str">'Content-Type: application/json'</span> \
+  <span class="curl-flag">-d</span> <span class="curl-str">'{"login":"••••••••","senha":"••••••••"}'</span>
+          </div>
+        </div>
+
+        <!-- Campos capturados + caminho -->
+        <div>
+          <div class="annotation">② Caminho completo do parâmetro</div>
+          <div class="cap-chain">
+            <span class="cap-chain-icon">⬡</span>
+            <div class="cap-chain-content">
+              <div class="cap-chain-title">Campos capturados neste step</div>
+              <div class="cap-chain-row">
+                <span class="cap-field">{token}</span>
+                <span class="cap-from">← resposta</span>
+                <span class="cap-path">data.access_token</span>
+                <span style="flex:1"></span>
+                <span class="cap-val" style="font-size:11px">eyJhbGci… (truncado)</span>
+              </div>
+              <div style="margin-left:12px;" class="usage-chain">
+                <span style="color:#444">↳ usado em</span>
+                <span class="usage-step">Step 2</span>
+                <span style="color:#444">→</span>
+                <span class="usage-field">body.authorization</span>
+              </div>
+              <div class="cap-chain-row" style="margin-top:4px">
+                <span class="cap-field">{userId}</span>
+                <span class="cap-from">← resposta</span>
+                <span class="cap-path">data.user.id</span>
+                <span style="flex:1"></span>
+                <span class="cap-val" style="font-size:11px">4827</span>
+              </div>
+              <div style="margin-left:12px;" class="usage-chain">
+                <span style="color:#444">↳ não utilizado nos steps seguintes</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resposta JSON com highlight -->
+        <div>
+          <div class="annotation">③ Resposta com JSON highlight</div>
+          <p style="font-size:11px; color:#555; font-weight:600; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px">Resposta</p>
+          <div class="response-pre">
+<span class="j-punct">{</span>
+  <span class="j-key">"status"</span><span class="j-punct">: </span><span class="j-str">"ok"</span><span class="j-punct">,</span>
+  <span class="j-key">"data"</span><span class="j-punct">: {</span>  <span class="fold">▼</span>
+    <span class="j-key">"access_token"</span><span class="j-punct">: </span><span class="j-str">"eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp..."</span><span class="j-punct">,</span>
+    <span class="j-key">"token_type"</span><span class="j-punct">: </span><span class="j-str">"Bearer"</span><span class="j-punct">,</span>
+    <span class="j-key">"expires_in"</span><span class="j-punct">: </span><span class="j-num">3600</span><span class="j-punct">,</span>
+    <span class="j-key">"user"</span><span class="j-punct">: {</span>  <span class="fold">▼</span>
+      <span class="j-key">"id"</span><span class="j-punct">: </span><span class="j-num">4827</span><span class="j-punct">,</span>
+      <span class="j-key">"name"</span><span class="j-punct">: </span><span class="j-str">"Admin"</span>
+    <span class="j-punct">}</span>
+  <span class="j-punct">}</span>
+<span class="j-punct">}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- STEP 2 Result -->
+    <div class="result-step">
+      <div class="result-step-header ok">
+        <span class="icon-ok">✓</span>
+        <div style="flex:1">
+          <span style="font-weight:500; font-size:13px">Consulta de Cliente</span>
+          <span style="margin-left:8px; font-size:12px; color:#555">GET /api/v1/clientes/{cpf}</span>
+        </div>
+        <span style="font-size:12px; color:#555">531ms</span>
+      </div>
+      <div class="result-url-bar">
+        <span class="method m-get">GET</span>
+        <span class="status-badge s-2xx">200</span>
+        <span class="url-text">https://erp.empresa.com/api/v1/clientes/••••••••</span>
+      </div>
+      <div class="result-body">
+
+        <div class="inner-tabs" style="margin-bottom:10px">
+          <button class="inner-tab active">cURL</button>
+          <button class="inner-tab">Request</button>
+          <button class="inner-tab">Resposta</button>
+        </div>
+        <div class="curl-block">
+          <button class="curl-copy">Copiar</button><span class="curl-hl">curl</span> <span class="curl-flag">-X GET</span> <span class="curl-str">'https://erp.empresa.com/api/v1/clientes/••••••••'</span> \
+  <span class="curl-flag">-H</span> <span class="curl-str">'Authorization: Bearer ••••••••'</span> \
+  <span class="curl-flag">-H</span> <span class="curl-str">'Content-Type: application/json'</span>
+        </div>
+
+        <!-- Mostra de onde o token veio -->
+        <div>
+          <div class="annotation">② Origem dos parâmetros injetados</div>
+          <div style="background:rgba(245,158,11,.06); border:1px solid rgba(245,158,11,.2); border-radius:6px; padding:10px 14px; font-size:12px;">
+            <div style="font-size:11px; font-weight:600; color:#f59e0b; text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px;">Parâmetros injetados neste step</div>
+            <div class="usage-chain">
+              <span class="usage-field">{token}</span>
+              <span style="color:#444">capturado em</span>
+              <span class="usage-step">Step 1</span>
+              <span style="color:#444">via</span>
+              <span style="font-family:monospace; color:#666">data.access_token</span>
+              <span style="color:#444">→ usado em</span>
+              <span style="font-family:monospace; color:#f59e0b">header Authorization</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p style="font-size:11px; color:#555; font-weight:600; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px">Resposta</p>
+          <div class="response-pre">
+<span class="j-punct">{</span>
+  <span class="j-key">"id"</span><span class="j-punct">: </span><span class="j-num">9201</span><span class="j-punct">,</span>
+  <span class="j-key">"nome"</span><span class="j-punct">: </span><span class="j-str">"João da Silva"</span><span class="j-punct">,</span>
+  <span class="j-key">"cpf"</span><span class="j-punct">: </span><span class="j-str">"••••••••"</span><span class="j-punct">,</span>
+  <span class="j-key">"ativo"</span><span class="j-punct">: </span><span class="j-bool">true</span><span class="j-punct">,</span>
+  <span class="j-key">"contratos"</span><span class="j-punct">: [</span>  <span class="fold">▶ 3 items</span>
+  <span class="j-punct">]</span>
+<span class="j-punct">}</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- end panel result -->
+</div><!-- end page -->
+
+<script>
+  function showTab(id) {
+    document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['edit','result'][i] === id))
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'))
+    document.getElementById('tab-' + id).classList.add('active')
+  }
+  // Inner tabs (just visual toggle)
+  document.querySelectorAll('.inner-tabs').forEach(group => {
+    group.querySelectorAll('.inner-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        group.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'))
+        tab.classList.add('active')
+      })
+    })
+  })
+</script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ERP Tester — Login (Fluid Orbs)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #060610;
+      gap: 28px;
+      overflow: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      position: relative;
+      z-index: 10;
+    }
+    .brand-code { font-family: monospace; font-size: 26px; font-weight: 900; letter-spacing: -0.03em; color: #6366f1; }
+    .brand-name { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: #ededed; }
+
+    form {
+      position: relative;
+      z-index: 10;
+      width: 380px;
+      background: rgba(8, 8, 18, 0.8);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 48px 40px 40px;
+      border-radius: 16px;
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    }
+
+    h2 { color: #6366f1; font-weight: 600; text-align: center; font-size: 18px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+    .subtitle { font-size: 13px; color: #555; text-align: center; margin-bottom: 32px; }
+
+    .inputBox { position: relative; width: 100%; margin-bottom: 28px; }
+    .inputBox input {
+      width: 100%; background: transparent; border: none; border-bottom: 1px solid #2a2a2a;
+      color: #ededed; font-size: 14px; padding: 10px 0; outline: none; transition: border-color 0.3s;
+    }
+    .inputBox input:focus { border-bottom-color: #6366f1; }
+    .inputBox span {
+      position: absolute; left: 0; top: 10px; font-size: 14px; color: #555; pointer-events: none; transition: 0.3s;
+    }
+    .inputBox input:focus ~ span,
+    .inputBox input:valid ~ span { transform: translateY(-20px); font-size: 11px; color: #6366f1; }
+
+    .forgot { text-align: right; margin-bottom: 28px; }
+    .forgot a { font-size: 12px; color: #555; text-decoration: none; }
+    .forgot a:hover { color: #6366f1; }
+
+    .btn-primary {
+      width: 100%; padding: 12px; background: #6366f1; color: white; border: none;
+      border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer;
+      transition: background 0.2s, transform 0.1s; margin-bottom: 24px;
+    }
+    .btn-primary:hover { background: #4f46e5; transform: translateY(-1px); }
+
+    .divider { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #1f1f1f; }
+    .divider span { font-size: 12px; color: #444; }
+
+    .sso-btn {
+      width: 100%; padding: 11px; background: transparent; border: 1px solid #2a2a2a;
+      border-radius: 8px; color: #888; font-size: 14px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; gap: 8px; transition: border-color 0.2s, color 0.2s;
+    }
+    .sso-btn:hover { border-color: #6366f1; color: #ededed; }
+
+    .footer { position: relative; z-index: 10; font-size: 11px; color: #333; }
+  </style>
+</head>
+<body>
+
+  <canvas id="c"></canvas>
+
+  <div class="brand">
+    <span class="brand-code">/ERP</span>
+    <span class="brand-name"> Tester</span>
+  </div>
+
+  <form autocomplete="off">
+    <h2>Entrar</h2>
+    <p class="subtitle">Acesso restrito à equipe autorizada</p>
+
+    <div class="inputBox">
+      <input type="email" required>
+      <span>E-mail</span>
+    </div>
+    <div class="inputBox">
+      <input type="password" required>
+      <span>Senha</span>
+    </div>
+
+    <div class="forgot"><a href="#">Esqueceu a senha?</a></div>
+
+    <button type="submit" class="btn-primary">Continuar</button>
+
+    <div class="divider"><span>ou</span></div>
+
+    <button type="button" class="sso-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Entrar com SSO
+    </button>
+  </form>
+
+  <p class="footer">Jarbis © 2026</p>
+
+  <script>
+    const canvas = document.getElementById('c')
+    const ctx = canvas.getContext('2d')
+    let W, H, mouse = { x: 0, y: 0 }, animId
+
+    function resize() {
+      W = canvas.width = window.innerWidth
+      H = canvas.height = window.innerHeight
+    }
+    resize()
+    window.addEventListener('resize', resize)
+    window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY })
+
+    // Metaballs / fluid orbs
+    const ORBS = [
+      { x: 0.3, y: 0.4, vx: 0.0004, vy: 0.0003, r: 0.28, hue: 245, sat: 80 },
+      { x: 0.7, y: 0.6, vx: -0.0003, vy: 0.0005, r: 0.22, hue: 260, sat: 70 },
+      { x: 0.5, y: 0.2, vx: 0.0002, vy: -0.0004, r: 0.20, hue: 220, sat: 75 },
+      { x: 0.2, y: 0.8, vx: 0.0005, vy: -0.0002, r: 0.18, hue: 280, sat: 65 },
+      { x: 0.8, y: 0.3, vx: -0.0004, vy: 0.0004, r: 0.16, hue: 230, sat: 80 },
+    ]
+
+    // Mouse-attracted "cursor orb"
+    const cursorOrb = { r: 0.15, hue: 245, sat: 90 }
+
+    let t = 0
+
+    function drawOrb(cx, cy, radius, hue, sat, alpha) {
+      const r = radius * Math.min(W, H)
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r)
+      grad.addColorStop(0, `hsla(${hue}, ${sat}%, 60%, ${alpha})`)
+      grad.addColorStop(0.5, `hsla(${hue}, ${sat}%, 50%, ${alpha * 0.5})`)
+      grad.addColorStop(1, `hsla(${hue}, ${sat}%, 40%, 0)`)
+      ctx.fillStyle = grad
+      ctx.beginPath()
+      ctx.arc(cx, cy, r, 0, Math.PI * 2)
+      ctx.fill()
+    }
+
+    function loop() {
+      t += 0.005
+      ctx.clearRect(0, 0, W, H)
+
+      // Draw soft ambient base
+      const base = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H) * 0.7)
+      base.addColorStop(0, 'rgba(15,12,40,0.3)')
+      base.addColorStop(1, 'rgba(4,4,16,0)')
+      ctx.fillStyle = base
+      ctx.fillRect(0, 0, W, H)
+
+      ctx.globalCompositeOperation = 'screen'
+
+      for (const o of ORBS) {
+        // Float with sine waves for organic movement
+        const px = (o.x + Math.sin(t * o.vx * 1000 + o.hue) * 0.18) * W
+        const py = (o.y + Math.cos(t * o.vy * 1000 + o.hue) * 0.15) * H
+        drawOrb(px, py, o.r, o.hue, o.sat, 0.22)
+      }
+
+      // Cursor-attracted glow
+      if (mouse.x || mouse.y) {
+        drawOrb(mouse.x, mouse.y, cursorOrb.r, cursorOrb.hue, cursorOrb.sat, 0.15)
+      }
+
+      ctx.globalCompositeOperation = 'source-over'
+
+      // Noise vignette
+      const vign = ctx.createRadialGradient(W/2, H/2, H*0.2, W/2, H/2, H*0.9)
+      vign.addColorStop(0, 'rgba(0,0,0,0)')
+      vign.addColorStop(1, 'rgba(0,0,0,0.65)')
+      ctx.fillStyle = vign
+      ctx.fillRect(0, 0, W, H)
+
+      animId = requestAnimationFrame(loop)
+    }
+
+    loop()
+  </script>
+
+</body>
+</html>

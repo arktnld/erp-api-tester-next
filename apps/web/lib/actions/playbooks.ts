@@ -218,3 +218,25 @@ export async function getPlaybookRun(id: number) {
     },
   })
 }
+
+export async function getPlaybookRunByToken(token: string) {
+  return prisma.playbookRun.findUniqueOrThrow({
+    where: { shareToken: token },
+    include: {
+      playbook: { select: { id: true, name: true, erp: { select: { name: true } } } },
+      company: { select: { name: true } },
+    },
+  })
+}
+
+export async function generateShareToken(runId: number): Promise<string> {
+  'use server'
+  const existing = await prisma.playbookRun.findUnique({
+    where: { id: runId },
+    select: { shareToken: true },
+  })
+  if (existing?.shareToken) return existing.shareToken
+  const token = crypto.randomUUID()
+  await prisma.playbookRun.update({ where: { id: runId }, data: { shareToken: token } })
+  return token
+}

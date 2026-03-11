@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ERP Tester — Login (tsParticles)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #0a0a0a;
+      gap: 28px;
+    }
+
+    #tsparticles {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      position: relative;
+      z-index: 10;
+    }
+    .brand-code { font-family: monospace; font-size: 26px; font-weight: 900; letter-spacing: -0.03em; color: #6366f1; }
+    .brand-name { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: #ededed; }
+
+    form {
+      position: relative;
+      z-index: 10;
+      width: 380px;
+      background: #111111;
+      padding: 48px 40px 40px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    h2 { color: #6366f1; font-weight: 600; text-align: center; font-size: 18px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+    .subtitle { font-size: 13px; color: #555; text-align: center; margin-bottom: 32px; }
+
+    .inputBox { position: relative; width: 100%; margin-bottom: 28px; }
+    .inputBox input {
+      width: 100%; background: transparent; border: none; border-bottom: 1px solid #2a2a2a;
+      color: #ededed; font-size: 14px; padding: 10px 0; outline: none; transition: border-color 0.3s;
+    }
+    .inputBox input:focus { border-bottom-color: #6366f1; }
+    .inputBox span {
+      position: absolute; left: 0; top: 10px; font-size: 14px; color: #555; pointer-events: none; transition: 0.3s;
+    }
+    .inputBox input:focus ~ span,
+    .inputBox input:valid ~ span { transform: translateY(-20px); font-size: 11px; color: #6366f1; }
+
+    .forgot { text-align: right; margin-bottom: 28px; }
+    .forgot a { font-size: 12px; color: #555; text-decoration: none; }
+    .forgot a:hover { color: #6366f1; }
+
+    .btn-primary {
+      width: 100%; padding: 12px; background: #6366f1; color: white; border: none;
+      border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-bottom: 24px;
+    }
+    .btn-primary:hover { background: #4f46e5; }
+
+    .divider { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #1f1f1f; }
+    .divider span { font-size: 12px; color: #444; }
+
+    .sso-btn {
+      width: 100%; padding: 11px; background: transparent; border: 1px solid #2a2a2a;
+      border-radius: 8px; color: #888; font-size: 14px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; gap: 8px; transition: border-color 0.2s, color 0.2s;
+    }
+    .sso-btn:hover { border-color: #6366f1; color: #ededed; }
+
+    .footer { position: relative; z-index: 10; font-size: 11px; color: #333; }
+  </style>
+</head>
+<body>
+
+  <canvas id="tsparticles"></canvas>
+
+  <div class="brand">
+    <span class="brand-code">/ERP</span>
+    <span class="brand-name"> Tester</span>
+  </div>
+
+  <form autocomplete="off">
+    <h2>Entrar</h2>
+    <p class="subtitle">Acesso restrito à equipe autorizada</p>
+
+    <div class="inputBox">
+      <input type="email" required>
+      <span>E-mail</span>
+    </div>
+    <div class="inputBox">
+      <input type="password" required>
+      <span>Senha</span>
+    </div>
+
+    <div class="forgot"><a href="#">Esqueceu a senha?</a></div>
+
+    <button type="submit" class="btn-primary">Continuar</button>
+
+    <div class="divider"><span>ou</span></div>
+
+    <button type="button" class="sso-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Entrar com SSO
+    </button>
+  </form>
+
+  <p class="footer">Jarbis © 2026</p>
+
+  <script>
+    const canvas = document.getElementById('tsparticles')
+    const ctx = canvas.getContext('2d')
+    const N = 90, MAX_DIST = 160, GRAB_DIST = 180
+    let pts = []
+    let mouse = { x: -9999, y: -9999 }
+
+    function resize() {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+    }
+    resize()
+    window.addEventListener('resize', resize)
+    window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY })
+    window.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999 })
+
+    function spawn() {
+      const speed = 0.25 + Math.random() * 0.35
+      const angle = Math.random() * Math.PI * 2
+      return { x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+               vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed,
+               r: 1.2 + Math.random() * 1.4 }
+    }
+    pts = Array.from({ length: N }, spawn)
+
+    function loop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      for (let i = 0; i < pts.length; i++) {
+        const p = pts[i]
+        p.x += p.vx; p.y += p.vy
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1
+      }
+
+      const adj = pts.map(() => [])
+      const dist = []
+      for (let i = 0; i < pts.length; i++) {
+        dist[i] = []
+        for (let j = i + 1; j < pts.length; j++) {
+          const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y
+          const d = Math.sqrt(dx*dx + dy*dy)
+          dist[i][j] = d
+          if (d < MAX_DIST) { adj[i].push(j); adj[j].push(i) }
+        }
+      }
+
+      // Triangles — only small ones, ~33% sparse
+      const FILL_DIST = MAX_DIST * 0.75
+      for (let i = 0; i < pts.length; i++) {
+        for (const j of adj[i]) {
+          if (j <= i) continue
+          const dij = dist[i][j]
+          if (dij > FILL_DIST) continue
+          for (const k of adj[j]) {
+            if (k <= j || !adj[i].includes(k)) continue
+            const dik = dist[i][k] ?? dist[k][i]
+            const djk = dist[j][k] ?? dist[k][j]
+            if (dik > FILL_DIST || djk > FILL_DIST) continue
+            if ((i * 31 + j * 17 + k * 7) % 3 !== 0) continue
+            const a = (1 - (dij + dik + djk) / 3 / FILL_DIST) * 0.18
+            ctx.beginPath()
+            ctx.moveTo(pts[i].x, pts[i].y)
+            ctx.lineTo(pts[j].x, pts[j].y)
+            ctx.lineTo(pts[k].x, pts[k].y)
+            ctx.closePath()
+            ctx.fillStyle = `rgba(99,102,241,${a})`
+            ctx.fill()
+          }
+        }
+      }
+
+      // Lines
+      for (let i = 0; i < pts.length; i++) {
+        for (const j of adj[i]) {
+          if (j <= i) continue
+          const d = dist[i][j]
+          ctx.beginPath()
+          ctx.moveTo(pts[i].x, pts[i].y)
+          ctx.lineTo(pts[j].x, pts[j].y)
+          ctx.strokeStyle = `rgba(99,102,241,${(1 - d/MAX_DIST) * 0.35})`
+          ctx.lineWidth = 0.7
+          ctx.stroke()
+        }
+      }
+
+      // Dots
+      for (let i = 0; i < pts.length; i++) {
+        ctx.beginPath()
+        ctx.arc(pts[i].x, pts[i].y, pts[i].r, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(129,140,248,0.85)'
+        ctx.fill()
+      }
+
+      // Mouse grab — connect nearby particles to cursor
+      for (let i = 0; i < pts.length; i++) {
+        const dx = pts[i].x - mouse.x, dy = pts[i].y - mouse.y
+        const d = Math.sqrt(dx*dx + dy*dy)
+        if (d < GRAB_DIST) {
+          const a = (1 - d / GRAB_DIST) * 0.6
+          ctx.beginPath()
+          ctx.moveTo(mouse.x, mouse.y)
+          ctx.lineTo(pts[i].x, pts[i].y)
+          ctx.strokeStyle = `rgba(129,140,248,${a})`
+          ctx.lineWidth = 1
+          ctx.stroke()
+        }
+      }
+
+      requestAnimationFrame(loop)
+    }
+    loop()
+  </script>
+
+</body>
+</html>

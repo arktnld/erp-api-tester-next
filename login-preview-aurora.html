@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ERP Tester — Login (Aurora)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #04080f;
+      gap: 28px;
+      overflow: hidden;
+    }
+
+    /* Aurora layers */
+    .aurora {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .aurora-layer {
+      position: absolute;
+      inset: -50%;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.35;
+      mix-blend-mode: screen;
+    }
+
+    .aurora-layer:nth-child(1) {
+      background: radial-gradient(ellipse 80% 50% at 50% 50%, #6366f1 0%, transparent 70%);
+      animation: aurora1 12s ease-in-out infinite alternate;
+    }
+    .aurora-layer:nth-child(2) {
+      background: radial-gradient(ellipse 60% 40% at 30% 60%, #8b5cf6 0%, transparent 70%);
+      animation: aurora2 15s ease-in-out infinite alternate;
+      opacity: 0.25;
+    }
+    .aurora-layer:nth-child(3) {
+      background: radial-gradient(ellipse 70% 60% at 70% 40%, #4f46e5 0%, transparent 60%);
+      animation: aurora3 18s ease-in-out infinite alternate;
+      opacity: 0.2;
+    }
+    .aurora-layer:nth-child(4) {
+      background: radial-gradient(ellipse 50% 80% at 60% 70%, #7c3aed 0%, transparent 60%);
+      animation: aurora4 10s ease-in-out infinite alternate;
+      opacity: 0.15;
+    }
+
+    /* Subtle star noise overlay */
+    .aurora::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.3) 0%, transparent 100%),
+        radial-gradient(1px 1px at 50% 80%, rgba(255,255,255,0.2) 0%, transparent 100%),
+        radial-gradient(1px 1px at 75% 15%, rgba(255,255,255,0.25) 0%, transparent 100%),
+        radial-gradient(1px 1px at 90% 55%, rgba(255,255,255,0.15) 0%, transparent 100%),
+        radial-gradient(1px 1px at 35% 65%, rgba(255,255,255,0.2) 0%, transparent 100%),
+        radial-gradient(1px 1px at 10% 85%, rgba(255,255,255,0.1) 0%, transparent 100%),
+        radial-gradient(1px 1px at 65% 40%, rgba(255,255,255,0.2) 0%, transparent 100%);
+      opacity: 0.6;
+    }
+
+    @keyframes aurora1 {
+      0%   { transform: translate(-10%, -15%) scale(1.1) rotate(-5deg); }
+      50%  { transform: translate(5%, 10%) scale(0.95) rotate(8deg); }
+      100% { transform: translate(15%, -5%) scale(1.2) rotate(-2deg); }
+    }
+    @keyframes aurora2 {
+      0%   { transform: translate(10%, 20%) scale(1.2) rotate(10deg); }
+      50%  { transform: translate(-15%, -5%) scale(0.9) rotate(-15deg); }
+      100% { transform: translate(5%, 15%) scale(1.1) rotate(5deg); }
+    }
+    @keyframes aurora3 {
+      0%   { transform: translate(-5%, 10%) scale(0.9) rotate(-8deg); }
+      50%  { transform: translate(20%, -10%) scale(1.15) rotate(12deg); }
+      100% { transform: translate(-10%, 5%) scale(1.05) rotate(-3deg); }
+    }
+    @keyframes aurora4 {
+      0%   { transform: translate(15%, -20%) scale(1.3) rotate(15deg); }
+      50%  { transform: translate(-10%, 10%) scale(0.85) rotate(-10deg); }
+      100% { transform: translate(5%, -10%) scale(1.1) rotate(8deg); }
+    }
+
+    /* Thin horizontal scan lines for depth */
+    .scanlines {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.04) 2px,
+        rgba(0,0,0,0.04) 4px
+      );
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      position: relative;
+      z-index: 10;
+    }
+    .brand-code { font-family: monospace; font-size: 26px; font-weight: 900; letter-spacing: -0.03em; color: #818cf8; }
+    .brand-name { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: #ededed; }
+
+    form {
+      position: relative;
+      z-index: 10;
+      width: 380px;
+      background: rgba(10, 10, 20, 0.75);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      padding: 48px 40px 40px;
+      border-radius: 16px;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      box-shadow: 0 0 60px rgba(99, 102, 241, 0.08), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    h2 { color: #818cf8; font-weight: 600; text-align: center; font-size: 18px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+    .subtitle { font-size: 13px; color: #555; text-align: center; margin-bottom: 32px; }
+
+    .inputBox { position: relative; width: 100%; margin-bottom: 28px; }
+    .inputBox input {
+      width: 100%; background: transparent; border: none; border-bottom: 1px solid rgba(99,102,241,0.2);
+      color: #ededed; font-size: 14px; padding: 10px 0; outline: none; transition: border-color 0.3s;
+    }
+    .inputBox input:focus { border-bottom-color: #818cf8; }
+    .inputBox span {
+      position: absolute; left: 0; top: 10px; font-size: 14px; color: #555; pointer-events: none; transition: 0.3s;
+    }
+    .inputBox input:focus ~ span,
+    .inputBox input:valid ~ span { transform: translateY(-20px); font-size: 11px; color: #818cf8; }
+
+    .forgot { text-align: right; margin-bottom: 28px; }
+    .forgot a { font-size: 12px; color: #555; text-decoration: none; }
+    .forgot a:hover { color: #818cf8; }
+
+    .btn-primary {
+      width: 100%; padding: 12px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white; border: none;
+      border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .divider { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(99,102,241,0.15); }
+    .divider span { font-size: 12px; color: #444; }
+
+    .sso-btn {
+      width: 100%; padding: 11px; background: transparent;
+      border: 1px solid rgba(99,102,241,0.2);
+      border-radius: 8px; color: #888; font-size: 14px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; gap: 8px; transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .sso-btn:hover { border-color: #818cf8; color: #ededed; background: rgba(99,102,241,0.08); }
+
+    .footer { position: relative; z-index: 10; font-size: 11px; color: #333; }
+  </style>
+</head>
+<body>
+
+  <div class="aurora">
+    <div class="aurora-layer"></div>
+    <div class="aurora-layer"></div>
+    <div class="aurora-layer"></div>
+    <div class="aurora-layer"></div>
+  </div>
+  <div class="scanlines"></div>
+
+  <div class="brand">
+    <span class="brand-code">/ERP</span>
+    <span class="brand-name"> Tester</span>
+  </div>
+
+  <form autocomplete="off">
+    <h2>Entrar</h2>
+    <p class="subtitle">Acesso restrito à equipe autorizada</p>
+
+    <div class="inputBox">
+      <input type="email" required>
+      <span>E-mail</span>
+    </div>
+    <div class="inputBox">
+      <input type="password" required>
+      <span>Senha</span>
+    </div>
+
+    <div class="forgot"><a href="#">Esqueceu a senha?</a></div>
+
+    <button type="submit" class="btn-primary">Continuar</button>
+
+    <div class="divider"><span>ou</span></div>
+
+    <button type="button" class="sso-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      Entrar com SSO
+    </button>
+  </form>
+
+  <p class="footer">Jarbis © 2026</p>
+
+</body>
+</html>
