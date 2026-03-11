@@ -106,7 +106,9 @@ function FlowCard({ step, stepNum, allSteps }: { step: StepResult; stepNum: numb
         {entries.map(([field, val]) => {
           const usedInSteps: number[] = []
           for (let j = stepNum; j < allSteps.length; j++) {
-            if (field in (allSteps[j].injectedFields ?? {})) usedInSteps.push(j + 1)
+            const next = allSteps[j]
+            const haystack = (next.requestBody ?? '') + (next.url ?? '')
+            if (val && haystack.includes(val)) usedInSteps.push(j + 1)
           }
           return (
             <div key={field} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
