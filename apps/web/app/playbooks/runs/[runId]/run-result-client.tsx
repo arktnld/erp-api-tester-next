@@ -122,48 +122,36 @@ function StepCard({ step, index, allSteps }: { step: StepResult; index: number; 
       {/* Body */}
       <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
 
-        {/* Injected fields — parâmetros de steps anteriores usados aqui */}
-        {hasInjected && (
-          <div style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 6, padding: '10px 14px' }}>
-            <p style={{ fontSize: 11, fontWeight: 600, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
-              Parâmetros injetados de steps anteriores
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-              {Object.entries(step.injectedFields ?? {}).map(([field]) => {
-                // find which step captured this field
-                const sourceStepIndex = allSteps.slice(0, index).findLastIndex(
-                  (s) => field in s.capturedFields
-                )
-                return (
-                  <div key={field} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'monospace', fontSize: 12 }}>
-                    <span style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b', borderRadius: 3, padding: '1px 6px' }}>{'{'}{ field }{'}'}</span>
-                    <span style={{ color: 'var(--text-subtle)', fontSize: 11 }}>capturado em</span>
-                    <span style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', borderRadius: 3, padding: '1px 6px', fontSize: 11 }}>
-                      Step {sourceStepIndex + 1}
-                    </span>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Tabs: cURL / Request / Resposta */}
-        <InnerTabs tabs={['cURL', 'Request', 'Resposta']}>
+        {/* Tabs: Request / Resposta / cURL */}
+        <InnerTabs tabs={['Request', 'Resposta', 'cURL']}>
           {(active) => (
             <>
               {active === 0 && (
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}>
-                    <CopyButton text={curl} />
-                  </div>
-                  <pre style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, padding: '12px 14px', fontFamily: 'monospace', fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', lineHeight: 1.7, margin: 0 }}>
-                    {curl}
-                  </pre>
-                </div>
-              )}
-              {active === 1 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {/* Injected fields — parâmetros de steps anteriores usados aqui */}
+                  {hasInjected && (
+                    <div style={{ background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 6, padding: '10px 14px' }}>
+                      <p style={{ fontSize: 11, fontWeight: 600, color: '#f59e0b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>
+                        Parâmetros injetados de steps anteriores
+                      </p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+                        {Object.entries(step.injectedFields ?? {}).map(([field]) => {
+                          const sourceStepIndex = allSteps.slice(0, index).findLastIndex(
+                            (s) => field in s.capturedFields
+                          )
+                          return (
+                            <div key={field} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: 'monospace', fontSize: 12 }}>
+                              <span style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b', borderRadius: 3, padding: '1px 6px' }}>{'{'}{ field }{'}'}</span>
+                              <span style={{ color: 'var(--text-subtle)', fontSize: 11 }}>capturado em</span>
+                              <span style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.3)', color: '#818cf8', borderRadius: 3, padding: '1px 6px', fontSize: 11 }}>
+                                Step {sourceStepIndex + 1}
+                              </span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
                   {/* Request Headers */}
                   {Object.keys(step.requestHeaders ?? {}).length > 0 && (
                     <div>
@@ -193,7 +181,7 @@ function StepCard({ step, index, allSteps }: { step: StepResult; index: number; 
                   )}
                 </div>
               )}
-              {active === 2 && (
+              {active === 1 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {/* Captured fields with path chain */}
                   {hasCaptured && (
@@ -235,6 +223,16 @@ function StepCard({ step, index, allSteps }: { step: StepResult; index: number; 
                   <CodeBlock language="json" customStyle={{ margin: 0, borderRadius: 8, fontSize: 11, backgroundColor: 'var(--surface-2)', maxHeight: 300, overflow: 'auto' }}>
                     {tryPretty(step.responseBody)}
                   </CodeBlock>
+                </div>
+              )}
+              {active === 2 && (
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 6 }}>
+                    <CopyButton text={curl} />
+                  </div>
+                  <pre style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, padding: '12px 14px', fontFamily: 'monospace', fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', lineHeight: 1.7, margin: 0 }}>
+                    {curl}
+                  </pre>
                 </div>
               )}
             </>
