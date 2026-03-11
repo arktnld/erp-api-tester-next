@@ -129,7 +129,7 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
     include: {
       steps: {
         orderBy: { order: 'asc' },
-        include: { endpoint: { select: { name: true, bodyTemplate: true, path: true } } },
+        include: { endpoint: { select: { name: true, bodyTemplate: true, pathTemplate: true } } },
       },
     },
   })
@@ -144,7 +144,7 @@ export async function runPlaybook(playbookId: number, companyId: number, clientI
   for (const step of playbook.steps) {
     const allAvailableFields = { ...capturedFields }
     // Only show fields actually referenced as {field} in the body template or URL path
-    const template = (step.bodyOverride || '') + (step.endpoint?.bodyTemplate || '') + (step.endpoint?.path || '')
+    const template = (step.bodyOverride || '') + (step.endpoint?.bodyTemplate || '') + (step.endpoint?.pathTemplate || '')
     const usedInjectedFields: Record<string, string> = {}
     for (const [field, value] of Object.entries(allAvailableFields)) {
       if (template.includes(`{${field}}`)) usedInjectedFields[field] = value
