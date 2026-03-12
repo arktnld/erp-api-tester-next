@@ -1,5 +1,5 @@
 /* ── Layout ──────────────────────────────────────────────────────────────── */
-.layout { display:flex; height:100%; overflow:hidden; }
+.layout { display:flex; height:100vh; overflow:hidden; }
 
 /* ── Sidebar ─────────────────────────────────────────────────────────────── */
 .sidebar { width:290px; border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; background:var(--surface); }
