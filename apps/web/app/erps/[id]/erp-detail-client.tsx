@@ -418,15 +418,15 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
           })
         }}>
           {/* cURL Import */}
-          <div style={{ marginBottom: 20, border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
+          <div style={{ marginBottom: 20, border: '1px solid color-mix(in srgb, var(--accent) 35%, transparent)', borderRadius: 8, overflow: 'hidden' }}>
             <button
               type="button"
               onClick={() => { setCurlOpen((v) => !v); setCurlError('') }}
-              style={{ width: '100%', padding: '9px 14px', background: 'var(--surface-2)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-muted)', fontSize: 13 }}
+              style={{ width: '100%', padding: '9px 14px', background: 'color-mix(in srgb, var(--accent) 8%, transparent)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, color: 'var(--accent)', fontSize: 13, fontWeight: 500 }}
             >
               <Terminal size={14} />
               Importar cURL
-              <span style={{ marginLeft: 'auto', fontSize: 10, opacity: 0.6 }}>{curlOpen ? '▲' : '▼'}</span>
+              <span style={{ marginLeft: 'auto', fontSize: 10, opacity: 0.7 }}>{curlOpen ? '▲' : '▼'}</span>
             </button>
             {curlOpen && (
               <div style={{ padding: '12px 14px', borderTop: '1px solid var(--border)' }}>

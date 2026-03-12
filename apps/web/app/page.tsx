@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { prisma } from '@erp/db'
 import { MethodBadge, StatusBadge } from '@/components/ui/badge'
 import { RotateCcw, Building2, FlaskConical, ListChecks, History } from 'lucide-react'
-import { HomeImport } from './home-import'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +13,7 @@ export default async function Dashboard() {
   const count = await prisma.eRP.count()
   if (count === 0) redirect('/setup')
 
-  const [recentHistory, companies, erpCount, endpointCount, playbookCount, historyCount, erps] =
+  const [recentHistory, companies, erpCount, endpointCount, playbookCount, historyCount] =
     await Promise.all([
       prisma.requestHistory.findMany({
         orderBy: { createdAt: 'desc' },
@@ -42,7 +41,6 @@ export default async function Dashboard() {
       prisma.endpoint.count(),
       prisma.playbook.count(),
       prisma.requestHistory.count(),
-      prisma.eRP.findMany({ orderBy: { name: 'asc' }, select: { id: true, name: true } }),
     ])
 
   const stats = [
@@ -62,9 +60,8 @@ export default async function Dashboard() {
   return (
     <div style={{ padding: '32px 40px', maxWidth: 960 }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+      <div style={{ marginBottom: 4 }}>
         <h1 style={{ fontSize: 20, fontWeight: 600 }}>Início</h1>
-        <HomeImport erps={erps} />
       </div>
       <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 28 }}>
         Acesso rápido e visão geral do sistema
