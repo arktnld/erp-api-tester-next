@@ -3,122 +3,143 @@
 import { useState, useEffect, useRef, useCallback, useTransition } from 'react'
 import { getCollectionStructure, deleteCollection, importCollection } from '@/app/actions/collections'
 import type { CollectionStructure, FolderNode, CollectionEndpoint, FlatEndpoint, CollectionParam } from './lib/parser'
+import styles from './collections.module.css'
 
 type CollectionMeta = { id: number; name: string; createdAt: Date }
 
-// ── Utilities ─────────────────────────────────────────────────────────────────
+// ── Utilities ─────────────────────────────────────────────────────────────
 
 function buildFlat(node: FolderNode, path: string[] = []): FlatEndpoint[] {
   const eps: FlatEndpoint[] = node.eps.map((ep) => ({
     ...ep,
     folderPath: path,
-    _paramNames: ep.params?.map((p) => p.name).join(' ') ?? '',
+    _paramNames: [...(ep.params ?? [])].map((p) => p.name).join(' '),
   }))
   return [...eps, ...node.children.flatMap((c) => buildFlat(c, [...path, c.name]))]
 }
 
-function scoreField(query: string, text: string): number {
-  if (!text) return 0
+function scoreField(query: string, text: string): { score: number; positions: number[] } | null {
+  if (!query || !text) return null
   const q = query.toLowerCase()
   const t = text.toLowerCase()
-  if (t === q) return 100
-  if (t.startsWith(q)) return 80
+  const positions: number[] = []
+  let j = 0
+  for (let i = 0; i < q.length; i++) {
+    while (j < t.length && t[j] !== q[i]) j++
+    if (j >= t.length) return null
+    positions.push(j++)
+  }
+  const MATCH = 16, BONUS_SOL = 16, BONUS_WORD = 8, BONUS_CAMEL = 7
+  const BONUS_CONSEC = 4, PEN_GAP_START = 3, PEN_GAP_EXT = 1
+  const charBonus = (p: number) => {
+    if (p === 0) return BONUS_SOL
+    const prev = t[p - 1]
+    if (' \t/-_.,:;(['.includes(prev)) return BONUS_WORD
+    if (t[p] >= 'A' && t[p] <= 'Z' && prev >= 'a' && prev <= 'z') return BONUS_CAMEL
+    return 0
+  }
   let score = 0
-  let qi = 0
-  let consecutive = 0
-  let lastMatch = -1
-  for (let ti = 0; ti < t.length && qi < q.length; ti++) {
-    if (t[ti] === q[qi]) {
-      if (ti === 0) score += 16
-      else if ('/\\-_.'.includes(t[ti - 1])) score += 8
-      else if (t[ti] === t[ti].toUpperCase() && t[ti - 1] === t[ti - 1].toLowerCase()) score += 7
-      if (lastMatch === ti - 1) {
-        consecutive++
-        score += 4 * consecutive
-      } else {
-        if (lastMatch >= 0) score -= 3 + (ti - lastMatch - 1)
-        consecutive = 0
-      }
-      lastMatch = ti
-      qi++
+  for (let i = 0; i < positions.length; i++) {
+    score += MATCH + charBonus(positions[i])
+    if (i > 0) {
+      const gap = positions[i] - positions[i - 1] - 1
+      score += gap === 0 ? BONUS_CONSEC : -(PEN_GAP_START + (gap - 1) * PEN_GAP_EXT)
     }
   }
-  if (qi < q.length) return 0
-  score -= text.length * 0.05
-  return score
+  score -= Math.floor(t.length * 0.05)
+  return { score, positions }
 }
 
-function runFuzzySearch(query: string, flat: FlatEndpoint[]): FlatEndpoint[] {
+function runFuzzySearch(query: string, flat: FlatEndpoint[]): Array<FlatEndpoint & { namePositions: Set<number> }> {
   if (!query.trim()) return []
   const q = query.trim()
-  const results: { ep: FlatEndpoint; score: number }[] = []
+  const results: Array<{ ep: FlatEndpoint; score: number; namePositions: Set<number> }> = []
   for (const ep of flat) {
+    const nameR = scoreField(q, ep.name)
+    const pathR = scoreField(q, ep.path ?? '')
+    const descR = scoreField(q, ep.desc ?? '')
+    const paramR = ep._paramNames ? scoreField(q, ep._paramNames) : null
     const methodBonus = ep.method.toLowerCase().startsWith(q.toLowerCase()) ? 60 : 0
-    const nameScore = scoreField(q, ep.name) * 3.0
-    const pathScore = scoreField(q, ep.path) * 1.5
-    const descScore = scoreField(q, ep.desc ?? '') * 0.7
-    const paramScore = scoreField(q, ep._paramNames) * 0.6
-    const total = nameScore + pathScore + descScore + paramScore + methodBonus
-    if (total > 0) results.push({ ep, score: total })
+    if (!nameR && !pathR && !descR && !paramR && !methodBonus) continue
+    const score =
+      (nameR ? nameR.score * 3.0 : 0) +
+      (pathR ? pathR.score * 1.5 : 0) +
+      (descR ? descR.score * 0.7 : 0) +
+      (paramR ? paramR.score * 0.6 : 0) +
+      methodBonus
+    if (!nameR && !pathR && score < 30) continue
+    if (score < 10) continue
+    results.push({ ep, score, namePositions: nameR ? new Set(nameR.positions) : new Set() })
   }
-  return results.sort((a, b) => b.score - a.score).map((r) => r.ep)
+  return results
+    .sort((a, b) => b.score - a.score)
+    .map(({ ep, namePositions }) => ({ ...ep, namePositions }))
 }
 
 function buildCurl(ep: CollectionEndpoint): string {
-  const lines: string[] = [`curl -X ${ep.method}`]
-  for (const h of ep.headers ?? []) lines.push(`  -H '${h.key}: ${h.value}'`)
-  if (ep.auth?.type === 'bearer') {
-    const token = ep.auth.details?.find((d) => d.key === 'token')?.value ?? '<token>'
-    lines.push(`  -H 'Authorization: Bearer ${token}'`)
-  } else if (ep.auth?.type === 'basic') {
-    const user = ep.auth.details?.find((d) => d.key === 'username')?.value ?? '<user>'
-    const pass = ep.auth.details?.find((d) => d.key === 'password')?.value ?? '<pass>'
-    lines.push(`  -u '${user}:${pass}'`)
-  } else if (ep.auth?.type === 'apikey') {
-    const key = ep.auth.details?.find((d) => d.key === 'key')?.value ?? 'X-API-Key'
-    const val = ep.auth.details?.find((d) => d.key === 'value')?.value ?? '<key>'
-    lines.push(`  -H '${key}: ${val}'`)
+  const parts: string[] = []
+  let url = ep.path ?? ''
+  const queryParams = ep.queryParams ?? []
+  const inlineQuery = queryParams.length > 0 && ['GET', 'HEAD', 'DELETE', 'OPTIONS'].includes(ep.method)
+  if (inlineQuery) {
+    const qs = queryParams
+      .map((p) => encodeURIComponent(p.name) + '=' + encodeURIComponent(p.example ?? '{{' + p.name + '}}'))
+      .join('&')
+    url += (url.includes('?') ? '&' : '?') + qs
   }
-  if (ep.body) {
-    if (ep.bodyMode === 'urlencoded') {
-      lines.push(`  --data '${ep.body}'`)
-    } else {
-      lines.push(`  -H 'Content-Type: ${ep.bodyContentType ?? 'application/json'}'`)
-      lines.push(`  -d '${ep.body.replace(/'/g, "'\\''")}'`)
+  parts.push(`curl -X ${ep.method} '${url}'`)
+  if (ep.auth) {
+    const type = ep.auth.type
+    const dets = ep.auth.details ?? []
+    const get = (key: string) => dets.find((d) => d.key === key)?.value ?? '{{' + key + '}}'
+    if (type === 'bearer') parts.push(`  -H 'Authorization: Bearer ${get('token')}'`)
+    else if (type === 'basic') parts.push(`  -u '${get('username')}:${get('password')}'`)
+    else if (type === 'apikey') parts.push(`  -H '${get('key')}: ${get('value')}'`)
+    else if (type === 'oauth2') parts.push(`  -H 'Authorization: Bearer {{access_token}}'`)
+  }
+  ;(ep.headers ?? [])
+    .filter((h) => h.key && h.key.toLowerCase() !== 'content-type')
+    .forEach((h) => parts.push(`  -H '${h.key}: ${h.value}'`))
+  if (ep.body != null) {
+    const bodyIsEmpty = Array.isArray(ep.body) ? ep.body.length === 0 : !String(ep.body).trim()
+    if (!bodyIsEmpty) {
+      if (ep.bodyMode === 'raw') {
+        parts.push(`  -H 'Content-Type: ${ep.bodyContentType ?? 'application/json'}'`)
+        parts.push(`  -d '${String(ep.body).replace(/'/g, "'\\''")}'`)
+      } else if (ep.bodyMode === 'urlencoded') {
+        String(ep.body).split('&').forEach((f) => parts.push(`  --data-urlencode '${f}'`))
+      }
     }
   }
-  lines.push(`  '${ep.path}'`)
-  return lines.join(' \\\n')
+  return parts.join(' \\\n')
 }
 
-// ── Sub-components ─────────────────────────────────────────────────────────────
+// ── Highlighted name ────────────────────────────────────────────────────────
 
-const METHOD_COLOR: Record<string, string> = {
-  GET: 'var(--method-get, #10b981)',
-  POST: 'var(--method-post, #8b5cf6)',
-  PUT: 'var(--method-put, #f59e0b)',
-  PATCH: 'var(--method-patch, #6b7280)',
-  DELETE: 'var(--method-delete, #ef4444)',
-}
-
-function MethodBadge({ method }: { method: string }) {
+function HighlightedName({ text, positions }: { text: string; positions: Set<number> }) {
+  if (!positions.size) return <span className={styles.epName}>{text}</span>
   return (
-    <span style={{ fontSize: 10, fontWeight: 700, fontFamily: 'monospace', color: METHOD_COLOR[method] ?? 'var(--text-muted)', minWidth: 52, flexShrink: 0 }}>
+    <span className={styles.epName}>
+      {Array.from(text).map((ch, i) =>
+        positions.has(i) ? <mark key={i} style={{ background: 'none', color: 'var(--accent)', fontWeight: 700 }}>{ch}</mark> : ch
+      )}
+    </span>
+  )
+}
+
+// ── Method Badge ────────────────────────────────────────────────────────────
+
+function MethodBadge({ method, large }: { method: string; large?: boolean }) {
+  return (
+    <span className={`${styles.methodBadge} ${styles[method] ?? ''} ${large ? styles.detailMethodBadge : ''}`}>
       {method}
     </span>
   )
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div style={{ marginTop: 14 }}>
-      <p style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{title}</p>
-      {children}
-    </div>
-  )
-}
+// ── Code Block ──────────────────────────────────────────────────────────────
 
-function CodeBlock({ code, label }: { code: string; label?: string }) {
+function CodeBlock({ code }: { code: string }) {
   const [copied, setCopied] = useState(false)
   const copy = () => {
     navigator.clipboard.writeText(code).then(() => {
@@ -127,183 +148,339 @@ function CodeBlock({ code, label }: { code: string; label?: string }) {
     })
   }
   return (
-    <div style={{ position: 'relative', backgroundColor: 'var(--surface-2, #161616)', border: '1px solid var(--border, #1f1f1f)', borderRadius: 6, overflow: 'hidden' }}>
-      {label && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 10px', borderBottom: '1px solid var(--border, #1f1f1f)' }}>
-          <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>{label}</span>
-          <button onClick={copy} style={{ fontSize: 10, color: copied ? 'var(--accent, #6366f1)' : 'var(--text-muted)', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px' }}>
-            {copied ? 'Copiado!' : 'Copiar'}
-          </button>
-        </div>
-      )}
-      {!label && (
-        <button onClick={copy} style={{ position: 'absolute', top: 6, right: 6, fontSize: 10, color: copied ? 'var(--accent, #6366f1)' : 'var(--text-muted)', background: 'var(--surface, #111)', border: '1px solid var(--border)', borderRadius: 4, cursor: 'pointer', padding: '2px 6px' }}>
-          {copied ? 'Copiado!' : 'Copiar'}
-        </button>
-      )}
-      <pre style={{ margin: 0, padding: '10px 12px', fontSize: 12, fontFamily: 'monospace', whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: 'var(--text)', lineHeight: 1.6, overflowX: 'auto' }}>
-        {code}
-      </pre>
+    <div className={styles.codeWrap}>
+      <pre className={styles.codeBlock}>{code}</pre>
+      <button className={styles.copyBtn} onClick={copy}>{copied ? '✓' : 'Copiar'}</button>
     </div>
   )
 }
 
-function ParamTable({ params, title }: { params: CollectionParam[]; title: string }) {
-  if (!params.length) return null
+// ── Collapsible Section ─────────────────────────────────────────────────────
+
+function Section({ title, count, startOpen = false, children }: { title: string; count?: number; startOpen?: boolean; children: React.ReactNode }) {
+  const [open, setOpen] = useState(startOpen)
   return (
-    <Section title={title}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-        <thead>
-          <tr>
-            {(['Nome', 'Tipo', 'Req', 'Desc'] as const).map((h) => (
-              <th key={h} style={{ textAlign: 'left', padding: '4px 8px', fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, borderBottom: '1px solid var(--border)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {params.map((p, i) => (
-            <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}>
-              <td style={{ padding: '5px 8px', fontFamily: 'monospace', color: 'var(--text)', fontWeight: 500 }}>{p.name}</td>
-              <td style={{ padding: '5px 8px', color: 'var(--text-muted)' }}>{p.type}{p.format ? `(${p.format})` : ''}</td>
-              <td style={{ padding: '5px 8px', color: p.required ? 'var(--method-delete, #ef4444)' : 'var(--text-subtle, #555)' }}>{p.required ? 'sim' : 'não'}</td>
-              <td style={{ padding: '5px 8px', color: 'var(--text-muted)' }}>{p.desc ?? p.example ?? ''}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Section>
+    <div className={styles.sect}>
+      <button className={styles.sectHd} onClick={() => setOpen((v) => !v)}>
+        <span className={`${styles.sectArrow} ${open ? styles.sectArrowOpen : ''}`}>›</span>
+        <span className={styles.sectTitle}>{title}</span>
+        {count != null && <span className={styles.sectCnt}>{count}</span>}
+      </button>
+      <div className={`${styles.sectBody} ${open ? styles.sectBodyOpen : ''}`}>{children}</div>
+    </div>
   )
 }
+
+// ── Param Table ─────────────────────────────────────────────────────────────
+
+function ParamTable({ params }: { params: CollectionParam[] }) {
+  const pinClass: Record<string, string> = {
+    path: styles.pinPath,
+    query: styles.pinQuery,
+    header: styles.pinHeader,
+    cookie: styles.pinCookie,
+  }
+  return (
+    <table className={styles.paramTable}>
+      <thead>
+        <tr>
+          <th>Nome</th><th>Tipo</th><th>Descrição</th>
+        </tr>
+      </thead>
+      <tbody>
+        {params.map((p, i) => (
+          <tr key={i}>
+            <td>
+              <span className={styles.pname}>{p.name}</span>
+              {p.required && <span className={styles.preq}>req</span>}
+              {p.in && <span className={`${styles.pin} ${pinClass[p.in] ?? ''}`}>{p.in}</span>}
+            </td>
+            <td>
+              <span className={styles.ptype}>
+                {p.type}{p.format ? ` (${p.format})` : ''}{p.enum ? ` [${p.enum.join('|')}]` : ''}
+              </span>
+            </td>
+            <td className={styles.pdesc}>
+              {p.desc && <div>{p.desc}</div>}
+              {p.example !== undefined && <span className={styles.pex}>{String(p.example)}</span>}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+}
+
+// ── Response Tabs ───────────────────────────────────────────────────────────
 
 function ResponseTabs({ responses }: { responses: NonNullable<CollectionEndpoint['responses']> }) {
   const [active, setActive] = useState(responses[0]?.status ?? '')
-  if (!responses.length) return null
   const cur = responses.find((r) => r.status === active)
+  const tabCls = (r: { status: string }) => {
+    const isActive = r.status === active
+    const s = r.status
+    if (isActive) {
+      if (s.startsWith('2')) return `${styles.respTab} ${styles.respTabActiveS2xx}`
+      if (s.startsWith('4')) return `${styles.respTab} ${styles.respTabActiveS4xx}`
+      if (s.startsWith('5')) return `${styles.respTab} ${styles.respTabActiveS5xx}`
+      return `${styles.respTab} ${styles.respTabActive}`
+    }
+    return styles.respTab
+  }
   return (
-    <Section title="Respostas">
-      <div style={{ display: 'flex', gap: 4, marginBottom: 8, flexWrap: 'wrap' }}>
-        {responses.map((r) => {
-          const color = r.status.startsWith('2') ? 'var(--method-get, #10b981)' : r.status.startsWith('4') ? 'var(--method-put, #f59e0b)' : r.status.startsWith('5') ? 'var(--method-delete, #ef4444)' : 'var(--text-muted)'
-          const isActive = r.status === active
-          return (
-            <button key={r.status} onClick={() => setActive(r.status)} style={{ padding: '3px 10px', borderRadius: 4, border: `1px solid ${isActive ? color : 'var(--border)'}`, background: isActive ? `color-mix(in srgb, ${color} 12%, transparent)` : 'transparent', color: isActive ? color : 'var(--text-muted)', fontSize: 12, fontFamily: 'monospace', cursor: 'pointer', fontWeight: isActive ? 600 : 400 }}>
-              {r.status}{r.statusText ? ` ${r.statusText}` : ''}
-            </button>
-          )
-        })}
+    <>
+      <div className={styles.respTabs}>
+        {responses.map((r) => (
+          <button key={r.status} className={tabCls(r)} onClick={() => setActive(r.status)}>
+            {r.status}{r.statusText ? ` ${r.statusText}` : ''}
+          </button>
+        ))}
       </div>
-      {cur?.desc && <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 8 }}>{cur.desc}</p>}
-      {cur?.example && <CodeBlock code={cur.example} label="Exemplo" />}
-    </Section>
+      {cur?.desc && <p className={styles.respDesc}>{cur.desc}</p>}
+      {cur?.example && <CodeBlock code={cur.example} />}
+    </>
   )
 }
 
-function EndpointDetail({ ep }: { ep: CollectionEndpoint }) {
-  const pathParams = ep.params?.filter((p) => p.in === 'path') ?? []
-  const queryParams = ep.params?.filter((p) => p.in === 'query') ?? []
-  const headerParams = ep.params?.filter((p) => p.in === 'header') ?? []
+// ── Endpoint Detail ─────────────────────────────────────────────────────────
+
+function EndpointDetail({ ep }: { ep: FlatEndpoint }) {
+  const [curlCopied, setCurlCopied] = useState(false)
+  const allParams = ep.params ?? []
+  const pathParams = allParams.filter((p) => p.in === 'path')
+  const queryParams = allParams.filter((p) => p.in === 'query')
+  const headerParams = allParams.filter((p) => p.in === 'header')
   const curlStr = buildCurl(ep)
 
+  const copyCurl = () => {
+    navigator.clipboard.writeText(curlStr).then(() => {
+      setCurlCopied(true)
+      setTimeout(() => setCurlCopied(false), 1500)
+    })
+  }
+
   return (
-    <div style={{ padding: '14px 16px' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 12 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <MethodBadge method={ep.method} />
-            <span style={{ fontSize: 13, fontFamily: 'monospace', color: 'var(--text)', wordBreak: 'break-all' }}>{ep.path}</span>
-            {ep.deprecated && <span style={{ fontSize: 10, color: 'var(--method-delete, #ef4444)', border: '1px solid var(--method-delete, #ef4444)', borderRadius: 3, padding: '1px 5px' }}>deprecated</span>}
-          </div>
-          {ep.name !== ep.path && <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: 0 }}>{ep.name}</p>}
+    <div className={styles.detail}>
+      {/* Breadcrumb */}
+      {ep.folderPath.length > 0 && (
+        <div className={styles.breadcrumb}>
+          {ep.folderPath.map((seg, i) => (
+            <span key={i}>
+              {i > 0 && <span className={styles.breadcrumbSep}>›</span>}
+              <span className={styles.breadcrumbItem}>{seg}</span>
+            </span>
+          ))}
         </div>
-        <CurlCopyButton curl={curlStr} />
+      )}
+
+      {/* Deprecated */}
+      {ep.deprecated && (
+        <div className={styles.deprecatedBanner}>⚠ Este endpoint está depreciado e pode ser removido em versões futuras.</div>
+      )}
+
+      {/* Method + path + cURL */}
+      <div className={styles.detailMethodPath}>
+        <MethodBadge method={ep.method} large />
+        <span className={styles.detailPath}>{ep.path}</span>
+        <button className={styles.curlCopyBtn} onClick={copyCurl}>
+          {curlCopied ? 'Copiado ✓' : 'Copiar cURL'}
+        </button>
       </div>
 
-      {ep.desc && <p style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 8 }}>{ep.desc}</p>}
+      <div className={styles.detailName}>{ep.name}</div>
+      {ep.operationId && (
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace', marginTop: 4 }}>{ep.operationId}</div>
+      )}
 
-      <ParamTable params={pathParams} title="Path params" />
-      <ParamTable params={queryParams} title="Query params" />
-      <ParamTable params={headerParams} title="Headers" />
+      {ep.desc && <p className={styles.detailDesc}>{ep.desc}</p>}
 
+      {/* Auth */}
+      {ep.auth && (
+        <Section title="Autenticação">
+          <div className={styles.authBlock}>
+            <span className={styles.authIcon}>🔑</span>
+            <div>
+              <div className={styles.authType}>{ep.auth.type}</div>
+              {ep.auth.details && ep.auth.details.length > 0 && (
+                <div className={styles.authDetail}>
+                  {ep.auth.details.map((d) => `${d.key}: ${d.value}`).join('\n')}
+                </div>
+              )}
+            </div>
+          </div>
+        </Section>
+      )}
+
+      {/* Headers */}
+      {ep.headers && ep.headers.length > 0 && (
+        <Section title="Headers" count={ep.headers.length}>
+          <table className={styles.hdrsTable}>
+            <tbody>
+              {ep.headers.map((h, i) => (
+                <tr key={i}>
+                  <td>{h.key}</td>
+                  <td>
+                    {h.value}
+                    {h.desc && <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>{h.desc}</div>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Section>
+      )}
+
+      {/* Path params */}
+      {pathParams.length > 0 && (
+        <Section title="Path params" count={pathParams.length} startOpen>
+          <ParamTable params={pathParams} />
+        </Section>
+      )}
+
+      {/* Query params */}
+      {queryParams.length > 0 && (
+        <Section title="Query params" count={queryParams.length} startOpen>
+          <ParamTable params={queryParams} />
+        </Section>
+      )}
+
+      {/* Header params */}
+      {headerParams.length > 0 && (
+        <Section title="Header params" count={headerParams.length}>
+          <ParamTable params={headerParams} />
+        </Section>
+      )}
+
+      {/* Body */}
       {ep.body && (
-        <Section title={`Body (${ep.bodyContentType ?? ep.bodyMode ?? 'raw'})`}>
+        <Section title="Body" startOpen>
+          {ep.bodyContentType && <span className={styles.bodyContentType}>{ep.bodyContentType}</span>}
           <CodeBlock code={ep.body} />
         </Section>
       )}
 
-      {ep.responses && ep.responses.length > 0 && <ResponseTabs responses={ep.responses} />}
-
-      {ep.examples && ep.examples.length > 0 && (
-        <Section title="Exemplos salvos">
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {ep.examples.map((ex, i) => (
-              <div key={i} style={{ border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden' }}>
-                <div style={{ padding: '6px 10px', borderBottom: '1px solid var(--border)', backgroundColor: 'var(--surface-2)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ fontSize: 11, fontFamily: 'monospace', color: ex.status.startsWith('2') ? 'var(--method-get, #10b981)' : 'var(--method-put, #f59e0b)' }}>{ex.status}</span>
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{ex.name}</span>
-                </div>
-                {ex.body && <CodeBlock code={ex.body} />}
-              </div>
-            ))}
-          </div>
+      {/* Responses */}
+      {ep.responses && ep.responses.length > 0 && (
+        <Section title="Respostas" count={ep.responses.length} startOpen>
+          <ResponseTabs responses={ep.responses} />
         </Section>
       )}
 
-      <Section title="cURL">
+      {/* Saved examples */}
+      {ep.examples && ep.examples.length > 0 && (
+        <Section title="Exemplos salvos" count={ep.examples.length}>
+          {ep.examples.map((ex, i) => (
+            <div key={i} style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                <span className={`${styles.statusBadge} ${ex.status.startsWith('2') ? styles.s2xx : ex.status.startsWith('4') ? styles.s4xx : styles.s5xx}`}>
+                  {ex.status}
+                </span>
+                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{ex.name}</span>
+              </div>
+              {ex.body && <CodeBlock code={ex.body} />}
+            </div>
+          ))}
+        </Section>
+      )}
+
+      {/* cURL */}
+      <Section title="cURL" startOpen>
         <CodeBlock code={curlStr} />
       </Section>
     </div>
   )
 }
 
-function CurlCopyButton({ curl }: { curl: string }) {
-  const [copied, setCopied] = useState(false)
-  const copy = () => {
-    navigator.clipboard.writeText(curl).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    })
-  }
+// ── Folder Node ─────────────────────────────────────────────────────────────
+
+function FolderNodeView({
+  node,
+  depth,
+  activeEpId,
+  onSelect,
+}: {
+  node: FolderNode
+  depth: number
+  activeEpId: string | null
+  onSelect: (ep: CollectionEndpoint) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const INDENT = 18
+  const BASE = 6
+  const rowPad = BASE + depth * INDENT
+  const epPad = BASE + (depth + 1) * INDENT + 2
+  const labelCls = depth === 0 ? styles.flD0 : depth === 1 ? styles.flD1 : styles.flD2
+
   return (
-    <button onClick={copy} style={{ padding: '5px 10px', fontSize: 11, fontFamily: 'monospace', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 5, color: copied ? 'var(--accent, #6366f1)' : 'var(--text-muted)', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
-      {copied ? '✓ Copiado' : '$ cURL'}
-    </button>
+    <div>
+      <button
+        className={styles.folderRow}
+        style={{ paddingLeft: rowPad }}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span className={`${styles.folderArrow} ${open ? styles.folderArrowOpen : ''}`}>›</span>
+        <span className={labelCls}>{node.name}</span>
+        <span className={styles.folderCount}>{node.eps.length + node.children.reduce((s, c) => s + c.eps.length, 0)}</span>
+      </button>
+
+      <div className={`${styles.folderChildren} ${open ? styles.folderChildrenOpen : ''}`} style={{ position: 'relative' }}>
+        <div className={styles.folderGuide} style={{ left: rowPad + 7 }} />
+
+        {node.children.map((child) => (
+          <FolderNodeView key={child.id} node={child} depth={depth + 1} activeEpId={activeEpId} onSelect={onSelect} />
+        ))}
+
+        {node.eps.map((ep) => (
+          <button
+            key={ep.id}
+            id={`ep-${ep.id}`}
+            className={`${styles.epItem} ${ep.id === activeEpId ? styles.epItemActive : ''}`}
+            style={{ paddingLeft: epPad }}
+            onClick={() => onSelect(ep)}
+          >
+            <MethodBadge method={ep.method} />
+            <span className={styles.epName}>{ep.name}</span>
+          </button>
+        ))}
+      </div>
+    </div>
   )
 }
 
-// ── ImportModal ──────────────────────────────────────────────────────────────
+// ── Import Modal ─────────────────────────────────────────────────────────────
 
 function ImportModal({ onClose, onImported }: { onClose: () => void; onImported: (id: number, name: string) => void }) {
+  const [tab, setTab] = useState<'file' | 'paste'>('file')
   const [text, setText] = useState('')
-  const [name, setName] = useState('')
   const [error, setError] = useState('')
+  const [dragover, setDragover] = useState(false)
   const [isPending, startTransition] = useTransition()
 
-  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0]
-    if (!f) return
+  const readFile = (f: File) => {
     const reader = new FileReader()
-    reader.onload = (ev) => {
-      const content = ev.target?.result as string
-      setText(content)
-      if (!name) setName(f.name.replace(/\.(json|yaml|yml)$/i, ''))
-    }
+    reader.onload = (ev) => setText(ev.target?.result as string ?? '')
     reader.readAsText(f)
   }
 
-  const handleSubmit = () => {
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0]
+    if (f) readFile(f)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragover(false)
+    const f = e.dataTransfer.files[0]
+    if (f) { readFile(f); setTab('paste') }
+  }
+
+  const doImport = () => {
     setError('')
     let parsed: unknown
-    try {
-      parsed = JSON.parse(text)
-    } catch {
-      setError('JSON inválido')
-      return
-    }
-    const collName = name.trim() || 'Collection'
+    try { parsed = JSON.parse(text) } catch { setError('JSON inválido'); return }
     startTransition(async () => {
       try {
-        const created = await importCollection(collName, parsed)
+        const created = await importCollection('Collection', parsed)
         onImported(created.id, created.name)
       } catch (e) {
         setError('Erro ao importar: ' + String(e))
@@ -312,31 +489,43 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
   }
 
   return (
-    <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={onClose}>
-      <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: 24, width: 480, maxWidth: '90vw', display: 'flex', flexDirection: 'column', gap: 14 }} onClick={(e) => e.stopPropagation()}>
-        <h3 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>Importar Collection</h3>
-
-        <div>
-          <label style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Nome</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Minha Collection" style={{ width: '100%', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, padding: '7px 10px', fontSize: 13, color: 'var(--text)', outline: 'none', boxSizing: 'border-box' }} />
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.modalTitle}>Importar collection</div>
+        <div className={styles.modalSub}>Postman v2.0 / v2.1 · OpenAPI / Swagger 2.0 / 3.0</div>
+        <div className={styles.modalTabs}>
+          <button className={`${styles.modalTab} ${tab === 'file' ? styles.modalTabActive : ''}`} onClick={() => setTab('file')}>Arquivo</button>
+          <button className={`${styles.modalTab} ${tab === 'paste' ? styles.modalTabActive : ''}`} onClick={() => setTab('paste')}>Colar JSON</button>
         </div>
 
-        <div>
-          <label style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>Arquivo JSON (Postman v2.1 ou OpenAPI 3.0)</label>
-          <input type="file" accept=".json,.yaml,.yml" onChange={handleFile} style={{ fontSize: 12, color: 'var(--text-muted)' }} />
-        </div>
+        {tab === 'file' ? (
+          <div
+            className={`${styles.dropArea} ${dragover ? styles.dropAreaDragover : ''}`}
+            onClick={() => document.getElementById('col-file-input')?.click()}
+            onDragOver={(e) => { e.preventDefault(); setDragover(true) }}
+            onDragLeave={() => setDragover(false)}
+            onDrop={handleDrop}
+          >
+            <div style={{ fontSize: 28, marginBottom: 8 }}>📄</div>
+            <strong>Clique ou arraste o arquivo aqui</strong><br />.json · .yaml · .yml
+          </div>
+        ) : (
+          <textarea
+            className={styles.pasteInput}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Cole o JSON aqui…"
+            rows={7}
+          />
+        )}
 
-        <div>
-          <label style={{ fontSize: 11, color: 'var(--text-muted)', display: 'block', marginBottom: 6 }}>ou cole o JSON aqui</label>
-          <textarea value={text} onChange={(e) => setText(e.target.value)} rows={6} placeholder='{"info": {...}, "item": [...]}' style={{ width: '100%', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, padding: '7px 10px', fontSize: 12, color: 'var(--text)', outline: 'none', fontFamily: 'monospace', resize: 'vertical', boxSizing: 'border-box' }} />
-        </div>
+        <input type="file" id="col-file-input" accept=".json,.yaml,.yml" style={{ display: 'none' }} onChange={handleFile} />
 
-        {error && <p style={{ fontSize: 12, color: 'var(--method-delete, #ef4444)', margin: 0 }}>{error}</p>}
-
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-          <button onClick={onClose} style={{ padding: '7px 14px', fontSize: 13, backgroundColor: 'transparent', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text-muted)', cursor: 'pointer' }}>Cancelar</button>
-          <button onClick={handleSubmit} disabled={!text.trim() || isPending} style={{ padding: '7px 14px', fontSize: 13, backgroundColor: 'var(--accent, #6366f1)', border: 'none', borderRadius: 6, color: '#fff', cursor: 'pointer', opacity: (!text.trim() || isPending) ? 0.5 : 1 }}>
-            {isPending ? 'Importando...' : 'Importar'}
+        {error && <div className={styles.errorMsg}>{error}</div>}
+        <div className={styles.modalFooter}>
+          <button className={styles.btn} onClick={onClose}>Cancelar</button>
+          <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={doImport} disabled={!text.trim() || isPending}>
+            {isPending ? 'Importando…' : 'Importar'}
           </button>
         </div>
       </div>
@@ -344,7 +533,7 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
   )
 }
 
-// ── CollectionSwitcher ───────────────────────────────────────────────────────
+// ── Collection Switcher ──────────────────────────────────────────────────────
 
 function CollectionSwitcher({
   collections,
@@ -381,145 +570,45 @@ function CollectionSwitcher({
   }
 
   return (
-    <div ref={ref} style={{ position: 'relative' }}>
-      <button
-        onClick={() => setOpen((v) => !v)}
-        style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', padding: '6px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, cursor: 'pointer', color: 'var(--text)', fontSize: 12, textAlign: 'left' }}
-      >
-        <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {active?.name ?? 'Selecionar collection'}
+    <div ref={ref} className={`${styles.colSwitcher} ${open ? styles.colSwitcherOpen : ''}`}>
+      <button className={styles.colSwitcherBtn} onClick={() => setOpen((v) => !v)}>
+        <span className={styles.colSwitcherIcon}>⊞</span>
+        <span className={`${styles.colSwitcherName} ${!active ? styles.colSwitcherPlaceholder : ''}`}>
+          {active?.name ?? 'Selecione uma coleção'}
         </span>
-        <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} style={{ color: 'var(--text-muted)', flexShrink: 0, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}>
-          <path d="m6 9 6 6 6-6" />
-        </svg>
+        <span className={`${styles.colSwitcherArrow} ${open ? styles.colSwitcherArrowOpen : ''}`}>▾</span>
       </button>
 
       {open && (
-        <div style={{ position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.3)', zIndex: 150, overflow: 'hidden', minWidth: 200 }}>
+        <div className={styles.colDropdown}>
           {collections.length === 0 && (
             <div style={{ padding: '10px 12px', fontSize: 12, color: 'var(--text-muted)' }}>Nenhuma collection</div>
           )}
           {collections.map((c) => (
-            <div
+            <button
               key={c.id}
+              className={`${styles.colDdItem} ${c.id === activeId ? styles.colDdItemActive : ''}`}
               onClick={() => { onSelect(c.id); setOpen(false) }}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', cursor: 'pointer', backgroundColor: c.id === activeId ? 'var(--surface-2)' : 'transparent', color: c.id === activeId ? 'var(--accent, #6366f1)' : 'var(--text)' }}
-              onMouseEnter={(e) => { if (c.id !== activeId) (e.currentTarget as HTMLDivElement).style.backgroundColor = 'var(--surface-2)' }}
-              onMouseLeave={(e) => { if (c.id !== activeId) (e.currentTarget as HTMLDivElement).style.backgroundColor = 'transparent' }}
             >
-              <span style={{ fontSize: 11, color: c.id === activeId ? 'var(--accent, #6366f1)' : 'transparent', flexShrink: 0, width: 12 }}>✓</span>
-              <span style={{ flex: 1, fontSize: 13, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</span>
-              <button
-                onClick={(e) => handleDelete(e, c.id)}
-                disabled={deletingId === c.id}
-                style={{ padding: '2px 5px', fontSize: 11, background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', opacity: deletingId === c.id ? 0.4 : 0.6, borderRadius: 4 }}
-                title="Deletar collection"
-                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--method-delete, #ef4444)')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+              <span className={styles.colDdCheck}>{c.id === activeId ? '✓' : ''}</span>
+              <span className={styles.colDdName}>{c.name}</span>
+              <span
+                className={styles.colDdDel}
+                onClick={(e) => handleDelete(e as unknown as React.MouseEvent, c.id)}
+                title="Deletar"
+                style={{ opacity: deletingId === c.id ? 0.4 : undefined }}
               >
                 ✕
-              </button>
-            </div>
-          ))}
-          <div style={{ borderTop: '1px solid var(--border)' }}>
-            <button
-              onClick={() => { setOpen(false); onImportClick() }}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '8px 12px', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 13 }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface-2)')}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-            >
-              <span style={{ fontSize: 14 }}>＋</span> Importar collection
+              </span>
             </button>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-// ── FolderNodeView ──────────────────────────────────────────────────────────
-
-function FolderNodeView({
-  node,
-  depth,
-  selectedId,
-  onSelect,
-}: {
-  node: FolderNode
-  depth: number
-  selectedId: string | null
-  onSelect: (ep: CollectionEndpoint) => void
-}) {
-  const [open, setOpen] = useState(depth === 0)
-  const isRoot = depth === 0
-
-  return (
-    <div>
-      {!isRoot && (
-        <button
-          onClick={() => setOpen((v) => !v)}
-          style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', padding: `5px ${8 + depth * 10}px`, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 12, textAlign: 'left' }}
-        >
-          <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} style={{ flexShrink: 0, transform: open ? 'rotate(90deg)' : 'none', transition: 'transform 0.12s' }}>
-            <path d="m9 18 6-6-6-6" />
-          </svg>
-          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 500 }}>{node.name}</span>
-          <span style={{ fontSize: 10, color: 'var(--text-subtle, #555)', backgroundColor: 'var(--border)', borderRadius: 8, padding: '1px 5px', marginLeft: 'auto', flexShrink: 0 }}>
-            {node.eps.length + node.children.reduce((s, c) => s + c.eps.length, 0)}
-          </span>
-        </button>
-      )}
-
-      {(isRoot || open) && (
-        <div>
-          {node.eps.map((ep) => {
-            const active = selectedId === ep.id
-            return (
-              <button
-                key={ep.id}
-                onClick={() => onSelect(ep)}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: `5px ${(depth + 1) * 10 + 4}px`, background: active ? 'color-mix(in srgb, var(--accent, #6366f1) 10%, transparent)' : 'none', border: 'none', cursor: 'pointer', textAlign: 'left', borderLeft: active ? '2px solid var(--accent, #6366f1)' : '2px solid transparent' }}
-              >
-                <MethodBadge method={ep.method} />
-                <span style={{ fontSize: 12, fontFamily: 'monospace', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: active ? 'var(--text)' : 'var(--text-muted)' }}>
-                  {ep.path}
-                </span>
-              </button>
-            )
-          })}
-          {node.children.map((child) => (
-            <FolderNodeView key={child.id} node={child} depth={depth + 1} selectedId={selectedId} onSelect={onSelect} />
           ))}
+          <div className={styles.colDdSep} />
+          <button className={styles.colDdNew} onClick={() => { setOpen(false); onImportClick() }}>
+            <span style={{ fontSize: 14 }}>＋</span> Importar collection
+          </button>
         </div>
       )}
     </div>
-  )
-}
-
-// ── SearchResults ────────────────────────────────────────────────────────────
-
-function SearchResults({ results, onSelect }: { results: FlatEndpoint[]; onSelect: (ep: FlatEndpoint) => void }) {
-  if (!results.length) return <div style={{ padding: '10px 12px', fontSize: 12, color: 'var(--text-muted)' }}>Nenhum resultado</div>
-  return (
-    <>
-      {results.slice(0, 12).map((ep, i) => (
-        <button
-          key={ep.id + i}
-          onClick={() => onSelect(ep)}
-          style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '8px 12px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', borderBottom: i < Math.min(results.length, 12) - 1 ? '1px solid var(--border)' : 'none', color: 'var(--text)' }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface-2)')}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-        >
-          <MethodBadge method={ep.method} />
-          <span style={{ fontSize: 12, fontFamily: 'monospace', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ep.path}</span>
-          {ep.folderPath.length > 0 && (
-            <span style={{ fontSize: 11, color: 'var(--text-subtle, #555)', flexShrink: 0, maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {ep.folderPath.join(' › ')}
-            </span>
-          )}
-        </button>
-      ))}
-    </>
   )
 }
 
@@ -535,48 +624,27 @@ export function CollectionsClient({
   const [collections, setCollections] = useState(initialCollections)
   const [activeId, setActiveId] = useState<number | null>(initialData?.id ?? null)
   const [structure, setStructure] = useState<CollectionStructure | null>(initialData?.structure ?? null)
-  const [selectedEp, setSelectedEp] = useState<CollectionEndpoint | null>(null)
+  const [activeEpId, setActiveEpId] = useState<string | null>(null)
+  const [activeEp, setActiveEp] = useState<FlatEndpoint | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<FlatEndpoint[]>([])
-  const [showSearch, setShowSearch] = useState(false)
+  const [searchResults, setSearchResults] = useState<Array<FlatEndpoint & { namePositions: Set<number> }>>([])
   const [showImport, setShowImport] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const flatRef = useRef<FlatEndpoint[]>([])
-  const searchRef = useRef<HTMLDivElement>(null)
 
-  // Rebuild flat list when structure changes
   useEffect(() => {
-    if (structure) {
-      flatRef.current = buildFlat(structure.tree)
-    } else {
-      flatRef.current = []
-    }
+    flatRef.current = structure ? buildFlat(structure.tree) : []
     setSearchQuery('')
     setSearchResults([])
-    setSelectedEp(null)
+    setActiveEp(null)
+    setActiveEpId(null)
   }, [structure])
 
-  // Fuzzy search
   useEffect(() => {
-    if (!searchQuery.trim()) {
-      setSearchResults([])
-      setShowSearch(false)
-      return
-    }
-    const results = runFuzzySearch(searchQuery, flatRef.current)
-    setSearchResults(results)
-    setShowSearch(true)
+    if (!searchQuery.trim()) { setSearchResults([]); return }
+    setSearchResults(runFuzzySearch(searchQuery, flatRef.current))
   }, [searchQuery])
-
-  // Close search dropdown on outside click
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) setShowSearch(false)
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
 
   const loadCollection = useCallback(async (id: number) => {
     setLoading(true)
@@ -585,48 +653,42 @@ export function CollectionsClient({
     setLoading(false)
   }, [])
 
-  const handleSelect = (id: number) => {
-    setActiveId(id)
-    loadCollection(id)
-  }
+  const handleSelect = (id: number) => { setActiveId(id); loadCollection(id) }
 
   const handleDelete = (id: number) => {
     const next = collections.filter((c) => c.id !== id)
     setCollections(next)
     if (activeId === id) {
       const first = next[0]
-      if (first) {
-        setActiveId(first.id)
-        loadCollection(first.id)
-      } else {
-        setActiveId(null)
-        setStructure(null)
-      }
+      if (first) { setActiveId(first.id); loadCollection(first.id) }
+      else { setActiveId(null); setStructure(null) }
     }
   }
 
   const handleImported = async (id: number, name: string) => {
     setShowImport(false)
-    const newMeta: CollectionMeta = { id, name, createdAt: new Date() }
-    setCollections((prev) => [newMeta, ...prev])
+    setCollections((prev) => [{ id, name, createdAt: new Date() }, ...prev])
     setActiveId(id)
     await loadCollection(id)
   }
 
-  const handleSearchSelect = (ep: FlatEndpoint) => {
+  const handleEpSelect = (ep: CollectionEndpoint) => {
+    const flat = flatRef.current.find((f) => f.id === ep.id)
+    setActiveEp(flat ?? { ...ep, folderPath: [], _paramNames: '' })
+    setActiveEpId(ep.id)
     setSearchQuery('')
-    setShowSearch(false)
-    setSelectedEp(ep)
+    setSearchResults([])
   }
+
+  const isSearching = searchQuery.trim().length > 0
 
   if (collections.length === 0 && !showImport) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 16 }}>
-        <p style={{ fontSize: 14, color: 'var(--text-muted)' }}>Nenhuma collection importada.</p>
-        <button onClick={() => setShowImport(true)} style={{ padding: '8px 18px', fontSize: 13, backgroundColor: 'var(--accent, #6366f1)', border: 'none', borderRadius: 6, color: '#fff', cursor: 'pointer' }}>
-          ＋ Importar collection
-        </button>
-        {showImport && <ImportModal onClose={() => setShowImport(false)} onImported={handleImported} />}
+      <div className={styles.emptyState} style={{ height: '100%' }}>
+        <div className={styles.emptyIcon}>⊞</div>
+        <div className={styles.emptyTitle}>Nenhuma collection importada</div>
+        <p className={styles.emptyDesc}>Importe uma collection Postman ou OpenAPI para começar a explorar endpoints.</p>
+        <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => setShowImport(true)}>＋ Importar collection</button>
       </div>
     )
   }
@@ -635,11 +697,10 @@ export function CollectionsClient({
     <>
       {showImport && <ImportModal onClose={() => setShowImport(false)} onImported={handleImported} />}
 
-      <div style={{ display: 'flex', height: '100%', overflow: 'hidden' }}>
+      <div className={styles.layout}>
         {/* Sidebar */}
-        <div style={{ width: 260, minWidth: 260, borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          {/* Collection switcher */}
-          <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--border)' }}>
+        <div className={styles.sidebar}>
+          <div className={styles.sidebarHeader}>
             <CollectionSwitcher
               collections={collections}
               activeId={activeId}
@@ -647,54 +708,81 @@ export function CollectionsClient({
               onDelete={handleDelete}
               onImportClick={() => setShowImport(true)}
             />
-          </div>
-
-          {/* Search */}
-          <div ref={searchRef} style={{ padding: '8px 12px', borderBottom: '1px solid var(--border)', position: 'relative' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 10px' }}>
-              <svg width={13} height={13} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} style={{ color: 'var(--text-muted)', flexShrink: 0 }}>
-                <circle cx={11} cy={11} r={8} /><path d="m21 21-4.35-4.35" />
-              </svg>
+            <div className={styles.searchWrap}>
+              <span className={styles.searchIcon}>⌕</span>
               <input
+                className={styles.searchInput}
+                type="text"
+                placeholder="Fuzzy search…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => { if (searchResults.length > 0) setShowSearch(true) }}
-                placeholder="Buscar endpoint..."
-                style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', fontSize: 12, color: 'var(--text)' }}
               />
-              {searchQuery && (
-                <button onClick={() => { setSearchQuery(''); setShowSearch(false) }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 0, fontSize: 14, lineHeight: 1 }} title="Limpar">
-                  ⌫
-                </button>
+              {isSearching && (
+                <span className={styles.searchCount}>{searchResults.length}</span>
+              )}
+              {isSearching && (
+                <button className={styles.searchClear} onClick={() => setSearchQuery('')} title="Limpar">⌫</button>
               )}
             </div>
-
-            {showSearch && (
-              <div style={{ position: 'absolute', top: 'calc(100%)', left: 12, right: 12, backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.3)', zIndex: 100, overflow: 'hidden', maxHeight: 320, overflowY: 'auto' }}>
-                <SearchResults results={searchResults} onSelect={handleSearchSelect} />
-              </div>
-            )}
           </div>
 
-          {/* Tree */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '6px 0' }}>
+          <div className={styles.sidebarTree}>
             {loading ? (
-              <div style={{ padding: 16, fontSize: 12, color: 'var(--text-muted)' }}>Carregando...</div>
+              <div className={styles.noResults}>Carregando…</div>
+            ) : isSearching ? (
+              searchResults.length === 0 ? (
+                <div className={styles.noResults}>Nenhum resultado.</div>
+              ) : (
+                searchResults.map((ep, i) => (
+                  <button
+                    key={ep.id + i}
+                    className={`${styles.epItem} ${styles.epItemSearchResult} ${ep.id === activeEpId ? styles.epItemActive : ''}`}
+                    onClick={() => handleEpSelect(ep)}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%' }}>
+                      <MethodBadge method={ep.method} />
+                      <HighlightedName text={ep.name} positions={ep.namePositions} />
+                    </div>
+                    {ep.folderPath.length > 0 && (
+                      <div className={styles.searchCrumb}>
+                        {ep.folderPath.join(' › ')}
+                      </div>
+                    )}
+                  </button>
+                ))
+              )
             ) : structure ? (
-              <FolderNodeView node={structure.tree} depth={0} selectedId={selectedEp?.id ?? null} onSelect={setSelectedEp} />
+              <>
+                {structure.tree.eps.map((ep) => (
+                  <button
+                    key={ep.id}
+                    className={`${styles.epItem} ${ep.id === activeEpId ? styles.epItemActive : ''}`}
+                    style={{ paddingLeft: 8 }}
+                    onClick={() => handleEpSelect(ep)}
+                  >
+                    <MethodBadge method={ep.method} />
+                    <span className={styles.epName}>{ep.name}</span>
+                  </button>
+                ))}
+                {structure.tree.children.map((child) => (
+                  <FolderNodeView key={child.id} node={child} depth={0} activeEpId={activeEpId} onSelect={handleEpSelect} />
+                ))}
+              </>
             ) : (
-              <div style={{ padding: 16, fontSize: 12, color: 'var(--text-muted)' }}>Selecione uma collection.</div>
+              <div className={styles.noResults}>Selecione uma collection.</div>
             )}
           </div>
         </div>
 
-        {/* Detail panel */}
-        <div style={{ flex: 1, overflowY: 'auto' }}>
-          {selectedEp ? (
-            <EndpointDetail ep={selectedEp} />
+        {/* Main */}
+        <div className={styles.main}>
+          {activeEp ? (
+            <EndpointDetail ep={activeEp} />
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: 13 }}>
-              Selecione um endpoint na lateral.
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>←</div>
+              <div className={styles.emptyTitle}>Selecione um endpoint</div>
+              <p className={styles.emptyDesc}>Escolha um endpoint na barra lateral para ver seus detalhes.</p>
             </div>
           )}
         </div>
