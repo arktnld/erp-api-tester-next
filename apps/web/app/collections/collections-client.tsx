@@ -114,6 +114,121 @@ function buildCurl(ep: CollectionEndpoint): string {
   return parts.join(' \\\n')
 }
 
+// ── Markdown ────────────────────────────────────────────────────────────────
+
+type InlineNode = { type: 'text'; text: string } | { type: 'strong'; children: InlineNode[] } | { type: 'em'; children: InlineNode[] } | { type: 'code'; text: string }
+
+function parseInline(text: string): InlineNode[] {
+  const nodes: InlineNode[] = []
+  let i = 0
+  while (i < text.length) {
+    if (text[i] === '*' && text[i + 1] === '*') {
+      const end = text.indexOf('**', i + 2)
+      if (end !== -1) { nodes.push({ type: 'strong', children: parseInline(text.slice(i + 2, end)) }); i = end + 2; continue }
+    }
+    if (text[i] === '*') {
+      const end = text.indexOf('*', i + 1)
+      if (end !== -1) { nodes.push({ type: 'em', children: parseInline(text.slice(i + 1, end)) }); i = end + 1; continue }
+    }
+    if (text[i] === '`') {
+      const end = text.indexOf('`', i + 1)
+      if (end !== -1) { nodes.push({ type: 'code', text: text.slice(i + 1, end) }); i = end + 1; continue }
+    }
+    const next = text.slice(i).search(/\*\*|\*|`/)
+    if (next === -1) { nodes.push({ type: 'text', text: text.slice(i) }); break }
+    nodes.push({ type: 'text', text: text.slice(i, i + next) }); i += next
+  }
+  return nodes
+}
+
+function RenderInline({ nodes }: { nodes: InlineNode[] }): React.ReactElement {
+  return (
+    <>
+      {nodes.map((n, i) =>
+        n.type === 'text' ? <span key={i}>{n.text}</span>
+        : n.type === 'strong' ? <strong key={i}><RenderInline nodes={n.children} /></strong>
+        : n.type === 'em' ? <em key={i}><RenderInline nodes={n.children} /></em>
+        : <code key={i} className={styles.mdCode}>{n.text}</code>
+      )}
+    </>
+  )
+}
+
+function MarkdownView({ text }: { text: string }) {
+  if (!text) return null
+  const lines = text.split('\n')
+  const elements: React.ReactNode[] = []
+  let i = 0
+  let key = 0
+
+  while (i < lines.length) {
+    const line = lines[i]
+    const trimmed = line.trim()
+
+    // Table
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+      const rows: string[][] = []
+      let isSep = false
+      let j = i
+      while (j < lines.length && lines[j].trim().startsWith('|')) {
+        const row = lines[j].trim()
+        if (/^\|[\s\-:|]+\|$/.test(row)) { isSep = true; j++; continue }
+        rows.push(row.slice(1, -1).split('|').map((c) => c.trim()))
+        j++
+      }
+      const [head, ...body] = rows
+      elements.push(
+        <table key={key++} className={styles.mdTable}>
+          {head && <thead><tr>{head.map((c, ci) => <th key={ci}>{c}</th>)}</tr></thead>}
+          {body.length > 0 && <tbody>{body.map((row, ri) => <tr key={ri}>{row.map((c, ci) => <td key={ci}>{c}</td>)}</tr>)}</tbody>}
+        </table>
+      )
+      i = j; continue
+    }
+
+    // Blank
+    if (!trimmed) { i++; continue }
+
+    // HR
+    if (/^[-*_]{3,}$/.test(trimmed)) { elements.push(<hr key={key++} className={styles.mdHr} />); i++; continue }
+
+    // Heading
+    const hm = trimmed.match(/^(#{1,6})\s+(.+)/)
+    if (hm) {
+      const level = hm[1].length
+      const Tag = (level <= 2 ? 'h3' : 'h4') as 'h3' | 'h4'
+      elements.push(<Tag key={key++} className={level <= 2 ? styles.mdH3 : styles.mdH4}>{hm[2]}</Tag>)
+      i++; continue
+    }
+
+    // List
+    const ulm = trimmed.match(/^[-*+]\s+(.+)/)
+    const olm = trimmed.match(/^\d+\.\s+(.+)/)
+    if (ulm || olm) {
+      const isOl = !!olm
+      const items: string[] = []
+      while (i < lines.length && (lines[i].trim().match(/^[-*+]\s+/) || lines[i].trim().match(/^\d+\.\s+/))) {
+        const m = lines[i].trim().match(/^(?:[-*+]|\d+\.)\s+(.+)/)
+        if (m) items.push(m[1])
+        i++
+      }
+      const ListTag = isOl ? 'ol' : 'ul'
+      elements.push(
+        <ListTag key={key++} className={isOl ? styles.mdOl : styles.mdUl}>
+          {items.map((item, li) => <li key={li} className={styles.mdLi}><RenderInline nodes={parseInline(item)} /></li>)}
+        </ListTag>
+      )
+      continue
+    }
+
+    // Paragraph
+    elements.push(<p key={key++} className={styles.mdP}><RenderInline nodes={parseInline(trimmed)} /></p>)
+    i++
+  }
+
+  return <div className={styles.mdWrap}>{elements}</div>
+}
+
 // ── Highlighted name ────────────────────────────────────────────────────────
 
 function HighlightedName({ text, positions }: { text: string; positions: Set<number> }) {
@@ -137,19 +252,49 @@ function MethodBadge({ method, large }: { method: string; large?: boolean }) {
   )
 }
 
-// ── Code Block ──────────────────────────────────────────────────────────────
+// ── Code Block (with JSON highlighting) ────────────────────────────────────
+
+type JsonToken = { t: 'key' | 'str' | 'num' | 'lit' | 'plain'; v: string }
+
+function tokenizeJson(code: string): JsonToken[] {
+  const tokens: JsonToken[] = []
+  const re = /"([^"\n]+)"(\s*:)|: "([^"\n]*)"|: (-?\d+\.?\d*)\b|: (true|false|null)\b/g
+  let last = 0
+  let m: RegExpExecArray | null
+  while ((m = re.exec(code)) !== null) {
+    if (m.index > last) tokens.push({ t: 'plain', v: code.slice(last, m.index) })
+    if (m[1] !== undefined) { tokens.push({ t: 'plain', v: '"' }); tokens.push({ t: 'key', v: m[1] }); tokens.push({ t: 'plain', v: '"' + m[2] }) }
+    else if (m[3] !== undefined) { tokens.push({ t: 'plain', v: ': "' }); tokens.push({ t: 'str', v: m[3] }); tokens.push({ t: 'plain', v: '"' }) }
+    else if (m[4] !== undefined) { tokens.push({ t: 'plain', v: ': ' }); tokens.push({ t: 'num', v: m[4] }) }
+    else if (m[5] !== undefined) { tokens.push({ t: 'plain', v: ': ' }); tokens.push({ t: 'lit', v: m[5] }) }
+    last = m.index + m[0].length
+  }
+  if (last < code.length) tokens.push({ t: 'plain', v: code.slice(last) })
+  return tokens
+}
 
 function CodeBlock({ code }: { code: string }) {
   const [copied, setCopied] = useState(false)
+  const isJson = code.trim().startsWith('{') || code.trim().startsWith('[')
   const copy = () => {
     navigator.clipboard.writeText(code).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     })
   }
+  let content: React.ReactNode = code
+  if (isJson) {
+    try {
+      const tokens = tokenizeJson(code)
+      const clsMap: Record<string, string> = { key: styles.hlKey, str: styles.hlStr, num: styles.hlNum, lit: styles.hlLit }
+      content = tokens.map((tok, i) =>
+        tok.t === 'plain' ? tok.v : <span key={i} className={clsMap[tok.t]}>{tok.v}</span>
+      )
+    } catch { content = code }
+  }
   return (
     <div className={styles.codeWrap}>
-      <pre className={styles.codeBlock}>{code}</pre>
+      <pre className={styles.codeBlock}>{content}</pre>
       <button className={styles.copyBtn} onClick={copy}>{copied ? '✓' : 'Copiar'}</button>
     </div>
   )
@@ -244,12 +389,96 @@ function ResponseTabs({ responses }: { responses: NonNullable<CollectionEndpoint
 
 // ── Endpoint Detail ─────────────────────────────────────────────────────────
 
+function ResponsesSection({ ep }: { ep: CollectionEndpoint }) {
+  const examples = ep.examples ?? []
+  const responses = ep.responses ?? []
+  const hasExamples = examples.length > 0
+  const hasResponses = !hasExamples && responses.length > 0
+  const count = hasExamples ? examples.length : hasResponses ? responses.length : null
+  const [activeTab, setActiveTab] = useState(0)
+
+  const tabCls = (idx: number, status: string) => {
+    const isActive = idx === activeTab
+    if (!isActive) return styles.respTab
+    if (status.startsWith('2')) return `${styles.respTab} ${styles.respTabActiveS2xx}`
+    if (status.startsWith('4')) return `${styles.respTab} ${styles.respTabActiveS4xx}`
+    if (status.startsWith('5')) return `${styles.respTab} ${styles.respTabActiveS5xx}`
+    return `${styles.respTab} ${styles.respTabActive}`
+  }
+
+  return (
+    <Section title="Respostas" count={count ?? undefined} startOpen>
+      {hasExamples ? (
+        <>
+          <div className={styles.respTabs}>
+            {examples.map((ex, i) => {
+              const label = ex.status + (ex.statusText ? ' ' + ex.statusText : '') + (examples.length > 1 ? ' · ' + ex.name : '')
+              return <button key={i} className={tabCls(i, ex.status)} onClick={() => setActiveTab(i)}>{label}</button>
+            })}
+          </div>
+          {examples[activeTab] && (() => {
+            const ex = examples[activeTab]
+            return (
+              <>
+                {ex.requestBody && (
+                  <div className={styles.exampleSection}>
+                    <div className={styles.exampleSectionTitle}>Request Body</div>
+                    <CodeBlock code={ex.requestBody} />
+                  </div>
+                )}
+                {ex.body && ex.body.trim() && (
+                  <div className={styles.exampleSection}>
+                    <div className={styles.exampleSectionTitle}>Response Body</div>
+                    <CodeBlock code={ex.body} />
+                  </div>
+                )}
+                {ex.headers && Object.keys(ex.headers).length > 0 && (
+                  <div className={styles.exampleSection}>
+                    <div className={styles.exampleSectionTitle}>Response Headers</div>
+                    <table className={styles.hdrsTable}>
+                      <tbody>
+                        {Object.entries(ex.headers).map(([k, v], i) => (
+                          <tr key={i}><td>{k}</td><td>{v}</td></tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </>
+            )
+          })()}
+        </>
+      ) : hasResponses ? (
+        <>
+          <div className={styles.respTabs}>
+            {responses.map((r, i) => (
+              <button key={i} className={tabCls(i, r.status)} onClick={() => setActiveTab(i)}>
+                {r.status}{r.statusText ? ' ' + r.statusText : ''}
+              </button>
+            ))}
+          </div>
+          {responses[activeTab] && (
+            <>
+              {responses[activeTab].desc && <p className={styles.respDesc}>{responses[activeTab].desc}</p>}
+              {responses[activeTab].example && responses[activeTab].example!.trim() && (
+                <CodeBlock code={responses[activeTab].example!} />
+              )}
+            </>
+          )}
+        </>
+      ) : (
+        <div className={styles.respEmpty}>
+          Esta coleção Postman não possui exemplos de resposta salvos para este endpoint.
+          <span className={styles.respEmptySub}>Para adicionar: execute no Postman → selecione a resposta → "Save as Example".</span>
+        </div>
+      )}
+    </Section>
+  )
+}
+
 function EndpointDetail({ ep }: { ep: FlatEndpoint }) {
   const [curlCopied, setCurlCopied] = useState(false)
   const allParams = ep.params ?? []
-  const pathParams = allParams.filter((p) => p.in === 'path')
-  const queryParams = allParams.filter((p) => p.in === 'query')
-  const headerParams = allParams.filter((p) => p.in === 'header')
   const curlStr = buildCurl(ep)
 
   const copyCurl = () => {
@@ -258,6 +487,21 @@ function EndpointDetail({ ep }: { ep: FlatEndpoint }) {
       setTimeout(() => setCurlCopied(false), 1500)
     })
   }
+
+  const hasAuth = ep.auth || (ep.security && ep.security.length > 0)
+
+  const pinClass: Record<string, string> = {
+    path: styles.pinPath, query: styles.pinQuery, header: styles.pinHeader, cookie: styles.pinCookie,
+  }
+  const paramGroups = [
+    { label: 'Path',   cls: 'path',   list: allParams.filter((p) => p.in === 'path') },
+    { label: 'Query',  cls: 'query',  list: allParams.filter((p) => p.in === 'query') },
+    { label: 'Header', cls: 'header', list: allParams.filter((p) => p.in === 'header') },
+    { label: 'Cookie', cls: 'cookie', list: allParams.filter((p) => p.in === 'cookie') },
+    { label: 'Outros', cls: 'query',  list: allParams.filter((p) => !p.in) },
+  ].filter((g) => g.list.length > 0)
+
+  const reqHeaders = (ep.headers ?? []).filter((h) => h.key && !h.key.match(/^(content-type|authorization)$/i))
 
   return (
     <div className={styles.detail}>
@@ -292,31 +536,60 @@ function EndpointDetail({ ep }: { ep: FlatEndpoint }) {
         <div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace', marginTop: 4 }}>{ep.operationId}</div>
       )}
 
-      {ep.desc && <p className={styles.detailDesc}>{ep.desc}</p>}
+      {ep.desc && <MarkdownView text={ep.desc} />}
 
-      {/* Auth */}
-      {ep.auth && (
-        <Section title="Autenticação">
+      {/* Auth / Security */}
+      {hasAuth && (
+        <Section title="Autenticação" startOpen>
           <div className={styles.authBlock}>
-            <span className={styles.authIcon}>🔑</span>
+            <span className={styles.authIcon}>🔒</span>
             <div>
-              <div className={styles.authType}>{ep.auth.type}</div>
-              {ep.auth.details && ep.auth.details.length > 0 && (
-                <div className={styles.authDetail}>
-                  {ep.auth.details.map((d) => `${d.key}: ${d.value}`).join('\n')}
-                </div>
+              {ep.auth && (
+                <>
+                  <div className={styles.authType}>
+                    {ep.auth.type.charAt(0).toUpperCase() + ep.auth.type.slice(1)}
+                  </div>
+                  {ep.auth.details && ep.auth.details.filter((d) => d.value && d.key !== 'token').length > 0 && (
+                    <div className={styles.authDetail}>
+                      {ep.auth.details.filter((d) => d.value && d.key !== 'token').map((d) => `${d.key}: ${d.value}`).join(' · ')}
+                    </div>
+                  )}
+                </>
+              )}
+              {ep.security && ep.security.map((sec, i) =>
+                Object.entries(sec).map(([scheme, scopes]) => (
+                  <div key={i + scheme}>
+                    <div className={styles.authType}>{scheme}</div>
+                    {scopes.length > 0 && <div className={styles.authDetail}>Escopos: {scopes.join(', ')}</div>}
+                  </div>
+                ))
               )}
             </div>
           </div>
         </Section>
       )}
 
-      {/* Headers */}
-      {ep.headers && ep.headers.length > 0 && (
-        <Section title="Headers" count={ep.headers.length}>
+      {/* Parameters — grouped */}
+      {allParams.length > 0 && (
+        <Section title="Parâmetros" count={allParams.length} startOpen>
+          {paramGroups.map((g) => (
+            <div key={g.label} className={styles.paramGroup}>
+              <div className={styles.paramGroupLbl}>
+                <span className={`${styles.pin} ${pinClass[g.cls] ?? ''}`}>{g.label}</span>
+                <span style={{ color: 'var(--text-muted)', fontSize: 10 }}>{g.list.length} parâmetro{g.list.length > 1 ? 's' : ''}</span>
+              </div>
+              <ParamTable params={g.list} />
+            </div>
+          ))}
+        </Section>
+      )}
+
+      {/* Request Headers */}
+      {reqHeaders.length > 0 && (
+        <Section title="Headers da Requisição" count={reqHeaders.length}>
           <table className={styles.hdrsTable}>
             <tbody>
-              {ep.headers.map((h, i) => (
+              {reqHeaders.map((h, i) => (
                 <tr key={i}>
                   <td>{h.key}</td>
                   <td>
@@ -330,58 +603,20 @@ function EndpointDetail({ ep }: { ep: FlatEndpoint }) {
         </Section>
       )}
 
-      {/* Path params */}
-      {pathParams.length > 0 && (
-        <Section title="Path params" count={pathParams.length} startOpen>
-          <ParamTable params={pathParams} />
-        </Section>
-      )}
-
-      {/* Query params */}
-      {queryParams.length > 0 && (
-        <Section title="Query params" count={queryParams.length} startOpen>
-          <ParamTable params={queryParams} />
-        </Section>
-      )}
-
-      {/* Header params */}
-      {headerParams.length > 0 && (
-        <Section title="Header params" count={headerParams.length}>
-          <ParamTable params={headerParams} />
-        </Section>
-      )}
-
       {/* Body */}
-      {ep.body && (
-        <Section title="Body" startOpen>
-          {ep.bodyContentType && <span className={styles.bodyContentType}>{ep.bodyContentType}</span>}
-          <CodeBlock code={ep.body} />
-        </Section>
-      )}
+      {ep.body != null && (() => {
+        const bodyIsEmpty = Array.isArray(ep.body) ? ep.body.length === 0 : !String(ep.body).trim()
+        if (bodyIsEmpty) return null
+        return (
+          <Section title="Request Body" startOpen>
+            {ep.bodyContentType && <span className={styles.bodyContentType}>{ep.bodyContentType}</span>}
+            <CodeBlock code={typeof ep.body === 'string' ? ep.body : JSON.stringify(ep.body, null, 2)} />
+          </Section>
+        )
+      })()}
 
-      {/* Responses */}
-      {ep.responses && ep.responses.length > 0 && (
-        <Section title="Respostas" count={ep.responses.length} startOpen>
-          <ResponseTabs responses={ep.responses} />
-        </Section>
-      )}
-
-      {/* Saved examples */}
-      {ep.examples && ep.examples.length > 0 && (
-        <Section title="Exemplos salvos" count={ep.examples.length}>
-          {ep.examples.map((ex, i) => (
-            <div key={i} style={{ marginBottom: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                <span className={`${styles.statusBadge} ${ex.status.startsWith('2') ? styles.s2xx : ex.status.startsWith('4') ? styles.s4xx : styles.s5xx}`}>
-                  {ex.status}
-                </span>
-                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{ex.name}</span>
-              </div>
-              {ex.body && <CodeBlock code={ex.body} />}
-            </div>
-          ))}
-        </Section>
-      )}
+      {/* Responses (unified) */}
+      <ResponsesSection ep={ep} />
 
       {/* cURL */}
       <Section title="cURL" startOpen>
