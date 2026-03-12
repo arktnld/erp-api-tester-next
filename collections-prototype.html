@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Collections — Protótipo</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  /* SITE NAV SIDEBAR */
+  .nav-sidebar { position:fixed; left:0; top:0; width:220px; height:100vh; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; z-index:50; }
+  .nav-logo { padding:18px 16px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:6px; }
+  .nav-logo-mark { font-family:monospace; font-size:15px; font-weight:700; color:var(--accent); }
+  .nav-logo-text { font-size:15px; font-weight:600; color:var(--text); }
+  .nav-menu { flex:1; padding:8px; display:flex; flex-direction:column; gap:1px; overflow-y:auto; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:7px 10px; border-radius:6px; font-size:13px; font-weight:400; color:var(--text-muted); cursor:default; text-decoration:none; }
+  .nav-item:hover { background:var(--surface-2); color:var(--text); }
+  .nav-item.active { background:var(--surface-2); color:var(--text); font-weight:500; }
+  .nav-icon { font-size:14px; width:18px; text-align:center; flex-shrink:0; }
+  .nav-footer { padding:8px; border-top:1px solid var(--border); }
+
+  :root {
+    --background:#0a0a0a; --surface:#111111; --surface-2:#161616; --border:#1f1f1f; --border-2:#2a2a2a;
+    --text:#ededed; --text-muted:#888888; --text-subtle:#555555;
+    --accent:#6366f1; --accent-hover:#4f46e5; --accent-dim:color-mix(in srgb,var(--accent) 12%,transparent);
+    --method-get:#10b981; --method-post:#8b5cf6; --method-put:#f59e0b; --method-patch:#6b7280; --method-delete:#ef4444;
+  }
+  body { background:var(--background); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif; height:100vh; overflow:hidden; font-size:13px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); font-size:12px; cursor:pointer; font-weight:500; transition:all .15s; }
+  .btn:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-primary { background:var(--accent); border-color:var(--accent); color:white; }
+  .btn-primary:hover { opacity:.85; color:white; }
+  .layout { position:fixed; top:0; left:220px; right:0; bottom:0; display:flex; overflow:hidden; }
+
+  /* SIDEBAR */
+  .sidebar { width:290px; border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; background:var(--surface); }
+  .sidebar-header { padding:10px; border-bottom:1px solid var(--border); display:flex; flex-direction:column; gap:8px; flex-shrink:0; }
+  .col-switcher { position:relative; }
+  .col-switcher-btn { display:flex; align-items:center; gap:8px; padding:7px 10px; border-radius:6px; cursor:pointer; background:var(--surface-2); border:1px solid var(--border); transition:border-color .12s; }
+  .col-switcher-btn:hover { border-color:var(--accent); }
+  .col-switcher.open .col-switcher-btn { border-color:var(--accent); }
+  .col-switcher-icon { font-size:11px; color:var(--text-muted); flex-shrink:0; }
+  .col-switcher-name { flex:1; font-size:12px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+  .col-switcher-name.placeholder { color:var(--text-muted); font-weight:400; }
+  .col-switcher-arrow { color:var(--text-muted); font-size:10px; flex-shrink:0; transition:transform .15s; }
+  .col-switcher.open .col-switcher-arrow { transform:rotate(180deg); }
+  .col-dropdown { display:none; position:absolute; top:calc(100% + 4px); left:0; right:0; background:var(--surface); border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.35); z-index:200; overflow:hidden; max-height:260px; overflow-y:auto; }
+  .col-switcher.open .col-dropdown { display:block; }
+  .col-dd-item { display:flex; align-items:center; gap:8px; padding:8px 10px; cursor:pointer; min-width:0; }
+  .col-dd-item:hover { background:var(--surface-2); }
+  .col-dd-item.active { background:var(--accent-dim); }
+  .col-dd-check { width:14px; flex-shrink:0; font-size:11px; color:var(--accent); }
+  .col-dd-name { flex:1; font-size:12px; font-weight:500; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+  .col-dd-item.active .col-dd-name { color:var(--text); font-weight:600; }
+  .col-dd-del { flex-shrink:0; border:none; background:none; color:transparent; cursor:pointer; font-size:13px; padding:0 2px; border-radius:3px; line-height:1; }
+  .col-dd-item:hover .col-dd-del { color:var(--text-muted); }
+  .col-dd-del:hover { color:#ef4444 !important; }
+  .col-dd-sep { height:1px; background:var(--border); margin:4px 0; }
+  .col-dd-new { display:flex; align-items:center; gap:8px; padding:8px 10px; cursor:pointer; font-size:12px; color:var(--text-muted); }
+  .col-dd-new:hover { background:var(--surface-2); color:var(--text); }
+  .search-wrap { position:relative; }
+  .search-input { width:100%; background:var(--surface-2); border:1px solid var(--border); color:var(--text); padding:7px 36px 7px 28px; border-radius:6px; font-size:12px; transition:border-color .15s; }
+  .search-input:focus { outline:none; border-color:var(--accent); }
+  .search-icon { position:absolute; left:9px; top:50%; transform:translateY(-50%); color:var(--text-muted); pointer-events:none; font-size:12px; }
+  .search-count { position:absolute; right:28px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:10px; background:var(--surface); border:1px solid var(--border); padding:1px 5px; border-radius:8px; }
+  .search-count:empty { display:none; }
+  .search-clear { position:absolute; right:8px; top:50%; transform:translateY(-50%); color:var(--text-muted); background:none; border:none; cursor:pointer; font-size:14px; line-height:1; padding:0; display:none; }
+  .search-clear:hover { color:var(--text); }
+  .sidebar-tree { flex:1; overflow-y:auto; padding:4px 0 12px; }
+  .sidebar-tree::-webkit-scrollbar { width:3px; }
+  .sidebar-tree::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+
+  /* FOLDER NODES */
+  .folder-row { display:flex; align-items:center; gap:4px; cursor:pointer; user-select:none; height:28px; padding-right:6px; border-radius:5px; margin:1px 4px; transition:background .12s; }
+  .folder-row:hover { background:var(--surface-2); }
+  .folder-arrow { font-size:14px; color:var(--text-muted); transition:transform .15s ease; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; width:16px; height:16px; line-height:1; margin-top:-1px; }
+  .folder-arrow.open { transform:rotate(90deg); }
+  /* depth-0: section header style */
+  .fl-d0 { font-size:11px; font-weight:700; color:var(--text-subtle); text-transform:uppercase; letter-spacing:.05em; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  /* depth-1: named folder */
+  .fl-d1 { font-size:12px; font-weight:600; color:var(--text); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  /* depth-2+: sub-folder */
+  .fl-d2 { font-size:12px; font-weight:500; color:var(--text-subtle); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .folder-count { font-size:9px; color:var(--text-muted); background:var(--surface-2); border:1px solid var(--border); border-radius:8px; padding:1px 5px; flex-shrink:0; }
+  /* Children container with guide line via positioned child */
+  .folder-children { display:none; position:relative; }
+  .folder-children.open { display:block; }
+  .folder-guide { position:absolute; top:0; bottom:0; width:1px; background:rgba(255,255,255,0.07); pointer-events:none; }
+
+  /* ENDPOINT ITEMS */
+  .ep-item { display:flex; align-items:center; gap:7px; height:28px; padding-right:4px; cursor:pointer; border-left:2px solid transparent; transition:all .1s; border-radius:0 4px 4px 0; margin-right:4px; }
+  .ep-item:hover { background:var(--surface-2); }
+  .ep-item.active { background:var(--accent-dim); border-left-color:var(--accent); }
+  .ep-item.search-result { height:auto; flex-direction:column; align-items:flex-start; gap:2px; padding:6px 8px 6px 10px; }
+  .search-crumb { font-size:10px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+  .method-badge { font-size:9px; font-weight:700; padding:2px 4px; border-radius:3px; flex-shrink:0; font-family:monospace; min-width:40px; text-align:center; }
+  .GET    { color:var(--method-get);    background:color-mix(in srgb,var(--method-get) 12%,transparent); }
+  .POST   { color:var(--method-post);   background:color-mix(in srgb,var(--method-post) 12%,transparent); }
+  .PUT    { color:var(--method-put);    background:color-mix(in srgb,var(--method-put) 12%,transparent); }
+  .DELETE { color:var(--method-delete); background:color-mix(in srgb,var(--method-delete) 12%,transparent); }
+  .PATCH  { color:var(--method-patch);  background:color-mix(in srgb,var(--method-patch) 12%,transparent); }
+  .ep-name { font-size:12px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ep-name mark { background:none; color:var(--accent); font-weight:700; }
+  .no-results { padding:24px 16px; text-align:center; color:var(--text-muted); font-size:12px; }
+
+  /* MAIN */
+  .main { flex:1; overflow-y:auto; display:flex; flex-direction:column; }
+  .main::-webkit-scrollbar { width:6px; }
+  .main::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
+  .empty-state { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; color:var(--text-muted); }
+  .empty-icon { font-size:44px; opacity:.3; }
+  .empty-title { font-size:15px; font-weight:600; color:var(--text-subtle); }
+  .empty-desc { font-size:12px; text-align:center; max-width:300px; line-height:1.7; }
+  .detail { padding:28px 32px; max-width:820px; }
+  .breadcrumb { display:flex; align-items:center; gap:4px; font-size:11px; color:var(--text-muted); margin-bottom:12px; flex-wrap:wrap; }
+  .breadcrumb-sep { color:var(--border); }
+  .breadcrumb-item { color:var(--text-subtle); }
+  .detail-method-path { display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
+  .curl-copy-btn { margin-left:auto; font-size:11px; font-weight:600; font-family:monospace; padding:4px 10px; border-radius:5px; border:1px solid var(--border); background:var(--surface-2); color:var(--text-muted); cursor:pointer; transition:all .12s; white-space:nowrap; }
+  .curl-copy-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .detail-method { font-size:13px; font-weight:700; padding:4px 10px; border-radius:5px; font-family:monospace; }
+  .detail-path { font-family:monospace; font-size:14px; font-weight:500; word-break:break-all; }
+  .detail-name { font-size:20px; font-weight:700; margin-bottom:8px; }
+  .detail-desc { color:var(--text-muted); line-height:1.7; font-size:13px; white-space:pre-wrap; }
+  .section { margin-top:24px; }
+  .section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:10px; }
+  .params-table { width:100%; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .params-row { display:grid; grid-template-columns:180px 90px 1fr; border-bottom:1px solid var(--border); }
+  .params-row:last-child { border-bottom:none; }
+  .params-row.header { background:var(--surface-2); }
+  .params-cell { padding:8px 12px; font-size:12px; color:var(--text-muted); word-break:break-word; }
+  .params-row.header .params-cell { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
+  .param-name { font-family:monospace; color:var(--accent); }
+  .param-required { color:#ef4444; font-size:10px; font-weight:700; margin-left:3px; }
+  .param-type { font-size:11px; color:var(--text-subtle); font-family:monospace; }
+  .code-block { background:var(--surface-2); border:1px solid var(--border); border-radius:8px; padding:14px 16px; font-family:monospace; font-size:12px; line-height:1.6; color:var(--text-subtle); overflow-x:auto; white-space:pre-wrap; word-break:break-word; }
+  .response-item { border:1px solid var(--border); border-radius:8px; margin-bottom:8px; overflow:hidden; }
+  .response-header { display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--surface-2); }
+  .status-badge { font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px; font-family:monospace; }
+  .s2xx { background:rgba(16,185,129,.15); color:#10b981; }
+  .s4xx { background:rgba(239,68,68,.15); color:#ef4444; }
+  .s5xx { background:rgba(245,158,11,.15); color:#f59e0b; }
+  .sdef { background:var(--surface-2); color:var(--text-subtle); }
+  .response-desc { font-size:12px; color:var(--text-muted); }
+
+  /* MODAL */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); display:flex; align-items:center; justify-content:center; z-index:100; backdrop-filter:blur(4px); }
+  .modal-overlay.hidden { display:none; }
+  .modal { background:var(--surface); border:1px solid var(--border); border-radius:12px; width:500px; padding:24px; }
+  .modal-title { font-size:16px; font-weight:700; margin-bottom:4px; }
+  .modal-sub { color:var(--text-muted); font-size:12px; margin-bottom:20px; }
+  .modal-tabs { display:flex; gap:4px; margin-bottom:16px; }
+  .modal-tab { padding:6px 14px; border-radius:6px; border:1px solid var(--border); background:none; color:var(--text-muted); font-size:12px; cursor:pointer; transition:all .15s; }
+  .modal-tab.active { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); font-weight:600; }
+  .drop-area { border:2px dashed var(--border); border-radius:8px; padding:32px; text-align:center; color:var(--text-muted); font-size:12px; cursor:pointer; transition:all .15s; line-height:1.8; }
+  .drop-area:hover,.drop-area.dragover { border-color:var(--accent); color:var(--accent); background:var(--accent-dim); }
+  .modal-footer { display:flex; justify-content:flex-end; gap:8px; margin-top:20px; }
+  .paste-input { width:100%; background:var(--surface-2); border:1px solid var(--border); color:var(--text); padding:10px; border-radius:6px; font-size:11px; font-family:monospace; resize:vertical; min-height:120px; }
+  .paste-input:focus { outline:none; border-color:var(--accent); }
+  .error-msg { color:#ef4444; font-size:12px; margin-top:8px; padding:8px 12px; background:rgba(239,68,68,.08); border-radius:6px; border:1px solid rgba(239,68,68,.2); }
+
+  /* COLLAPSIBLE SECTIONS */
+  .sect { margin-top:16px; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .sect-hd { display:flex; align-items:center; gap:6px; padding:9px 14px; cursor:pointer; user-select:none; background:var(--surface-2); transition:background .12s; }
+  .sect-hd:hover { background:rgba(99,102,241,.08); }
+  .sect-arrow { font-size:13px; color:var(--text-muted); transition:transform .15s ease; display:inline-flex; align-items:center; justify-content:center; width:14px; }
+  .sect-arrow.open { transform:rotate(90deg); }
+  .sect-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); flex:1; }
+  .sect-cnt { font-size:9px; padding:1px 6px; border-radius:8px; background:var(--background); border:1px solid var(--border); color:var(--text-muted); font-weight:600; }
+  .sect-body { display:none; padding:14px; }
+  .sect-body.open { display:block; }
+
+  /* PARAM TABLE */
+  .param-table { width:100%; border-collapse:collapse; }
+  .param-table th { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); padding:6px 10px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap; }
+  .param-table td { padding:8px 10px; font-size:12px; vertical-align:top; border-bottom:1px solid rgba(255,255,255,.04); }
+  .param-table tr:last-child td { border-bottom:none; }
+  .param-table tr:hover td { background:rgba(255,255,255,.015); }
+  .pname { font-family:monospace; font-size:12px; color:var(--accent); font-weight:500; }
+  .preq { font-size:9px; font-weight:700; color:#ef4444; background:rgba(239,68,68,.12); border-radius:3px; padding:1px 4px; margin-left:4px; }
+  .ptype { font-family:monospace; font-size:11px; color:var(--text-subtle); }
+  .pdesc { color:var(--text-muted); font-size:11px; line-height:1.5; }
+  .pex { font-family:monospace; font-size:11px; color:var(--text-subtle); background:var(--background); padding:1px 5px; border-radius:3px; margin-top:3px; display:inline-block; }
+  .pin { font-size:9px; font-weight:700; padding:2px 6px; border-radius:4px; font-family:monospace; white-space:nowrap; }
+  .pin-path   { background:rgba(168,85,247,.15);  color:#a855f7; }
+  .pin-query  { background:rgba(59,130,246,.15);   color:#3b82f6; }
+  .pin-header { background:rgba(107,114,128,.15);  color:#9ca3af; }
+  .pin-cookie { background:rgba(245,158,11,.15);   color:#f59e0b; }
+  .param-group { margin-bottom:16px; }
+  .param-group:last-child { margin-bottom:0; }
+  .param-group-lbl { display:flex; align-items:center; gap:6px; margin-bottom:6px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); }
+
+  /* AUTH BLOCK */
+  .auth-block { display:flex; align-items:flex-start; gap:10px; padding:10px 14px; background:rgba(245,158,11,.07); border:1px solid rgba(245,158,11,.2); border-radius:6px; }
+  .auth-icon { font-size:16px; flex-shrink:0; margin-top:1px; }
+  .auth-type { font-size:12px; font-weight:600; color:#f59e0b; margin-bottom:3px; }
+  .auth-detail { font-size:11px; color:var(--text-muted); line-height:1.6; font-family:monospace; }
+
+  /* BODY / CODE */
+  .body-ct { font-size:10px; font-weight:600; padding:3px 8px; border-radius:4px; border:1px solid var(--border); color:var(--text-subtle); font-family:monospace; margin-bottom:10px; display:inline-block; }
+  .code-wrap { position:relative; }
+  .copy-btn { position:absolute; top:8px; right:8px; font-size:10px; padding:3px 8px; border-radius:4px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); cursor:pointer; transition:all .1s; }
+  .copy-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .hl-key { color:#d19a66; }
+  .hl-str { color:#98c379; }
+  .hl-num { color:#61afef; }
+  .hl-lit { color:#56b6c2; }
+
+  /* RESPONSE TABS */
+  .resp-tabs { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:12px; }
+  .resp-tab { font-size:11px; font-weight:600; font-family:monospace; padding:4px 10px; border-radius:5px; border:1px solid var(--border); background:none; color:var(--text-muted); cursor:pointer; transition:all .12s; }
+  .resp-tab:hover { border-color:var(--accent); color:var(--accent); }
+  .resp-tab.active.s2xx, .resp-tab.s2xx:hover { background:rgba(16,185,129,.1); border-color:#10b981; color:#10b981; }
+  .resp-tab.active.s4xx, .resp-tab.s4xx:hover { background:rgba(239,68,68,.1); border-color:#ef4444; color:#ef4444; }
+  .resp-tab.active.s5xx, .resp-tab.s5xx:hover { background:rgba(245,158,11,.1); border-color:#f59e0b; color:#f59e0b; }
+  .resp-tab.active { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+  .resp-panel { display:none; }
+  .resp-panel.active { display:block; }
+  .resp-desc { font-size:12px; color:var(--text-muted); line-height:1.6; margin-bottom:10px; }
+
+  /* HEADERS TABLE */
+  .hdrs-table { width:100%; border-collapse:collapse; }
+  .hdrs-table td { padding:5px 8px; font-size:11px; font-family:monospace; border-bottom:1px solid rgba(255,255,255,.04); vertical-align:top; }
+  .hdrs-table td:first-child { color:var(--accent); width:38%; white-space:nowrap; }
+  .hdrs-table td:last-child { color:var(--text-subtle); word-break:break-all; }
+  .hdrs-table tr:last-child td { border-bottom:none; }
+
+  /* MARKDOWN RENDERER */
+  .md-wrap { font-size:12px; color:var(--text-muted); line-height:1.7; }
+  .md-wrap h3 { font-size:13px; font-weight:700; color:var(--text); margin:14px 0 6px; }
+  .md-wrap h4 { font-size:11px; font-weight:700; color:var(--text-subtle); margin:12px 0 4px; text-transform:uppercase; letter-spacing:.04em; }
+  .md-wrap p { margin:3px 0; }
+  .md-wrap ul,.md-wrap ol { padding-left:18px; margin:4px 0; }
+  .md-wrap li { margin:2px 0; }
+  .md-wrap strong { color:var(--text-subtle); font-weight:600; }
+  .md-wrap code { font-family:monospace; font-size:11px; background:var(--surface-2); padding:1px 5px; border-radius:3px; color:var(--accent); }
+  .md-wrap table { width:100%; border-collapse:collapse; margin:10px 0; font-size:11px; }
+  .md-wrap th { background:var(--surface-2); color:var(--text-muted); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; padding:6px 10px; border:1px solid var(--border); text-align:left; }
+  .md-wrap td { padding:6px 10px; border:1px solid var(--border); color:var(--text-subtle); vertical-align:top; }
+  .md-wrap hr { border:none; border-top:1px solid var(--border); margin:10px 0; }
+
+  /* RESPONSE EXAMPLES */
+  .example-body { display:none; }
+  .example-body.open { display:block; }
+  .example-section { padding:12px 14px; border-top:1px solid var(--border); }
+  .example-section-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--text-muted); margin-bottom:8px; }
+
+  /* DEPRECATED */
+  .deprecated-banner { display:flex; align-items:center; gap:8px; padding:8px 14px; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2); border-radius:6px; margin-bottom:12px; font-size:12px; color:#ef4444; font-weight:600; }
+
+  /* CODE TABS */
+</style>
+</head>
+<body>
+<aside class="nav-sidebar">
+  <div class="nav-logo">
+    <span class="nav-logo-mark">/ERP</span>
+    <span class="nav-logo-text">Tester</span>
+  </div>
+  <nav class="nav-menu">
+    <a class="nav-item" href="#"><span class="nav-icon">⌂</span> Home</a>
+    <a class="nav-item" href="#"><span class="nav-icon">⚡</span> Testar API</a>
+    <a class="nav-item" href="#"><span class="nav-icon">◈</span> ERPs</a>
+    <a class="nav-item" href="#"><span class="nav-icon">⊙</span> Empresas</a>
+    <a class="nav-item" href="#"><span class="nav-icon">⏱</span> Histórico</a>
+    <a class="nav-item" href="#"><span class="nav-icon">▶</span> Playbooks</a>
+    <a class="nav-item active" href="#"><span class="nav-icon">⊞</span> Collections</a>
+    <a class="nav-item" href="#"><span class="nav-icon">⚙</span> Configurações</a>
+  </nav>
+  <div class="nav-footer"></div>
+</aside>
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="col-switcher" id="colSwitcher">
+        <div class="col-switcher-btn" id="colSwitcherBtn">
+          <span class="col-switcher-icon">⊞</span>
+          <span class="col-switcher-name placeholder" id="colSwitcherName">Selecione uma coleção</span>
+          <span class="col-switcher-arrow">▾</span>
+        </div>
+        <div class="col-dropdown" id="colDropdown"></div>
+      </div>
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input class="search-input" type="text" placeholder="Fuzzy search…" oninput="fuzzySearch(this.value)" id="searchInput">
+        <span class="search-count" id="searchCount"></span>
+        <button class="search-clear" id="searchClear" onclick="clearSearch()" title="Limpar">⌫</button>
+      </div>
+    </div>
+    <div class="sidebar-tree" id="sidebarTree"></div>
+  </div>
+  <div class="main" id="mainContent"></div>
+</div>
+
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title">Importar collection</div>
+    <div class="modal-sub">Postman v2.0 / v2.1 · OpenAPI / Swagger 2.0 / 3.0</div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="setTab('file',this)">Arquivo</button>
+      <button class="modal-tab" onclick="setTab('paste',this)">Colar JSON</button>
+    </div>
+    <div id="tab-file">
+      <div class="drop-area" id="dropArea" onclick="document.getElementById('fileInput').click()">
+        <div style="font-size:28px;margin-bottom:8px">📄</div>
+        <strong>Clique ou arraste o arquivo aqui</strong><br>.json · .yaml · .yml
+      </div>
+      <input type="file" id="fileInput" accept=".json,.yaml,.yml" style="display:none" onchange="handleFile(this)">
+    </div>
+    <div id="tab-paste" style="display:none">
+      <textarea class="paste-input" id="pasteInput" placeholder="Cole o JSON aqui…" rows="7"></textarea>
+    </div>
+    <div id="importError" style="display:none"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="doImport()">Importar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let tree    = null   // { name, children: FolderNode[], eps: [] }  (root)
+let flatList = []
+let activeId = null
+let openIds  = new Set()
+let pendingJson = null
+let epCounter = 0
+let collections = []
+let activeCollId = null
+
+// FolderNode: { id, name, children: [], eps: [] }
+// Ep: { id, method, path, name, desc, params, body, responses, folderPath: [] }
+
+// ── MARKDOWN ──────────────────────────────────────────────────────────────────
+function mdInline(t) {
+  return t
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+}
+
+function renderMarkdown(raw) {
+  if (!raw) return ''
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  const lines = raw.split('\n')
+  const out = []; let listStack = [], inTable = false, tableHdr = true
+
+  const closeList = () => {
+    while (listStack.length) { out.push(listStack.pop() === 'ul' ? '</ul>' : '</ol>') }
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+    const trimmed = line.trim()
+
+    // Table
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+      closeList()
+      if (!inTable) { out.push('<table>'); inTable = true; tableHdr = true }
+      if (/^\|[\s\-:|]+\|/.test(trimmed)) { tableHdr = false; continue }
+      const cells = trimmed.slice(1,-1).split('|').map(c => mdInline(esc(c.trim())))
+      const tag = tableHdr ? 'th' : 'td'
+      out.push('<tr>' + cells.map(c=>`<${tag}>${c}</${tag}>`).join('') + '</tr>')
+      continue
+    } else if (inTable) { out.push('</table>'); inTable = false }
+
+    // Blank line
+    if (!trimmed) { closeList(); out.push(''); continue }
+
+    // Headings
+    const hm = trimmed.match(/^(#{1,6})\s+(.+)/)
+    if (hm) { closeList(); const n = Math.min(hm[1].length + 1, 4); out.push(`<h${n}>${mdInline(esc(hm[2]))}</h${n}>`); continue }
+
+    // HR
+    if (/^[-*_]{3,}$/.test(trimmed)) { closeList(); out.push('<hr>'); continue }
+
+    // Ordered list
+    const olm = trimmed.match(/^(\d+)\.\s+(.+)/)
+    if (olm) {
+      if (!listStack.length || listStack[listStack.length-1] !== 'ol') { out.push('<ol>'); listStack.push('ol') }
+      out.push(`<li>${mdInline(esc(olm[2]))}</li>`); continue
+    }
+
+    // Unordered list
+    const ulm = trimmed.match(/^[-*+]\s+(.+)/)
+    if (ulm) {
+      if (!listStack.length || listStack[listStack.length-1] !== 'ul') { out.push('<ul>'); listStack.push('ul') }
+      out.push(`<li>${mdInline(esc(ulm[1]))}</li>`); continue
+    }
+
+    closeList()
+    out.push(`<p>${mdInline(esc(trimmed))}</p>`)
+  }
+  if (inTable) out.push('</table>')
+  closeList()
+  return out.join('\n')
+}
+
+// ── PARSERS ───────────────────────────────────────────────────────────────────
+function makeFolder(name, parentId) {
+  const id = (parentId ? parentId + '/' : '') + name
+  return { id, name, children: [], eps: [] }
+}
+
+function parsePostmanNode(items, folder) {
+  items.forEach(node => {
+    if (node.item) {
+      const child = makeFolder(node.name || 'Sem nome', folder.id)
+      parsePostmanNode(node.item, child)
+      // Only add folder if it has content
+      if (child.children.length > 0 || child.eps.length > 0) folder.children.push(child)
+    } else if (node.request) {
+      folder.eps.push(parsePostmanEndpoint(node, folder))
+    }
+  })
+}
+
+function parsePostmanEndpoint(node, folder) {
+  const req = node.request || {}
+  const method = (req.method || 'GET').toUpperCase()
+  const urlObj = req.url || {}
+  const rawUrl = typeof urlObj === 'string' ? urlObj : (urlObj.raw || '')
+  let path = rawUrl
+  try {
+    if (rawUrl.startsWith('http')) {
+      const u = new URL(rawUrl.replace(/\{\{[^}]+\}\}/g, 'x'))
+      path = u.pathname + (u.search || '')
+    }
+  } catch(e) { path = rawUrl.split('?')[0] }
+  path = path.replace(/\{\{([^}]+)\}\}/g, '{$1}')
+
+  const queryParams = (typeof urlObj === 'object' ? (urlObj.query || []) : [])
+    .filter(q => !q.disabled)
+    .map(q => ({ name: q.key||'', type:'string', req:false, in:'query', desc: q.description||'', example: q.value||'' }))
+  const pathParams = (typeof urlObj === 'object' ? (urlObj.variable || []) : [])
+    .map(v => ({ name: v.key||v.id||'', type:'string', req:true, in:'path', desc: v.description||'', example: v.value||'' }))
+  const params = [...pathParams, ...queryParams]
+
+  // Request headers
+  const headers = Array.isArray(req.header)
+    ? req.header.filter(h => !h.disabled).map(h => ({ key: h.key||'', value: h.value||'', desc: h.description||'' }))
+    : []
+
+  // Auth
+  let auth = null
+  if (req.auth && req.auth.type) {
+    auth = { type: req.auth.type, details: req.auth[req.auth.type] || [] }
+  }
+
+  // Body
+  let body = null, bodyMode = null, bodyContentType = null
+  if (req.body) {
+    const b = req.body; bodyMode = b.mode
+    if (b.mode === 'raw' && b.raw) {
+      body = b.raw
+      const ctH = headers.find(h => h.key.toLowerCase() === 'content-type')
+      bodyContentType = ctH ? ctH.value.split(';')[0].trim()
+        : (b.options && b.options.raw && b.options.raw.language === 'json') ? 'application/json' : 'text/plain'
+    } else if (b.mode === 'urlencoded' && b.urlencoded) {
+      body = b.urlencoded.filter(f => !f.disabled).map(f => ({ key: f.key||'', value: f.value||'', desc: f.description||'' }))
+      bodyContentType = 'application/x-www-form-urlencoded'
+    } else if (b.mode === 'formdata' && b.formdata) {
+      body = b.formdata.filter(f => !f.disabled).map(f => ({ key: f.key||'', value: f.value||'', type: f.type||'text', desc: f.description||'' }))
+      bodyContentType = 'multipart/form-data'
+    }
+  }
+
+  let desc = ''
+  if (typeof req.description === 'string') desc = req.description
+  else if (req.description && req.description.content) desc = req.description.content
+  desc = desc.replace(/\n{3,}/g, '\n\n').trim()
+
+  // Saved examples (node.response array in Postman = saved responses)
+  // Note: r.code = numeric (200), r.status = text ("OK") — use code first
+  const examples = (node.response || []).map(r => ({
+    name: r.name || 'Exemplo',
+    status: String(r.code || r.status || '200'),
+    statusText: typeof r.status === 'string' ? r.status : '',
+    body: r.body != null ? String(r.body) : '',
+    headers: Array.isArray(r.header) ? r.header.map(h => ({ key: h.key||'', value: h.value||'' })) : [],
+    requestBody: r.originalRequest && r.originalRequest.body && r.originalRequest.body.raw
+      ? r.originalRequest.body.raw : null,
+  }))
+
+  // Responses: deduplicated by status code from examples
+  // If no saved examples, responses is empty (shown as empty state in UI)
+  const responses = [...new Map(
+    examples.map(e => [e.status, { s: e.status, statusText: e.statusText, desc: e.name, example: e.body || null }])
+  ).values()]
+
+  return {
+    id: ++epCounter, method, path,
+    name: node.name || path,
+    desc, params, queryParams, pathParams, headers, auth,
+    body, bodyMode, bodyContentType,
+    responses, examples,
+    folderPath: folderPathOf(folder)
+  }
+}
+
+function folderPathOf(folder) {
+  return folder.id ? folder.id.split('/') : []
+}
+
+function parsePostman(json) {
+  epCounter = 0
+  const root = { id:'', name: json.info?.name || 'Postman', children:[], eps:[] }
+  parsePostmanNode(json.item || [], root)
+  return root
+}
+
+function parseOpenAPI(json) {
+  epCounter = 0
+  const root = { id:'', name: json.info?.title || 'OpenAPI', children:[], eps:[] }
+  const byTag = {}
+  const methods = ['get','post','put','patch','delete','head','options']
+  Object.entries(json.paths || {}).forEach(([path, pathObj]) => {
+    methods.forEach(m => {
+      const op = pathObj[m]; if (!op) return
+      const tag = (op.tags && op.tags[0]) || 'Default'
+      if (!byTag[tag]) byTag[tag] = []
+      const params = (op.parameters || []).map(p => ({
+        name: p.name||'',
+        type: (p.schema&&p.schema.type) || p.type || 'string',
+        format: (p.schema&&p.schema.format) || '',
+        enum: (p.schema&&p.schema.enum) || null,
+        req: !!p.required,
+        deprecated: !!p.deprecated,
+        in: p.in || 'query',
+        desc: p.description || '',
+        example: p.example !== undefined ? p.example
+          : ((p.schema&&p.schema.example) !== undefined ? p.schema.example : undefined),
+      }))
+      let body = null, bodyContentType = null, bodyMode = 'raw'
+      const rb = op.requestBody
+      if (rb) {
+        const cnt = rb.content || {}
+        const ctKey = 'application/json' in cnt ? 'application/json' : Object.keys(cnt)[0]
+        bodyContentType = ctKey || null
+        const mc = ctKey ? cnt[ctKey] : null
+        if (mc && mc.schema) {
+          try { body = JSON.stringify(schemaToExample(mc.schema, json, 0), null, 2) }
+          catch(e) { body = JSON.stringify(mc.schema, null, 2) }
+        }
+      }
+      const responses = Object.entries(op.responses||{}).map(([s,r]) => {
+        let example = null
+        if (r.content) {
+          const ctKey = 'application/json' in r.content ? 'application/json' : Object.keys(r.content)[0]
+          const mc = ctKey ? r.content[ctKey] : null
+          if (mc && mc.schema) {
+            try { example = JSON.stringify(schemaToExample(mc.schema, json, 0), null, 2) } catch(e) {}
+          } else if (mc && mc.example) {
+            example = typeof mc.example === 'string' ? mc.example : JSON.stringify(mc.example, null, 2)
+          }
+        }
+        return { s, desc: r.description||'', example }
+      })
+      byTag[tag].push({
+        id: ++epCounter, method: m.toUpperCase(), path,
+        name: op.summary || op.operationId || (m.toUpperCase()+' '+path),
+        desc: op.description || '',
+        operationId: op.operationId || null,
+        deprecated: !!op.deprecated,
+        security: op.security || null,
+        params, body, bodyContentType, bodyMode,
+        queryParams: params.filter(p=>p.in==='query'),
+        pathParams: params.filter(p=>p.in==='path'),
+        headerParams: params.filter(p=>p.in==='header'),
+        cookieParams: params.filter(p=>p.in==='cookie'),
+        headers: [], auth: null, responses, examples: [],
+        folderPath: [tag]
+      })
+    })
+  })
+  Object.entries(byTag).forEach(([tag, eps]) => {
+    const folder = makeFolder(tag, '')
+    folder.eps = eps.map(ep => ({ ...ep, folderPath: [tag] }))
+    root.children.push(folder)
+  })
+  return root
+}
+
+function schemaToExample(schema, root, depth) {
+  if (!schema || depth > 3) return null
+  if (schema.$ref) {
+    const parts = schema.$ref.replace('#/','').split('/')
+    let ref = root; parts.forEach(p => { ref = ref && ref[p] })
+    return ref ? schemaToExample(ref, root, depth+1) : {}
+  }
+  if (schema.example !== undefined) return schema.example
+  if (schema.type==='object'||schema.properties) {
+    const obj={}; Object.entries(schema.properties||{}).forEach(([k,v])=>{ obj[k]=schemaToExample(v,root,depth+1) }); return obj
+  }
+  if (schema.type==='array') return [schemaToExample(schema.items||{},root,depth+1)]
+  if (schema.type==='integer'||schema.type==='number') return 0
+  if (schema.type==='boolean') return false
+  if (schema.enum) return schema.enum[0]
+  return ''
+}
+
+function detectAndParse(json) {
+  if (json.openapi || json.swagger) return parseOpenAPI(json)
+  if (json.info && json.item) return parsePostman(json)
+  throw new Error('Formato não reconhecido. Use Postman v2.x ou OpenAPI 2/3.')
+}
+
+// ── FLAT INDEX ────────────────────────────────────────────────────────────────
+function buildFlat(node, acc, path) {
+  acc = acc || []; path = path || []
+  node.eps.forEach(ep => acc.push({
+    ...ep,
+    folderId: node.id,
+    folderPath: path,
+    _paramNames: [...(ep.params||[]), ...(ep.queryParams||[]), ...(ep.pathParams||[])].map(p=>p.name).join(' ')
+  }))
+  node.children.forEach(c => buildFlat(c, acc, [...path, node.name]))
+  return acc
+}
+
+// ── FUZZY ─────────────────────────────────────────────────────────────────────
+// fzf-inspired scoring: match bonus + boundary/consecutive bonuses - gap penalties
+function scoreField(query, text) {
+  if (!query || !text) return null
+  const q = query.toLowerCase(), t = text.toLowerCase()
+  const n = q.length, m = t.length
+  // Subsequence check + greedy positions
+  const positions = []
+  let j = 0
+  for (let i = 0; i < n; i++) {
+    while (j < m && t[j] !== q[i]) j++
+    if (j >= m) return null
+    positions.push(j++)
+  }
+  // Score using fzf-style bonuses
+  const MATCH = 16, BONUS_SOL = 16, BONUS_WORD = 8, BONUS_CAMEL = 7
+  const BONUS_CONSEC = 4, PEN_GAP_START = 3, PEN_GAP_EXT = 1
+  function charBonus(p) {
+    if (p === 0) return BONUS_SOL
+    const prev = t[p - 1]
+    if (' \t/-_.,:;(['.includes(prev)) return BONUS_WORD
+    if (t[p] >= 'A' && t[p] <= 'Z' && prev >= 'a' && prev <= 'z') return BONUS_CAMEL
+    return 0
+  }
+  let score = 0
+  for (let i = 0; i < positions.length; i++) {
+    score += MATCH + charBonus(positions[i])
+    if (i > 0) {
+      const gap = positions[i] - positions[i - 1] - 1
+      score += gap === 0 ? BONUS_CONSEC : -(PEN_GAP_START + (gap - 1) * PEN_GAP_EXT)
+    }
+  }
+  // Length normalization: prefer matches in shorter strings (name vs long desc)
+  score -= Math.floor(t.length * 0.05)
+  return { score, positions }
+}
+
+function fuzzyMatch(query, ep) {
+  if (!query) return null
+  const nameR  = scoreField(query, ep.name)
+  const pathR  = scoreField(query, ep.path || '')
+  const descR  = scoreField(query, ep.desc || '')
+  const paramR = ep._paramNames ? scoreField(query, ep._paramNames) : null
+  const methodBonus = ep.method.toLowerCase().startsWith(query.toLowerCase()) ? 60 : 0
+  if (!nameR && !pathR && !descR && !paramR && !methodBonus) return null
+  const score =
+    (nameR  ? nameR.score  * 3.0 : 0) +
+    (pathR  ? pathR.score  * 1.5 : 0) +
+    (descR  ? descR.score  * 0.7 : 0) +
+    (paramR ? paramR.score * 0.6 : 0) +
+    methodBonus
+  // Reject weak matches — require meaningful name/path hit or strong multi-field signal
+  if (!nameR && !pathR && score < 30) return null
+  if (score < 10) return null
+  return { score, namePositions: nameR ? new Set(nameR.positions) : new Set() }
+}
+
+function fuzzySearch(q) {
+  const cnt = document.getElementById('searchCount')
+  const clr = document.getElementById('searchClear')
+  clr.style.display = q ? 'block' : 'none'
+  if (!q.trim() || !tree) { cnt.textContent = ''; renderTree(tree, null); return }
+  const results = []
+  flatList.forEach(ep => {
+    const m = fuzzyMatch(q, ep)
+    if (m) results.push({ ...ep, score: m.score, namePos: m.namePositions })
+  })
+  results.sort((a, b) => b.score - a.score)
+  cnt.textContent = results.length ? String(results.length) : '0'
+  renderSearchResults(results)
+}
+
+function clearSearch() {
+  const inp = document.getElementById('searchInput')
+  inp.value = ''
+  fuzzySearch('')
+  inp.focus()
+}
+
+// ── SEARCH RESULTS (flat ranked list) ────────────────────────────────────────
+function renderSearchResults(results) {
+  const tree_el = document.getElementById('sidebarTree')
+  while (tree_el.firstChild) tree_el.removeChild(tree_el.firstChild)
+  if (results.length === 0) {
+    const msg = document.createElement('div'); msg.className = 'no-results'; msg.textContent = 'Nenhum resultado.'
+    tree_el.appendChild(msg); return
+  }
+  results.forEach(ep => {
+    const item = document.createElement('div')
+    item.className = 'ep-item search-result' + (ep.id === activeId ? ' active' : '')
+    item.id = 'ep-' + ep.id
+    item.onclick = () => selectEndpoint(ep.id)
+
+    const top = document.createElement('div'); top.style.cssText = 'display:flex;align-items:center;gap:6px;'
+    const badge = document.createElement('span'); badge.className = 'method-badge ' + ep.method; badge.textContent = ep.method
+    const nameEl = document.createElement('span'); nameEl.className = 'ep-name'
+    // Highlight matched chars in name
+    if (ep.namePos && ep.namePos.size > 0) {
+      let html = ''
+      for (let i = 0; i < ep.name.length; i++) {
+        const ch = ep.name[i].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        html += ep.namePos.has(i) ? '<mark>' + ch + '</mark>' : ch
+      }
+      nameEl.innerHTML = html
+    } else { nameEl.textContent = ep.name }
+    top.appendChild(badge); top.appendChild(nameEl)
+
+    // Breadcrumb path
+    if (ep.folderPath && ep.folderPath.length > 0) {
+      const crumb = document.createElement('div'); crumb.className = 'search-crumb'
+      crumb.textContent = ep.folderPath.filter(p => p && p !== tree.name).join(' › ')
+      item.appendChild(top); item.appendChild(crumb)
+    } else {
+      item.appendChild(top)
+    }
+    tree_el.appendChild(item)
+  })
+}
+
+// ── SIDEBAR RENDER (recursive) ────────────────────────────────────────────────
+function countEpsInFolder(node, matchIds) {
+  let n = matchIds ? node.eps.filter(ep=>matchIds.has(ep.id)).length : node.eps.length
+  node.children.forEach(c => n += countEpsInFolder(c, matchIds))
+  return n
+}
+
+function renderTree(rootNode, matchIds, highlights) {
+  const tree_el = document.getElementById('sidebarTree')
+  while(tree_el.firstChild) tree_el.removeChild(tree_el.firstChild)
+  if(!rootNode) return
+
+  // If root has direct eps (no children), show them flat
+  if(rootNode.children.length===0 && rootNode.eps.length===0) {
+    const msg=document.createElement('div'); msg.className='no-results'; msg.textContent='Nenhum endpoint encontrado.'
+    tree_el.appendChild(msg); return
+  }
+
+  function renderFolder(node, depth, container) {
+    const total = countEpsInFolder(node, matchIds)
+    if(matchIds && total===0) return
+
+    const INDENT = 18  // px per level
+    const BASE = 6
+    const rowPad = BASE + depth * INDENT
+
+    const wrapper = document.createElement('div')
+
+    // Folder row
+    const row = document.createElement('div'); row.className='folder-row'
+    row.style.paddingLeft = rowPad + 'px'
+
+    const arrow = document.createElement('span')
+    arrow.className = 'folder-arrow'
+    arrow.textContent = '›'
+
+    const labelCls = depth === 0 ? 'fl-d0' : depth === 1 ? 'fl-d1' : 'fl-d2'
+    const label = document.createElement('span'); label.className = labelCls; label.textContent = node.name
+    const count = document.createElement('span'); count.className = 'folder-count'; count.textContent = total
+    row.appendChild(arrow); row.appendChild(label); row.appendChild(count)
+
+    // Children container
+    const children_el = document.createElement('div'); children_el.className = 'folder-children'
+
+    // Indent guide line: thin vertical line aligned to the chevron center of this folder
+    const guide = document.createElement('div'); guide.className = 'folder-guide'
+    guide.style.left = (rowPad + 7) + 'px'  // center of the ›
+    children_el.appendChild(guide)
+
+    const isOpen = matchIds ? true : openIds.has(node.id)
+    if(isOpen){ children_el.classList.add('open'); arrow.classList.add('open') }
+
+    row.onclick = () => {
+      const open = children_el.classList.toggle('open')
+      arrow.classList.toggle('open', open)
+      if(open) openIds.add(node.id); else openIds.delete(node.id)
+    }
+
+    wrapper.appendChild(row)
+
+    // Sub-folders at depth+1
+    node.children.forEach(child => renderFolder(child, depth + 1, children_el))
+
+    // Endpoints: indented one level beyond folder, + small left margin past the guide
+    const epPad = BASE + (depth + 1) * INDENT + 2
+    const eps = matchIds ? node.eps.filter(ep=>matchIds.has(ep.id)) : node.eps
+    eps.forEach(ep => {
+      const item = document.createElement('div')
+      item.className = 'ep-item' + (ep.id===activeId ? ' active' : '')
+      item.id = 'ep-' + ep.id
+      item.style.paddingLeft = epPad + 'px'
+      item.onclick = () => selectEndpoint(ep.id)
+      const badge = document.createElement('span'); badge.className = 'method-badge ' + ep.method; badge.textContent = ep.method
+      const nameEl = document.createElement('span'); nameEl.className = 'ep-name'
+      const np = highlights && highlights[ep.id]
+      if(np && np.size > 0){
+        let html = ''
+        for(let i = 0; i < ep.name.length; i++){
+          const ch = ep.name[i].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+          html += np.has(i) ? '<mark>' + ch + '</mark>' : ch
+        }
+        nameEl.innerHTML = html
+      } else { nameEl.textContent = ep.name }
+      item.appendChild(badge); item.appendChild(nameEl); children_el.appendChild(item)
+    })
+
+    wrapper.appendChild(children_el)
+    container.appendChild(wrapper)
+  }
+
+  // Render top-level: direct eps first, then folders
+  if(rootNode.eps && rootNode.eps.length>0) {
+    const eps = matchIds ? rootNode.eps.filter(ep=>matchIds.has(ep.id)) : rootNode.eps
+    eps.forEach(ep => {
+      const item=document.createElement('div')
+      item.className='ep-item'+(ep.id===activeId?' active':'')
+      item.id='ep-'+ep.id
+      item.style.paddingLeft='8px'
+      item.onclick=()=>selectEndpoint(ep.id)
+      const badge=document.createElement('span'); badge.className='method-badge '+ep.method; badge.textContent=ep.method
+      const nameEl=document.createElement('span'); nameEl.className='ep-name'; nameEl.textContent=ep.name
+      item.appendChild(badge); item.appendChild(nameEl); tree_el.appendChild(item)
+    })
+  }
+  rootNode.children.forEach(child => renderFolder(child, 0, tree_el))
+
+  if(matchIds && countEpsInFolder(rootNode, matchIds)===0){
+    const msg=document.createElement('div'); msg.className='no-results'; msg.textContent='Nenhum endpoint encontrado.'
+    tree_el.appendChild(msg)
+  }
+}
+
+// ── CURL BUILDER ──────────────────────────────────────────────────────────────
+function buildCurl(ep) {
+  const parts = []
+
+  // Method + URL (append query params for non-body methods)
+  let url = ep.path
+  const queryParams = (ep.queryParams || [])
+  const inlineQuery = queryParams.length > 0 && ['GET','HEAD','DELETE','OPTIONS'].includes(ep.method)
+  if (inlineQuery) {
+    const qs = queryParams.map(p => {
+      const val = p.example !== undefined ? encodeURIComponent(p.example) : encodeURIComponent('{{'+p.name+'}}')
+      return encodeURIComponent(p.name) + '=' + val
+    }).join('&')
+    url += (url.includes('?') ? '&' : '?') + qs
+  }
+
+  parts.push(`curl -X ${ep.method} '${url}'`)
+
+  // Auth header
+  if (ep.auth) {
+    const type = ep.auth.type
+    const dets = Array.isArray(ep.auth.details) ? ep.auth.details : []
+    const get = key => { const d = dets.find(d => d.key === key); return d ? d.value || '{{'+key+'}}' : '{{'+key+'}}' }
+    if (type === 'bearer') {
+      parts.push(`  -H 'Authorization: Bearer ${get('token')}'`)
+    } else if (type === 'basic') {
+      parts.push(`  -u '${get('username')}:${get('password')}'`)
+    } else if (type === 'apikey') {
+      const inVal = get('in') || 'header'
+      if (inVal === 'header') parts.push(`  -H '${get('key')}: ${get('value')}'`)
+    } else if (type === 'oauth2') {
+      parts.push(`  -H 'Authorization: Bearer {{access_token}}'`)
+    }
+  }
+
+  // Request headers (skip Content-Type — added later with body)
+  ;(ep.headers || [])
+    .filter(h => h.key && h.key.toLowerCase() !== 'content-type')
+    .forEach(h => parts.push(`  -H '${h.key}: ${h.value}'`))
+
+  // Body
+  if (ep.body != null) {
+    const bodyIsEmpty = Array.isArray(ep.body) ? ep.body.length === 0 : !String(ep.body).trim()
+    if (!bodyIsEmpty) {
+      if (ep.bodyMode === 'raw') {
+        const ct = ep.bodyContentType || 'application/json'
+        parts.push(`  -H 'Content-Type: ${ct}'`)
+        const escaped = String(ep.body).replace(/'/g, `'\\''`)
+        parts.push(`  -d '${escaped}'`)
+      } else if (ep.bodyMode === 'urlencoded') {
+        const arr = Array.isArray(ep.body) ? ep.body : []
+        arr.forEach(f => parts.push(`  --data-urlencode '${f.key}=${f.value}'`))
+      } else if (ep.bodyMode === 'formdata') {
+        const arr = Array.isArray(ep.body) ? ep.body : []
+        arr.forEach(f => parts.push(`  -F '${f.key}=${f.type === 'file' ? '@'+f.value : f.value}'`))
+      }
+    }
+  } else if (!inlineQuery && queryParams.length > 0) {
+    // POST/PUT with query params: use --data-urlencode or append
+    queryParams.forEach(p => {
+      const val = p.example !== undefined ? p.example : '{{'+p.name+'}}'
+      parts.push(`  --data-urlencode '${p.name}=${val}'`)
+    })
+  }
+
+  return parts.join(' \\\n')
+}
+
+
+// ── DETAIL HELPERS ────────────────────────────────────────────────────────────
+function makeSection(title, count, startOpen) {
+  const sect = document.createElement('div'); sect.className = 'sect'
+  const hd = document.createElement('div'); hd.className = 'sect-hd'
+  const arrow = document.createElement('span'); arrow.className = 'sect-arrow' + (startOpen ? ' open' : ''); arrow.textContent = '›'
+  const titleEl = document.createElement('span'); titleEl.className = 'sect-title'; titleEl.textContent = title
+  hd.appendChild(arrow); hd.appendChild(titleEl)
+  if (count != null) {
+    const cnt = document.createElement('span'); cnt.className = 'sect-cnt'; cnt.textContent = count; hd.appendChild(cnt)
+  }
+  const body = document.createElement('div'); body.className = 'sect-body' + (startOpen ? ' open' : '')
+  hd.onclick = () => { const o = body.classList.toggle('open'); arrow.classList.toggle('open', o) }
+  sect.appendChild(hd); sect.appendChild(body)
+  return { sect, body }
+}
+
+function hlJson(json) {
+  return json
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"([^"\n]+)"(\s*:)/g, '<span class="hl-key">"$1"</span>$2')
+    .replace(/: "([^"\n]*)"/g, ': <span class="hl-str">"$1"</span>')
+    .replace(/: (-?\d+\.?\d*)/g, (m,n) => m.replace(n,'<span class="hl-num">'+n+'</span>'))
+    .replace(/: (true|false|null)\b/g, (m,l) => m.replace(l,'<span class="hl-lit">'+l+'</span>'))
+}
+
+function makeCodeBlock(text) {
+  const isJson = text.trim().startsWith('{') || text.trim().startsWith('[')
+  const wrap = document.createElement('div'); wrap.className = 'code-wrap'
+  const pre = document.createElement('pre'); pre.className = 'code-block'; pre.style.maxHeight = '320px'; pre.style.overflowY = 'auto'
+  if (isJson) { try { pre.innerHTML = hlJson(text) } catch(e) { pre.textContent = text } } else { pre.textContent = text }
+  const btn = document.createElement('button'); btn.className = 'copy-btn'; btn.textContent = 'Copiar'
+  btn.onclick = e => {
+    e.stopPropagation()
+    navigator.clipboard.writeText(text).catch(() => { const t=document.createElement('textarea');t.value=text;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t) })
+    btn.textContent = '✓'; setTimeout(() => btn.textContent = 'Copiar', 1500)
+  }
+  wrap.appendChild(pre); wrap.appendChild(btn)
+  return wrap
+}
+
+function makeParamTable(params) {
+  const table = document.createElement('table'); table.className = 'param-table'
+  const thead = document.createElement('thead'); const hr = document.createElement('tr')
+  ;['Nome','Tipo','Descrição'].forEach(h => { const th = document.createElement('th'); th.textContent = h; hr.appendChild(th) })
+  thead.appendChild(hr); table.appendChild(thead)
+  const tbody = document.createElement('tbody')
+  params.forEach(p => {
+    const tr = document.createElement('tr')
+    const td1 = document.createElement('td')
+    const pn = document.createElement('span'); pn.className = 'pname'; pn.textContent = p.name; td1.appendChild(pn)
+    if (p.req) { const r = document.createElement('span'); r.className = 'preq'; r.textContent = 'req'; td1.appendChild(r) }
+    if (p.deprecated) { const d = document.createElement('span'); d.style.cssText='font-size:9px;color:var(--text-muted);margin-left:4px'; d.textContent='deprecated'; td1.appendChild(d) }
+    const td2 = document.createElement('td')
+    const pt = document.createElement('span'); pt.className = 'ptype'
+    pt.textContent = p.type + (p.format ? ' ('+p.format+')' : '') + (p.enum ? ' ['+p.enum.join('|')+']' : '')
+    td2.appendChild(pt)
+    const td3 = document.createElement('td'); td3.className = 'pdesc'
+    if (p.desc) { const d = document.createElement('div'); d.textContent = p.desc; td3.appendChild(d) }
+    if (p.example !== undefined) { const ex = document.createElement('span'); ex.className = 'pex'; ex.textContent = String(p.example); td3.appendChild(ex) }
+    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tbody.appendChild(tr)
+  })
+  table.appendChild(tbody); return table
+}
+
+function makeHdrsTable(headers) {
+  const table = document.createElement('table'); table.className = 'hdrs-table'
+  const tbody = document.createElement('tbody')
+  headers.forEach(h => {
+    const tr = document.createElement('tr')
+    const td1 = document.createElement('td'); td1.textContent = h.key
+    const td2 = document.createElement('td'); td2.textContent = h.value
+    if (h.desc) { const d = document.createElement('div'); d.style.cssText='font-size:10px;color:var(--text-muted);margin-top:2px'; d.textContent = h.desc; td2.appendChild(d) }
+    tr.appendChild(td1); tr.appendChild(td2); tbody.appendChild(tr)
+  })
+  table.appendChild(tbody); return table
+}
+
+// ── DETAIL ────────────────────────────────────────────────────────────────────
+function selectEndpoint(id) {
+  activeId = id
+  document.querySelectorAll('.ep-item').forEach(el => el.classList.remove('active'))
+  const el = document.getElementById('ep-'+id); if(el) el.classList.add('active')
+  const ep = flatList.find(e => e.id === id); if (!ep) return
+
+  const main = document.getElementById('mainContent')
+  while(main.firstChild) main.removeChild(main.firstChild)
+
+  const detail = document.createElement('div'); detail.className = 'detail'
+
+  // Breadcrumb
+  if (ep.folderPath && ep.folderPath.length > 0) {
+    const bc = document.createElement('div'); bc.className = 'breadcrumb'
+    ep.folderPath.forEach((seg, i) => {
+      if (i > 0) { const s = document.createElement('span'); s.className = 'breadcrumb-sep'; s.textContent = '›'; bc.appendChild(s) }
+      const s = document.createElement('span'); s.className = 'breadcrumb-item'; s.textContent = seg; bc.appendChild(s)
+    })
+    detail.appendChild(bc)
+  }
+
+  // Deprecated banner
+  if (ep.deprecated) {
+    const b = document.createElement('div'); b.className = 'deprecated-banner'
+    b.textContent = '⚠ Este endpoint está depreciado e pode ser removido em versões futuras.'
+    detail.appendChild(b)
+  }
+
+  // Method + path + copy cURL button
+  const mp = document.createElement('div'); mp.className = 'detail-method-path'
+  const mb = document.createElement('span'); mb.className = 'method-badge detail-method '+ep.method; mb.textContent = ep.method
+  const pe = document.createElement('span'); pe.className = 'detail-path'; pe.textContent = ep.path
+  const curlBtn = document.createElement('button'); curlBtn.className = 'curl-copy-btn'; curlBtn.textContent = 'Copiar cURL'
+  curlBtn.onclick = () => {
+    const code = buildCurl(ep)
+    const ok = () => { curlBtn.textContent = 'Copiado ✓'; setTimeout(() => { curlBtn.textContent = 'Copiar cURL' }, 1500) }
+    if (navigator.clipboard) { navigator.clipboard.writeText(code).then(ok).catch(ok) } else { ok() }
+  }
+  mp.appendChild(mb); mp.appendChild(pe); mp.appendChild(curlBtn); detail.appendChild(mp)
+
+  // Name + operationId
+  const ne = document.createElement('div'); ne.className = 'detail-name'; ne.textContent = ep.name; detail.appendChild(ne)
+  if (ep.operationId) {
+    const oid = document.createElement('div')
+    oid.style.cssText = 'font-size:11px;color:var(--text-muted);font-family:monospace;margin-top:4px'
+    oid.textContent = ep.operationId; detail.appendChild(oid)
+  }
+
+  // Description
+  if (ep.desc) {
+    const de = document.createElement('div'); de.className = 'md-wrap'; de.style.marginTop = '10px'
+    de.innerHTML = renderMarkdown(ep.desc); detail.appendChild(de)
+  }
+
+  // Auth / Security
+  const hasAuth = ep.auth || (ep.security && ep.security.length > 0)
+  if (hasAuth) {
+    const { sect, body } = makeSection('Autenticação', null, true)
+    const block = document.createElement('div'); block.className = 'auth-block'
+    const icon = document.createElement('span'); icon.className = 'auth-icon'; icon.textContent = '🔒'
+    const info = document.createElement('div')
+    if (ep.auth) {
+      const t = document.createElement('div'); t.className = 'auth-type'
+      t.textContent = ep.auth.type.charAt(0).toUpperCase() + ep.auth.type.slice(1); info.appendChild(t)
+      const dets = Array.isArray(ep.auth.details) ? ep.auth.details.filter(d => d.value && d.key !== 'token') : []
+      if (dets.length > 0) {
+        const d = document.createElement('div'); d.className = 'auth-detail'; d.textContent = dets.map(d => d.key+': '+d.value).join(' · '); info.appendChild(d)
+      }
+    }
+    if (ep.security) {
+      ep.security.forEach(sec => Object.entries(sec).forEach(([scheme, scopes]) => {
+        const t = document.createElement('div'); t.className = 'auth-type'; t.textContent = scheme; info.appendChild(t)
+        if (scopes.length > 0) { const d = document.createElement('div'); d.className = 'auth-detail'; d.textContent = 'Escopos: '+scopes.join(', '); info.appendChild(d) }
+      }))
+    }
+    block.appendChild(icon); block.appendChild(info); body.appendChild(block); detail.appendChild(sect)
+  }
+
+  // Parameters — grouped by location
+  const allParams = ep.params || []
+  if (allParams.length > 0) {
+    const { sect, body } = makeSection('Parâmetros', allParams.length, true)
+    const groups = [
+      { label: 'Path',   cls: 'pin-path',   list: allParams.filter(p => p.in === 'path') },
+      { label: 'Query',  cls: 'pin-query',  list: allParams.filter(p => p.in === 'query') },
+      { label: 'Header', cls: 'pin-header', list: allParams.filter(p => p.in === 'header') },
+      { label: 'Cookie', cls: 'pin-cookie', list: allParams.filter(p => p.in === 'cookie') },
+      { label: 'Outros', cls: 'pin-query',  list: allParams.filter(p => !p.in) },
+    ].filter(g => g.list.length > 0)
+    groups.forEach(g => {
+      const grp = document.createElement('div'); grp.className = 'param-group'
+      const lbl = document.createElement('div'); lbl.className = 'param-group-lbl'
+      const badge = document.createElement('span'); badge.className = 'pin '+g.cls; badge.textContent = g.label
+      const cnt = document.createElement('span'); cnt.style.cssText='color:var(--text-muted);font-size:10px'; cnt.textContent = g.list.length+' parâmetro'+(g.list.length>1?'s':'')
+      lbl.appendChild(badge); lbl.appendChild(cnt); grp.appendChild(lbl)
+      grp.appendChild(makeParamTable(g.list)); body.appendChild(grp)
+    })
+    detail.appendChild(sect)
+  }
+
+  // Request Headers (non-auth, non-content-type)
+  const reqHeaders = (ep.headers || []).filter(h => h.key && !h.key.match(/^(content-type|authorization)$/i))
+  if (reqHeaders.length > 0) {
+    const { sect, body } = makeSection('Headers da Requisição', reqHeaders.length, false)
+    body.appendChild(makeHdrsTable(reqHeaders)); detail.appendChild(sect)
+  }
+
+  // Request Body
+  if (ep.body != null) {
+    const bodyIsEmpty = Array.isArray(ep.body) ? ep.body.length === 0 : !ep.body
+    if (!bodyIsEmpty) {
+      const { sect, body } = makeSection('Request Body', null, true)
+      if (ep.bodyContentType) {
+        const ct = document.createElement('span'); ct.className = 'body-ct'; ct.textContent = ep.bodyContentType; body.appendChild(ct)
+      }
+      if (ep.bodyMode === 'urlencoded' || ep.bodyMode === 'formdata') {
+        const arr = Array.isArray(ep.body) ? ep.body : []
+        const table = document.createElement('table'); table.className = 'param-table'
+        const thead = document.createElement('thead'); const hr = document.createElement('tr')
+        const cols = ep.bodyMode === 'formdata' ? ['Campo','Tipo','Valor','Descrição'] : ['Campo','Valor','Descrição']
+        cols.forEach(h => { const th = document.createElement('th'); th.textContent = h; hr.appendChild(th) })
+        thead.appendChild(hr); table.appendChild(thead)
+        const tbody = document.createElement('tbody')
+        arr.forEach(f => {
+          const tr = document.createElement('tr')
+          const td1 = document.createElement('td'); const n = document.createElement('span'); n.className = 'pname'; n.textContent = f.key; td1.appendChild(n); tr.appendChild(td1)
+          if (ep.bodyMode === 'formdata') { const td2 = document.createElement('td'); td2.className = 'ptype'; td2.textContent = f.type||'text'; tr.appendChild(td2) }
+          const tdv = document.createElement('td'); tdv.className = 'pdesc'; tdv.textContent = f.value; tr.appendChild(tdv)
+          const tdd = document.createElement('td'); tdd.className = 'pdesc'; tdd.textContent = f.desc||''; tr.appendChild(tdd)
+          tbody.appendChild(tr)
+        })
+        table.appendChild(tbody); body.appendChild(table)
+      } else {
+        body.appendChild(makeCodeBlock(ep.body))
+      }
+      detail.appendChild(sect)
+    }
+  }
+
+  // Respostas — unified section (no duplication between examples and responses)
+  {
+    const exs = ep.examples || []
+    const hasExamples = exs.length > 0
+    const hasResponses = !hasExamples && ep.responses && ep.responses.length > 0
+    const count = hasExamples ? exs.length : hasResponses ? ep.responses.length : null
+    const { sect, body } = makeSection('Respostas', count, true)
+    const tabs = document.createElement('div'); tabs.className = 'resp-tabs'
+    const panels = document.createElement('div')
+
+    if (hasExamples) {
+      // Postman: show each saved example as a tab with request + response
+      exs.forEach((ex, i) => {
+        const tabCls = ex.status.startsWith('2') ? 's2xx' : ex.status.startsWith('4') ? 's4xx' : ex.status.startsWith('5') ? 's5xx' : ''
+        const tabLabel = ex.status + (ex.statusText ? ' '+ex.statusText : '') + (exs.length > 1 ? ' · '+ex.name : '')
+        const tab = document.createElement('button'); tab.className = 'resp-tab '+tabCls+(i===0?' active':''); tab.textContent = tabLabel
+        const panel = document.createElement('div'); panel.className = 'resp-panel'+(i===0?' active':'')
+        tab.onclick = () => {
+          tabs.querySelectorAll('.resp-tab').forEach(t=>t.classList.remove('active'))
+          panels.querySelectorAll('.resp-panel').forEach(p=>p.classList.remove('active'))
+          tab.classList.add('active'); panel.classList.add('active')
+        }
+        if (ex.requestBody) {
+          const sec = document.createElement('div'); sec.className = 'example-section'
+          const t = document.createElement('div'); t.className = 'example-section-title'; t.textContent = 'Request Body'; sec.appendChild(t)
+          sec.appendChild(makeCodeBlock(ex.requestBody)); panel.appendChild(sec)
+        }
+        if (ex.body && ex.body.trim()) {
+          const sec = document.createElement('div'); sec.className = 'example-section'
+          const t = document.createElement('div'); t.className = 'example-section-title'; t.textContent = 'Response Body'; sec.appendChild(t)
+          sec.appendChild(makeCodeBlock(ex.body)); panel.appendChild(sec)
+        }
+        if (ex.headers && ex.headers.length > 0) {
+          const sec = document.createElement('div'); sec.className = 'example-section'
+          const t = document.createElement('div'); t.className = 'example-section-title'; t.textContent = 'Response Headers'; sec.appendChild(t)
+          sec.appendChild(makeHdrsTable(ex.headers.map(h=>({key:h.key,value:h.value,desc:''})))); panel.appendChild(sec)
+        }
+        tabs.appendChild(tab); panels.appendChild(panel)
+      })
+      body.appendChild(tabs); body.appendChild(panels)
+    } else if (hasResponses) {
+      // OpenAPI: show responses from spec (status + description + example from schema)
+      ep.responses.forEach((r, i) => {
+        const tabCls = r.s.startsWith('2') ? 's2xx' : r.s.startsWith('4') ? 's4xx' : r.s.startsWith('5') ? 's5xx' : ''
+        const tab = document.createElement('button'); tab.className = 'resp-tab '+tabCls+(i===0?' active':'')
+        tab.textContent = r.s + (r.statusText ? ' '+r.statusText : '')
+        const panel = document.createElement('div'); panel.className = 'resp-panel'+(i===0?' active':'')
+        tab.onclick = () => {
+          tabs.querySelectorAll('.resp-tab').forEach(t=>t.classList.remove('active'))
+          panels.querySelectorAll('.resp-panel').forEach(p=>p.classList.remove('active'))
+          tab.classList.add('active'); panel.classList.add('active')
+        }
+        if (r.desc) { const rd = document.createElement('div'); rd.className = 'resp-desc'; rd.textContent = r.desc; panel.appendChild(rd) }
+        if (r.example && r.example.trim()) { panel.appendChild(makeCodeBlock(r.example)) }
+        tabs.appendChild(tab); panels.appendChild(panel)
+      })
+      body.appendChild(tabs); body.appendChild(panels)
+    } else {
+      const empty = document.createElement('div')
+      empty.style.cssText = 'font-size:12px;color:var(--text-muted);line-height:1.7;padding:2px 0'
+      empty.innerHTML = 'Esta coleção Postman não possui exemplos de resposta salvos para este endpoint.<br>' +
+        '<span style="font-size:11px;opacity:.7">Para adicionar: execute no Postman → selecione a resposta → "Save as Example".</span>'
+      body.appendChild(empty)
+    }
+    detail.appendChild(sect)
+
+  }
+
+  main.appendChild(detail)
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function showError(msg){const el=document.getElementById('importError');el.style.display='block';el.className='error-msg';el.textContent=msg}
+function hideError(){document.getElementById('importError').style.display='none'}
+function setTab(tab,btn){
+  document.getElementById('tab-file').style.display=tab==='file'?'block':'none'
+  document.getElementById('tab-paste').style.display=tab==='paste'?'block':'none'
+  document.querySelectorAll('.modal-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');hideError()
+}
+function handleFile(input){
+  const file=input.files[0];if(!file)return
+  const reader=new FileReader()
+  reader.onload=e=>{
+    const drop=document.getElementById('dropArea')
+    try {
+      pendingJson=JSON.parse(e.target.result)
+      drop.style.borderColor='var(--method-get)';drop.style.color='var(--method-get)'
+      drop.textContent='✓ '+file.name+' ('+( file.size/1024).toFixed(1)+' KB)'
+      hideError()
+    } catch(err){showError('JSON inválido: '+err.message);pendingJson=null}
+  }
+  reader.readAsText(file)
+}
+const dropArea=document.getElementById('dropArea')
+dropArea.addEventListener('dragover',e=>{e.preventDefault();dropArea.classList.add('dragover')})
+dropArea.addEventListener('dragleave',()=>dropArea.classList.remove('dragover'))
+dropArea.addEventListener('drop',e=>{
+  e.preventDefault();dropArea.classList.remove('dragover')
+  const file=e.dataTransfer.files[0];if(!file)return
+  const reader=new FileReader()
+  reader.onload=ev=>{
+    try{pendingJson=JSON.parse(ev.target.result);dropArea.style.borderColor='var(--method-get)';dropArea.style.color='var(--method-get)';dropArea.textContent='✓ '+file.name;hideError()}
+    catch(err){showError('JSON inválido: '+err.message);pendingJson=null}
+  }
+  reader.readAsText(file)
+})
+
+// ── MULTI-COLLECTION ──────────────────────────────────────────────────────────
+function saveStorage() {
+  try {
+    localStorage.setItem('erp-collections', JSON.stringify(collections.map(c => ({ id: c.id, name: c.name, raw: c.raw }))))
+    if (activeCollId != null) localStorage.setItem('erp-active-coll', String(activeCollId))
+  } catch(e) {}
+}
+
+function loadStorage() {
+  try {
+    const data = JSON.parse(localStorage.getItem('erp-collections') || '[]')
+    collections = data
+    renderCollectionsList()
+    const lastId = Number(localStorage.getItem('erp-active-coll'))
+    const toActivate = collections.find(c => c.id === lastId) || collections[0]
+    if (toActivate) selectCollection(toActivate.id)
+  } catch(e) {}
+}
+
+function renderCollectionsList() {
+  const dd = document.getElementById('colDropdown')
+  const nameEl = document.getElementById('colSwitcherName')
+  while (dd.firstChild) dd.removeChild(dd.firstChild)
+
+  const active = collections.find(c => c.id === activeCollId)
+  if (active) {
+    nameEl.textContent = active.name
+    nameEl.classList.remove('placeholder')
+  } else {
+    nameEl.textContent = 'Selecione uma coleção'
+    nameEl.classList.add('placeholder')
+  }
+
+  collections.forEach(col => {
+    const item = document.createElement('div')
+    item.className = 'col-dd-item' + (col.id === activeCollId ? ' active' : '')
+    const check = document.createElement('span'); check.className = 'col-dd-check'
+    check.textContent = col.id === activeCollId ? '✓' : ''
+    const name = document.createElement('span'); name.className = 'col-dd-name'; name.textContent = col.name
+    const del = document.createElement('button'); del.className = 'col-dd-del'; del.title = 'Remover'; del.textContent = '⌫'
+    del.onclick = e => { e.stopPropagation(); deleteCollection(col.id) }
+    item.onclick = () => { selectCollection(col.id); closeColDropdown() }
+    item.appendChild(check); item.appendChild(name); item.appendChild(del)
+    dd.appendChild(item)
+  })
+
+  if (collections.length > 0) {
+    const sep = document.createElement('div'); sep.className = 'col-dd-sep'; dd.appendChild(sep)
+  }
+  const newItem = document.createElement('div'); newItem.className = 'col-dd-new'
+  newItem.innerHTML = '<span style="font-size:14px;line-height:1">＋</span> Importar coleção'
+  newItem.onclick = () => { closeColDropdown(); openModal() }
+  dd.appendChild(newItem)
+}
+
+function toggleColDropdown() {
+  document.getElementById('colSwitcher').classList.toggle('open')
+}
+function closeColDropdown() {
+  document.getElementById('colSwitcher').classList.remove('open')
+}
+
+function selectCollection(id) {
+  const col = collections.find(c => c.id === id)
+  if (!col) return
+  closeColDropdown()
+  activeCollId = id
+  try {
+    tree = detectAndParse(col.raw)
+    flatList = buildFlat(tree)
+  } catch(e) { console.error(e); return }
+  openIds = new Set(); activeId = null
+  clearSearch()
+  renderTree(tree, null)
+  renderEmpty()
+  renderCollectionsList()
+  localStorage.setItem('erp-active-coll', String(id))
+}
+
+function deleteCollection(id) {
+  collections = collections.filter(c => c.id !== id)
+  saveStorage()
+  if (activeCollId === id) {
+    activeCollId = null; tree = null; flatList = []; openIds = new Set(); activeId = null
+    if (collections.length > 0) { selectCollection(collections[0].id) }
+    else { renderCollectionsList(); document.getElementById('sidebarTree').innerHTML = ''; renderEmpty() }
+  } else {
+    renderCollectionsList()
+  }
+}
+
+function doImport(){
+  hideError()
+  let json=pendingJson
+  if(!json){const paste=document.getElementById('pasteInput').value.trim();if(paste){try{json=JSON.parse(paste)}catch(e){showError('JSON inválido: '+e.message);return}}}
+  if(!json){showError('Nenhum arquivo ou JSON fornecido.');return}
+  try{
+    const testTree=detectAndParse(json)
+    const id=Date.now()
+    collections.push({id, name: testTree.name, raw: json})
+    saveStorage()
+    closeModal();pendingJson=null
+    selectCollection(id)
+  }catch(e){showError(e.message)}
+}
+function openModal(){document.getElementById('modalOverlay').classList.remove('hidden')}
+function closeModal(){document.getElementById('modalOverlay').classList.add('hidden');pendingJson=null;hideError()}
+document.getElementById('modalOverlay').onclick=e=>{if(e.target.id==='modalOverlay')closeModal()}
+document.getElementById('colSwitcherBtn').onclick=()=>toggleColDropdown()
+document.addEventListener('click',e=>{const sw=document.getElementById('colSwitcher');if(sw&&!sw.contains(e.target))closeColDropdown()})
+loadStorage()
+
+function renderEmpty(){
+  const main=document.getElementById('mainContent')
+  while(main.firstChild)main.removeChild(main.firstChild)
+  const es=document.createElement('div');es.className='empty-state'
+  const icon=document.createElement('div');icon.className='empty-icon';icon.textContent=tree?'←':'📂'
+  const t=document.createElement('div');t.className='empty-title';t.textContent=tree?'Selecione um endpoint':'Nenhuma collection'
+  const d=document.createElement('div');d.className='empty-desc';d.textContent=tree?'Use o fuzzy search ou navegue pela árvore.':'Clique em "Importar" para carregar um arquivo Postman ou OpenAPI.'
+  es.appendChild(icon);es.appendChild(t);es.appendChild(d);main.appendChild(es)
+}
+
+renderEmpty()
+</script>
+</body>
+</html>

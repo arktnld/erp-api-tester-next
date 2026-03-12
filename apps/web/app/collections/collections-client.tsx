@@ -911,7 +911,6 @@ export function CollectionsClient({
   const [showImport, setShowImport] = useState(false)
   const [loading, setLoading] = useState(false)
   const [openFolderIds, setOpenFolderIds] = useState<Set<string>>(new Set())
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const flatRef = useRef<FlatEndpoint[]>([])
 
@@ -1003,23 +1002,15 @@ export function CollectionsClient({
 
       <div className={styles.layout}>
         {/* Sidebar */}
-        <div className={`${styles.sidebar} ${sidebarCollapsed ? styles.sidebarCollapsed : ''}`}>
-          {sidebarCollapsed ? (
-            <div className={styles.sidebarCollapseRow}>
-              <button className={styles.sidebarCollapseBtn} onClick={() => setSidebarCollapsed(false)} title="Expandir">›</button>
-            </div>
-          ) : (
+        <div className={styles.sidebar}>
           <div className={styles.sidebarHeader}>
-            <div className={styles.sidebarHeaderTop}>
-              <CollectionSwitcher
-                collections={collections}
-                activeId={activeId}
-                onSelect={handleSelect}
-                onDelete={handleDelete}
-                onImportClick={() => setShowImport(true)}
-              />
-              <button className={styles.sidebarCollapseBtn} onClick={() => setSidebarCollapsed(true)} title="Recolher">‹</button>
-            </div>
+            <CollectionSwitcher
+              collections={collections}
+              activeId={activeId}
+              onSelect={handleSelect}
+              onDelete={handleDelete}
+              onImportClick={() => setShowImport(true)}
+            />
             <div className={styles.searchWrap}>
               <span className={styles.searchIcon}>⌕</span>
               <input
@@ -1037,9 +1028,8 @@ export function CollectionsClient({
               )}
             </div>
           </div>
-          )}
 
-          {!sidebarCollapsed && <div className={styles.sidebarTree}>
+          <div className={styles.sidebarTree}>
             {loading ? (
               <div className={styles.noResults}>Carregando…</div>
             ) : isSearching ? (
@@ -1092,7 +1082,7 @@ export function CollectionsClient({
             ) : (
               <div className={styles.noResults}>Selecione uma collection.</div>
             )}
-          </div>}
+          </div>
         </div>
 
         {/* Main */}

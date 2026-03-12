@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Server, Building2, FlaskConical, History, BookMarked, ListChecks, Settings } from 'lucide-react'
+import { LayoutDashboard, Server, Building2, FlaskConical, History, BookMarked, ListChecks, Settings, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { UserButton } from '@clerk/nextjs'
 import { TourButton } from '@/components/ui/tour-button'
+import { useSidebar } from './sidebar-context'
 
 type SidebarERP = {
   id: number
@@ -15,13 +16,14 @@ type SidebarERP = {
 
 export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
   const pathname = usePathname()
+  const { collapsed, toggle } = useSidebar()
 
   if (pathname.startsWith('/sign-in')) return null
 
   const nav = [
     { href: '/', label: 'Home', icon: LayoutDashboard, tourId: 'home' },
     { href: '/test', label: 'Testar API', icon: FlaskConical, tourId: 'test' },
-{ href: '/erps', label: 'ERPs', icon: Server, tourId: 'erps' },
+    { href: '/erps', label: 'ERPs', icon: Server, tourId: 'erps' },
     { href: '/companies', label: 'Empresas', icon: Building2, tourId: 'companies' },
     { href: '/history', label: 'Histórico', icon: History, tourId: 'history' },
     { href: '/playbooks', label: 'Playbooks', icon: ListChecks, tourId: 'playbooks' },
@@ -29,11 +31,13 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
     { href: '/settings', label: 'Configurações', icon: Settings, tourId: 'settings' },
   ]
 
+  const W = collapsed ? 56 : 220
+
   return (
     <aside
       style={{
-        width: 220,
-        minWidth: 220,
+        width: W,
+        minWidth: W,
         height: '100vh',
         backgroundColor: 'var(--surface)',
         borderRight: '1px solid var(--border)',
@@ -43,36 +47,74 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
         top: 0,
         left: 0,
         zIndex: 50,
+        transition: 'width 0.18s ease, min-width 0.18s ease',
+        overflow: 'hidden',
       }}
     >
-      {/* Logo */}
+      {/* Logo + toggle */}
       <div
         style={{
-          padding: '18px 16px 16px',
+          padding: collapsed ? '18px 0 16px' : '18px 16px 16px',
           borderBottom: '1px solid var(--border)',
           display: 'flex',
           alignItems: 'center',
+          justifyContent: collapsed ? 'center' : 'space-between',
           gap: 0,
+          flexShrink: 0,
+          transition: 'padding 0.18s ease',
         }}
       >
-        <span style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 900, letterSpacing: '-0.03em', color: 'var(--accent)' }}>/ERP</span>
-        <span style={{ fontFamily: 'var(--font-logo)', fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text)' }}> Tester</span>
+        {!collapsed && (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 900, letterSpacing: '-0.03em', color: 'var(--accent)' }}>/ERP</span>
+            <span style={{ fontFamily: 'var(--font-logo)', fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text)' }}> Tester</span>
+          </div>
+        )}
+        <button
+          onClick={toggle}
+          title={collapsed ? 'Expandir menu' : 'Recolher menu'}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 28,
+            height: 28,
+            borderRadius: 6,
+            border: 'none',
+            background: 'none',
+            color: 'var(--text-muted)',
+            cursor: 'pointer',
+            flexShrink: 0,
+            transition: 'background 0.12s, color 0.12s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = 'var(--surface-2)'
+            e.currentTarget.style.color = 'var(--text)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'none'
+            e.currentTarget.style.color = 'var(--text-muted)'
+          }}
+        >
+          {collapsed ? <PanelLeftOpen size={15} /> : <PanelLeftClose size={15} />}
+        </button>
       </div>
 
       {/* Nav */}
-      <div data-tour="nav" style={{ flex: 1, overflowY: 'auto', padding: '8px 8px' }}>
+      <div data-tour="nav" style={{ flex: 1, overflowY: 'auto', padding: '8px 8px', overflowX: 'hidden' }}>
         {nav.map(({ href, label, icon: Icon, tourId }) => {
-          const active =
-            pathname === href || (href !== '/' && pathname.startsWith(href))
+          const active = pathname === href || (href !== '/' && pathname.startsWith(href))
           return (
             <div key={href} {...(tourId ? { 'data-tour': tourId } : {})}>
               <Link
                 href={href}
+                title={collapsed ? label : undefined}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 10,
-                  padding: '7px 10px',
+                  justifyContent: collapsed ? 'center' : 'flex-start',
+                  gap: collapsed ? 0 : 10,
+                  padding: collapsed ? '7px 0' : '7px 10px',
                   borderRadius: 6,
                   marginBottom: 2,
                   color: active ? 'var(--text)' : 'var(--text-muted)',
@@ -81,10 +123,12 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
                   fontSize: 13,
                   fontWeight: active ? 500 : 400,
                   transition: 'all 0.1s',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
                 }}
               >
-                <Icon size={15} />
-                {label}
+                <Icon size={15} style={{ flexShrink: 0 }} />
+                {!collapsed && label}
               </Link>
             </div>
           )
@@ -95,17 +139,21 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
       <div
         data-tour="footer"
         style={{
-          padding: '8px 12px',
+          padding: collapsed ? '8px 0' : '8px 12px',
           borderTop: '1px solid var(--border)',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: collapsed ? 'center' : 'space-between',
+          flexShrink: 0,
+          transition: 'padding 0.18s ease',
         }}
       >
         <UserButton afterSignOutUrl="/sign-in" />
-        <div style={{ display: 'flex', gap: 4 }}>
-          <TourButton />
-        </div>
+        {!collapsed && (
+          <div style={{ display: 'flex', gap: 4 }}>
+            <TourButton />
+          </div>
+        )}
       </div>
     </aside>
   )

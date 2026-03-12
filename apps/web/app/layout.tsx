@@ -5,6 +5,7 @@ import { ClerkThemeProvider } from '@/components/layout/clerk-theme-provider'
 import { Sidebar } from '@/components/layout/sidebar'
 import { CommandPalette } from '@/components/ui/command-palette'
 import { MainContent } from '@/components/layout/main-content'
+import { SidebarProvider } from '@/components/layout/sidebar-context'
 import { RoleProvider } from '@/lib/role-context'
 import { getCurrentRole } from '@/lib/require-role'
 import { auth } from '@clerk/nextjs/server'
@@ -57,8 +58,10 @@ export default async function RootLayout({
       <body>
         <RoleProvider role={userId ? role : 'viewer'}>
           <CommandPalette erps={erps} />
-          <Sidebar erps={erps} />
-          <MainContent>{children}</MainContent>
+          <SidebarProvider>
+            <Sidebar erps={erps} />
+            <MainContent>{children}</MainContent>
+          </SidebarProvider>
         </RoleProvider>
       </body>
     </html>
