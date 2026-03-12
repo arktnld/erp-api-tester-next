@@ -18,6 +18,18 @@ function buildFlat(node: FolderNode, path: string[] = []): FlatEndpoint[] {
   return [...eps, ...node.children.flatMap((c) => buildFlat(c, [...path, c.name]))]
 }
 
+function getOpenFolderNodes(root: FolderNode, folderPath: string[]): FolderNode[] {
+  const result: FolderNode[] = []
+  let current = root
+  for (const name of folderPath) {
+    const next = current.children.find((c) => c.name === name)
+    if (!next) break
+    result.push(next)
+    current = next
+  }
+  return result
+}
+
 function scoreField(query: string, text: string): { score: number; positions: number[] } | null {
   if (!query || !text) return null
   const q = query.toLowerCase()
@@ -633,13 +645,17 @@ function FolderNodeView({
   depth,
   activeEpId,
   onSelect,
+  openFolderIds,
+  onToggleFolder,
 }: {
   node: FolderNode
   depth: number
   activeEpId: string | null
   onSelect: (ep: CollectionEndpoint) => void
+  openFolderIds: Set<string>
+  onToggleFolder: (id: string) => void
 }) {
-  const [open, setOpen] = useState(false)
+  const open = openFolderIds.has(node.id)
   const INDENT = 18
   const BASE = 6
   const rowPad = BASE + depth * INDENT
@@ -651,7 +667,7 @@ function FolderNodeView({
       <button
         className={styles.folderRow}
         style={{ paddingLeft: rowPad }}
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => onToggleFolder(node.id)}
       >
         <span className={`${styles.folderArrow} ${open ? styles.folderArrowOpen : ''}`}>›</span>
         <span className={labelCls}>{node.name}</span>
@@ -662,7 +678,15 @@ function FolderNodeView({
         <div className={styles.folderGuide} style={{ left: rowPad + 7 }} />
 
         {node.children.map((child) => (
-          <FolderNodeView key={child.id} node={child} depth={depth + 1} activeEpId={activeEpId} onSelect={onSelect} />
+          <FolderNodeView
+            key={child.id}
+            node={child}
+            depth={depth + 1}
+            activeEpId={activeEpId}
+            onSelect={onSelect}
+            openFolderIds={openFolderIds}
+            onToggleFolder={onToggleFolder}
+          />
         ))}
 
         {node.eps.map((ep) => (
@@ -886,6 +910,7 @@ export function CollectionsClient({
   const [searchQuery, setSearchQuery] = useState('')
   const [showImport, setShowImport] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [openFolderIds, setOpenFolderIds] = useState<Set<string>>(new Set())
 
   const flatRef = useRef<FlatEndpoint[]>([])
 
@@ -894,6 +919,7 @@ export function CollectionsClient({
     setSearchQuery('')
     setActiveEp(null)
     setActiveEpId(null)
+    setOpenFolderIds(new Set())
   }, [structure])
 
 
@@ -923,19 +949,41 @@ export function CollectionsClient({
     await loadCollection(id)
   }
 
+  const handleToggleFolder = useCallback((id: string) => {
+    setOpenFolderIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }, [])
+
   const handleEpSelect = (ep: CollectionEndpoint) => {
     const flat = flatRef.current.find((f) => f.id === ep.id)
-    setActiveEp(flat ?? { ...ep, folderPath: [], _paramNames: '' })
+    const resolved = flat ?? { ...ep, folderPath: [], _paramNames: '' }
+    setActiveEp(resolved)
     setActiveEpId(ep.id)
     setSearchQuery('')
+    if (structure && resolved.folderPath.length > 0) {
+      const nodes = getOpenFolderNodes(structure.tree, resolved.folderPath)
+      if (nodes.length > 0) {
+        setOpenFolderIds((prev) => {
+          const next = new Set(prev)
+          nodes.forEach((n) => next.add(n.id))
+          return next
+        })
+      }
+    }
+    setTimeout(() => {
+      document.getElementById(`ep-${ep.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }, 50)
   }
 
   const isSearching = searchQuery.trim().length > 0
-  const searchResults = useMemo(
-    () => (isSearching ? runFuzzySearch(searchQuery, flatRef.current) : []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [searchQuery]
-  )
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return []
+    return runFuzzySearch(searchQuery, flatRef.current)
+  }, [searchQuery])
 
   if (collections.length === 0 && !showImport) {
     return (
@@ -981,16 +1029,16 @@ export function CollectionsClient({
             </div>
           </div>
 
-          <div className={styles.sidebarTree}>
+          <div className={styles.sidebarTree} key={isSearching ? 'search' : 'tree'}>
             {loading ? (
               <div className={styles.noResults}>Carregando…</div>
             ) : isSearching ? (
               searchResults.length === 0 ? (
                 <div className={styles.noResults}>Nenhum resultado.</div>
               ) : (
-                searchResults.map((ep, i) => (
+                searchResults.map((ep) => (
                   <button
-                    key={ep.id + i}
+                    key={ep.id}
                     className={`${styles.epItem} ${styles.epItemSearchResult} ${ep.id === activeEpId ? styles.epItemActive : ''}`}
                     onClick={() => handleEpSelect(ep)}
                   >
@@ -1020,7 +1068,15 @@ export function CollectionsClient({
                   </button>
                 ))}
                 {structure.tree.children.map((child) => (
-                  <FolderNodeView key={child.id} node={child} depth={0} activeEpId={activeEpId} onSelect={handleEpSelect} />
+                  <FolderNodeView
+                    key={child.id}
+                    node={child}
+                    depth={0}
+                    activeEpId={activeEpId}
+                    onSelect={handleEpSelect}
+                    openFolderIds={openFolderIds}
+                    onToggleFolder={handleToggleFolder}
+                  />
                 ))}
               </>
             ) : (
