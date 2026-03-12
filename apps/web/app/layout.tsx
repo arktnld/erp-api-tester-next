@@ -5,6 +5,7 @@ import { ClerkThemeProvider } from '@/components/layout/clerk-theme-provider'
 import { Sidebar } from '@/components/layout/sidebar'
 import { CommandPalette } from '@/components/ui/command-palette'
 import { MainContent } from '@/components/layout/main-content'
+import NextTopLoader from 'nextjs-toploader'
 import { SidebarProvider } from '@/components/layout/sidebar-context'
 import { RoleProvider } from '@/lib/role-context'
 import { getCurrentRole } from '@/lib/require-role'
@@ -56,6 +57,7 @@ export default async function RootLayout({
         (function(){var t=localStorage.getItem('theme');if(t==='light')document.documentElement.setAttribute('data-theme','light')})()
       `}</Script>
       <body>
+        <NextTopLoader color="var(--accent)" showSpinner={false} height={2} />
         <RoleProvider role={userId ? role : 'viewer'}>
           <CommandPalette erps={erps} />
           <SidebarProvider>
