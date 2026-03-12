@@ -8022,6 +8022,7 @@ export namespace Prisma {
     context: number
     systemPrompt: number
     embeddingProvider: number
+    rawJson: number
     createdAt: number
     _all: number
   }
@@ -8059,6 +8060,7 @@ export namespace Prisma {
     context?: true
     systemPrompt?: true
     embeddingProvider?: true
+    rawJson?: true
     createdAt?: true
     _all?: true
   }
@@ -8155,6 +8157,7 @@ export namespace Prisma {
     context: string
     systemPrompt: string
     embeddingProvider: string
+    rawJson: JsonValue | null
     createdAt: Date
     _count: PostmanCollectionCountAggregateOutputType | null
     _avg: PostmanCollectionAvgAggregateOutputType | null
@@ -8183,6 +8186,7 @@ export namespace Prisma {
     context?: boolean
     systemPrompt?: boolean
     embeddingProvider?: boolean
+    rawJson?: boolean
     createdAt?: boolean
     chunks?: boolean | PostmanCollection$chunksArgs<ExtArgs>
     _count?: boolean | PostmanCollectionCountOutputTypeDefaultArgs<ExtArgs>
@@ -8194,6 +8198,7 @@ export namespace Prisma {
     context?: boolean
     systemPrompt?: boolean
     embeddingProvider?: boolean
+    rawJson?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["postmanCollection"]>
 
@@ -8203,6 +8208,7 @@ export namespace Prisma {
     context?: boolean
     systemPrompt?: boolean
     embeddingProvider?: boolean
+    rawJson?: boolean
     createdAt?: boolean
   }, ExtArgs["result"]["postmanCollection"]>
 
@@ -8212,10 +8218,11 @@ export namespace Prisma {
     context?: boolean
     systemPrompt?: boolean
     embeddingProvider?: boolean
+    rawJson?: boolean
     createdAt?: boolean
   }
 
-  export type PostmanCollectionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "context" | "systemPrompt" | "embeddingProvider" | "createdAt", ExtArgs["result"]["postmanCollection"]>
+  export type PostmanCollectionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "context" | "systemPrompt" | "embeddingProvider" | "rawJson" | "createdAt", ExtArgs["result"]["postmanCollection"]>
   export type PostmanCollectionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     chunks?: boolean | PostmanCollection$chunksArgs<ExtArgs>
     _count?: boolean | PostmanCollectionCountOutputTypeDefaultArgs<ExtArgs>
@@ -8234,6 +8241,7 @@ export namespace Prisma {
       context: string
       systemPrompt: string
       embeddingProvider: string
+      rawJson: Prisma.JsonValue | null
       createdAt: Date
     }, ExtArgs["result"]["postmanCollection"]>
     composites: {}
@@ -8664,6 +8672,7 @@ export namespace Prisma {
     readonly context: FieldRef<"PostmanCollection", 'String'>
     readonly systemPrompt: FieldRef<"PostmanCollection", 'String'>
     readonly embeddingProvider: FieldRef<"PostmanCollection", 'String'>
+    readonly rawJson: FieldRef<"PostmanCollection", 'Json'>
     readonly createdAt: FieldRef<"PostmanCollection", 'DateTime'>
   }
     
@@ -13281,6 +13290,7 @@ export namespace Prisma {
     startedAt: Date | null
     endedAt: Date | null
     status: string | null
+    shareToken: string | null
   }
 
   export type PlaybookRunMaxAggregateOutputType = {
@@ -13291,6 +13301,7 @@ export namespace Prisma {
     startedAt: Date | null
     endedAt: Date | null
     status: string | null
+    shareToken: string | null
   }
 
   export type PlaybookRunCountAggregateOutputType = {
@@ -13302,6 +13313,7 @@ export namespace Prisma {
     endedAt: number
     status: number
     steps: number
+    shareToken: number
     _all: number
   }
 
@@ -13328,6 +13340,7 @@ export namespace Prisma {
     startedAt?: true
     endedAt?: true
     status?: true
+    shareToken?: true
   }
 
   export type PlaybookRunMaxAggregateInputType = {
@@ -13338,6 +13351,7 @@ export namespace Prisma {
     startedAt?: true
     endedAt?: true
     status?: true
+    shareToken?: true
   }
 
   export type PlaybookRunCountAggregateInputType = {
@@ -13349,6 +13363,7 @@ export namespace Prisma {
     endedAt?: true
     status?: true
     steps?: true
+    shareToken?: true
     _all?: true
   }
 
@@ -13447,6 +13462,7 @@ export namespace Prisma {
     endedAt: Date | null
     status: string
     steps: JsonValue
+    shareToken: string | null
     _count: PlaybookRunCountAggregateOutputType | null
     _avg: PlaybookRunAvgAggregateOutputType | null
     _sum: PlaybookRunSumAggregateOutputType | null
@@ -13477,6 +13493,7 @@ export namespace Prisma {
     endedAt?: boolean
     status?: boolean
     steps?: boolean
+    shareToken?: boolean
     playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
     company?: boolean | CompanyDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["playbookRun"]>
@@ -13490,6 +13507,7 @@ export namespace Prisma {
     endedAt?: boolean
     status?: boolean
     steps?: boolean
+    shareToken?: boolean
     playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
     company?: boolean | CompanyDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["playbookRun"]>
@@ -13503,6 +13521,7 @@ export namespace Prisma {
     endedAt?: boolean
     status?: boolean
     steps?: boolean
+    shareToken?: boolean
     playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
     company?: boolean | CompanyDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["playbookRun"]>
@@ -13516,9 +13535,10 @@ export namespace Prisma {
     endedAt?: boolean
     status?: boolean
     steps?: boolean
+    shareToken?: boolean
   }
 
-  export type PlaybookRunOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "playbookId" | "companyId" | "clientId" | "startedAt" | "endedAt" | "status" | "steps", ExtArgs["result"]["playbookRun"]>
+  export type PlaybookRunOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "playbookId" | "companyId" | "clientId" | "startedAt" | "endedAt" | "status" | "steps" | "shareToken", ExtArgs["result"]["playbookRun"]>
   export type PlaybookRunInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     playbook?: boolean | PlaybookDefaultArgs<ExtArgs>
     company?: boolean | CompanyDefaultArgs<ExtArgs>
@@ -13547,6 +13567,7 @@ export namespace Prisma {
       endedAt: Date | null
       status: string
       steps: Prisma.JsonValue
+      shareToken: string | null
     }, ExtArgs["result"]["playbookRun"]>
     composites: {}
   }
@@ -13980,6 +14001,7 @@ export namespace Prisma {
     readonly endedAt: FieldRef<"PlaybookRun", 'DateTime'>
     readonly status: FieldRef<"PlaybookRun", 'String'>
     readonly steps: FieldRef<"PlaybookRun", 'Json'>
+    readonly shareToken: FieldRef<"PlaybookRun", 'String'>
   }
     
 
@@ -16756,6 +16778,7 @@ export namespace Prisma {
     context: 'context',
     systemPrompt: 'systemPrompt',
     embeddingProvider: 'embeddingProvider',
+    rawJson: 'rawJson',
     createdAt: 'createdAt'
   };
 
@@ -16811,7 +16834,8 @@ export namespace Prisma {
     startedAt: 'startedAt',
     endedAt: 'endedAt',
     status: 'status',
-    steps: 'steps'
+    steps: 'steps',
+    shareToken: 'shareToken'
   };
 
   export type PlaybookRunScalarFieldEnum = (typeof PlaybookRunScalarFieldEnum)[keyof typeof PlaybookRunScalarFieldEnum]
@@ -16867,6 +16891,14 @@ export namespace Prisma {
   };
 
   export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
   export const QueryMode: {
@@ -17361,6 +17393,7 @@ export namespace Prisma {
     context?: StringFilter<"PostmanCollection"> | string
     systemPrompt?: StringFilter<"PostmanCollection"> | string
     embeddingProvider?: StringFilter<"PostmanCollection"> | string
+    rawJson?: JsonNullableFilter<"PostmanCollection">
     createdAt?: DateTimeFilter<"PostmanCollection"> | Date | string
     chunks?: EmbeddingChunkListRelationFilter
   }
@@ -17371,6 +17404,7 @@ export namespace Prisma {
     context?: SortOrder
     systemPrompt?: SortOrder
     embeddingProvider?: SortOrder
+    rawJson?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     chunks?: EmbeddingChunkOrderByRelationAggregateInput
   }
@@ -17384,6 +17418,7 @@ export namespace Prisma {
     context?: StringFilter<"PostmanCollection"> | string
     systemPrompt?: StringFilter<"PostmanCollection"> | string
     embeddingProvider?: StringFilter<"PostmanCollection"> | string
+    rawJson?: JsonNullableFilter<"PostmanCollection">
     createdAt?: DateTimeFilter<"PostmanCollection"> | Date | string
     chunks?: EmbeddingChunkListRelationFilter
   }, "id">
@@ -17394,6 +17429,7 @@ export namespace Prisma {
     context?: SortOrder
     systemPrompt?: SortOrder
     embeddingProvider?: SortOrder
+    rawJson?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: PostmanCollectionCountOrderByAggregateInput
     _avg?: PostmanCollectionAvgOrderByAggregateInput
@@ -17411,6 +17447,7 @@ export namespace Prisma {
     context?: StringWithAggregatesFilter<"PostmanCollection"> | string
     systemPrompt?: StringWithAggregatesFilter<"PostmanCollection"> | string
     embeddingProvider?: StringWithAggregatesFilter<"PostmanCollection"> | string
+    rawJson?: JsonNullableWithAggregatesFilter<"PostmanCollection">
     createdAt?: DateTimeWithAggregatesFilter<"PostmanCollection"> | Date | string
   }
 
@@ -17643,6 +17680,7 @@ export namespace Prisma {
     endedAt?: DateTimeNullableFilter<"PlaybookRun"> | Date | string | null
     status?: StringFilter<"PlaybookRun"> | string
     steps?: JsonFilter<"PlaybookRun">
+    shareToken?: StringNullableFilter<"PlaybookRun"> | string | null
     playbook?: XOR<PlaybookScalarRelationFilter, PlaybookWhereInput>
     company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
   }
@@ -17656,12 +17694,14 @@ export namespace Prisma {
     endedAt?: SortOrderInput | SortOrder
     status?: SortOrder
     steps?: SortOrder
+    shareToken?: SortOrderInput | SortOrder
     playbook?: PlaybookOrderByWithRelationInput
     company?: CompanyOrderByWithRelationInput
   }
 
   export type PlaybookRunWhereUniqueInput = Prisma.AtLeast<{
     id?: number
+    shareToken?: string
     AND?: PlaybookRunWhereInput | PlaybookRunWhereInput[]
     OR?: PlaybookRunWhereInput[]
     NOT?: PlaybookRunWhereInput | PlaybookRunWhereInput[]
@@ -17674,7 +17714,7 @@ export namespace Prisma {
     steps?: JsonFilter<"PlaybookRun">
     playbook?: XOR<PlaybookScalarRelationFilter, PlaybookWhereInput>
     company?: XOR<CompanyScalarRelationFilter, CompanyWhereInput>
-  }, "id">
+  }, "id" | "shareToken">
 
   export type PlaybookRunOrderByWithAggregationInput = {
     id?: SortOrder
@@ -17685,6 +17725,7 @@ export namespace Prisma {
     endedAt?: SortOrderInput | SortOrder
     status?: SortOrder
     steps?: SortOrder
+    shareToken?: SortOrderInput | SortOrder
     _count?: PlaybookRunCountOrderByAggregateInput
     _avg?: PlaybookRunAvgOrderByAggregateInput
     _max?: PlaybookRunMaxOrderByAggregateInput
@@ -17704,6 +17745,7 @@ export namespace Prisma {
     endedAt?: DateTimeNullableWithAggregatesFilter<"PlaybookRun"> | Date | string | null
     status?: StringWithAggregatesFilter<"PlaybookRun"> | string
     steps?: JsonWithAggregatesFilter<"PlaybookRun">
+    shareToken?: StringNullableWithAggregatesFilter<"PlaybookRun"> | string | null
   }
 
   export type AuditLogWhereInput = {
@@ -18281,6 +18323,7 @@ export namespace Prisma {
     context: string
     systemPrompt?: string
     embeddingProvider?: string
+    rawJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     chunks?: EmbeddingChunkCreateNestedManyWithoutCollectionInput
   }
@@ -18291,6 +18334,7 @@ export namespace Prisma {
     context: string
     systemPrompt?: string
     embeddingProvider?: string
+    rawJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     chunks?: EmbeddingChunkUncheckedCreateNestedManyWithoutCollectionInput
   }
@@ -18300,6 +18344,7 @@ export namespace Prisma {
     context?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
     embeddingProvider?: StringFieldUpdateOperationsInput | string
+    rawJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     chunks?: EmbeddingChunkUpdateManyWithoutCollectionNestedInput
   }
@@ -18310,6 +18355,7 @@ export namespace Prisma {
     context?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
     embeddingProvider?: StringFieldUpdateOperationsInput | string
+    rawJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     chunks?: EmbeddingChunkUncheckedUpdateManyWithoutCollectionNestedInput
   }
@@ -18320,6 +18366,7 @@ export namespace Prisma {
     context: string
     systemPrompt?: string
     embeddingProvider?: string
+    rawJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
   }
 
@@ -18328,6 +18375,7 @@ export namespace Prisma {
     context?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
     embeddingProvider?: StringFieldUpdateOperationsInput | string
+    rawJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -18337,6 +18385,7 @@ export namespace Prisma {
     context?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
     embeddingProvider?: StringFieldUpdateOperationsInput | string
+    rawJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -18527,6 +18576,7 @@ export namespace Prisma {
     endedAt?: Date | string | null
     status?: string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: string | null
     playbook: PlaybookCreateNestedOneWithoutRunsInput
     company: CompanyCreateNestedOneWithoutPlaybookRunsInput
   }
@@ -18540,6 +18590,7 @@ export namespace Prisma {
     endedAt?: Date | string | null
     status?: string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: string | null
   }
 
   export type PlaybookRunUpdateInput = {
@@ -18548,6 +18599,7 @@ export namespace Prisma {
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: NullableStringFieldUpdateOperationsInput | string | null
     playbook?: PlaybookUpdateOneRequiredWithoutRunsNestedInput
     company?: CompanyUpdateOneRequiredWithoutPlaybookRunsNestedInput
   }
@@ -18561,6 +18613,7 @@ export namespace Prisma {
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PlaybookRunCreateManyInput = {
@@ -18572,6 +18625,7 @@ export namespace Prisma {
     endedAt?: Date | string | null
     status?: string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: string | null
   }
 
   export type PlaybookRunUpdateManyMutationInput = {
@@ -18580,6 +18634,7 @@ export namespace Prisma {
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PlaybookRunUncheckedUpdateManyInput = {
@@ -18591,6 +18646,7 @@ export namespace Prisma {
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type AuditLogCreateInput = {
@@ -19272,6 +19328,29 @@ export namespace Prisma {
     id?: SortOrder
     companyId?: SortOrder
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type EmbeddingChunkListRelationFilter = {
     every?: EmbeddingChunkWhereInput
@@ -19289,6 +19368,7 @@ export namespace Prisma {
     context?: SortOrder
     systemPrompt?: SortOrder
     embeddingProvider?: SortOrder
+    rawJson?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -19316,6 +19396,32 @@ export namespace Prisma {
 
   export type PostmanCollectionSumOrderByAggregateInput = {
     id?: SortOrder
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type PostmanCollectionScalarRelationFilter = {
@@ -19465,6 +19571,21 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type PlaybookRunCountOrderByAggregateInput = {
     id?: SortOrder
     playbookId?: SortOrder
@@ -19474,6 +19595,7 @@ export namespace Prisma {
     endedAt?: SortOrder
     status?: SortOrder
     steps?: SortOrder
+    shareToken?: SortOrder
   }
 
   export type PlaybookRunAvgOrderByAggregateInput = {
@@ -19491,6 +19613,7 @@ export namespace Prisma {
     startedAt?: SortOrder
     endedAt?: SortOrder
     status?: SortOrder
+    shareToken?: SortOrder
   }
 
   export type PlaybookRunMinOrderByAggregateInput = {
@@ -19501,6 +19624,7 @@ export namespace Prisma {
     startedAt?: SortOrder
     endedAt?: SortOrder
     status?: SortOrder
+    shareToken?: SortOrder
   }
 
   export type PlaybookRunSumOrderByAggregateInput = {
@@ -19522,6 +19646,24 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type AuditLogCountOrderByAggregateInput = {
@@ -20199,6 +20341,10 @@ export namespace Prisma {
     set?: Date | string | null
   }
 
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
   export type PlaybookUpdateOneRequiredWithoutRunsNestedInput = {
     create?: XOR<PlaybookCreateWithoutRunsInput, PlaybookUncheckedCreateWithoutRunsInput>
     connectOrCreate?: PlaybookCreateOrConnectWithoutRunsInput
@@ -20382,6 +20528,29 @@ export namespace Prisma {
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
@@ -20392,6 +20561,20 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
   export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -20406,6 +20589,23 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type CompanyCreateWithoutErpInput = {
@@ -20873,6 +21073,7 @@ export namespace Prisma {
     endedAt?: Date | string | null
     status?: string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: string | null
     playbook: PlaybookCreateNestedOneWithoutRunsInput
   }
 
@@ -20884,6 +21085,7 @@ export namespace Prisma {
     endedAt?: Date | string | null
     status?: string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: string | null
   }
 
   export type PlaybookRunCreateOrConnectWithoutCompanyInput = {
@@ -20979,6 +21181,7 @@ export namespace Prisma {
     endedAt?: DateTimeNullableFilter<"PlaybookRun"> | Date | string | null
     status?: StringFilter<"PlaybookRun"> | string
     steps?: JsonFilter<"PlaybookRun">
+    shareToken?: StringNullableFilter<"PlaybookRun"> | string | null
   }
 
   export type CompanyCreateWithoutTestClientsInput = {
@@ -21071,6 +21274,7 @@ export namespace Prisma {
     context: string
     systemPrompt?: string
     embeddingProvider?: string
+    rawJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
   }
 
@@ -21080,6 +21284,7 @@ export namespace Prisma {
     context: string
     systemPrompt?: string
     embeddingProvider?: string
+    rawJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
   }
 
@@ -21104,6 +21309,7 @@ export namespace Prisma {
     context?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
     embeddingProvider?: StringFieldUpdateOperationsInput | string
+    rawJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -21113,6 +21319,7 @@ export namespace Prisma {
     context?: StringFieldUpdateOperationsInput | string
     systemPrompt?: StringFieldUpdateOperationsInput | string
     embeddingProvider?: StringFieldUpdateOperationsInput | string
+    rawJson?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -21171,6 +21378,7 @@ export namespace Prisma {
     endedAt?: Date | string | null
     status?: string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: string | null
     company: CompanyCreateNestedOneWithoutPlaybookRunsInput
   }
 
@@ -21182,6 +21390,7 @@ export namespace Prisma {
     endedAt?: Date | string | null
     status?: string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: string | null
   }
 
   export type PlaybookRunCreateOrConnectWithoutPlaybookInput = {
@@ -21726,6 +21935,7 @@ export namespace Prisma {
     endedAt?: Date | string | null
     status?: string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: string | null
   }
 
   export type TestClientUpdateWithoutCompanyInput = {
@@ -21754,6 +21964,7 @@ export namespace Prisma {
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: NullableStringFieldUpdateOperationsInput | string | null
     playbook?: PlaybookUpdateOneRequiredWithoutRunsNestedInput
   }
 
@@ -21765,6 +21976,7 @@ export namespace Prisma {
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PlaybookRunUncheckedUpdateManyWithoutCompanyInput = {
@@ -21775,6 +21987,7 @@ export namespace Prisma {
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type EmbeddingChunkUpdateWithoutCollectionInput = {
@@ -21808,6 +22021,7 @@ export namespace Prisma {
     endedAt?: Date | string | null
     status?: string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: string | null
   }
 
   export type PlaybookStepUpdateWithoutPlaybookInput = {
@@ -21842,6 +22056,7 @@ export namespace Prisma {
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: NullableStringFieldUpdateOperationsInput | string | null
     company?: CompanyUpdateOneRequiredWithoutPlaybookRunsNestedInput
   }
 
@@ -21853,6 +22068,7 @@ export namespace Prisma {
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type PlaybookRunUncheckedUpdateManyWithoutPlaybookInput = {
@@ -21863,6 +22079,7 @@ export namespace Prisma {
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: StringFieldUpdateOperationsInput | string
     steps?: JsonNullValueInput | InputJsonValue
+    shareToken?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
 

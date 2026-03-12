@@ -33,3 +33,11 @@ export async function getCollectionStructure(id: number) {
 export async function deleteCollection(id: number) {
   await prisma.postmanCollection.delete({ where: { id } })
 }
+
+export async function importCollection(name: string, rawJson: unknown) {
+  const created = await prisma.postmanCollection.create({
+    data: { name, rawJson: rawJson as never, context: '', systemPrompt: '' },
+    select: { id: true, name: true, createdAt: true },
+  })
+  return created
+}

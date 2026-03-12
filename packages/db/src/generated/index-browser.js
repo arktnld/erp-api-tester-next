@@ -181,6 +181,7 @@ exports.Prisma.PostmanCollectionScalarFieldEnum = {
   context: 'context',
   systemPrompt: 'systemPrompt',
   embeddingProvider: 'embeddingProvider',
+  rawJson: 'rawJson',
   createdAt: 'createdAt'
 };
 
@@ -221,7 +222,8 @@ exports.Prisma.PlaybookRunScalarFieldEnum = {
   startedAt: 'startedAt',
   endedAt: 'endedAt',
   status: 'status',
-  steps: 'steps'
+  steps: 'steps',
+  shareToken: 'shareToken'
 };
 
 exports.Prisma.AuditLogScalarFieldEnum = {
@@ -261,6 +263,11 @@ exports.Prisma.SortOrder = {
 };
 
 exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 
