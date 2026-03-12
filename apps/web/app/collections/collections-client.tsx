@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback, useTransition } from 'react'
+import { useState, useEffect, useRef, useCallback, useTransition, useMemo } from 'react'
 import { getCollectionStructure, deleteCollection, importCollection } from '@/app/actions/collections'
 import type { CollectionStructure, FolderNode, CollectionEndpoint, FlatEndpoint, CollectionParam } from './lib/parser'
 import styles from './collections.module.css'
@@ -687,13 +687,27 @@ function FolderNodeView({
 function ImportModal({ onClose, onImported }: { onClose: () => void; onImported: (id: number, name: string) => void }) {
   const [tab, setTab] = useState<'file' | 'paste'>('file')
   const [text, setText] = useState('')
+  const [collName, setCollName] = useState('')
   const [error, setError] = useState('')
   const [dragover, setDragover] = useState(false)
   const [isPending, startTransition] = useTransition()
 
   const readFile = (f: File) => {
     const reader = new FileReader()
-    reader.onload = (ev) => setText(ev.target?.result as string ?? '')
+    reader.onload = (ev) => {
+      const content = ev.target?.result as string ?? ''
+      setText(content)
+      if (!collName) {
+        // Try to extract name from JSON
+        try {
+          const json = JSON.parse(content)
+          const name = json.info?.name || json.info?.title || f.name.replace(/\.(json|yaml|yml)$/i, '')
+          setCollName(name)
+        } catch {
+          setCollName(f.name.replace(/\.(json|yaml|yml)$/i, ''))
+        }
+      }
+    }
     reader.readAsText(f)
   }
 
@@ -715,7 +729,7 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
     try { parsed = JSON.parse(text) } catch { setError('JSON inválido'); return }
     startTransition(async () => {
       try {
-        const created = await importCollection('Collection', parsed)
+        const created = await importCollection(collName.trim() || 'Collection', parsed)
         onImported(created.id, created.name)
       } catch (e) {
         setError('Erro ao importar: ' + String(e))
@@ -728,6 +742,14 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalTitle}>Importar collection</div>
         <div className={styles.modalSub}>Postman v2.0 / v2.1 · OpenAPI / Swagger 2.0 / 3.0</div>
+        <input
+          value={collName}
+          onChange={(e) => setCollName(e.target.value)}
+          placeholder="Nome da collection"
+          style={{ width: '100%', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, padding: '7px 10px', fontSize: 13, color: 'var(--text)', outline: 'none', boxSizing: 'border-box', marginBottom: 12 }}
+          onFocus={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
+          onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
+        />
         <div className={styles.modalTabs}>
           <button className={`${styles.modalTab} ${tab === 'file' ? styles.modalTabActive : ''}`} onClick={() => setTab('file')}>Arquivo</button>
           <button className={`${styles.modalTab} ${tab === 'paste' ? styles.modalTabActive : ''}`} onClick={() => setTab('paste')}>Colar JSON</button>
@@ -862,7 +884,6 @@ export function CollectionsClient({
   const [activeEpId, setActiveEpId] = useState<string | null>(null)
   const [activeEp, setActiveEp] = useState<FlatEndpoint | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<Array<FlatEndpoint & { namePositions: Set<number> }>>([])
   const [showImport, setShowImport] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -871,15 +892,10 @@ export function CollectionsClient({
   useEffect(() => {
     flatRef.current = structure ? buildFlat(structure.tree) : []
     setSearchQuery('')
-    setSearchResults([])
     setActiveEp(null)
     setActiveEpId(null)
   }, [structure])
 
-  useEffect(() => {
-    if (!searchQuery.trim()) { setSearchResults([]); return }
-    setSearchResults(runFuzzySearch(searchQuery, flatRef.current))
-  }, [searchQuery])
 
   const loadCollection = useCallback(async (id: number) => {
     setLoading(true)
@@ -912,10 +928,14 @@ export function CollectionsClient({
     setActiveEp(flat ?? { ...ep, folderPath: [], _paramNames: '' })
     setActiveEpId(ep.id)
     setSearchQuery('')
-    setSearchResults([])
   }
 
   const isSearching = searchQuery.trim().length > 0
+  const searchResults = useMemo(
+    () => (isSearching ? runFuzzySearch(searchQuery, flatRef.current) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [searchQuery]
+  )
 
   if (collections.length === 0 && !showImport) {
     return (
