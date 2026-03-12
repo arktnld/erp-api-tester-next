@@ -2,7 +2,7 @@
 
 import { useState, useTransition, useEffect } from 'react'
 import Link from 'next/link'
-import { ChevronLeft, Plus, Trash2, Pencil, GripVertical, Zap, Copy } from 'lucide-react'
+import { ChevronLeft, Plus, Trash2, Pencil, GripVertical, Zap, Copy, Terminal } from 'lucide-react'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import type { DropResult } from '@hello-pangea/dnd'
 import { MethodBadge } from '@/components/ui/badge'
@@ -51,6 +51,59 @@ type ERP = {
 }
 
 const METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+
+function parseCurl(raw: string): { method: string; path: string; headers: Record<string, string>; body: string } | null {
+  try {
+    const line = raw.replace(/\\\n\s*/g, ' ').trim()
+    if (!line.startsWith('curl ')) return null
+
+    let method = 'GET'
+    let url = ''
+    const headers: Record<string, string> = {}
+    let body = ''
+
+    const tokens: string[] = []
+    let i = 0
+    while (i < line.length) {
+      if (line[i] === ' ') { i++; continue }
+      if (line[i] === "'" || line[i] === '"') {
+        const q = line[i]; let s = ''; i++
+        while (i < line.length && line[i] !== q) {
+          if (line[i] === '\\') { i++; s += line[i] ?? '' } else s += line[i]
+          i++
+        }
+        i++; tokens.push(s)
+      } else {
+        let s = ''
+        while (i < line.length && line[i] !== ' ') { s += line[i]; i++ }
+        tokens.push(s)
+      }
+    }
+
+    for (let j = 0; j < tokens.length; j++) {
+      const t = tokens[j]
+      if (t === 'curl') continue
+      if (t === '-X' || t === '--request') { method = tokens[++j] ?? method; continue }
+      if (t === '-H' || t === '--header') {
+        const h = tokens[++j] ?? ''; const colon = h.indexOf(':')
+        if (colon > 0) {
+          const key = h.slice(0, colon).trim(); const val = h.slice(colon + 1).trim()
+          if (!/^content-type$/i.test(key) && !/^authorization$/i.test(key)) headers[key] = val
+        }
+        continue
+      }
+      if (t === '-d' || t === '--data' || t === '--data-raw' || t === '--data-binary') {
+        body = tokens[++j] ?? ''; if (method === 'GET') method = 'POST'; continue
+      }
+      if (!t.startsWith('-')) {
+        try { const u = new URL(t); url = u.pathname + u.search } catch { if (t.startsWith('/')) url = t }
+      }
+    }
+
+    if (!url) return null
+    return { method, path: url, headers, body }
+  } catch { return null }
+}
 
 const GROUP_COLORS = [
   { text: '#6366f1', bg: '#6366f118', border: '#6366f144' },
@@ -101,6 +154,21 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
   const [isPending, startTransition] = useTransition()
   const { canAdmin: canEdit } = useRole()
 
+  // cURL import state
+  const [curlInput, setCurlInput] = useState('')
+  const [curlOpen, setCurlOpen] = useState(false)
+  const [curlError, setCurlError] = useState('')
+
+  const handleImportCurl = () => {
+    const result = parseCurl(curlInput)
+    if (!result) { setCurlError('cURL inválido. Verifique o formato.'); return }
+    setEpMethod(result.method)
+    setEpPath(result.path)
+    setEpBody(result.body)
+    setEpHeaders(Object.keys(result.headers).length > 0 ? JSON.stringify(result.headers, null, 2) : '{}')
+    setCurlOpen(false); setCurlInput(''); setCurlError('')
+  }
+
   // Endpoint form state
   const [epName, setEpName] = useState('')
   const [epMethod, setEpMethod] = useState('GET')
@@ -148,6 +216,7 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
     setEpRequiresClient(ep?.requiresClient ?? true)
     setEpIsModification(ep?.isModification ?? false)
     setEpNotes(ep?.notes ?? '')
+    setCurlInput(''); setCurlOpen(false); setCurlError('')
     setEndpointSheet({ open: true, endpoint: ep })
   }
 
@@ -348,6 +417,34 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
             setEndpointSheet({ open: false })
           })
         }}>
+          {/* cURL Import */}
+          <div style={{ marginBottom: 20, border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
+            <button
+              type="button"
+              onClick={() => { setCurlOpen((v) => !v); setCurlError('') }}
+              style={{ width: '100%', padding: '9px 14px', background: 'var(--surface-2)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-muted)', fontSize: 13 }}
+            >
+              <Terminal size={14} />
+              Importar cURL
+              <span style={{ marginLeft: 'auto', fontSize: 10, opacity: 0.6 }}>{curlOpen ? '▲' : '▼'}</span>
+            </button>
+            {curlOpen && (
+              <div style={{ padding: '12px 14px', borderTop: '1px solid var(--border)' }}>
+                <textarea
+                  value={curlInput}
+                  onChange={(e) => { setCurlInput(e.target.value); setCurlError('') }}
+                  placeholder={"curl -X POST https://api.example.com/v1/endpoint \\\n  -H \"X-Token: abc\" \\\n  -d '{\"key\": \"value\"}'"}
+                  rows={5}
+                  style={{ width: '100%', padding: '8px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontFamily: 'monospace', fontSize: 11, outline: 'none', resize: 'vertical' }}
+                />
+                {curlError && <p style={{ fontSize: 12, color: '#ef4444', margin: '6px 0 0' }}>{curlError}</p>}
+                <Button type="button" onClick={handleImportCurl} disabled={!curlInput.trim()} style={{ marginTop: 8 }}>
+                  Preencher campos
+                </Button>
+              </div>
+            )}
+          </div>
+
           <label style={labelStyle}>Nome</label>
           <Input value={epName} onChange={(e) => setEpName(e.target.value)} placeholder="Consultar Contrato" required />
 
