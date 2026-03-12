@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@erp/db'
 import { MethodBadge, StatusBadge } from '@/components/ui/badge'
-import { RotateCcw, Building2, FlaskConical, ListChecks, History } from 'lucide-react'
+import { RotateCcw, Building2, FlaskConical, ListChecks, History, BookOpen } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -53,8 +53,9 @@ export default async function Dashboard() {
 
   const quickActions = [
     { href: '/test', label: 'Testar API', desc: 'Disparar requisições', icon: FlaskConical },
-{ href: '/playbooks', label: 'Playbooks', desc: 'Fluxos automatizados', icon: ListChecks },
+    { href: '/playbooks', label: 'Playbooks', desc: 'Fluxos automatizados', icon: ListChecks },
     { href: '/history', label: 'Histórico', desc: 'Todas as requisições', icon: History },
+    { href: '/collections', label: 'Collections', desc: 'Explorar endpoints', icon: BookOpen },
   ]
 
   return (
