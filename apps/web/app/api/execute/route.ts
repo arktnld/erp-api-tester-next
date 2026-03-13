@@ -14,10 +14,22 @@ export async function POST(req: NextRequest) {
     const result = await executeRequest(parsed)
     return NextResponse.json(result)
   } catch (err: unknown) {
-    if (err instanceof ValidationError) {
-      return NextResponse.json({ error: String(err) }, { status: 400 })
-    }
-    logger.error({ err: String(err) }, 'execute server error')
-    return NextResponse.json({ error: String(err) }, { status: 500 })
+    const message = String(err)
+    const status = err instanceof ValidationError ? 400 : 500
+    if (status === 500) logger.error({ err: message }, 'execute server error')
+    return NextResponse.json({
+      statusCode: status,
+      url: '',
+      method: '',
+      requestBody: null,
+      requestHeaders: {},
+      responseBody: JSON.stringify({ error: message }),
+      responseHeaders: {},
+      durationMs: 0,
+      contentCategory: 'json',
+      mimeType: 'application/json',
+      fileName: null,
+      isBinary: false,
+    })
   }
 }
