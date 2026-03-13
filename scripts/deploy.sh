@@ -13,6 +13,9 @@ echo "==> Deploy iniciado em $SERVER"
 ssh "$SERVER" bash -s << REMOTE
 set -e
 
+export NVM_DIR="\$HOME/.nvm"
+[ -s "\$NVM_DIR/nvm.sh" ] && source "\$NVM_DIR/nvm.sh"
+
 cd $APP_DIR
 
 echo "--- Baixando últimas alterações ---"
