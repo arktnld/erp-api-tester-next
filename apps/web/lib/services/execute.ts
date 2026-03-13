@@ -175,6 +175,16 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
 
   const allFields = mergeFields(fields, company)
 
+  // Pre-auth: token_endpoint — obtain/reuse session token BEFORE substitution so {token} works in paths/bodies
+  if (company.authType === 'token_endpoint') {
+    const cfg = (company.authConfig ?? {}) as TokenEndpointConfig
+    const isTokenEndpoint = endpoint.id === cfg.tokenEndpointId
+    if (!isTokenEndpoint) {
+      const token = cfg.cachedToken ?? await fetchTokenInline(company, cfg, environmentUrl ?? null)
+      allFields['token'] = token
+    }
+  }
+
   const resolvedPath = substitute(endpoint.pathTemplate, allFields)
   const resolvedBody =
     customBody != null
@@ -185,17 +195,6 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
 
   const endpointHeaders = JSON.parse(endpoint.headers || '{}') as Record<string, string>
   const authHeaders = buildAuthHeaders(company)
-
-  // Pre-auth: token_endpoint — obtain/reuse session token before main request
-  let tokenAuthHeaders: Record<string, string> = {}
-  if (company.authType === 'token_endpoint') {
-    const cfg = (company.authConfig ?? {}) as TokenEndpointConfig
-    const isTokenEndpoint = endpoint.id === cfg.tokenEndpointId
-    if (!isTokenEndpoint) {
-      const token = cfg.cachedToken ?? await fetchTokenInline(company, cfg, environmentUrl ?? null)
-      tokenAuthHeaders = { Authorization: `Bearer ${token}` }
-    }
-  }
 
   const url = `${environmentUrl ?? company.baseUrl}${resolvedPath}`
 
@@ -209,7 +208,6 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
     ...(resolvedBody != null && !endpointHeaders['Content-Type'] ? { 'Content-Type': 'application/json' } : {}),
     ...endpointHeaders,
     ...authHeaders,
-    ...tokenAuthHeaders,
   }
 
   logger.info({ endpointId, url, method: endpoint.method }, 'execute start')

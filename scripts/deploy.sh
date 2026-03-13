@@ -34,9 +34,9 @@ echo "--- Reiniciando PM2 ---"
 if pm2 list | grep -q "$PM2_APP"; then
   pm2 restart $PM2_APP
 else
-  pm2 start pnpm --name "$PM2_APP" -- --filter web start
+  cd $APP_DIR/apps/web
+  pm2 start 'node_modules/.bin/next start --port 9000' --name "$PM2_APP"
   pm2 save
-  pm2 startup | tail -1 | sudo bash
 fi
 
 echo ""
