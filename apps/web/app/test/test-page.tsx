@@ -71,7 +71,7 @@ export function TestPage({
       case 'basic':
         return new Set(['Authorization'])
       case 'api_key':
-        return cfg?.header ? new Set([cfg.header]) : new Set<string>()
+        return cfg?.header ? new Set([String(cfg.header)]) : new Set<string>()
       case 'custom_headers':
         return cfg ? new Set(Object.keys(cfg)) : new Set<string>()
       default:
