@@ -178,13 +178,13 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
   // Pre-auth: token_endpoint — obtain/reuse session token BEFORE substitution so {token} works in paths/bodies
   if (company.authType === 'token_endpoint') {
     const cfg = (company.authConfig ?? {}) as TokenEndpointConfig
-    const isTokenEndpoint = endpoint.id === cfg.tokenEndpointId
-    if (!isTokenEndpoint) {
+    // Always inject static params (SYS, PASSWORD, etc.) so they resolve in any template
+    Object.assign(allFields, cfg.params ?? {})
+    if (endpoint.id !== cfg.tokenEndpointId) {
+      // Override TOKEN placeholder with the session token for non-auth endpoints
       const token = cfg.cachedToken ?? await fetchTokenInline(company, cfg, environmentUrl ?? null)
       allFields['token'] = token
-    } else {
-      // Token endpoint called directly — inject params so {SYS}, {TOKEN}, etc. resolve
-      Object.assign(allFields, cfg.params ?? {})
+      allFields['TOKEN'] = token
     }
   }
 
