@@ -11,7 +11,10 @@ export default async function CompaniesPage() {
   const [companies, erps] = await Promise.all([
     getCompanies(),
     prisma.eRP.findMany({
-      select: { id: true, name: true },
+      select: {
+        id: true, name: true,
+        endpoints: { select: { id: true, name: true, pathTemplate: true, bodyTemplate: true }, orderBy: { sortOrder: 'asc' } },
+      },
       orderBy: { name: 'asc' },
     }),
   ])

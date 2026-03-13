@@ -222,17 +222,19 @@ interface TestSelectorsProps {
   erp: ERP | undefined
   company: Company | undefined
   companyEnvironments: Environment[]
+  tokenAcquired: boolean
   onErpChange: (id: number | null) => void
   onCompanyChange: (id: number | null) => void
   onEndpointChange: (id: number | null) => void
   onClientChange: (id: number | null) => void
   onEnvironmentChange: (url: string | null) => void
+  onObtainToken: () => void
 }
 
 export function TestSelectors({
   erps, erpId, companyId, endpointId, clientId, environmentUrl,
-  needsClient, erp, company, companyEnvironments,
-  onErpChange, onCompanyChange, onEndpointChange, onClientChange, onEnvironmentChange,
+  needsClient, erp, company, companyEnvironments, tokenAcquired,
+  onErpChange, onCompanyChange, onEndpointChange, onClientChange, onEnvironmentChange, onObtainToken,
 }: TestSelectorsProps) {
   const [open, setOpen] = useState({ erp: true, company: false, endpoint: false, client: false })
   const [q, setQ] = useState({ erp: '', company: '', endpoint: '', client: '' })
@@ -316,6 +318,22 @@ export function TestSelectors({
             <div style={{ maxHeight: 160, overflowY: 'auto' }}>
               <ItemList items={filteredCompanies} selectedId={companyId} onSelect={handleCompanySelect} />
             </div>
+            {/* Token status for token_endpoint auth */}
+            {companyId && company?.authType === 'token_endpoint' && (
+              <div style={{ margin: '6px 0 4px', padding: '6px 8px', borderRadius: 6, backgroundColor: 'var(--surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                {tokenAcquired || (company.authConfig as { cachedToken?: string } | null)?.cachedToken
+                  ? <span style={{ fontSize: 11, color: '#10b981' }}>🟢 Token válido</span>
+                  : <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>🔑 Sem token</span>
+                }
+                <button
+                  onClick={onObtainToken}
+                  style={{ fontSize: 11, padding: '3px 8px', backgroundColor: 'color-mix(in srgb, var(--accent) 12%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)', borderRadius: 4, color: 'var(--accent)', cursor: 'pointer' }}
+                >
+                  Obter token
+                </button>
+              </div>
+            )}
+
             {companyEnvironments.length > 0 && companyId && (
               <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
                 <p style={{ fontSize: 10, color: 'var(--text-subtle)', padding: '0 8px 4px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Ambiente</p>

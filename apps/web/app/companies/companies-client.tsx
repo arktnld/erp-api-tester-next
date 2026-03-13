@@ -33,9 +33,15 @@ function nextEnvSuggestion(existing: Environment[]): string {
   const names = existing.map((e) => e.name)
   return ENV_SUGGESTIONS.find((s) => !names.includes(s)) ?? 'Ambiente'
 }
-type ERP = { id: number; name: string }
+type ERPEndpoint = { id: number; name: string; pathTemplate: string; bodyTemplate: string }
+type ERP = { id: number; name: string; endpoints: ERPEndpoint[] }
 
-const AUTH_TYPES = ['none', 'bearer', 'api_key', 'basic', 'custom_headers', 'body_fields']
+function getPlaceholders(endpoint: ERPEndpoint): string[] {
+  const combined = `${endpoint.pathTemplate} ${endpoint.bodyTemplate}`
+  return [...new Set(Array.from(combined.matchAll(/\{(\w+)\}/g)).map((m) => m[1]))]
+}
+
+const AUTH_TYPES = ['none', 'bearer', 'api_key', 'basic', 'custom_headers', 'body_fields', 'token_endpoint']
 const AUTH_PLACEHOLDERS: Record<string, string> = {
   bearer: '{"token": "eyJhbGciOiJSUzI1NiJ9..."}',
   api_key: '{"header": "X-API-Key", "value": "abc123"}',
@@ -75,6 +81,9 @@ export function CompaniesClient({
   const [newEnvUrl, setNewEnvUrl] = useState('')
   const [authType, setAuthType] = useState('none')
   const [authConfig, setAuthConfig] = useState('{}')
+  const [tokenEpId, setTokenEpId] = useState('')
+  const [tokenPath, setTokenPath] = useState('token')
+  const [tokenParams, setTokenParams] = useState<Record<string, string>>({})
   const [notes, setNotes] = useState('')
   const [isPending, startTransition] = useTransition()
   const { canEdit } = useRole()
@@ -87,8 +96,18 @@ export function CompaniesClient({
     setEnvironments(envs)
     setNewEnvName(nextEnvSuggestion(envs))
     setNewEnvUrl('')
-    setAuthType(company?.authType ?? 'none')
-    setAuthConfig(company?.authConfig ? JSON.stringify(company.authConfig) : '{}')
+    const aType = company?.authType ?? 'none'
+    setAuthType(aType)
+    if (aType === 'token_endpoint' && company?.authConfig) {
+      const cfg = company.authConfig as { tokenEndpointId?: number; tokenPath?: string; params?: Record<string, string> }
+      setTokenEpId(String(cfg.tokenEndpointId ?? ''))
+      setTokenPath(cfg.tokenPath ?? 'token')
+      setTokenParams(cfg.params ?? {})
+      setAuthConfig('{}')
+    } else {
+      setTokenEpId(''); setTokenPath('token'); setTokenParams({})
+      setAuthConfig(company?.authConfig ? JSON.stringify(company.authConfig) : '{}')
+    }
     setNotes(company?.notes ?? '')
     setSheet({ open: true, company })
   }
@@ -231,18 +250,25 @@ export function CompaniesClient({
             e.preventDefault()
             startTransition(async () => {
               const environmentsJson = JSON.stringify(environments)
+              let finalAuthConfig = authConfig
+              if (authType === 'token_endpoint') {
+                const existingCfg = sheet.company?.authType === 'token_endpoint'
+                  ? (sheet.company.authConfig as { cachedToken?: string; cachedAt?: number } | null)
+                  : null
+                finalAuthConfig = JSON.stringify({
+                  tokenEndpointId: Number(tokenEpId),
+                  tokenPath,
+                  params: tokenParams,
+                  ...(existingCfg?.cachedToken ? { cachedToken: existingCfg.cachedToken, cachedAt: existingCfg.cachedAt } : {}),
+                })
+              }
               if (sheet.company) {
                 await updateCompany(sheet.company.id, {
-                  name,
-                  erpId: Number(erpId),
-                  baseUrl,
-                  environments: environmentsJson,
-                  authType,
-                  authConfig,
-                  notes,
+                  name, erpId: Number(erpId), baseUrl, environments: environmentsJson,
+                  authType, authConfig: finalAuthConfig, notes,
                 })
               } else {
-                await createCompany({ name, erpId: Number(erpId), baseUrl, environments: environmentsJson, authType, authConfig, notes })
+                await createCompany({ name, erpId: Number(erpId), baseUrl, environments: environmentsJson, authType, authConfig: finalAuthConfig, notes })
               }
               setSheet({ open: false })
             })
@@ -313,7 +339,7 @@ export function CompaniesClient({
           <label style={labelStyle}>Tipo de Autenticação</label>
           <select
             value={authType}
-            onChange={(e) => { setAuthType(e.target.value); setAuthConfig('{}') }}
+            onChange={(e) => { setAuthType(e.target.value); setAuthConfig('{}'); setTokenEpId(''); setTokenPath('token'); setTokenParams({}) }}
             style={selectStyle}
           >
             {AUTH_TYPES.map((t) => (
@@ -321,7 +347,59 @@ export function CompaniesClient({
             ))}
           </select>
 
-          {authType !== 'none' && (
+          {authType === 'token_endpoint' ? (() => {
+            const erpEndpoints = erps.find((e) => e.id === Number(erpId))?.endpoints ?? []
+            const selectedEp = erpEndpoints.find((ep) => ep.id === Number(tokenEpId))
+            const placeholders = selectedEp ? getPlaceholders(selectedEp) : []
+            return (
+              <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div>
+                  <label style={labelStyle}>Endpoint de token</label>
+                  <select
+                    style={selectStyle}
+                    value={tokenEpId}
+                    onChange={(e) => { setTokenEpId(e.target.value); setTokenParams({}) }}
+                  >
+                    <option value="">Selecione o endpoint...</option>
+                    {erpEndpoints.map((ep) => (
+                      <option key={ep.id} value={ep.id}>{ep.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>Caminho do token na resposta</label>
+                  <input
+                    value={tokenPath}
+                    onChange={(e) => setTokenPath(e.target.value)}
+                    placeholder="token  ou  data.access_token"
+                    style={{ width: '100%', padding: '7px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, fontFamily: 'monospace', outline: 'none' }}
+                  />
+                </div>
+                {placeholders.length > 0 && (
+                  <div>
+                    <label style={labelStyle}>Credenciais</label>
+                    <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginBottom: 6 }}>Valores para os parâmetros do endpoint de token</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {placeholders.map((key) => (
+                        <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <code style={{ fontSize: 11, color: 'var(--accent)', width: 120, flexShrink: 0, fontFamily: 'monospace' }}>{key}</code>
+                          <input
+                            value={tokenParams[key] ?? ''}
+                            onChange={(e) => setTokenParams((prev) => ({ ...prev, [key]: e.target.value }))}
+                            placeholder={`valor de {${key}}`}
+                            style={{ flex: 1, padding: '6px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, fontFamily: 'monospace', outline: 'none' }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {sheet.company?.authType === 'token_endpoint' && (sheet.company.authConfig as { cachedToken?: string } | null)?.cachedToken && (
+                  <p style={{ fontSize: 11, color: '#10b981' }}>🟢 Token em cache disponível</p>
+                )}
+              </div>
+            )
+          })() : authType !== 'none' && (
             <>
               <label style={labelStyle}>Config de Auth (JSON)</label>
               <textarea

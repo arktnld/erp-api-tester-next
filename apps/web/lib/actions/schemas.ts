@@ -9,7 +9,7 @@ export const CompanySchema = z.object({
   erpId: z.number().int().positive(),
   baseUrl: z.string().url('URL inválida'),
   environments: z.string().default('[]'),
-  authType: z.enum(['none', 'bearer', 'api_key', 'basic', 'custom_headers', 'body_fields']),
+  authType: z.enum(['none', 'bearer', 'api_key', 'basic', 'custom_headers', 'body_fields', 'token_endpoint']),
   authConfig: z.string().default('{}'),
   notes: z.string().default(''),
 })

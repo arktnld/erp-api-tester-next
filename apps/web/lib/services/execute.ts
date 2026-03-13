@@ -3,7 +3,7 @@ import { validatePublicUrl } from '@/lib/security'
 import { buildAuthHeaders } from '@/lib/auth'
 import { mergeFields } from '@/lib/fields'
 import { getEndpoint } from '@/lib/repo/endpoints'
-import { getCompanyWithAuth, getTestClientWithCompany } from '@/lib/repo/companies'
+import { getCompanyWithAuth, getTestClientWithCompany, saveTokenCache } from '@/lib/repo/companies'
 import { recordExecution } from '@/lib/repo/history'
 import { logger } from '@/lib/logger'
 import { request as httpRequest } from 'node:http'
@@ -11,6 +11,45 @@ import { request as httpsRequest } from 'node:https'
 import type { ContentCategory } from '@/app/test/lib/types'
 
 export class ValidationError extends Error {}
+
+type TokenEndpointConfig = {
+  tokenEndpointId: number
+  tokenPath: string
+  params: Record<string, string>
+  cachedToken?: string
+  cachedAt?: number
+}
+
+function extractByPath(obj: unknown, path: string): string | null {
+  let current: unknown = obj
+  for (const key of path.split('.')) {
+    if (current == null || typeof current !== 'object') return null
+    current = (current as Record<string, unknown>)[key]
+  }
+  return current != null ? String(current) : null
+}
+
+async function fetchTokenInline(
+  company: { id: number; baseUrl: string },
+  cfg: TokenEndpointConfig,
+  environmentUrl: string | null
+): Promise<string> {
+  const tokenEndpoint = await getEndpoint(cfg.tokenEndpointId)
+  const params = cfg.params ?? {}
+  const resolvedPath = substitute(tokenEndpoint.pathTemplate, params)
+  const bodyTemplate = tokenEndpoint.bodyTemplate?.trim() ? substitute(tokenEndpoint.bodyTemplate, params) : null
+  const url = `${environmentUrl ?? company.baseUrl}${resolvedPath}`
+  validatePublicUrl(url)
+  const res = await httpFetch(url, tokenEndpoint.method, {}, bodyTemplate)
+  if (res.status < 200 || res.status >= 300)
+    throw new Error(`Auth falhou: HTTP ${res.status} — ${res.body.slice(0, 200)}`)
+  let json: unknown
+  try { json = JSON.parse(res.body) } catch { throw new Error(`Auth: resposta não é JSON — ${res.body.slice(0, 200)}`) }
+  const token = extractByPath(json, cfg.tokenPath ?? 'token')
+  if (!token) throw new Error(`Token não encontrado em "${cfg.tokenPath}"`)
+  await saveTokenCache(company.id, { ...cfg, cachedToken: token, cachedAt: Date.now() })
+  return token
+}
 
 export interface ExecuteParams {
   endpointId: number
@@ -147,6 +186,17 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
   const endpointHeaders = JSON.parse(endpoint.headers || '{}') as Record<string, string>
   const authHeaders = buildAuthHeaders(company)
 
+  // Pre-auth: token_endpoint — obtain/reuse session token before main request
+  let tokenAuthHeaders: Record<string, string> = {}
+  if (company.authType === 'token_endpoint') {
+    const cfg = (company.authConfig ?? {}) as TokenEndpointConfig
+    const isTokenEndpoint = endpoint.id === cfg.tokenEndpointId
+    if (!isTokenEndpoint) {
+      const token = cfg.cachedToken ?? await fetchTokenInline(company, cfg, environmentUrl ?? null)
+      tokenAuthHeaders = { Authorization: `Bearer ${token}` }
+    }
+  }
+
   const url = `${environmentUrl ?? company.baseUrl}${resolvedPath}`
 
   try {
@@ -159,6 +209,7 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
     ...(resolvedBody != null && !endpointHeaders['Content-Type'] ? { 'Content-Type': 'application/json' } : {}),
     ...endpointHeaders,
     ...authHeaders,
+    ...tokenAuthHeaders,
   }
 
   logger.info({ endpointId, url, method: endpoint.method }, 'execute start')
@@ -189,6 +240,17 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
 
   const durationMs = Date.now() - startMs
   logger.info({ url, statusCode, durationMs }, 'execute complete')
+
+  // Auto-save token when the token endpoint itself was just executed successfully
+  if (company.authType === 'token_endpoint' && statusCode >= 200 && statusCode < 300) {
+    const cfg = (company.authConfig ?? {}) as TokenEndpointConfig
+    if (endpoint.id === cfg.tokenEndpointId) {
+      try {
+        const token = extractByPath(JSON.parse(responseBody), cfg.tokenPath ?? 'token')
+        if (token) await saveTokenCache(company.id, { ...cfg, cachedToken: token, cachedAt: Date.now() })
+      } catch { /* ignore */ }
+    }
+  }
 
   await recordExecution({
     erpName: company.erp.name,

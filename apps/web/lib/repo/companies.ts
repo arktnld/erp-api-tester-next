@@ -13,6 +13,10 @@ export function getCompanyWithAuth(id: number) {
   return prisma.company.findUniqueOrThrow({ where: { id }, select: companyAuthSelect })
 }
 
+export function saveTokenCache(companyId: number, updatedConfig: Record<string, unknown>) {
+  return prisma.company.update({ where: { id: companyId }, data: { authConfig: updatedConfig } })
+}
+
 export function getTestClientWithCompany(id: number) {
   return prisma.testClient.findUniqueOrThrow({
     where: { id },

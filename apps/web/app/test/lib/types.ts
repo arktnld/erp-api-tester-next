@@ -19,7 +19,7 @@ export type Company = {
   baseUrl: string
   environments: Environment[]
   authType: string
-  authConfig: Record<string, string> | null
+  authConfig: Record<string, unknown> | null
   testClients: TestClient[]
 }
 

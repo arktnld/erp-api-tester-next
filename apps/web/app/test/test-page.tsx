@@ -42,6 +42,7 @@ export function TestPage({
   const [environmentUrl, setEnvironmentUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [response, setResponse] = useState<ExecuteResponse | null>(null)
+  const [tokenAcquired, setTokenAcquired] = useState<Record<number, boolean>>({})
   const [bodyMode, setBodyMode] = useState<'form' | 'raw'>('form')
   const [rawBody, setRawBody] = useState('')
   const [showCancel, setShowCancel] = useState(false)
@@ -64,7 +65,7 @@ export function TestPage({
   const editorLanguage = detectLanguage(endpoint?.headers ?? '{}')
   // Header names whose values should be fully masked
   const sensitiveHeaderKeys: Set<string> = (() => {
-    const cfg = company?.authConfig as Record<string, string> | null
+    const cfg = company?.authConfig as Record<string, unknown> | null
     switch (company?.authType) {
       case 'bearer':
       case 'basic':
@@ -80,9 +81,9 @@ export function TestPage({
   // Body field values to mask (body_fields auth injects them literally into the body)
   const sensitiveValues: Set<string> = new Set(
     company?.authType === 'body_fields' && company?.authConfig
-      ? Object.values(company.authConfig as Record<string, string>).filter(
-          (v) => typeof v === 'string' && v.length > 4
-        )
+      ? Object.values(company.authConfig as Record<string, unknown>).filter(
+          (v) => typeof v === 'string' && (v as string).length > 4
+        ) as string[]
       : []
   )
 
@@ -121,6 +122,29 @@ export function TestPage({
 
   const cancel = () => {
     abortRef.current?.abort()
+  }
+
+  const obtainToken = async () => {
+    if (!companyId) return
+    const cfg = company?.authConfig as { tokenEndpointId?: number } | null
+    if (!cfg?.tokenEndpointId) return
+    setLoading(true)
+    try {
+      const res = await fetch('/api/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpointId: cfg.tokenEndpointId, companyId, environmentUrl: environmentUrl ?? undefined }),
+      })
+      const data = await res.json()
+      if (data.statusCode >= 200 && data.statusCode < 300) {
+        setTokenAcquired((prev) => ({ ...prev, [companyId]: true }))
+        setResponse(data)
+      } else {
+        setResponse(data)
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -170,11 +194,13 @@ export function TestPage({
           erp={erp}
           company={company}
           companyEnvironments={companyEnvironments}
+          tokenAcquired={companyId ? (tokenAcquired[companyId] ?? false) : false}
           onErpChange={(id) => { setErpId(id); setCompanyId(null); setEndpointId(null); setClientId(null); setResponse(null) }}
           onCompanyChange={(id) => { setCompanyId(id); setClientId(null); setEnvironmentUrl(null) }}
           onEndpointChange={setEndpointId}
           onClientChange={setClientId}
           onEnvironmentChange={setEnvironmentUrl}
+          onObtainToken={obtainToken}
         />
         <TestRequest
           response={response}
