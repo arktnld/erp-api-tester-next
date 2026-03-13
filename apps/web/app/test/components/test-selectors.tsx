@@ -318,21 +318,6 @@ export function TestSelectors({
             <div style={{ maxHeight: 160, overflowY: 'auto' }}>
               <ItemList items={filteredCompanies} selectedId={companyId} onSelect={handleCompanySelect} />
             </div>
-            {/* Token status for token_endpoint auth */}
-            {companyId && company?.authType === 'token_endpoint' && (
-              <div style={{ margin: '6px 0 4px', padding: '6px 8px', borderRadius: 6, backgroundColor: 'var(--surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                {tokenAcquired || (company.authConfig as { cachedToken?: string } | null)?.cachedToken
-                  ? <span style={{ fontSize: 11, color: '#10b981' }}>🟢 Token válido</span>
-                  : <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>🔑 Sem token</span>
-                }
-                <button
-                  onClick={onObtainToken}
-                  style={{ fontSize: 11, padding: '3px 8px', backgroundColor: 'color-mix(in srgb, var(--accent) 12%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 30%, transparent)', borderRadius: 4, color: 'var(--accent)', cursor: 'pointer' }}
-                >
-                  Obter token
-                </button>
-              </div>
-            )}
 
             {companyEnvironments.length > 0 && companyId && (
               <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
@@ -355,6 +340,22 @@ export function TestSelectors({
                 ))}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Token status — always visible when company uses token_endpoint */}
+        {companyId && company?.authType === 'token_endpoint' && (
+          <div style={{ margin: '2px 8px 4px', padding: '7px 10px', borderRadius: 6, border: '1px solid color-mix(in srgb, var(--accent) 25%, transparent)', backgroundColor: 'color-mix(in srgb, var(--accent) 6%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+            {tokenAcquired || (company.authConfig as { cachedToken?: string } | null)?.cachedToken
+              ? <span style={{ fontSize: 11, color: '#10b981', fontWeight: 500 }}>🟢 Token válido</span>
+              : <span style={{ fontSize: 11, color: 'var(--text-subtle)', fontWeight: 500 }}>🔑 Sem token em cache</span>
+            }
+            <button
+              onClick={onObtainToken}
+              style={{ fontSize: 11, padding: '3px 8px', backgroundColor: 'color-mix(in srgb, var(--accent) 15%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 35%, transparent)', borderRadius: 4, color: 'var(--accent)', cursor: 'pointer', whiteSpace: 'nowrap' }}
+            >
+              Obter token
+            </button>
           </div>
         )}
 
