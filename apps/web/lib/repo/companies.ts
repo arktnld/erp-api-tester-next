@@ -14,7 +14,7 @@ export function getCompanyWithAuth(id: number) {
 }
 
 export function saveTokenCache(companyId: number, updatedConfig: Record<string, unknown>) {
-  return prisma.company.update({ where: { id: companyId }, data: { authConfig: updatedConfig } })
+  return prisma.company.update({ where: { id: companyId }, data: { authConfig: updatedConfig as Parameters<typeof prisma.company.update>[0]['data']['authConfig'] } })
 }
 
 export function getTestClientWithCompany(id: number) {
