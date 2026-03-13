@@ -182,6 +182,9 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
     if (!isTokenEndpoint) {
       const token = cfg.cachedToken ?? await fetchTokenInline(company, cfg, environmentUrl ?? null)
       allFields['token'] = token
+    } else {
+      // Token endpoint called directly — inject params so {SYS}, {TOKEN}, etc. resolve
+      Object.assign(allFields, cfg.params ?? {})
     }
   }
 
