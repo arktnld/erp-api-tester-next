@@ -44,7 +44,7 @@ export async function duplicateTestClient(id: number, companyId: number) {
     data: {
       companyId: original.companyId,
       name: `${original.name} (cópia)`,
-      fieldsData: original.fieldsData,
+      fieldsData: original.fieldsData as Parameters<typeof prisma.testClient.create>[0]['data']['fieldsData'],
     },
   })
   revalidatePath(`/companies/${companyId}`)
