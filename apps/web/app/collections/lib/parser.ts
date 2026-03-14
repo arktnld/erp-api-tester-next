@@ -250,7 +250,8 @@ function parseOpenAPI(raw: Record<string, unknown>): CollectionStructure {
 export function parseCollectionStructure(rawJson: unknown): CollectionStructure {
   if (!rawJson || typeof rawJson !== 'object') return { name: 'Collection', tree: { id: 'root', name: 'Collection', children: [], eps: [] } }
   const raw = rawJson as Record<string, unknown>
-  if (raw.info && (raw.info as Record<string, unknown>)._postman_id) return parsePostmanV2(raw)
+  const info = raw.info as Record<string, unknown> | undefined
+  if (raw.item && info && (info._postman_id || String(info.schema ?? '').includes('getpostman.com'))) return parsePostmanV2(raw)
   if (raw.openapi || raw.swagger) return parseOpenAPI(raw)
   return { name: 'Collection', tree: { id: 'root', name: 'Collection', children: [], eps: [] } }
 }
