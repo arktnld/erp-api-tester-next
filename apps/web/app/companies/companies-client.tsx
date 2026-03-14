@@ -403,7 +403,7 @@ export function CompaniesClient({
             </>
           )}
 
-          {!(() => { const t = erps.find((e) => e.id === Number(erpId))?.authTemplate as AuthTemplate | null; return !!(t?.type && t.type !== 'none' && t.fields?.length) })() && authType === 'token_endpoint' ? (() => {
+          {!(() => { const t = erps.find((e) => e.id === Number(erpId))?.authTemplate as AuthTemplate | null; return !!(t?.type && t.type !== 'none') })() && authType === 'token_endpoint' ? (() => {
             const erpEndpoints = erps.find((e) => e.id === Number(erpId))?.endpoints ?? []
             const selectedEp = erpEndpoints.find((ep) => ep.id === Number(tokenEpId))
             const placeholders = selectedEp ? getPlaceholders(selectedEp) : []
@@ -455,7 +455,7 @@ export function CompaniesClient({
                 )}
               </div>
             )
-          })() : !(() => { const t = erps.find((e) => e.id === Number(erpId))?.authTemplate as AuthTemplate | null; return !!(t?.type && t.type !== 'none' && t.fields?.length) })() && authType !== 'none' && (
+          })() : !(() => { const t = erps.find((e) => e.id === Number(erpId))?.authTemplate as AuthTemplate | null; return !!(t?.type && t.type !== 'none') })() && authType !== 'none' && (
             <>
               <label style={labelStyle}>Config de Auth (JSON)</label>
               <textarea
