@@ -40,6 +40,25 @@ export async function updateFieldSchema(
   revalidatePath(`/erps/${erpId}`)
 }
 
+export async function duplicateFieldSchema(id: number, erpId: number) {
+  await requireAdmin()
+  const original = await prisma.eRPFieldSchema.findUniqueOrThrow({ where: { id } })
+  await prisma.eRPFieldSchema.create({
+    data: {
+      erpId: original.erpId,
+      fieldName: `${original.fieldName}_copia`,
+      label: `${original.label} (cópia)`,
+      fieldType: original.fieldType,
+      required: original.required,
+      sortOrder: original.sortOrder + 1,
+      sourceEndpointId: original.sourceEndpointId,
+      endpointParam: original.endpointParam,
+      responsePath: original.responsePath,
+    },
+  })
+  revalidatePath(`/erps/${erpId}`)
+}
+
 export async function deleteFieldSchema(id: number, erpId: number) {
   await requireAdmin()
   await prisma.eRPFieldSchema.delete({ where: { id } })
