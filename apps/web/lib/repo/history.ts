@@ -16,6 +16,8 @@ export interface RecordExecutionData {
   responseBody: string
   responseHeaders: string
   durationMs: number
+  userId?: string
+  userEmail?: string
 }
 
 export function recordExecution(data: RecordExecutionData) {

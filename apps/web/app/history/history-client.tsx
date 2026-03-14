@@ -29,6 +29,7 @@ type HistoryItem = {
   responseHeaders: string
   durationMs: number
   createdAt: Date
+  userEmail?: string | null
 }
 
 const tabBtnStyle = (active: boolean): React.CSSProperties => ({
@@ -63,6 +64,7 @@ interface Filters {
   status: string
   from: string
   to: string
+  user: string
 }
 
 interface Props {
@@ -73,6 +75,7 @@ interface Props {
   companies: string[]
   endpoints: string[]
   clients: string[]
+  users: string[]
   currentFilters: Filters
 }
 
@@ -84,6 +87,7 @@ export function HistoryClient({
   companies,
   endpoints,
   clients,
+  users,
   currentFilters,
 }: Props) {
   const router = useRouter()
@@ -92,7 +96,7 @@ export function HistoryClient({
   const [tab, setTab] = useState<'response' | 'request' | 'req-headers' | 'res-headers'>('response')
 
   const totalPages = Math.ceil(total / pageSize)
-  const hasActiveFilters = ['company', 'endpoint', 'client', 'status', 'from', 'to']
+  const hasActiveFilters = ['company', 'endpoint', 'client', 'status', 'from', 'to', 'user']
     .some((k) => searchParams.get(k))
 
   function navigate(updates: Partial<Filters> & { page?: number }) {
@@ -131,6 +135,15 @@ export function HistoryClient({
       cell: ({ getValue }) => (
         <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>
           {getValue() as string}
+        </span>
+      ),
+    },
+    {
+      accessorKey: 'userEmail',
+      header: 'Usuário',
+      cell: ({ getValue }) => (
+        <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+          {(getValue() as string | null | undefined) ?? '—'}
         </span>
       ),
     },
@@ -237,6 +250,15 @@ export function HistoryClient({
           style={filterSelectStyle(!!currentFilters.to)}
           title="Data fim"
         />
+
+        <select
+          value={currentFilters.user}
+          onChange={(e) => navigate({ user: e.target.value })}
+          style={filterSelectStyle(!!currentFilters.user)}
+        >
+          <option value="">Todos os usuários</option>
+          {users.map((u) => <option key={u} value={u}>{u}</option>)}
+        </select>
 
         {hasActiveFilters && (
           <button

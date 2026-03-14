@@ -58,6 +58,8 @@ export interface ExecuteParams {
   environmentUrl?: string | null
   rawBody?: string | null
   inlineFields?: Record<string, string> | null
+  userId?: string
+  userEmail?: string
 }
 
 export interface ExecuteResult {
@@ -154,7 +156,7 @@ function httpFetch(
 }
 
 export async function executeRequest(params: ExecuteParams): Promise<ExecuteResult> {
-  const { endpointId, clientId, companyId, environmentUrl, rawBody: customBody, inlineFields } = params
+  const { endpointId, clientId, companyId, environmentUrl, rawBody: customBody, inlineFields, userId, userEmail } = params
 
   const endpoint = await getEndpoint(endpointId)
 
@@ -269,6 +271,8 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
     responseBody,
     responseHeaders: JSON.stringify(responseHeaders),
     durationMs,
+    userId,
+    userEmail,
   })
 
   return {

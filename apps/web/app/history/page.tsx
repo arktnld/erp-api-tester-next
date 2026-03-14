@@ -15,11 +15,13 @@ function buildWhere(p: {
   status?: string
   from?: string
   to?: string
+  user?: string
 }): Prisma.RequestHistoryWhereInput {
   const where: Prisma.RequestHistoryWhereInput = {}
   if (p.company) where.companyName = p.company
   if (p.endpoint) where.endpointName = p.endpoint
   if (p.client) where.clientName = p.client
+  if (p.user) where.userEmail = p.user
   if (p.status) {
     const prefix = Number(p.status[0])
     where.statusCode = { gte: prefix * 100, lt: (prefix + 1) * 100 }
@@ -51,13 +53,14 @@ export default async function HistoryPage({
     status?: string
     from?: string
     to?: string
+    user?: string
   }>
 }) {
   const params = await searchParams
   const page = Math.max(1, Number(params.page) || 1)
   const where = buildWhere(params)
 
-  const [history, total, companies, endpoints, clients] = await Promise.all([
+  const [history, total, companies, endpoints, clients, users] = await Promise.all([
     prisma.requestHistory.findMany({
       where,
       orderBy: { createdAt: 'desc' },
@@ -80,6 +83,12 @@ export default async function HistoryPage({
       select: { clientName: true },
       orderBy: { clientName: 'asc' },
     }),
+    prisma.requestHistory.findMany({
+      where: { userEmail: { not: null } },
+      distinct: ['userEmail'],
+      select: { userEmail: true },
+      orderBy: { userEmail: 'asc' },
+    }),
   ])
 
   return (
@@ -91,6 +100,7 @@ export default async function HistoryPage({
       companies={companies.map((r) => r.companyName).filter(Boolean) as string[]}
       endpoints={endpoints.map((r) => r.endpointName).filter(Boolean) as string[]}
       clients={clients.map((r) => r.clientName).filter(Boolean) as string[]}
+      users={users.map((r) => r.userEmail).filter(Boolean) as string[]}
       currentFilters={{
         company: params.company ?? '',
         endpoint: params.endpoint ?? '',
@@ -98,6 +108,7 @@ export default async function HistoryPage({
         status: params.status ?? '',
         from: params.from ?? '',
         to: params.to ?? '',
+        user: params.user ?? '',
       }}
     />
   )
