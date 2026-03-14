@@ -32,7 +32,7 @@ function nextEnvSuggestion(existing: Environment[]): string {
   return ENV_SUGGESTIONS.find((s) => !names.includes(s)) ?? 'Ambiente'
 }
 type AuthTemplateField = { key: string; label: string; placeholder?: string; default?: string; hidden?: boolean }
-type AuthTemplate = { type: string; label: string; fields: AuthTemplateField[] }
+type AuthTemplate = { type: string; label: string; tokenEndpointId?: number; tokenPath?: string; fields: AuthTemplateField[] }
 type ERPEndpoint = { id: number; name: string; pathTemplate: string; bodyTemplate: string }
 type ERP = { id: number; name: string; authTemplate: unknown; endpoints: ERPEndpoint[] }
 
