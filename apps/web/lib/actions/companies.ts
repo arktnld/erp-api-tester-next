@@ -8,7 +8,7 @@ import { recordAudit } from '@/lib/audit'
 
 export async function getCompanies() {
   return prisma.company.findMany({
-    orderBy: { name: 'asc' },
+    orderBy: [{ erp: { name: 'asc' } }, { name: 'asc' }],
     include: {
       erp: { select: { id: true, name: true } },
       _count: { select: { testClients: true } },

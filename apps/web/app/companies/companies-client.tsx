@@ -1,10 +1,8 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useMemo } from 'react'
 import Link from 'next/link'
 import { Plus, Pencil, Trash2, ChevronRight, X } from 'lucide-react'
-import type { ColumnDef } from '@tanstack/react-table'
-import { DataTable } from '@/components/ui/data-table'
 import { PageHeader } from '@/components/ui/page-header'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -86,7 +84,22 @@ export function CompaniesClient({
   const [tokenParams, setTokenParams] = useState<Record<string, string>>({})
   const [notes, setNotes] = useState('')
   const [isPending, startTransition] = useTransition()
+  const [search, setSearch] = useState('')
   const { canEdit } = useRole()
+
+  const grouped = useMemo(() => {
+    const q = search.toLowerCase()
+    const filtered = q
+      ? companies.filter((c) => c.name.toLowerCase().includes(q) || c.erp.name.toLowerCase().includes(q) || c.baseUrl.toLowerCase().includes(q))
+      : companies
+    const map = new Map<string, Company[]>()
+    filtered.forEach((c) => {
+      const key = c.erp.name
+      if (!map.has(key)) map.set(key, [])
+      map.get(key)!.push(c)
+    })
+    return map
+  }, [companies, search])
 
   const openSheet = (company?: Company) => {
     setName(company?.name ?? '')
@@ -126,85 +139,6 @@ export function CompaniesClient({
     setNewEnvName(nextEnvSuggestion(updated))
   }
 
-  const columns: ColumnDef<Company, unknown>[] = [
-    {
-      accessorKey: 'name',
-      header: 'Empresa',
-      cell: ({ row }) => (
-        <Link
-          href={`/companies/${row.original.id}`}
-          style={{
-            color: 'var(--text)',
-            textDecoration: 'none',
-            fontWeight: 500,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-          }}
-        >
-          {row.original.name}
-          <ChevronRight size={13} color="var(--text-subtle)" />
-        </Link>
-      ),
-    },
-    {
-      accessorKey: 'erp.name',
-      header: 'ERP',
-      cell: ({ row }) => (
-        <span
-          style={{
-            fontSize: 12,
-            padding: '2px 8px',
-            borderRadius: 4,
-            backgroundColor: 'var(--surface-2)',
-            color: 'var(--text-muted)',
-          }}
-        >
-          {row.original.erp.name}
-        </span>
-      ),
-    },
-    {
-      accessorKey: 'baseUrl',
-      header: 'URL Base',
-      cell: ({ row }) => (
-        <span
-          title={row.original.baseUrl || undefined}
-          style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'monospace' }}
-        >
-          {row.original.baseUrl || <span style={{ color: 'var(--text-subtle)' }}>—</span>}
-        </span>
-      ),
-    },
-    {
-      accessorKey: '_count.testClients',
-      header: 'Clientes',
-      cell: ({ getValue }) => (
-        <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>
-          {getValue() as number}
-        </span>
-      ),
-    },
-    ...(canEdit ? [{
-      id: 'actions',
-      header: '',
-      cell: ({ row }: { row: { original: Company } }) => (
-        <div style={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-          <Button variant="ghost" size="sm" onClick={() => openSheet(row.original)}>
-            <Pencil size={13} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => startTransition(() => deleteCompany(row.original.id))}
-          >
-            <Trash2 size={13} />
-          </Button>
-        </div>
-      ),
-    }] : []),
-  ]
-
   return (
     <div style={{ padding: '32px 40px' }}>
       <PageHeader
@@ -224,19 +158,42 @@ export function CompaniesClient({
             : undefined
         }
       />
-      <div
-        style={{
-          backgroundColor: 'var(--surface)',
-          border: '1px solid var(--border)',
-          borderRadius: 10,
-          overflow: 'hidden',
-        }}
-      >
-        <DataTable
-          data={companies}
-          columns={columns}
-          searchPlaceholder="Buscar empresas..."
-        />
+      <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
+        <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--border)' }}>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar empresas..."
+            style={{ width: '100%', padding: '6px 10px', fontSize: 13, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', outline: 'none' }}
+          />
+        </div>
+        {grouped.size === 0 ? (
+          <p style={{ padding: '24px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>Nenhuma empresa encontrada.</p>
+        ) : (
+          [...grouped.entries()].map(([erpName, group]) => (
+            <div key={erpName}>
+              <div style={{ padding: '8px 16px', backgroundColor: 'var(--surface-2)', borderBottom: '1px solid var(--border)', fontSize: 11, fontWeight: 600, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {erpName}
+              </div>
+              {group.map((company, i) => (
+                <div key={company.id} style={{ display: 'flex', alignItems: 'center', padding: '10px 16px', borderBottom: i < group.length - 1 ? '1px solid var(--border)' : undefined, gap: 12 }}>
+                  <Link href={`/companies/${company.id}`} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text)', textDecoration: 'none', fontWeight: 500, fontSize: 14 }}>
+                    {company.name}
+                    <ChevronRight size={13} color="var(--text-subtle)" />
+                  </Link>
+                  <span style={{ fontSize: 12, fontFamily: 'monospace', color: 'var(--text-muted)', flex: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{company.baseUrl}</span>
+                  <span style={{ fontSize: 12, color: 'var(--text-subtle)', flexShrink: 0 }}>{company._count.testClients} cliente{company._count.testClients !== 1 ? 's' : ''}</span>
+                  {canEdit && (
+                    <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
+                      <Button variant="ghost" size="sm" onClick={() => openSheet(company)}><Pencil size={13} /></Button>
+                      <Button variant="ghost" size="sm" onClick={() => { if (confirm(`Excluir ${company.name}?`)) startTransition(async () => { await deleteCompany(company.id) }) }}><Trash2 size={13} /></Button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))
+        )}
       </div>
 
       {canEdit && <Sheet
