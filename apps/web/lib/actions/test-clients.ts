@@ -37,6 +37,19 @@ export async function getTestClient(id: number) {
   return prisma.testClient.findUniqueOrThrow({ where: { id } })
 }
 
+export async function duplicateTestClient(id: number, companyId: number) {
+  await requireEdit()
+  const original = await prisma.testClient.findUniqueOrThrow({ where: { id } })
+  await prisma.testClient.create({
+    data: {
+      companyId: original.companyId,
+      name: `${original.name} (cópia)`,
+      fieldsData: original.fieldsData,
+    },
+  })
+  revalidatePath(`/companies/${companyId}`)
+}
+
 export async function deleteTestClient(id: number, companyId: number) {
   await requireEdit()
   await prisma.testClient.delete({ where: { id } })

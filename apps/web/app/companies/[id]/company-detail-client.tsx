@@ -4,7 +4,7 @@ import { useTransition, useState } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, Plus, Pencil, Trash2, User, Copy, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { deleteTestClient } from '@/lib/actions/test-clients'
+import { deleteTestClient, duplicateTestClient } from '@/lib/actions/test-clients'
 import { useRole } from '@/lib/role-context'
 
 type FieldSchema = {
@@ -174,11 +174,15 @@ export function CompanyDetailClient({ company }: { company: Company }) {
                   {canEdit && (
                     <div style={{ display: 'flex', gap: 2 }}>
                       <Link href={`/companies/${company.id}/clients/${client.id}/edit`}>
-                        <Button variant="ghost" size="sm"><Pencil size={12} /></Button>
+                        <Button variant="ghost" size="sm" title="Editar"><Pencil size={12} /></Button>
                       </Link>
+                      <Button variant="ghost" size="sm" title="Duplicar" onClick={() => startTransition(() => duplicateTestClient(client.id, company.id))}>
+                        <Copy size={12} />
+                      </Button>
                       <Button
                         variant="ghost"
                         size="sm"
+                        title="Excluir"
                         onClick={() => startTransition(() => deleteTestClient(client.id, company.id))}
                       >
                         <Trash2 size={12} />
