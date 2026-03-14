@@ -115,7 +115,7 @@ export function CompaniesClient({
     setNewEnvUrl('')
     const erp = erps.find((e) => e.id === Number(eid))
     const template = erp?.authTemplate as AuthTemplate | null
-    const hasTemplate = !!(template?.type && template.type !== 'none' && template.fields?.length)
+    const hasTemplate = !!(template?.type && template.type !== 'none')
     const aType = company?.authType ?? (hasTemplate ? template!.type : 'none')
     setAuthType(aType)
     if (hasTemplate && template!.type === 'token_endpoint') {
@@ -232,7 +232,7 @@ export function CompaniesClient({
               const environmentsJson = JSON.stringify(environments)
               const selectedErp = erps.find((e) => e.id === Number(erpId))
               const template = selectedErp?.authTemplate as AuthTemplate | null
-              const hasTemplate = !!(template?.type && template.type !== 'none' && template.fields?.length)
+              const hasTemplate = !!(template?.type && template.type !== 'none')
               let finalAuthConfig = authConfig
               if (hasTemplate && template!.type === 'token_endpoint') {
                 // Template token_endpoint: tokenEndpointId/tokenPath from template, params from user input
@@ -288,7 +288,7 @@ export function CompaniesClient({
             setErpId(newId)
             const erp = erps.find((er) => er.id === Number(newId))
             const template = erp?.authTemplate as AuthTemplate | null
-            const hasTemplate = !!(template?.type && template.type !== 'none' && template.fields?.length)
+            const hasTemplate = !!(template?.type && template.type !== 'none')
             if (hasTemplate) {
               setAuthType(template!.type)
               const vals: Record<string, string> = {}
@@ -355,7 +355,7 @@ export function CompaniesClient({
           {(() => {
             const selectedErp = erps.find((e) => e.id === Number(erpId))
             const template = selectedErp?.authTemplate as AuthTemplate | null
-            const hasTemplate = !!(template?.type && template.type !== 'none' && template.fields?.length)
+            const hasTemplate = !!(template?.type && template.type !== 'none')
             if (hasTemplate) {
               return (
                 <div style={{ marginTop: 12 }}>
@@ -387,7 +387,7 @@ export function CompaniesClient({
           {!(() => {
             const selectedErp = erps.find((e) => e.id === Number(erpId))
             const template = selectedErp?.authTemplate as AuthTemplate | null
-            return !!(template?.type && template.type !== 'none' && template.fields?.length)
+            return !!(template?.type && template.type !== 'none')
           })() && (
             <>
               <label style={labelStyle}>Tipo de Autenticação</label>
