@@ -118,13 +118,13 @@ export function CompaniesClient({
     const hasTemplate = !!(template?.type && template.type !== 'none' && template.fields?.length)
     const aType = company?.authType ?? (hasTemplate ? template!.type : 'none')
     setAuthType(aType)
-    if (aType === 'token_endpoint' && company?.authConfig) {
-      const cfg = company.authConfig as { tokenEndpointId?: number; tokenPath?: string; params?: Record<string, string> }
-      setTokenEpId(String(cfg.tokenEndpointId ?? ''))
-      setTokenPath(cfg.tokenPath ?? 'token')
-      setTokenParams(cfg.params ?? {})
-      setAuthConfig('{}')
-      setTemplateValues({})
+    if (hasTemplate && template!.type === 'token_endpoint') {
+      // Template token_endpoint: tokenEndpointId/tokenPath come from template, only load credential params
+      const existingParams = (company?.authConfig as { params?: Record<string, string> } | null)?.params ?? {}
+      const vals: Record<string, string> = {}
+      template!.fields.forEach((f) => { vals[f.key] = existingParams[f.key] ?? f.default ?? '' })
+      setTemplateValues(vals)
+      setTokenEpId(''); setTokenPath('token'); setTokenParams({}); setAuthConfig('{}')
     } else if (hasTemplate) {
       setTokenEpId(''); setTokenPath('token'); setTokenParams({})
       setAuthConfig('{}')
@@ -132,6 +132,13 @@ export function CompaniesClient({
       const vals: Record<string, string> = {}
       template!.fields.forEach((f) => { vals[f.key] = existingCfg[f.key] ?? f.default ?? '' })
       setTemplateValues(vals)
+    } else if (aType === 'token_endpoint' && company?.authConfig) {
+      const cfg = company.authConfig as { tokenEndpointId?: number; tokenPath?: string; params?: Record<string, string> }
+      setTokenEpId(String(cfg.tokenEndpointId ?? ''))
+      setTokenPath(cfg.tokenPath ?? 'token')
+      setTokenParams(cfg.params ?? {})
+      setAuthConfig('{}')
+      setTemplateValues({})
     } else {
       setTokenEpId(''); setTokenPath('token'); setTokenParams({})
       setTemplateValues({})
@@ -227,7 +234,20 @@ export function CompaniesClient({
               const template = selectedErp?.authTemplate as AuthTemplate | null
               const hasTemplate = !!(template?.type && template.type !== 'none' && template.fields?.length)
               let finalAuthConfig = authConfig
-              if (authType === 'token_endpoint') {
+              if (hasTemplate && template!.type === 'token_endpoint') {
+                // Template token_endpoint: tokenEndpointId/tokenPath from template, params from user input
+                const existingCfg = sheet.company?.authType === 'token_endpoint'
+                  ? (sheet.company.authConfig as { cachedToken?: string; cachedAt?: number } | null)
+                  : null
+                const params: Record<string, string> = {}
+                template!.fields.forEach((f) => { params[f.key] = templateValues[f.key] ?? f.default ?? '' })
+                finalAuthConfig = JSON.stringify({
+                  tokenEndpointId: template!.tokenEndpointId,
+                  tokenPath: template!.tokenPath ?? 'token',
+                  params,
+                  ...(existingCfg?.cachedToken ? { cachedToken: existingCfg.cachedToken, cachedAt: existingCfg.cachedAt } : {}),
+                })
+              } else if (authType === 'token_endpoint') {
                 const existingCfg = sheet.company?.authType === 'token_endpoint'
                   ? (sheet.company.authConfig as { cachedToken?: string; cachedAt?: number } | null)
                   : null

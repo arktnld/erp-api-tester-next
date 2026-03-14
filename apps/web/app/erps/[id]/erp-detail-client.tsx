@@ -32,9 +32,11 @@ type AuthTemplateField = {
 type AuthTemplate = {
   type: string
   label: string
+  tokenEndpointId?: number
+  tokenPath?: string
   fields: AuthTemplateField[]
 }
-const AUTH_TYPES_TEMPLATE = ['none', 'bearer', 'api_key', 'basic', 'custom_headers', 'body_fields']
+const AUTH_TYPES_TEMPLATE = ['none', 'bearer', 'api_key', 'basic', 'custom_headers', 'body_fields', 'token_endpoint']
 
 type Endpoint = {
   id: number
@@ -201,6 +203,8 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
   const [atType, setAtType] = useState(existingTemplate?.type ?? 'none')
   const [atLabel, setAtLabel] = useState(existingTemplate?.label ?? '')
   const [atFields, setAtFields] = useState<AuthTemplateField[]>(existingTemplate?.fields ?? [])
+  const [atTokenEpId, setAtTokenEpId] = useState(existingTemplate?.tokenEndpointId ? String(existingTemplate.tokenEndpointId) : '')
+  const [atTokenPath, setAtTokenPath] = useState(existingTemplate?.tokenPath ?? 'token')
   const [atSaved, setAtSaved] = useState(false)
 
   const addAtField = () => setAtFields((prev) => [...prev, { key: '', label: '', placeholder: '', default: '', hidden: false }])
@@ -210,7 +214,12 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
 
   const saveAuthTemplate = () => {
     startTransition(async () => {
-      const template: AuthTemplate = { type: atType, label: atLabel, fields: atFields.filter((f) => f.key.trim()) }
+      const template: AuthTemplate = {
+        type: atType,
+        label: atLabel,
+        fields: atFields.filter((f) => f.key.trim()),
+        ...(atType === 'token_endpoint' ? { tokenEndpointId: Number(atTokenEpId), tokenPath: atTokenPath } : {}),
+      }
       await updateERPAuthTemplate(erp.id, atType === 'none' ? {} : template)
       setAtSaved(true)
       setTimeout(() => setAtSaved(false), 2000)
@@ -462,12 +471,43 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
               <input
                 value={atLabel}
                 onChange={(e) => setAtLabel(e.target.value)}
-                placeholder="Ex: Token IXC, API Key Totvs..."
+                placeholder="Ex: Token IXC, Token MKSolutions..."
                 style={{ width: '100%', padding: '7px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 13, outline: 'none' }}
               />
 
+              {atType === 'token_endpoint' && (
+                <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  <div>
+                    <label style={labelStyle}>Endpoint de autenticação</label>
+                    <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginBottom: 6 }}>Endpoint deste ERP que retorna o token de sessão</p>
+                    <select
+                      style={selectStyle}
+                      value={atTokenEpId}
+                      onChange={(e) => setAtTokenEpId(e.target.value)}
+                    >
+                      <option value="">Selecione o endpoint...</option>
+                      {endpoints.map((ep) => (
+                        <option key={ep.id} value={ep.id}>{ep.method} {ep.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Caminho do token na resposta</label>
+                    <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginBottom: 6 }}>Caminho no JSON da resposta onde o token está (ex: <code style={{ fontFamily: 'monospace' }}>Token</code>, <code style={{ fontFamily: 'monospace' }}>data.access_token</code>)</p>
+                    <input
+                      value={atTokenPath}
+                      onChange={(e) => setAtTokenPath(e.target.value)}
+                      placeholder="Token"
+                      style={{ width: '100%', padding: '7px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, fontFamily: 'monospace', outline: 'none' }}
+                    />
+                  </div>
+                </div>
+              )}
+
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 20, marginBottom: 8 }}>
-                <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Campos</label>
+                <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  {atType === 'token_endpoint' ? 'Campos de credencial' : 'Campos'}
+                </label>
                 {canEdit && (
                   <Button type="button" variant="ghost" size="sm" onClick={addAtField}>
                     <Plus size={13} /> Adicionar campo
@@ -475,7 +515,9 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
                 )}
               </div>
               <p style={{ fontSize: 12, color: 'var(--text-subtle)', marginBottom: 12 }}>
-                Cada campo corresponde a uma chave no JSON de config da empresa (ex: <code style={{ fontFamily: 'monospace' }}>header</code>, <code style={{ fontFamily: 'monospace' }}>value</code>, <code style={{ fontFamily: 'monospace' }}>token</code>).
+                {atType === 'token_endpoint'
+                  ? 'Credenciais que a empresa precisa preencher (ex: usuário e senha). São passadas como parâmetros ao endpoint de autenticação.'
+                  : 'Cada campo corresponde a uma chave no JSON de config da empresa (ex: username, password, token).'}
               </p>
 
               {atFields.length === 0 && (
