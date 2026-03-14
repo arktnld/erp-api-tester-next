@@ -18,8 +18,23 @@ import {
   duplicateEndpoint,
 } from '@/lib/actions/endpoints'
 import { createFieldSchema, updateFieldSchema, deleteFieldSchema, duplicateFieldSchema, reorderFieldSchemas } from '@/lib/actions/field-schemas'
+import { updateERPAuthTemplate } from '@/lib/actions/erps'
 import { formLabel as labelStyle, selectStyle } from '@/lib/styles'
 import { useRole } from '@/lib/role-context'
+
+type AuthTemplateField = {
+  key: string
+  label: string
+  placeholder?: string
+  default?: string
+  hidden?: boolean
+}
+type AuthTemplate = {
+  type: string
+  label: string
+  fields: AuthTemplateField[]
+}
+const AUTH_TYPES_TEMPLATE = ['none', 'bearer', 'api_key', 'basic', 'custom_headers', 'body_fields']
 
 type Endpoint = {
   id: number
@@ -46,6 +61,7 @@ type FieldSchema = {
 type ERP = {
   id: number
   name: string
+  authTemplate: unknown
   endpoints: Endpoint[]
   fieldSchemas: FieldSchema[]
 }
@@ -144,7 +160,7 @@ const tabStyle = (active: boolean): React.CSSProperties => ({
 })
 
 export function ERPDetailClient({ erp }: { erp: ERP }) {
-  const [tab, setTab] = useState<'endpoints' | 'fields'>('endpoints')
+  const [tab, setTab] = useState<'endpoints' | 'fields' | 'auth'>('endpoints')
   const [endpoints, setEndpoints] = useState<Endpoint[]>(erp.endpoints)
   useEffect(() => { setEndpoints(erp.endpoints) }, [erp.endpoints])
   const [fieldSchemas, setFieldSchemas] = useState<FieldSchema[]>(erp.fieldSchemas)
@@ -179,6 +195,27 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
   const [epRequiresClient, setEpRequiresClient] = useState(true)
   const [epIsModification, setEpIsModification] = useState(false)
   const [epNotes, setEpNotes] = useState('')
+
+  // Auth template state
+  const existingTemplate = erp.authTemplate as AuthTemplate | null
+  const [atType, setAtType] = useState(existingTemplate?.type ?? 'none')
+  const [atLabel, setAtLabel] = useState(existingTemplate?.label ?? '')
+  const [atFields, setAtFields] = useState<AuthTemplateField[]>(existingTemplate?.fields ?? [])
+  const [atSaved, setAtSaved] = useState(false)
+
+  const addAtField = () => setAtFields((prev) => [...prev, { key: '', label: '', placeholder: '', default: '', hidden: false }])
+  const removeAtField = (i: number) => setAtFields((prev) => prev.filter((_, idx) => idx !== i))
+  const updateAtField = (i: number, patch: Partial<AuthTemplateField>) =>
+    setAtFields((prev) => prev.map((f, idx) => (idx === i ? { ...f, ...patch } : f)))
+
+  const saveAuthTemplate = () => {
+    startTransition(async () => {
+      const template: AuthTemplate = { type: atType, label: atLabel, fields: atFields.filter((f) => f.key.trim()) }
+      await updateERPAuthTemplate(erp.id, atType === 'none' ? {} : template)
+      setAtSaved(true)
+      setTimeout(() => setAtSaved(false), 2000)
+    })
+  }
 
   // Field form state
   const [fsName, setFsName] = useState('')
@@ -248,6 +285,9 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
         </button>
         <button style={tabStyle(tab === 'fields')} onClick={() => setTab('fields')}>
           Campos do Cliente ({erp.fieldSchemas.length})
+        </button>
+        <button style={tabStyle(tab === 'auth')} onClick={() => setTab('auth')}>
+          Autenticação
         </button>
       </div>
 
@@ -400,6 +440,108 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
                 )}
               </Droppable>
             </DragDropContext>
+          )}
+        </div>
+      )}
+
+      {/* Auth Template Tab */}
+      {tab === 'auth' && (
+        <div style={{ maxWidth: 540 }}>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
+            Define o template de autenticação padrão para empresas deste ERP. Ao criar/editar uma empresa, os campos configurados aqui serão exibidos como formulário, sem precisar editar JSON.
+          </p>
+
+          <label style={labelStyle}>Tipo de Autenticação</label>
+          <select style={selectStyle} value={atType} onChange={(e) => setAtType(e.target.value)}>
+            {AUTH_TYPES_TEMPLATE.map((t) => <option key={t} value={t}>{t}</option>)}
+          </select>
+
+          {atType !== 'none' && (
+            <>
+              <label style={labelStyle}>Nome do método <span style={{ color: 'var(--text-subtle)' }}>(exibido na empresa)</span></label>
+              <input
+                value={atLabel}
+                onChange={(e) => setAtLabel(e.target.value)}
+                placeholder="Ex: Token IXC, API Key Totvs..."
+                style={{ width: '100%', padding: '7px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 13, outline: 'none' }}
+              />
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 20, marginBottom: 8 }}>
+                <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Campos</label>
+                {canEdit && (
+                  <Button type="button" variant="ghost" size="sm" onClick={addAtField}>
+                    <Plus size={13} /> Adicionar campo
+                  </Button>
+                )}
+              </div>
+              <p style={{ fontSize: 12, color: 'var(--text-subtle)', marginBottom: 12 }}>
+                Cada campo corresponde a uma chave no JSON de config da empresa (ex: <code style={{ fontFamily: 'monospace' }}>header</code>, <code style={{ fontFamily: 'monospace' }}>value</code>, <code style={{ fontFamily: 'monospace' }}>token</code>).
+              </p>
+
+              {atFields.length === 0 && (
+                <p style={{ fontSize: 13, color: 'var(--text-subtle)', textAlign: 'center', padding: '16px 0' }}>Nenhum campo configurado.</p>
+              )}
+
+              {atFields.map((f, i) => (
+                <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '12px 14px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, marginBottom: 8 }}>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ ...labelStyle, marginBottom: 2 }}>Chave (key)</label>
+                      <input
+                        value={f.key}
+                        onChange={(e) => updateAtField(i, { key: e.target.value })}
+                        placeholder="token"
+                        style={{ width: '100%', padding: '6px 8px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--accent)', fontSize: 12, fontFamily: 'monospace', outline: 'none' }}
+                      />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ ...labelStyle, marginBottom: 2 }}>Label</label>
+                      <input
+                        value={f.label}
+                        onChange={(e) => updateAtField(i, { label: e.target.value })}
+                        placeholder="Token de Acesso"
+                        style={{ width: '100%', padding: '6px 8px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, outline: 'none' }}
+                      />
+                    </div>
+                    {canEdit && (
+                      <button type="button" onClick={() => removeAtField(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)', alignSelf: 'flex-end', paddingBottom: 4 }}>
+                        <Trash2 size={13} />
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ ...labelStyle, marginBottom: 2 }}>Placeholder</label>
+                      <input
+                        value={f.placeholder ?? ''}
+                        onChange={(e) => updateAtField(i, { placeholder: e.target.value })}
+                        placeholder="Token abc123..."
+                        style={{ width: '100%', padding: '6px 8px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, outline: 'none' }}
+                      />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ ...labelStyle, marginBottom: 2 }}>Valor padrão</label>
+                      <input
+                        value={f.default ?? ''}
+                        onChange={(e) => updateAtField(i, { default: e.target.value })}
+                        placeholder="Authorization"
+                        style={{ width: '100%', padding: '6px 8px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, fontFamily: 'monospace', outline: 'none' }}
+                      />
+                    </div>
+                  </div>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, cursor: 'pointer', color: 'var(--text-muted)' }}>
+                    <input type="checkbox" checked={f.hidden ?? false} onChange={(e) => updateAtField(i, { hidden: e.target.checked })} />
+                    Oculto (usar valor padrão sem exibir ao usuário)
+                  </label>
+                </div>
+              ))}
+            </>
+          )}
+
+          {canEdit && (
+            <Button onClick={saveAuthTemplate} disabled={isPending} style={{ marginTop: 16 }}>
+              {atSaved ? '✓ Salvo' : isPending ? 'Salvando...' : 'Salvar Template'}
+            </Button>
           )}
         </div>
       )}

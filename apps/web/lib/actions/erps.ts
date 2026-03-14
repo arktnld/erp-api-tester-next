@@ -43,6 +43,12 @@ export async function updateERP(id: number, data: { name: string }) {
   await recordAudit('update', 'erp', id, parsed.name)
 }
 
+export async function updateERPAuthTemplate(id: number, template: unknown) {
+  await requireAdmin()
+  await prisma.eRP.update({ where: { id }, data: { authTemplate: template as Parameters<typeof prisma.eRP.update>[0]['data']['authTemplate'] } })
+  revalidatePath(`/erps/${id}`)
+}
+
 export async function deleteERP(id: number) {
   await requireAdmin()
   const erp = await prisma.eRP.findUniqueOrThrow({ where: { id }, select: { name: true } })

@@ -12,7 +12,7 @@ export default async function CompaniesPage() {
     getCompanies(),
     prisma.eRP.findMany({
       select: {
-        id: true, name: true,
+        id: true, name: true, authTemplate: true,
         endpoints: { select: { id: true, name: true, pathTemplate: true, bodyTemplate: true }, orderBy: { sortOrder: 'asc' } },
       },
       orderBy: { name: 'asc' },

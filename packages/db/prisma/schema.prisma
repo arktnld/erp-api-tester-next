@@ -11,6 +11,7 @@ datasource db {
 model ERP {
   id           Int              @id @default(autoincrement())
   name         String           @unique
+  authTemplate Json             @default("{}")
   createdAt    DateTime         @default(now())
   companies    Company[]
   endpoints    Endpoint[]

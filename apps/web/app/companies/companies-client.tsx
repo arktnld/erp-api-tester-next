@@ -31,8 +31,10 @@ function nextEnvSuggestion(existing: Environment[]): string {
   const names = existing.map((e) => e.name)
   return ENV_SUGGESTIONS.find((s) => !names.includes(s)) ?? 'Ambiente'
 }
+type AuthTemplateField = { key: string; label: string; placeholder?: string; default?: string; hidden?: boolean }
+type AuthTemplate = { type: string; label: string; fields: AuthTemplateField[] }
 type ERPEndpoint = { id: number; name: string; pathTemplate: string; bodyTemplate: string }
-type ERP = { id: number; name: string; endpoints: ERPEndpoint[] }
+type ERP = { id: number; name: string; authTemplate: unknown; endpoints: ERPEndpoint[] }
 
 function getPlaceholders(endpoint: ERPEndpoint): string[] {
   const combined = `${endpoint.pathTemplate} ${endpoint.bodyTemplate}`
@@ -82,6 +84,7 @@ export function CompaniesClient({
   const [tokenEpId, setTokenEpId] = useState('')
   const [tokenPath, setTokenPath] = useState('token')
   const [tokenParams, setTokenParams] = useState<Record<string, string>>({})
+  const [templateValues, setTemplateValues] = useState<Record<string, string>>({})
   const [notes, setNotes] = useState('')
   const [isPending, startTransition] = useTransition()
   const [search, setSearch] = useState('')
@@ -103,13 +106,17 @@ export function CompaniesClient({
 
   const openSheet = (company?: Company) => {
     setName(company?.name ?? '')
-    setErpId(company?.erpId?.toString() ?? (erps[0]?.id?.toString() ?? ''))
+    const eid = company?.erpId?.toString() ?? (erps[0]?.id?.toString() ?? '')
+    setErpId(eid)
     setBaseUrl(company?.baseUrl ?? '')
     const envs: Environment[] = company?.environments ? (company.environments as Environment[]) : []
     setEnvironments(envs)
     setNewEnvName(nextEnvSuggestion(envs))
     setNewEnvUrl('')
-    const aType = company?.authType ?? 'none'
+    const erp = erps.find((e) => e.id === Number(eid))
+    const template = erp?.authTemplate as AuthTemplate | null
+    const hasTemplate = !!(template?.type && template.type !== 'none' && template.fields?.length)
+    const aType = company?.authType ?? (hasTemplate ? template!.type : 'none')
     setAuthType(aType)
     if (aType === 'token_endpoint' && company?.authConfig) {
       const cfg = company.authConfig as { tokenEndpointId?: number; tokenPath?: string; params?: Record<string, string> }
@@ -117,8 +124,17 @@ export function CompaniesClient({
       setTokenPath(cfg.tokenPath ?? 'token')
       setTokenParams(cfg.params ?? {})
       setAuthConfig('{}')
+      setTemplateValues({})
+    } else if (hasTemplate) {
+      setTokenEpId(''); setTokenPath('token'); setTokenParams({})
+      setAuthConfig('{}')
+      const existingCfg = company?.authConfig as Record<string, string> | null ?? {}
+      const vals: Record<string, string> = {}
+      template!.fields.forEach((f) => { vals[f.key] = existingCfg[f.key] ?? f.default ?? '' })
+      setTemplateValues(vals)
     } else {
       setTokenEpId(''); setTokenPath('token'); setTokenParams({})
+      setTemplateValues({})
       setAuthConfig(company?.authConfig ? JSON.stringify(company.authConfig) : '{}')
     }
     setNotes(company?.notes ?? '')
@@ -207,6 +223,9 @@ export function CompaniesClient({
             e.preventDefault()
             startTransition(async () => {
               const environmentsJson = JSON.stringify(environments)
+              const selectedErp = erps.find((e) => e.id === Number(erpId))
+              const template = selectedErp?.authTemplate as AuthTemplate | null
+              const hasTemplate = !!(template?.type && template.type !== 'none' && template.fields?.length)
               let finalAuthConfig = authConfig
               if (authType === 'token_endpoint') {
                 const existingCfg = sheet.company?.authType === 'token_endpoint'
@@ -218,6 +237,10 @@ export function CompaniesClient({
                   params: tokenParams,
                   ...(existingCfg?.cachedToken ? { cachedToken: existingCfg.cachedToken, cachedAt: existingCfg.cachedAt } : {}),
                 })
+              } else if (hasTemplate) {
+                const cfg: Record<string, string> = {}
+                template!.fields.forEach((f) => { cfg[f.key] = templateValues[f.key] ?? f.default ?? '' })
+                finalAuthConfig = JSON.stringify(cfg)
               }
               if (sheet.company) {
                 await updateCompany(sheet.company.id, {
@@ -240,7 +263,23 @@ export function CompaniesClient({
           />
 
           <label style={labelStyle}>ERP</label>
-          <select value={erpId} onChange={(e) => setErpId(e.target.value)} style={selectStyle}>
+          <select value={erpId} onChange={(e) => {
+            const newId = e.target.value
+            setErpId(newId)
+            const erp = erps.find((er) => er.id === Number(newId))
+            const template = erp?.authTemplate as AuthTemplate | null
+            const hasTemplate = !!(template?.type && template.type !== 'none' && template.fields?.length)
+            if (hasTemplate) {
+              setAuthType(template!.type)
+              const vals: Record<string, string> = {}
+              template!.fields.forEach((f) => { vals[f.key] = f.default ?? '' })
+              setTemplateValues(vals)
+              setAuthConfig('{}')
+            } else {
+              setAuthType('none'); setAuthConfig('{}'); setTemplateValues({})
+            }
+            setTokenEpId(''); setTokenPath('token'); setTokenParams({})
+          }} style={selectStyle}>
             {erps.map((erp) => (
               <option key={erp.id} value={erp.id}>
                 {erp.name}
@@ -293,18 +332,58 @@ export function CompaniesClient({
             </Button>
           </div>
 
-          <label style={labelStyle}>Tipo de Autenticação</label>
-          <select
-            value={authType}
-            onChange={(e) => { setAuthType(e.target.value); setAuthConfig('{}'); setTokenEpId(''); setTokenPath('token'); setTokenParams({}) }}
-            style={selectStyle}
-          >
-            {AUTH_TYPES.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
+          {(() => {
+            const selectedErp = erps.find((e) => e.id === Number(erpId))
+            const template = selectedErp?.authTemplate as AuthTemplate | null
+            const hasTemplate = !!(template?.type && template.type !== 'none' && template.fields?.length)
+            if (hasTemplate) {
+              return (
+                <div style={{ marginTop: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                    <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Autenticação</span>
+                    <span style={{ fontSize: 12, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 25%, transparent)', borderRadius: 4, padding: '2px 8px', fontWeight: 500 }}>
+                      {template!.label || template!.type}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {template!.fields.filter((f) => !f.hidden).map((f) => (
+                      <div key={f.key}>
+                        <label style={labelStyle}>{f.label}</label>
+                        <input
+                          value={templateValues[f.key] ?? ''}
+                          onChange={(e) => setTemplateValues((prev) => ({ ...prev, [f.key]: e.target.value }))}
+                          placeholder={f.placeholder ?? f.key}
+                          style={{ width: '100%', padding: '7px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 13, outline: 'none' }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            }
+            return null
+          })()}
 
-          {authType === 'token_endpoint' ? (() => {
+          {!(() => {
+            const selectedErp = erps.find((e) => e.id === Number(erpId))
+            const template = selectedErp?.authTemplate as AuthTemplate | null
+            return !!(template?.type && template.type !== 'none' && template.fields?.length)
+          })() && (
+            <>
+              <label style={labelStyle}>Tipo de Autenticação</label>
+              <select
+                value={authType}
+                onChange={(e) => { setAuthType(e.target.value); setAuthConfig('{}'); setTokenEpId(''); setTokenPath('token'); setTokenParams({}) }}
+                style={selectStyle}
+              >
+                {AUTH_TYPES.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </>
+          )}
+
+          {!(() => { const t = erps.find((e) => e.id === Number(erpId))?.authTemplate as AuthTemplate | null; return !!(t?.type && t.type !== 'none' && t.fields?.length) })() && authType === 'token_endpoint' ? (() => {
             const erpEndpoints = erps.find((e) => e.id === Number(erpId))?.endpoints ?? []
             const selectedEp = erpEndpoints.find((ep) => ep.id === Number(tokenEpId))
             const placeholders = selectedEp ? getPlaceholders(selectedEp) : []
@@ -356,7 +435,7 @@ export function CompaniesClient({
                 )}
               </div>
             )
-          })() : authType !== 'none' && (
+          })() : !(() => { const t = erps.find((e) => e.id === Number(erpId))?.authTemplate as AuthTemplate | null; return !!(t?.type && t.type !== 'none' && t.fields?.length) })() && authType !== 'none' && (
             <>
               <label style={labelStyle}>Config de Auth (JSON)</label>
               <textarea
