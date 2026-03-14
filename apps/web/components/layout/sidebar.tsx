@@ -65,10 +65,10 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
         }}
       >
         {!collapsed && (
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
             <span style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 900, letterSpacing: '-0.03em', color: 'var(--accent)' }}>/ERP</span>
             <span style={{ fontFamily: 'var(--font-logo)', fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--text)' }}> Tester</span>
-          </div>
+          </Link>
         )}
         <button
           onClick={toggle}
