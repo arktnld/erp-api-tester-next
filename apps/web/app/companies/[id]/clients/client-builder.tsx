@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, Loader2, Check, Zap, ChevronDown } from 'lucide-react'
+import { ChevronLeft, Loader2, Check, Zap, ChevronDown, KeyRound } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { createTestClient, updateTestClient } from '@/lib/actions/test-clients'
@@ -33,11 +33,13 @@ type ERP = {
   fieldSchemas: FieldSchema[]
   endpoints: Endpoint[]
 }
+type TokenEndpointConfig = { tokenEndpointId?: number; cachedToken?: string }
 type Company = {
   id: number
   name: string
   baseUrl: string
   authType: string
+  authConfig: unknown
   erp: ERP
   testClients: { id: number; name: string; fieldsData: unknown }[]
 }
@@ -50,6 +52,34 @@ type TestClient = {
 export function ClientBuilder({ company, client }: { company: Company; client?: TestClient }) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+
+  const tokenCfg = company.authType === 'token_endpoint' ? (company.authConfig as TokenEndpointConfig) : null
+  const [tokenValid, setTokenValid] = useState(!!(tokenCfg?.cachedToken))
+  const [tokenLoading, setTokenLoading] = useState(false)
+  const [tokenError, setTokenError] = useState('')
+
+  const obtainToken = async () => {
+    if (!tokenCfg?.tokenEndpointId) return
+    setTokenLoading(true)
+    setTokenError('')
+    try {
+      const res = await fetch('/api/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpointId: tokenCfg.tokenEndpointId, companyId: company.id }),
+      })
+      const data = await res.json() as { statusCode: number; responseBody: string }
+      if (data.statusCode >= 200 && data.statusCode < 300) {
+        setTokenValid(true)
+      } else {
+        setTokenError('Falha ao obter token — verifique as credenciais')
+      }
+    } catch {
+      setTokenError('Erro ao conectar com o servidor')
+    } finally {
+      setTokenLoading(false)
+    }
+  }
 
   const [clientName, setClientName] = useState(client?.name ?? '')
   const [fieldValues, setFieldValues] = useState<Record<string, string>>(() => {
@@ -139,6 +169,22 @@ export function ClientBuilder({ company, client }: { company: Company; client?: 
 
             {fetchOpen && (
               <div style={{ padding: '0 20px 20px' }}>
+                {tokenCfg && (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px', borderRadius: 6, backgroundColor: tokenValid ? 'color-mix(in srgb, #10b981 8%, transparent)' : 'color-mix(in srgb, var(--accent) 6%, transparent)', border: `1px solid ${tokenValid ? 'color-mix(in srgb, #10b981 25%, transparent)' : 'color-mix(in srgb, var(--accent) 25%, transparent)'}`, marginBottom: 12 }}>
+                    <span style={{ fontSize: 12, color: tokenValid ? '#10b981' : 'var(--text-subtle)', fontWeight: 500 }}>
+                      {tokenValid ? '🟢 Token válido' : '🔑 Sem token — busca vai falhar'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={obtainToken}
+                      disabled={tokenLoading}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, padding: '3px 10px', backgroundColor: 'color-mix(in srgb, var(--accent) 15%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 35%, transparent)', borderRadius: 4, color: 'var(--accent)', cursor: tokenLoading ? 'default' : 'pointer', opacity: tokenLoading ? 0.6 : 1 }}
+                    >
+                      {tokenLoading ? <><Loader2 size={11} style={{ animation: 'spin 1s linear infinite' }} /> Obtendo...</> : <><KeyRound size={11} /> Obter token</>}
+                    </button>
+                  </div>
+                )}
+                {tokenError && <p style={{ fontSize: 12, color: 'var(--status-error)', marginBottom: 10 }}>{tokenError}</p>}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {uniqueParams.map((param) => (
                     <div key={param}>
@@ -158,7 +204,7 @@ export function ClientBuilder({ company, client }: { company: Company; client?: 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 14 }}>
                   <button
                     type="button"
-                    disabled={fetchLoading || (uniqueParams.length > 0 && uniqueParams.every((p) => !identifiers[p]))}
+                    disabled={fetchLoading || (tokenCfg && !tokenValid) || (uniqueParams.length > 0 && uniqueParams.every((p) => !identifiers[p]))}
                     onClick={handleFetch}
                     style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 16px', fontSize: 13, fontWeight: 500, color: 'white', backgroundColor: 'var(--accent)', border: 'none', borderRadius: 6, cursor: 'pointer', opacity: fetchLoading || uniqueParams.every((p) => !identifiers[p]) ? 0.5 : 1 }}
                   >
