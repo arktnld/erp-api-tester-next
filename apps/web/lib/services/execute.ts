@@ -198,7 +198,9 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
         ? substitute(endpoint.bodyTemplate, allFields)
         : null
 
-  const endpointHeaders = JSON.parse(endpoint.headers || '{}') as Record<string, string>
+  const rawEndpointHeaders = JSON.parse(endpoint.headers || '{}') as Record<string, string>
+  const endpointHeaders: Record<string, string> = {}
+  for (const [k, v] of Object.entries(rawEndpointHeaders)) endpointHeaders[k] = substitute(v, allFields)
   const authHeaders = buildAuthHeaders(company)
 
   const url = `${environmentUrl ?? company.baseUrl}${resolvedPath}`
