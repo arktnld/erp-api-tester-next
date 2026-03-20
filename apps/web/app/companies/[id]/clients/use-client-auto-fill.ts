@@ -48,6 +48,15 @@ function flattenJson(obj: unknown, prefix = ''): Array<{ key: string; value: str
   })
 }
 
+function resolveFromFlat(flat: Array<{ key: string; value: string }>, path: string): string | undefined {
+  // Exact match first
+  const exact = flat.find(({ key, value }) => key === path && value !== '')
+  if (exact) return exact.value
+  // Fallback: wildcard all numeric indices, return first non-empty match
+  const pattern = new RegExp('^' + path.replace(/\[\d+\]/g, '\\[\\d+\\]') + '$')
+  return flat.find(({ key, value }) => pattern.test(key) && value !== '')?.value
+}
+
 export function useClientAutoFill(
   company: Company,
   fieldValues: Record<string, string>,
@@ -128,9 +137,9 @@ export function useClientAutoFill(
 
             group.fields.forEach((fs) => {
               if (!fs.responsePath) return
-              const found = flat.find(({ key: k }) => k === fs.responsePath)
-              if (found && found.value !== '') {
-                pool[fs.fieldName] = found.value
+              const value = resolveFromFlat(flat, fs.responsePath)
+              if (value) {
+                pool[fs.fieldName] = value
                 totalFilled++
                 progress = true
               }
