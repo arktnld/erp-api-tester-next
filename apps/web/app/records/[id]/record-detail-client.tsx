@@ -55,6 +55,7 @@ type RecordData = {
   name: string
   createdAt: Date
   company: Company
+  category: { id: number; name: string } | null
   blocks: Block[]
 }
 
@@ -569,6 +570,11 @@ export function RecordDetailClient({ record: initial }: { record: RecordData }) 
           </span>
         )}
 
+        {initial.category && (
+          <span style={{ fontSize: 11, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '3px 8px', borderRadius: 4, flexShrink: 0, fontWeight: 500 }}>
+            {initial.category.name}
+          </span>
+        )}
         <span style={{ fontSize: 12, color: 'var(--text-muted)', backgroundColor: 'var(--surface-2)', padding: '3px 8px', borderRadius: 4, flexShrink: 0 }}>
           {company.name}
         </span>

@@ -3,11 +3,27 @@
 import { prisma } from '@erp/db'
 import { revalidatePath } from 'next/cache'
 
+export async function getCategories() {
+  return prisma.recordCategory.findMany({ orderBy: { name: 'asc' } })
+}
+
+export async function createCategory(name: string) {
+  const category = await prisma.recordCategory.create({ data: { name }, select: { id: true, name: true } })
+  revalidatePath('/records')
+  return category
+}
+
+export async function deleteCategory(id: number) {
+  await prisma.recordCategory.delete({ where: { id } })
+  revalidatePath('/records')
+}
+
 export async function getRecords() {
   return prisma.apiRecord.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
       company: { select: { id: true, name: true } },
+      category: { select: { id: true, name: true } },
       _count: { select: { blocks: true } },
     },
   })
@@ -20,9 +36,9 @@ export async function getCompaniesForRecord() {
   })
 }
 
-export async function createRecord(name: string, companyId: number) {
+export async function createRecord(name: string, companyId: number, categoryId?: number | null) {
   const record = await prisma.apiRecord.create({
-    data: { name, companyId },
+    data: { name, companyId, categoryId: categoryId ?? null },
     select: { id: true },
   })
   revalidatePath('/records')
@@ -35,6 +51,11 @@ export async function renameRecord(id: number, name: string) {
   revalidatePath(`/records/${id}`)
 }
 
+export async function moveRecordCategory(id: number, categoryId: number | null) {
+  await prisma.apiRecord.update({ where: { id }, data: { categoryId } })
+  revalidatePath('/records')
+}
+
 export async function deleteRecord(id: number) {
   await prisma.apiRecord.delete({ where: { id } })
   revalidatePath('/records')
@@ -44,6 +65,7 @@ export async function getRecordForEdit(id: number) {
   return prisma.apiRecord.findUnique({
     where: { id },
     include: {
+      category: { select: { id: true, name: true } },
       company: {
         select: {
           id: true,
@@ -72,6 +94,7 @@ export async function getRecordForView(id: number) {
     where: { id },
     include: {
       company: { select: { name: true } },
+      category: { select: { name: true } },
       blocks: {
         orderBy: { order: 'asc' },
         include: {

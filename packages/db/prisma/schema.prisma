@@ -67,14 +67,23 @@ model Company {
   apiRecords   ApiRecord[]
 }
 
+model RecordCategory {
+  id        Int         @id @default(autoincrement())
+  name      String      @unique
+  createdAt DateTime    @default(now())
+  records   ApiRecord[]
+}
+
 model ApiRecord {
-  id        Int           @id @default(autoincrement())
-  name      String
-  companyId Int
-  company   Company       @relation(fields: [companyId], references: [id])
-  blocks    RecordBlock[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  id         Int              @id @default(autoincrement())
+  name       String
+  companyId  Int
+  categoryId Int?
+  company    Company          @relation(fields: [companyId], references: [id])
+  category   RecordCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  blocks     RecordBlock[]
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
 }
 
 model RecordBlock {
