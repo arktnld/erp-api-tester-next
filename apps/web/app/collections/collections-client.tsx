@@ -893,6 +893,9 @@ function CollectionSwitcher({
   )
 }
 
+const STORAGE_COL = 'col_sel_id'
+const STORAGE_EP  = 'col_sel_ep'
+
 // ── CollectionsClient ────────────────────────────────────────────────────────
 
 export function CollectionsClient({
@@ -913,6 +916,7 @@ export function CollectionsClient({
   const [openFolderIds, setOpenFolderIds] = useState<Set<string>>(new Set())
 
   const flatRef = useRef<FlatEndpoint[]>([])
+  const isFirstStructureLoad = useRef(true)
 
   useEffect(() => {
     flatRef.current = structure ? buildFlat(structure.tree) : []
@@ -920,7 +924,37 @@ export function CollectionsClient({
     setActiveEp(null)
     setActiveEpId(null)
     setOpenFolderIds(new Set())
+
+    // Restore saved endpoint on first collection load
+    if (isFirstStructureLoad.current && structure && flatRef.current.length > 0) {
+      isFirstStructureLoad.current = false
+      const savedEpId = localStorage.getItem(STORAGE_EP)
+      if (savedEpId) {
+        const ep = flatRef.current.find((f) => f.id === savedEpId)
+        if (ep) {
+          setActiveEp(ep)
+          setActiveEpId(ep.id)
+          if (ep.folderPath.length > 0) {
+            const nodes = getOpenFolderNodes(structure.tree, ep.folderPath)
+            if (nodes.length > 0) setOpenFolderIds(new Set(nodes.map((n) => n.id)))
+          }
+          setTimeout(() => {
+            document.getElementById(`ep-${ep.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+          }, 50)
+        }
+      }
+    }
   }, [structure])
+
+  // Persist active collection
+  useEffect(() => {
+    if (activeId != null) localStorage.setItem(STORAGE_COL, String(activeId))
+  }, [activeId])
+
+  // Persist active endpoint
+  useEffect(() => {
+    if (activeEpId != null) localStorage.setItem(STORAGE_EP, activeEpId)
+  }, [activeEpId])
 
 
   const loadCollection = useCallback(async (id: number) => {
@@ -930,7 +964,22 @@ export function CollectionsClient({
     setLoading(false)
   }, [])
 
-  const handleSelect = (id: number) => { setActiveId(id); loadCollection(id) }
+  const handleSelect = (id: number) => {
+    isFirstStructureLoad.current = true
+    setActiveId(id)
+    loadCollection(id)
+  }
+
+  // Restore saved collection on mount (may differ from server-rendered first collection)
+  useEffect(() => {
+    const savedId = localStorage.getItem(STORAGE_COL)
+    if (!savedId) return
+    const id = parseInt(savedId, 10)
+    if (isNaN(id) || id === initialData?.id) return
+    const exists = initialCollections.find((c) => c.id === id)
+    if (exists) handleSelect(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleDelete = (id: number) => {
     const next = collections.filter((c) => c.id !== id)
