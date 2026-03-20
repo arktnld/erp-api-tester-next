@@ -1,0 +1,1 @@
+ALTER TABLE "Endpoint" ADD COLUMN "authMode" TEXT NOT NULL DEFAULT '';

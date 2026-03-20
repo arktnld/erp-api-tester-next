@@ -46,6 +46,7 @@ model Endpoint {
   requiresClient  Boolean @default(true)
   isModification  Boolean @default(false)
   notes           String        @default("") @db.Text
+  authMode        String        @default("")
   erp             ERP           @relation(fields: [erpId], references: [id], onDelete: Cascade)
   playbookSteps   PlaybookStep[]
 }

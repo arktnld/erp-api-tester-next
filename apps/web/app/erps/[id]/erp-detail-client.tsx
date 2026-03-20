@@ -29,14 +29,23 @@ type AuthTemplateField = {
   default?: string
   hidden?: boolean
 }
-type AuthTemplate = {
+type AuthMode = {
+  id: string
   type: string
   label: string
+  fields: AuthTemplateField[]
   tokenEndpointId?: number
   tokenPath?: string
-  fields: AuthTemplateField[]
 }
 const AUTH_TYPES_TEMPLATE = ['none', 'bearer', 'api_key', 'basic', 'custom_headers', 'body_fields', 'token_endpoint']
+
+function parseInitialAuthModes(authTemplate: unknown): AuthMode[] {
+  if (!authTemplate || typeof authTemplate !== 'object') return []
+  if (Array.isArray(authTemplate)) return authTemplate as AuthMode[]
+  const t = authTemplate as Record<string, unknown>
+  if (!t.type || t.type === 'none') return []
+  return [{ id: 'default', type: String(t.type), label: String(t.label ?? ''), fields: (t.fields as AuthTemplateField[]) ?? [], tokenEndpointId: t.tokenEndpointId as number | undefined, tokenPath: String(t.tokenPath ?? 'token') }]
+}
 
 type Endpoint = {
   id: number
@@ -49,6 +58,7 @@ type Endpoint = {
   requiresClient: boolean
   isModification: boolean
   notes: string
+  authMode: string
 }
 type FieldSchema = {
   id: number
@@ -197,30 +207,36 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
   const [epRequiresClient, setEpRequiresClient] = useState(true)
   const [epIsModification, setEpIsModification] = useState(false)
   const [epNotes, setEpNotes] = useState('')
+  const [epAuthMode, setEpAuthMode] = useState('')
 
-  // Auth template state
-  const existingTemplate = erp.authTemplate as AuthTemplate | null
-  const [atType, setAtType] = useState(existingTemplate?.type ?? 'none')
-  const [atLabel, setAtLabel] = useState(existingTemplate?.label ?? '')
-  const [atFields, setAtFields] = useState<AuthTemplateField[]>(existingTemplate?.fields ?? [])
-  const [atTokenEpId, setAtTokenEpId] = useState(existingTemplate?.tokenEndpointId ? String(existingTemplate.tokenEndpointId) : '')
-  const [atTokenPath, setAtTokenPath] = useState(existingTemplate?.tokenPath ?? 'token')
+  // Auth template state (multi-mode)
+  const [authModes, setAuthModes] = useState<AuthMode[]>(() => parseInitialAuthModes(erp.authTemplate))
   const [atSaved, setAtSaved] = useState(false)
 
-  const addAtField = () => setAtFields((prev) => [...prev, { key: '', label: '', placeholder: '', default: '', hidden: false }])
-  const removeAtField = (i: number) => setAtFields((prev) => prev.filter((_, idx) => idx !== i))
-  const updateAtField = (i: number, patch: Partial<AuthTemplateField>) =>
-    setAtFields((prev) => prev.map((f, idx) => (idx === i ? { ...f, ...patch } : f)))
+  const addAuthMode = () => setAuthModes((prev) => [...prev, { id: '', type: 'none', label: '', fields: [], tokenPath: 'token' }])
+  const removeAuthMode = (i: number) => setAuthModes((prev) => prev.filter((_, idx) => idx !== i))
+  const updateAuthMode = (i: number, patch: Partial<AuthMode>) =>
+    setAuthModes((prev) => prev.map((m, idx) => (idx === i ? { ...m, ...patch } : m)))
+  const addModeField = (i: number) =>
+    updateAuthMode(i, { fields: [...authModes[i].fields, { key: '', label: '', placeholder: '', default: '', hidden: false }] })
+  const removeModeField = (modeIdx: number, fieldIdx: number) =>
+    updateAuthMode(modeIdx, { fields: authModes[modeIdx].fields.filter((_, j) => j !== fieldIdx) })
+  const updateModeField = (modeIdx: number, fieldIdx: number, patch: Partial<AuthTemplateField>) =>
+    updateAuthMode(modeIdx, { fields: authModes[modeIdx].fields.map((f, j) => (j === fieldIdx ? { ...f, ...patch } : f)) })
 
   const saveAuthTemplate = () => {
     startTransition(async () => {
-      const template: AuthTemplate = {
-        type: atType,
-        label: atLabel,
-        fields: atFields.filter((f) => f.key.trim()),
-        ...(atType === 'token_endpoint' ? { tokenEndpointId: Number(atTokenEpId), tokenPath: atTokenPath } : {}),
+      const valid = authModes.filter((m) => m.id.trim() && m.type !== 'none')
+      let template: unknown
+      if (valid.length === 0) {
+        template = {}
+      } else if (valid.length === 1) {
+        const m = valid[0]
+        template = { type: m.type, label: m.label, fields: m.fields.filter((f) => f.key.trim()), ...(m.type === 'token_endpoint' ? { tokenEndpointId: m.tokenEndpointId, tokenPath: m.tokenPath } : {}) }
+      } else {
+        template = valid.map((m) => ({ id: m.id, type: m.type, label: m.label, fields: m.fields.filter((f) => f.key.trim()), ...(m.type === 'token_endpoint' ? { tokenEndpointId: m.tokenEndpointId, tokenPath: m.tokenPath } : {}) }))
       }
-      await updateERPAuthTemplate(erp.id, atType === 'none' ? {} : template)
+      await updateERPAuthTemplate(erp.id, template)
       setAtSaved(true)
       setTimeout(() => setAtSaved(false), 2000)
     })
@@ -262,6 +278,7 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
     setEpRequiresClient(ep?.requiresClient ?? true)
     setEpIsModification(ep?.isModification ?? false)
     setEpNotes(ep?.notes ?? '')
+    setEpAuthMode(ep?.authMode ?? '')
     setCurlInput(''); setCurlOpen(false); setCurlError('')
     setEndpointSheet({ open: true, endpoint: ep })
   }
@@ -455,133 +472,120 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
 
       {/* Auth Template Tab */}
       {tab === 'auth' && (
-        <div style={{ maxWidth: 540 }}>
+        <div style={{ maxWidth: 580 }}>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 20 }}>
-            Define o template de autenticação padrão para empresas deste ERP. Ao criar/editar uma empresa, os campos configurados aqui serão exibidos como formulário, sem precisar editar JSON.
+            Define os modos de autenticação deste ERP. Ao criar/editar uma empresa, os campos configurados aqui serão exibidos como formulário. Cada modo pode ser selecionado por endpoint.
           </p>
 
-          <label style={labelStyle}>Tipo de Autenticação</label>
-          <select style={selectStyle} value={atType} onChange={(e) => setAtType(e.target.value)}>
-            {AUTH_TYPES_TEMPLATE.map((t) => <option key={t} value={t}>{t}</option>)}
-          </select>
-
-          {atType !== 'none' && (
-            <>
-              <label style={labelStyle}>Nome do método <span style={{ color: 'var(--text-subtle)' }}>(exibido na empresa)</span></label>
-              <input
-                value={atLabel}
-                onChange={(e) => setAtLabel(e.target.value)}
-                placeholder="Ex: Token IXC, Token MKSolutions..."
-                style={{ width: '100%', padding: '7px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 13, outline: 'none' }}
-              />
-
-              {atType === 'token_endpoint' && (
-                <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  <div>
-                    <label style={labelStyle}>Endpoint de autenticação</label>
-                    <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginBottom: 6 }}>Endpoint deste ERP que retorna o token de sessão</p>
-                    <select
-                      style={selectStyle}
-                      value={atTokenEpId}
-                      onChange={(e) => setAtTokenEpId(e.target.value)}
-                    >
-                      <option value="">Selecione o endpoint...</option>
-                      {endpoints.map((ep) => (
-                        <option key={ep.id} value={ep.id}>{ep.method} {ep.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label style={labelStyle}>Caminho do token na resposta</label>
-                    <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginBottom: 6 }}>Caminho no JSON da resposta onde o token está (ex: <code style={{ fontFamily: 'monospace' }}>Token</code>, <code style={{ fontFamily: 'monospace' }}>data.access_token</code>)</p>
-                    <input
-                      value={atTokenPath}
-                      onChange={(e) => setAtTokenPath(e.target.value)}
-                      placeholder="Token"
-                      style={{ width: '100%', padding: '7px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, fontFamily: 'monospace', outline: 'none' }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 20, marginBottom: 8 }}>
-                <label style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  {atType === 'token_endpoint' ? 'Campos de credencial' : 'Campos'}
-                </label>
-                {canEdit && (
-                  <Button type="button" variant="ghost" size="sm" onClick={addAtField}>
-                    <Plus size={13} /> Adicionar campo
-                  </Button>
+          {authModes.map((mode, modeIdx) => (
+            <div key={modeIdx} style={{ border: '1px solid var(--border)', borderRadius: 10, padding: '16px', marginBottom: 16, backgroundColor: 'var(--surface)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)' }}>Modo {modeIdx + 1}</span>
+                {canEdit && authModes.length > 1 && (
+                  <button type="button" onClick={() => removeAuthMode(modeIdx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)' }}>
+                    <Trash2 size={13} />
+                  </button>
                 )}
               </div>
-              <p style={{ fontSize: 12, color: 'var(--text-subtle)', marginBottom: 12 }}>
-                {atType === 'token_endpoint'
-                  ? 'Credenciais que a empresa precisa preencher (ex: usuário e senha). São passadas como parâmetros ao endpoint de autenticação.'
-                  : 'Cada campo corresponde a uma chave no JSON de config da empresa (ex: username, password, token).'}
-              </p>
 
-              {atFields.length === 0 && (
-                <p style={{ fontSize: 13, color: 'var(--text-subtle)', textAlign: 'center', padding: '16px 0' }}>Nenhum campo configurado.</p>
-              )}
+              <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+                <div style={{ flex: 1 }}>
+                  <label style={labelStyle}>ID do modo</label>
+                  <input
+                    value={mode.id}
+                    onChange={(e) => updateAuthMode(modeIdx, { id: e.target.value })}
+                    placeholder="default, basic, bearer..."
+                    style={{ width: '100%', padding: '6px 8px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--accent)', fontSize: 12, fontFamily: 'monospace', outline: 'none' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={labelStyle}>Tipo</label>
+                  <select style={selectStyle} value={mode.type} onChange={(e) => updateAuthMode(modeIdx, { type: e.target.value })}>
+                    {AUTH_TYPES_TEMPLATE.map((t) => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+              </div>
 
-              {atFields.map((f, i) => (
-                <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '12px 14px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, marginBottom: 8 }}>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <div style={{ flex: 1 }}>
-                      <label style={{ ...labelStyle, marginBottom: 2 }}>Chave (key)</label>
-                      <input
-                        value={f.key}
-                        onChange={(e) => updateAtField(i, { key: e.target.value })}
-                        placeholder="token"
-                        style={{ width: '100%', padding: '6px 8px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--accent)', fontSize: 12, fontFamily: 'monospace', outline: 'none' }}
-                      />
+              {mode.type !== 'none' && (
+                <>
+                  <label style={labelStyle}>Nome do modo <span style={{ color: 'var(--text-subtle)' }}>(exibido na empresa)</span></label>
+                  <input
+                    value={mode.label}
+                    onChange={(e) => updateAuthMode(modeIdx, { label: e.target.value })}
+                    placeholder="Ex: Token IXC, Auth Básica..."
+                    style={{ width: '100%', padding: '7px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 13, outline: 'none', marginBottom: 10 }}
+                  />
+
+                  {mode.type === 'token_endpoint' && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 10 }}>
+                      <div>
+                        <label style={labelStyle}>Endpoint de autenticação</label>
+                        <select style={selectStyle} value={mode.tokenEndpointId ?? ''} onChange={(e) => updateAuthMode(modeIdx, { tokenEndpointId: e.target.value ? Number(e.target.value) : undefined })}>
+                          <option value="">Selecione o endpoint...</option>
+                          {endpoints.map((ep) => <option key={ep.id} value={ep.id}>{ep.method} {ep.name}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label style={labelStyle}>Caminho do token na resposta</label>
+                        <input
+                          value={mode.tokenPath ?? 'token'}
+                          onChange={(e) => updateAuthMode(modeIdx, { tokenPath: e.target.value })}
+                          placeholder="Token"
+                          style={{ width: '100%', padding: '7px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, fontFamily: 'monospace', outline: 'none' }}
+                        />
+                      </div>
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <label style={{ ...labelStyle, marginBottom: 2 }}>Label</label>
-                      <input
-                        value={f.label}
-                        onChange={(e) => updateAtField(i, { label: e.target.value })}
-                        placeholder="Token de Acesso"
-                        style={{ width: '100%', padding: '6px 8px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, outline: 'none' }}
-                      />
-                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                    <label style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Campos</label>
                     {canEdit && (
-                      <button type="button" onClick={() => removeAtField(i)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)', alignSelf: 'flex-end', paddingBottom: 4 }}>
-                        <Trash2 size={13} />
-                      </button>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => addModeField(modeIdx)}>
+                        <Plus size={13} /> Campo
+                      </Button>
                     )}
                   </div>
-                  <div style={{ display: 'flex', gap: 8 }}>
-                    <div style={{ flex: 1 }}>
-                      <label style={{ ...labelStyle, marginBottom: 2 }}>Placeholder</label>
-                      <input
-                        value={f.placeholder ?? ''}
-                        onChange={(e) => updateAtField(i, { placeholder: e.target.value })}
-                        placeholder="Token abc123..."
-                        style={{ width: '100%', padding: '6px 8px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, outline: 'none' }}
-                      />
+
+                  {mode.fields.map((f, fi) => (
+                    <div key={fi} style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '10px 12px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, marginBottom: 6 }}>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ ...labelStyle, marginBottom: 2 }}>Chave</label>
+                          <input value={f.key} onChange={(e) => updateModeField(modeIdx, fi, { key: e.target.value })} placeholder="token" style={{ width: '100%', padding: '5px 7px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 5, color: 'var(--accent)', fontSize: 12, fontFamily: 'monospace', outline: 'none' }} />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <label style={{ ...labelStyle, marginBottom: 2 }}>Label</label>
+                          <input value={f.label} onChange={(e) => updateModeField(modeIdx, fi, { label: e.target.value })} placeholder="Token de Acesso" style={{ width: '100%', padding: '5px 7px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 5, color: 'var(--text)', fontSize: 12, outline: 'none' }} />
+                        </div>
+                        {canEdit && (
+                          <button type="button" onClick={() => removeModeField(modeIdx, fi)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-subtle)', alignSelf: 'flex-end', paddingBottom: 2 }}>
+                            <Trash2 size={12} />
+                          </button>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <input value={f.placeholder ?? ''} onChange={(e) => updateModeField(modeIdx, fi, { placeholder: e.target.value })} placeholder="Placeholder..." style={{ flex: 1, padding: '5px 7px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 5, color: 'var(--text)', fontSize: 11, outline: 'none' }} />
+                        <input value={f.default ?? ''} onChange={(e) => updateModeField(modeIdx, fi, { default: e.target.value })} placeholder="Valor padrão" style={{ flex: 1, padding: '5px 7px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 5, color: 'var(--text)', fontSize: 11, fontFamily: 'monospace', outline: 'none' }} />
+                      </div>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, cursor: 'pointer', color: 'var(--text-muted)' }}>
+                        <input type="checkbox" checked={f.hidden ?? false} onChange={(e) => updateModeField(modeIdx, fi, { hidden: e.target.checked })} />
+                        Oculto (usar valor padrão)
+                      </label>
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <label style={{ ...labelStyle, marginBottom: 2 }}>Valor padrão</label>
-                      <input
-                        value={f.default ?? ''}
-                        onChange={(e) => updateAtField(i, { default: e.target.value })}
-                        placeholder="Authorization"
-                        style={{ width: '100%', padding: '6px 8px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, fontFamily: 'monospace', outline: 'none' }}
-                      />
-                    </div>
-                  </div>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, cursor: 'pointer', color: 'var(--text-muted)' }}>
-                    <input type="checkbox" checked={f.hidden ?? false} onChange={(e) => updateAtField(i, { hidden: e.target.checked })} />
-                    Oculto (usar valor padrão sem exibir ao usuário)
-                  </label>
-                </div>
-              ))}
-            </>
+                  ))}
+                </>
+              )}
+            </div>
+          ))}
+
+          {canEdit && (
+            <Button type="button" variant="ghost" onClick={addAuthMode} style={{ marginBottom: 16 }}>
+              <Plus size={13} /> Adicionar modo
+            </Button>
           )}
 
           {canEdit && (
-            <Button onClick={saveAuthTemplate} disabled={isPending} style={{ marginTop: 16 }}>
+            <Button onClick={saveAuthTemplate} disabled={isPending} style={{ marginLeft: 8 }}>
               {atSaved ? '✓ Salvo' : isPending ? 'Salvando...' : 'Salvar Template'}
             </Button>
           )}
@@ -593,7 +597,7 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
         <form onSubmit={(e) => {
           e.preventDefault()
           startTransition(async () => {
-            const data = { name: epName, method: epMethod, pathTemplate: epPath, bodyTemplate: epBody, headers: epHeaders, group: epGroup, requiresClient: epRequiresClient, isModification: epIsModification, notes: epNotes }
+            const data = { name: epName, method: epMethod, pathTemplate: epPath, bodyTemplate: epBody, headers: epHeaders, group: epGroup, requiresClient: epRequiresClient, isModification: epIsModification, notes: epNotes, authMode: epAuthMode }
             if (endpointSheet.endpoint) {
               await updateEndpoint(endpointSheet.endpoint.id, erp.id, data)
             } else {
@@ -667,6 +671,18 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
             rows={3}
             style={{ width: '100%', padding: '8px 12px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, outline: 'none', resize: 'vertical' }}
           />
+
+          {authModes.filter((m) => m.id.trim()).length > 0 && (
+            <>
+              <label style={labelStyle}>Modo de autenticação</label>
+              <select style={selectStyle} value={epAuthMode} onChange={(e) => setEpAuthMode(e.target.value)}>
+                <option value="">(padrão)</option>
+                {authModes.filter((m) => m.id.trim()).map((m) => (
+                  <option key={m.id} value={m.id}>{m.label || m.id} ({m.type})</option>
+                ))}
+              </select>
+            </>
+          )}
 
           <Button type="submit" disabled={isPending} style={{ width: '100%', marginTop: 24 }}>
             {isPending ? 'Salvando...' : 'Salvar Endpoint'}

@@ -25,6 +25,7 @@ export const EndpointSchema = z.object({
   requiresClient: z.boolean().default(true),
   isModification: z.boolean().default(false),
   notes: z.string().default(''),
+  authMode: z.string().default(''),
 })
 
 export const TestClientSchema = z.object({

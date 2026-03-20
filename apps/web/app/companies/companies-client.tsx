@@ -10,6 +10,7 @@ import { Sheet } from '@/components/ui/sheet'
 import { createCompany, updateCompany, deleteCompany } from '@/lib/actions/companies'
 import { formLabel as labelStyle, selectStyle } from '@/lib/styles'
 import { useRole } from '@/lib/role-context'
+import { getAuthModes, getModeCredentials } from '@/lib/auth'
 
 type Environment = { name: string; url: string }
 type Company = {
@@ -32,7 +33,7 @@ function nextEnvSuggestion(existing: Environment[]): string {
   return ENV_SUGGESTIONS.find((s) => !names.includes(s)) ?? 'Ambiente'
 }
 type AuthTemplateField = { key: string; label: string; placeholder?: string; default?: string; hidden?: boolean }
-type AuthTemplate = { type: string; label: string; tokenEndpointId?: number; tokenPath?: string; fields: AuthTemplateField[] }
+type AuthMode = { id: string; type: string; label: string; fields: AuthTemplateField[]; tokenEndpointId?: number; tokenPath?: string }
 type ERPEndpoint = { id: number; name: string; pathTemplate: string; bodyTemplate: string }
 type ERP = { id: number; name: string; authTemplate: unknown; endpoints: ERPEndpoint[] }
 
@@ -84,7 +85,7 @@ export function CompaniesClient({
   const [tokenEpId, setTokenEpId] = useState('')
   const [tokenPath, setTokenPath] = useState('token')
   const [tokenParams, setTokenParams] = useState<Record<string, string>>({})
-  const [templateValues, setTemplateValues] = useState<Record<string, string>>({})
+  const [modeValues, setModeValues] = useState<Record<string, Record<string, string>>>({})
   const [notes, setNotes] = useState('')
   const [isPending, startTransition] = useTransition()
   const [search, setSearch] = useState('')
@@ -114,34 +115,33 @@ export function CompaniesClient({
     setNewEnvName(nextEnvSuggestion(envs))
     setNewEnvUrl('')
     const erp = erps.find((e) => e.id === Number(eid))
-    const template = erp?.authTemplate as AuthTemplate | null
-    const hasTemplate = !!(template?.type && template.type !== 'none')
-    const aType = company?.authType ?? (hasTemplate ? template!.type : 'none')
-    setAuthType(aType)
-    if (hasTemplate && template!.type === 'token_endpoint') {
-      // Template token_endpoint: tokenEndpointId/tokenPath come from template, only load credential params
-      const existingParams = (company?.authConfig as { params?: Record<string, string> } | null)?.params ?? {}
-      const vals: Record<string, string> = {}
-      template!.fields.forEach((f) => { vals[f.key] = existingParams[f.key] ?? f.default ?? '' })
-      setTemplateValues(vals)
+    const modes = getAuthModes(erp?.authTemplate) as AuthMode[]
+    if (modes.length > 0) {
+      const modeIds = modes.map((m) => m.id)
+      const vals: Record<string, Record<string, string>> = {}
+      modes.forEach((mode) => {
+        const creds = getModeCredentials(company?.authConfig, mode.id, modeIds)
+        const mv: Record<string, string> = {}
+        if (mode.type === 'token_endpoint') {
+          mode.fields.forEach((f) => { mv[f.key] = (creds as Record<string, string>)[f.key] ?? f.default ?? '' })
+        } else {
+          mode.fields.forEach((f) => { mv[f.key] = creds[f.key] ?? f.default ?? '' })
+        }
+        vals[mode.id] = mv
+      })
+      setModeValues(vals)
+      setAuthType(modes[0].type)
       setTokenEpId(''); setTokenPath('token'); setTokenParams({}); setAuthConfig('{}')
-    } else if (hasTemplate) {
-      setTokenEpId(''); setTokenPath('token'); setTokenParams({})
-      setAuthConfig('{}')
-      const existingCfg = company?.authConfig as Record<string, string> | null ?? {}
-      const vals: Record<string, string> = {}
-      template!.fields.forEach((f) => { vals[f.key] = existingCfg[f.key] ?? f.default ?? '' })
-      setTemplateValues(vals)
-    } else if (aType === 'token_endpoint' && company?.authConfig) {
+    } else if (company?.authType === 'token_endpoint' && company?.authConfig) {
       const cfg = company.authConfig as { tokenEndpointId?: number; tokenPath?: string; params?: Record<string, string> }
       setTokenEpId(String(cfg.tokenEndpointId ?? ''))
       setTokenPath(cfg.tokenPath ?? 'token')
       setTokenParams(cfg.params ?? {})
-      setAuthConfig('{}')
-      setTemplateValues({})
+      setAuthConfig('{}'); setModeValues({})
+      setAuthType('token_endpoint')
     } else {
-      setTokenEpId(''); setTokenPath('token'); setTokenParams({})
-      setTemplateValues({})
+      setTokenEpId(''); setTokenPath('token'); setTokenParams({}); setModeValues({})
+      setAuthType(company?.authType ?? 'none')
       setAuthConfig(company?.authConfig ? JSON.stringify(company.authConfig) : '{}')
     }
     setNotes(company?.notes ?? '')
@@ -231,44 +231,56 @@ export function CompaniesClient({
             startTransition(async () => {
               const environmentsJson = JSON.stringify(environments)
               const selectedErp = erps.find((e) => e.id === Number(erpId))
-              const template = selectedErp?.authTemplate as AuthTemplate | null
-              const hasTemplate = !!(template?.type && template.type !== 'none')
+              const modes = getAuthModes(selectedErp?.authTemplate) as AuthMode[]
               let finalAuthConfig = authConfig
-              if (hasTemplate && template!.type === 'token_endpoint') {
-                // Template token_endpoint: tokenEndpointId/tokenPath from template, params from user input
-                const existingCfg = sheet.company?.authType === 'token_endpoint'
-                  ? (sheet.company.authConfig as { cachedToken?: string; cachedAt?: number } | null)
-                  : null
-                const params: Record<string, string> = {}
-                template!.fields.forEach((f) => { params[f.key] = templateValues[f.key] ?? f.default ?? '' })
-                finalAuthConfig = JSON.stringify({
-                  tokenEndpointId: template!.tokenEndpointId,
-                  tokenPath: template!.tokenPath ?? 'token',
-                  params,
-                  ...(existingCfg?.cachedToken ? { cachedToken: existingCfg.cachedToken, cachedAt: existingCfg.cachedAt } : {}),
+              let finalAuthType = authType
+              if (modes.length > 1) {
+                // Multi-mode: save as keyed object {modeId: {fields}}
+                const cfg: Record<string, Record<string, string> | Record<string, unknown>> = {}
+                modes.forEach((mode) => {
+                  if (mode.type === 'token_endpoint') {
+                    const existingModeCfg = sheet.company?.authType === 'token_endpoint'
+                      ? (sheet.company.authConfig as { cachedToken?: string; cachedAt?: number } | null)
+                      : null
+                    const params: Record<string, string> = {}
+                    mode.fields.forEach((f) => { params[f.key] = modeValues[mode.id]?.[f.key] ?? f.default ?? '' })
+                    cfg[mode.id] = { tokenEndpointId: mode.tokenEndpointId, tokenPath: mode.tokenPath ?? 'token', params, ...(existingModeCfg?.cachedToken ? { cachedToken: existingModeCfg.cachedToken, cachedAt: existingModeCfg.cachedAt } : {}) }
+                  } else {
+                    const mv: Record<string, string> = {}
+                    mode.fields.forEach((f) => { mv[f.key] = modeValues[mode.id]?.[f.key] ?? f.default ?? '' })
+                    cfg[mode.id] = mv
+                  }
                 })
+                finalAuthConfig = JSON.stringify(cfg)
+                finalAuthType = modes[0].type
+              } else if (modes.length === 1) {
+                const mode = modes[0]
+                finalAuthType = mode.type
+                if (mode.type === 'token_endpoint') {
+                  const existingCfg = sheet.company?.authType === 'token_endpoint'
+                    ? (sheet.company.authConfig as { cachedToken?: string; cachedAt?: number } | null)
+                    : null
+                  const params: Record<string, string> = {}
+                  mode.fields.forEach((f) => { params[f.key] = modeValues[mode.id]?.[f.key] ?? f.default ?? '' })
+                  finalAuthConfig = JSON.stringify({ tokenEndpointId: mode.tokenEndpointId, tokenPath: mode.tokenPath ?? 'token', params, ...(existingCfg?.cachedToken ? { cachedToken: existingCfg.cachedToken, cachedAt: existingCfg.cachedAt } : {}) })
+                } else {
+                  const cfg: Record<string, string> = {}
+                  mode.fields.forEach((f) => { cfg[f.key] = modeValues[mode.id]?.[f.key] ?? f.default ?? '' })
+                  finalAuthConfig = JSON.stringify(cfg)
+                }
               } else if (authType === 'token_endpoint') {
                 const existingCfg = sheet.company?.authType === 'token_endpoint'
                   ? (sheet.company.authConfig as { cachedToken?: string; cachedAt?: number } | null)
                   : null
-                finalAuthConfig = JSON.stringify({
-                  tokenEndpointId: Number(tokenEpId),
-                  tokenPath,
-                  params: tokenParams,
-                  ...(existingCfg?.cachedToken ? { cachedToken: existingCfg.cachedToken, cachedAt: existingCfg.cachedAt } : {}),
-                })
-              } else if (hasTemplate) {
-                const cfg: Record<string, string> = {}
-                template!.fields.forEach((f) => { cfg[f.key] = templateValues[f.key] ?? f.default ?? '' })
-                finalAuthConfig = JSON.stringify(cfg)
+                finalAuthConfig = JSON.stringify({ tokenEndpointId: Number(tokenEpId), tokenPath, params: tokenParams, ...(existingCfg?.cachedToken ? { cachedToken: existingCfg.cachedToken, cachedAt: existingCfg.cachedAt } : {}) })
               }
               if (sheet.company) {
                 await updateCompany(sheet.company.id, {
                   name, erpId: Number(erpId), baseUrl, environments: environmentsJson,
-                  authType, authConfig: finalAuthConfig, notes,
+                  authType: finalAuthType, authConfig: finalAuthConfig, notes,
                 })
               } else {
-                await createCompany({ name, erpId: Number(erpId), baseUrl, environments: environmentsJson, authType, authConfig: finalAuthConfig, notes })
+                await createCompany({ name, erpId: Number(erpId), baseUrl, environments: environmentsJson, authType: finalAuthType, authConfig: finalAuthConfig, notes })
               }
               setSheet({ open: false })
             })
@@ -287,16 +299,15 @@ export function CompaniesClient({
             const newId = e.target.value
             setErpId(newId)
             const erp = erps.find((er) => er.id === Number(newId))
-            const template = erp?.authTemplate as AuthTemplate | null
-            const hasTemplate = !!(template?.type && template.type !== 'none')
-            if (hasTemplate) {
-              setAuthType(template!.type)
-              const vals: Record<string, string> = {}
-              template!.fields.forEach((f) => { vals[f.key] = f.default ?? '' })
-              setTemplateValues(vals)
+            const modes = getAuthModes(erp?.authTemplate) as AuthMode[]
+            if (modes.length > 0) {
+              setAuthType(modes[0].type)
+              const vals: Record<string, Record<string, string>> = {}
+              modes.forEach((m) => { vals[m.id] = {}; m.fields.forEach((f) => { vals[m.id][f.key] = f.default ?? '' }) })
+              setModeValues(vals)
               setAuthConfig('{}')
             } else {
-              setAuthType('none'); setAuthConfig('{}'); setTemplateValues({})
+              setAuthType('none'); setAuthConfig('{}'); setModeValues({})
             }
             setTokenEpId(''); setTokenPath('token'); setTokenParams({})
           }} style={selectStyle}>
@@ -354,119 +365,102 @@ export function CompaniesClient({
 
           {(() => {
             const selectedErp = erps.find((e) => e.id === Number(erpId))
-            const template = selectedErp?.authTemplate as AuthTemplate | null
-            const hasTemplate = !!(template?.type && template.type !== 'none')
-            if (hasTemplate) {
+            const modes = getAuthModes(selectedErp?.authTemplate) as AuthMode[]
+            if (modes.length > 0) {
               return (
                 <div style={{ marginTop: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                    <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Autenticação</span>
-                    <span style={{ fontSize: 12, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 25%, transparent)', borderRadius: 4, padding: '2px 8px', fontWeight: 500 }}>
-                      {template!.label || template!.type}
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {template!.fields.filter((f) => !f.hidden).map((f) => (
-                      <div key={f.key}>
-                        <label style={labelStyle}>{f.label}</label>
-                        <input
-                          value={templateValues[f.key] ?? ''}
-                          onChange={(e) => setTemplateValues((prev) => ({ ...prev, [f.key]: e.target.value }))}
-                          placeholder={f.placeholder ?? f.key}
-                          style={{ width: '100%', padding: '7px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 13, outline: 'none' }}
-                        />
+                  <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Autenticação</span>
+                  {modes.map((mode) => (
+                    <div key={mode.id} style={{ marginTop: 10, padding: '12px 14px', border: '1px solid var(--border)', borderRadius: 8, backgroundColor: 'var(--surface)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                        <span style={{ fontSize: 12, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', border: '1px solid color-mix(in srgb, var(--accent) 25%, transparent)', borderRadius: 4, padding: '2px 8px', fontWeight: 500 }}>
+                          {mode.label || mode.id}
+                        </span>
+                        <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{mode.type}</span>
+                        {mode.type === 'token_endpoint' && (() => {
+                          const isCached = modes.length === 1 && sheet.company?.authType === 'token_endpoint' && (sheet.company.authConfig as { cachedToken?: string } | null)?.cachedToken
+                          return isCached ? <span style={{ fontSize: 11, color: '#10b981' }}>🟢 Token em cache</span> : null
+                        })()}
                       </div>
-                    ))}
-                  </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {mode.fields.filter((f) => !f.hidden).map((f) => (
+                          <div key={f.key}>
+                            <label style={labelStyle}>{f.label}</label>
+                            <input
+                              value={modeValues[mode.id]?.[f.key] ?? ''}
+                              onChange={(e) => setModeValues((prev) => ({ ...prev, [mode.id]: { ...prev[mode.id], [f.key]: e.target.value } }))}
+                              placeholder={f.placeholder ?? f.key}
+                              style={{ width: '100%', padding: '7px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 13, outline: 'none' }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )
             }
             return null
           })()}
 
-          {!(() => {
+          {(() => {
             const selectedErp = erps.find((e) => e.id === Number(erpId))
-            const template = selectedErp?.authTemplate as AuthTemplate | null
-            return !!(template?.type && template.type !== 'none')
-          })() && (
-            <>
-              <label style={labelStyle}>Tipo de Autenticação</label>
-              <select
-                value={authType}
-                onChange={(e) => { setAuthType(e.target.value); setAuthConfig('{}'); setTokenEpId(''); setTokenPath('token'); setTokenParams({}) }}
-                style={selectStyle}
-              >
-                {AUTH_TYPES.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </>
-          )}
-
-          {!(() => { const t = erps.find((e) => e.id === Number(erpId))?.authTemplate as AuthTemplate | null; return !!(t?.type && t.type !== 'none') })() && authType === 'token_endpoint' ? (() => {
-            const erpEndpoints = erps.find((e) => e.id === Number(erpId))?.endpoints ?? []
-            const selectedEp = erpEndpoints.find((ep) => ep.id === Number(tokenEpId))
-            const placeholders = selectedEp ? getPlaceholders(selectedEp) : []
+            const modes = getAuthModes(selectedErp?.authTemplate) as AuthMode[]
+            if (modes.length > 0) return null
             return (
-              <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <div>
-                  <label style={labelStyle}>Endpoint de token</label>
-                  <select
-                    style={selectStyle}
-                    value={tokenEpId}
-                    onChange={(e) => { setTokenEpId(e.target.value); setTokenParams({}) }}
-                  >
-                    <option value="">Selecione o endpoint...</option>
-                    {erpEndpoints.map((ep) => (
-                      <option key={ep.id} value={ep.id}>{ep.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label style={labelStyle}>Caminho do token na resposta</label>
-                  <input
-                    value={tokenPath}
-                    onChange={(e) => setTokenPath(e.target.value)}
-                    placeholder="token  ou  data.access_token"
-                    style={{ width: '100%', padding: '7px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, fontFamily: 'monospace', outline: 'none' }}
-                  />
-                </div>
-                {placeholders.length > 0 && (
-                  <div>
-                    <label style={labelStyle}>Credenciais</label>
-                    <p style={{ fontSize: 11, color: 'var(--text-subtle)', marginBottom: 6 }}>Valores para os parâmetros do endpoint de token</p>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      {placeholders.map((key) => (
-                        <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <code style={{ fontSize: 11, color: 'var(--accent)', width: 120, flexShrink: 0, fontFamily: 'monospace' }}>{key}</code>
-                          <input
-                            value={tokenParams[key] ?? ''}
-                            onChange={(e) => setTokenParams((prev) => ({ ...prev, [key]: e.target.value }))}
-                            placeholder={`valor de {${key}}`}
-                            style={{ flex: 1, padding: '6px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, fontFamily: 'monospace', outline: 'none' }}
-                          />
+              <>
+                <label style={labelStyle}>Tipo de Autenticação</label>
+                <select
+                  value={authType}
+                  onChange={(e) => { setAuthType(e.target.value); setAuthConfig('{}'); setTokenEpId(''); setTokenPath('token'); setTokenParams({}) }}
+                  style={selectStyle}
+                >
+                  {AUTH_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+                </select>
+                {authType === 'token_endpoint' ? (() => {
+                  const erpEndpoints = erps.find((e) => e.id === Number(erpId))?.endpoints ?? []
+                  const selectedEp = erpEndpoints.find((ep) => ep.id === Number(tokenEpId))
+                  const placeholders = selectedEp ? getPlaceholders(selectedEp) : []
+                  return (
+                    <div style={{ marginTop: 4, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      <div>
+                        <label style={labelStyle}>Endpoint de token</label>
+                        <select style={selectStyle} value={tokenEpId} onChange={(e) => { setTokenEpId(e.target.value); setTokenParams({}) }}>
+                          <option value="">Selecione o endpoint...</option>
+                          {erpEndpoints.map((ep) => <option key={ep.id} value={ep.id}>{ep.name}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label style={labelStyle}>Caminho do token na resposta</label>
+                        <input value={tokenPath} onChange={(e) => setTokenPath(e.target.value)} placeholder="token  ou  data.access_token" style={{ width: '100%', padding: '7px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, fontFamily: 'monospace', outline: 'none' }} />
+                      </div>
+                      {placeholders.length > 0 && (
+                        <div>
+                          <label style={labelStyle}>Credenciais</label>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                            {placeholders.map((key) => (
+                              <div key={key} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <code style={{ fontSize: 11, color: 'var(--accent)', width: 120, flexShrink: 0, fontFamily: 'monospace' }}>{key}</code>
+                                <input value={tokenParams[key] ?? ''} onChange={(e) => setTokenParams((prev) => ({ ...prev, [key]: e.target.value }))} placeholder={`valor de {${key}}`} style={{ flex: 1, padding: '6px 10px', backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', fontSize: 12, fontFamily: 'monospace', outline: 'none' }} />
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      ))}
+                      )}
+                      {sheet.company?.authType === 'token_endpoint' && (sheet.company.authConfig as { cachedToken?: string } | null)?.cachedToken && (
+                        <p style={{ fontSize: 11, color: '#10b981' }}>🟢 Token em cache disponível</p>
+                      )}
                     </div>
-                  </div>
-                )}
-                {sheet.company?.authType === 'token_endpoint' && (sheet.company.authConfig as { cachedToken?: string } | null)?.cachedToken && (
-                  <p style={{ fontSize: 11, color: '#10b981' }}>🟢 Token em cache disponível</p>
-                )}
-              </div>
+                  )
+                })() : authType !== 'none' ? (
+                  <>
+                    <label style={labelStyle}>Config de Auth (JSON)</label>
+                    <textarea value={authConfig} onChange={(e) => setAuthConfig(e.target.value)} placeholder={AUTH_PLACEHOLDERS[authType]} rows={4} style={textareaStyle} />
+                  </>
+                ) : null}
+              </>
             )
-          })() : !(() => { const t = erps.find((e) => e.id === Number(erpId))?.authTemplate as AuthTemplate | null; return !!(t?.type && t.type !== 'none') })() && authType !== 'none' && (
-            <>
-              <label style={labelStyle}>Config de Auth (JSON)</label>
-              <textarea
-                value={authConfig}
-                onChange={(e) => setAuthConfig(e.target.value)}
-                placeholder={AUTH_PLACEHOLDERS[authType]}
-                rows={4}
-                style={textareaStyle}
-              />
-            </>
-          )}
+          })()}
 
           <label style={labelStyle}>Notas <span style={{ color: 'var(--text-subtle)' }}>(opcional)</span></label>
           <textarea

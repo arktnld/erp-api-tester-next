@@ -6,7 +6,7 @@ const companyAuthSelect = {
   baseUrl: true,
   authType: true,
   authConfig: true,
-  erp: { select: { name: true } },
+  erp: { select: { name: true, authTemplate: true } },
 } as const
 
 export function getCompanyWithAuth(id: number) {

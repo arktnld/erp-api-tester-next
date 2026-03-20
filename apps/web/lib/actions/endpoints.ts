@@ -16,6 +16,7 @@ export async function createEndpoint(data: {
   requiresClient: boolean
   isModification: boolean
   notes: string
+  authMode: string
 }) {
   await requireAdmin()
   const parsed = EndpointSchema.parse(data)
@@ -37,6 +38,7 @@ export async function updateEndpoint(
     requiresClient: boolean
     isModification: boolean
     notes: string
+    authMode: string
   }
 ) {
   await requireAdmin()
@@ -71,6 +73,7 @@ export async function duplicateEndpoint(id: number, erpId: number) {
       requiresClient: original.requiresClient,
       isModification: original.isModification,
       notes: original.notes,
+      authMode: original.authMode,
       sortOrder: original.sortOrder + 1,
     },
   })

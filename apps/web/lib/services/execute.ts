@@ -1,6 +1,6 @@
 import { substitute } from '@/lib/utils'
 import { validatePublicUrl } from '@/lib/security'
-import { buildAuthHeaders } from '@/lib/auth'
+import { buildAuthHeaders, buildAuthHeadersForMode, getAuthModes, getModeCredentials } from '@/lib/auth'
 import { mergeFields } from '@/lib/fields'
 import { getEndpoint } from '@/lib/repo/endpoints'
 import { getCompanyWithAuth, getTestClientWithCompany, saveTokenCache } from '@/lib/repo/companies'
@@ -177,6 +177,22 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
 
   const allFields = mergeFields(fields, company)
 
+  // Multi-mode auth: if endpoint specifies authMode, override auth for this request
+  let modeAuthHeaders: Record<string, string> | null = null
+  if (endpoint.authMode) {
+    const modes = getAuthModes((company.erp as { name: string; authTemplate?: unknown }).authTemplate)
+    const modeIds = modes.map((m) => m.id)
+    const mode = modes.find((m) => m.id === endpoint.authMode)
+    if (mode) {
+      const creds = getModeCredentials(company.authConfig, endpoint.authMode, modeIds)
+      if (mode.type === 'body_fields') {
+        Object.assign(allFields, creds)
+      } else {
+        modeAuthHeaders = buildAuthHeadersForMode(mode.type, creds)
+      }
+    }
+  }
+
   // Pre-auth: token_endpoint — obtain/reuse session token BEFORE substitution so {token} works in paths/bodies
   if (company.authType === 'token_endpoint') {
     const cfg = (company.authConfig ?? {}) as TokenEndpointConfig
@@ -201,7 +217,7 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
   const rawEndpointHeaders = JSON.parse(endpoint.headers || '{}') as Record<string, string>
   const endpointHeaders: Record<string, string> = {}
   for (const [k, v] of Object.entries(rawEndpointHeaders)) endpointHeaders[k] = substitute(v, allFields)
-  const authHeaders = buildAuthHeaders(company)
+  const authHeaders = modeAuthHeaders ?? buildAuthHeaders(company)
 
   const url = `${environmentUrl ?? company.baseUrl}${resolvedPath}`
 

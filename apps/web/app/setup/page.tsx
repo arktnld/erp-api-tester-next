@@ -55,7 +55,7 @@ export default function SetupPage() {
       const result = await createEndpoint({
         erpId, name: epName, method: epMethod, pathTemplate: epPath,
         bodyTemplate: '', headers: '{}', group: '', requiresClient: true,
-        isModification: false, notes: '',
+        isModification: false, notes: '', authMode: '',
       })
       setEndpointId(result.id)
       setStep(3)
