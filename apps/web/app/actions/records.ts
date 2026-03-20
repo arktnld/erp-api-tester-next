@@ -52,7 +52,7 @@ export async function getRecordForEdit(id: number) {
           authType: true,
           authConfig: true,
           environments: true,
-          testClients: { orderBy: { name: 'asc' }, select: { id: true, name: true } },
+          testClients: { orderBy: { name: 'asc' }, select: { id: true, name: true, fieldsData: true } },
           erp: {
             select: {
               id: true,

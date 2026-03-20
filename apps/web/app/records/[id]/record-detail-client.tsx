@@ -3,8 +3,11 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { ArrowLeft, Plus, Trash2, Play, Share2, Check, ChevronDown } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, Play, Share2, Check, ChevronDown, Copy, Terminal } from 'lucide-react'
 import { addBlock, updateBlock, deleteBlock, renameRecord } from '@/app/actions/records'
+import { substitute } from '@/lib/utils'
+import { mergeFields } from '@/lib/fields'
+import { buildAuthHeaders } from '@/lib/auth'
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -23,7 +26,7 @@ type Endpoint = {
   sortOrder: number
 }
 
-type TestClient = { id: number; name: string }
+type TestClient = { id: number; name: string; fieldsData: unknown }
 
 type Block = {
   id: number
@@ -35,20 +38,22 @@ type Block = {
   executedAt: Date | null
 }
 
+type Company = {
+  id: number
+  name: string
+  baseUrl: string
+  authType: string
+  authConfig: unknown
+  environments: unknown
+  testClients: TestClient[]
+  erp: { id: number; name: string; endpoints: Endpoint[] }
+}
+
 type RecordData = {
   id: number
   name: string
   createdAt: Date
-  company: {
-    id: number
-    name: string
-    baseUrl: string
-    authType: string
-    authConfig: unknown
-    environments: unknown
-    testClients: TestClient[]
-    erp: { id: number; name: string; endpoints: Endpoint[] }
-  }
+  company: Company
   blocks: Block[]
 }
 
@@ -85,6 +90,51 @@ function tryPretty(v: unknown): string {
     try { return JSON.stringify(JSON.parse(v), null, 2) } catch { return v }
   }
   return JSON.stringify(v, null, 2)
+}
+
+type JsonToken = { t: 'key' | 'str' | 'num' | 'lit' | 'plain'; v: string }
+
+function tokenizeJson(code: string): JsonToken[] {
+  const tokens: JsonToken[] = []
+  const re = /"([^"\n]+)"(\s*:)|: "([^"\n]*)"|: (-?\d+\.?\d*)\b|: (true|false|null)\b/g
+  let last = 0; let m: RegExpExecArray | null
+  while ((m = re.exec(code)) !== null) {
+    if (m.index > last) tokens.push({ t: 'plain', v: code.slice(last, m.index) })
+    if (m[1] !== undefined) { tokens.push({ t: 'plain', v: '"' }); tokens.push({ t: 'key', v: m[1] }); tokens.push({ t: 'plain', v: '"' + m[2] }) }
+    else if (m[3] !== undefined) { tokens.push({ t: 'plain', v: ': "' }); tokens.push({ t: 'str', v: m[3] }); tokens.push({ t: 'plain', v: '"' }) }
+    else if (m[4] !== undefined) { tokens.push({ t: 'plain', v: ': ' }); tokens.push({ t: 'num', v: m[4] }) }
+    else if (m[5] !== undefined) { tokens.push({ t: 'plain', v: ': ' }); tokens.push({ t: 'lit', v: m[5] }) }
+    last = m.index + m[0].length
+  }
+  if (last < code.length) tokens.push({ t: 'plain', v: code.slice(last) })
+  return tokens
+}
+
+function JsonHighlight({ code }: { code: string }) {
+  const clr: Record<string, string> = { key: '#d19a66', str: '#98c379', num: '#61afef', lit: '#56b6c2' }
+  try {
+    const tokens = tokenizeJson(code)
+    return <>{tokens.map((tok, i) => tok.t === 'plain' ? tok.v : <span key={i} style={{ color: clr[tok.t] }}>{tok.v}</span>)}</>
+  } catch { return <>{code}</> }
+}
+
+function buildCurlCmd(
+  endpoint: Endpoint,
+  company: Pick<Company, 'baseUrl' | 'authType' | 'authConfig'>,
+  fields: Record<string, string>,
+): string {
+  const allFields = mergeFields(fields, company)
+  const url = `${company.baseUrl}${substitute(endpoint.pathTemplate, allFields)}`
+  const parts = [`curl -X ${endpoint.method} '${url}'`]
+  const authHeaders = buildAuthHeaders(company)
+  for (const [k, v] of Object.entries(authHeaders)) parts.push(`  -H '${k}: ${v}'`)
+  try {
+    const h = JSON.parse(endpoint.headers || '{}') as Record<string, string>
+    for (const [k, v] of Object.entries(h)) parts.push(`  -H '${k}: ${v}'`)
+  } catch {}
+  const body = endpoint.bodyTemplate?.trim() ? substitute(endpoint.bodyTemplate, allFields) : ''
+  if (body) parts.push(`  -d '${body}'`)
+  return parts.join(' \\\n')
 }
 
 // ── Endpoint Select ──────────────────────────────────────────────────────────
@@ -201,14 +251,14 @@ function BlockEditor({
   index,
   endpoints,
   clients,
-  companyId,
+  company,
   onDelete,
 }: {
   block: Block
   index: number
   endpoints: Endpoint[]
   clients: TestClient[]
-  companyId: number
+  company: Company
   onDelete: () => void
 }) {
   const [endpointId, setEndpointId] = useState<number | null>(block.endpointId)
@@ -218,11 +268,18 @@ function BlockEditor({
   )
   const [note, setNote] = useState(block.note)
   const [executing, setExecuting] = useState(false)
+  const [showCurl, setShowCurl] = useState(false)
+  const [curlCopied, setCurlCopied] = useState(false)
   const noteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const endpoint = endpoints.find((e) => e.id === endpointId)
+  const client = clients.find((c) => c.id === clientId)
   const needsClient = endpoint?.requiresClient !== false
   const canExecute = !!endpointId && (!needsClient || !!clientId)
+
+  const curlCmd = endpoint
+    ? buildCurlCmd(endpoint, company, client ? (client.fieldsData as Record<string, string> ?? {}) : {})
+    : null
 
   const execute = async () => {
     if (!canExecute || executing) return
@@ -231,20 +288,11 @@ function BlockEditor({
       const res = await fetch('/api/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          endpointId,
-          clientId: needsClient ? clientId : null,
-          companyId,
-        }),
+        body: JSON.stringify({ endpointId, clientId: needsClient ? clientId : null, companyId: company.id }),
       })
       const data = await res.json()
       setResponse(data)
-      await updateBlock(block.id, {
-        endpointId,
-        clientId: needsClient ? clientId : null,
-        response: data,
-        executedAt: new Date(),
-      })
+      await updateBlock(block.id, { endpointId, clientId: needsClient ? clientId : null, response: data, executedAt: new Date() })
     } finally {
       setExecuting(false)
     }
@@ -252,22 +300,22 @@ function BlockEditor({
 
   const saveNote = useCallback((value: string) => {
     if (noteTimerRef.current) clearTimeout(noteTimerRef.current)
-    noteTimerRef.current = setTimeout(() => {
-      updateBlock(block.id, { note: value })
-    }, 600)
+    noteTimerRef.current = setTimeout(() => { updateBlock(block.id, { note: value }) }, 600)
   }, [block.id])
 
-  const handleNoteChange = (value: string) => {
-    setNote(value)
-    saveNote(value)
+  const handleNoteChange = (value: string) => { setNote(value); saveNote(value) }
+
+  const copyCurl = () => {
+    if (!curlCmd) return
+    navigator.clipboard.writeText(curlCmd).then(() => { setCurlCopied(true); setTimeout(() => setCurlCopied(false), 1500) })
   }
 
   const prettyResponse = response ? tryPretty(response.responseBody) : null
 
   return (
-    <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
-      {/* Block header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderBottom: response ? '1px solid var(--border)' : 'none' }}>
+    <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10 }}>
+      {/* Block header — selectors row */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderBottom: '1px solid var(--border-subtle, var(--border))' }}>
         <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', backgroundColor: 'var(--surface-2)', padding: '2px 6px', borderRadius: 4, flexShrink: 0 }}>
           #{index + 1}
         </span>
@@ -281,9 +329,7 @@ function BlockEditor({
             style={{ padding: '6px 10px', fontSize: 12, borderRadius: 6, border: '1px solid var(--border)', backgroundColor: 'var(--surface-2)', color: clientId ? 'var(--text)' : 'var(--text-subtle)', width: 160, flexShrink: 0 }}
           >
             <option value="">Cliente…</option>
-            {clients.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
+            {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         )}
 
@@ -296,14 +342,56 @@ function BlockEditor({
           {executing ? 'Executando…' : 'Executar'}
         </button>
 
+        {curlCmd && (
+          <button
+            onClick={() => setShowCurl((v) => !v)}
+            title="Ver cURL"
+            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '5px 8px', borderRadius: 5, border: '1px solid var(--border)', backgroundColor: showCurl ? 'var(--surface-2)' : 'transparent', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 11, flexShrink: 0 }}
+          >
+            <Terminal size={11} /> cURL
+          </button>
+        )}
+
         <button
           onClick={onDelete}
-          style={{ padding: '5px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', flexShrink: 0, marginLeft: 'auto' }}
+          style={{ padding: '5px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', flexShrink: 0, marginLeft: curlCmd ? 0 : 'auto' }}
           title="Remover bloco"
         >
           <Trash2 size={13} />
         </button>
       </div>
+
+      {/* Endpoint info bar */}
+      {endpoint && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 14px', backgroundColor: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
+          <MethodTag method={endpoint.method} />
+          <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{endpoint.pathTemplate}</span>
+          {endpoint.isModification && (
+            <span style={{ fontSize: 10, color: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.12)', padding: '1px 6px', borderRadius: 3, flexShrink: 0 }}>modificação</span>
+          )}
+          {endpoint.notes && (
+            <span style={{ fontSize: 11, color: 'var(--text-subtle)', marginLeft: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+              💬 {endpoint.notes}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* cURL */}
+      {showCurl && curlCmd && (
+        <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)', position: 'relative' }}>
+          <pre style={{ margin: 0, fontSize: 11, color: 'var(--text-muted)', backgroundColor: 'var(--surface-2)', borderRadius: 6, padding: '10px 12px', overflowX: 'auto', fontFamily: 'monospace', lineHeight: 1.6 }}>
+            {curlCmd}
+          </pre>
+          <button
+            onClick={copyCurl}
+            style={{ position: 'absolute', top: 18, right: 22, display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', fontSize: 10, borderRadius: 4, border: '1px solid var(--border)', backgroundColor: 'var(--surface)', color: curlCopied ? '#10b981' : 'var(--text-muted)', cursor: 'pointer' }}
+          >
+            {curlCopied ? <Check size={10} /> : <Copy size={10} />}
+            {curlCopied ? 'Copiado' : 'Copiar'}
+          </button>
+        </div>
+      )}
 
       {/* Response */}
       {response && (
@@ -312,8 +400,8 @@ function BlockEditor({
             <StatusBadge code={response.statusCode} />
             <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{response.durationMs}ms</span>
           </div>
-          <pre style={{ margin: 0, fontSize: 11, color: 'var(--text)', backgroundColor: 'var(--surface-2)', borderRadius: 6, padding: '10px 12px', overflowX: 'auto', maxHeight: 320, overflowY: 'auto', fontFamily: 'monospace', lineHeight: 1.5 }}>
-            {prettyResponse}
+          <pre style={{ margin: 0, fontSize: 11, color: 'var(--text)', backgroundColor: 'var(--surface-2)', borderRadius: 6, padding: '10px 12px', overflowX: 'auto', maxHeight: 360, overflowY: 'auto', fontFamily: 'monospace', lineHeight: 1.5 }}>
+            <JsonHighlight code={prettyResponse ?? ''} />
           </pre>
         </div>
       )}
@@ -371,10 +459,23 @@ export function RecordDetailClient({ record: initial }: { record: RecordData }) 
 
   const handleShare = () => {
     const url = `${window.location.origin}/records/${initial.id}/view`
-    navigator.clipboard.writeText(url).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
+    const done = () => { setCopied(true); setTimeout(() => setCopied(false), 2000) }
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(done).catch(() => fallbackCopy(url, done))
+    } else {
+      fallbackCopy(url, done)
+    }
+  }
+
+  const fallbackCopy = (text: string, cb: () => void) => {
+    const ta = document.createElement('textarea')
+    ta.value = text
+    ta.style.cssText = 'position:fixed;opacity:0'
+    document.body.appendChild(ta)
+    ta.select()
+    try { document.execCommand('copy') } catch {}
+    document.body.removeChild(ta)
+    cb()
   }
 
   return (
@@ -433,7 +534,7 @@ export function RecordDetailClient({ record: initial }: { record: RecordData }) 
               index={i}
               endpoints={endpoints}
               clients={clients}
-              companyId={company.id}
+              company={company}
               onDelete={() => handleDeleteBlock(block.id)}
             />
           ))}
