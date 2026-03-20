@@ -3,11 +3,12 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { ArrowLeft, Plus, Trash2, Play, Share2, Check, ChevronDown, Copy, Terminal } from 'lucide-react'
+import { ArrowLeft, Plus, Trash2, Play, Share2, Check, ChevronDown, Copy, Terminal, Pencil } from 'lucide-react'
 import { addBlock, updateBlock, deleteBlock, renameRecord } from '@/app/actions/records'
 import { substitute } from '@/lib/utils'
 import { mergeFields } from '@/lib/fields'
 import { buildAuthHeaders } from '@/lib/auth'
+import { JsonTree } from '@/app/test/components/json-tree'
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -246,6 +247,19 @@ function EndpointSelect({
 
 // ── Block Editor ─────────────────────────────────────────────────────────────
 
+const METHOD_BORDER: Record<string, string> = {
+  GET: '#10b981', POST: '#8b5cf6', PUT: '#f59e0b', PATCH: '#6b7280', DELETE: '#ef4444',
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderBottom: '1px solid var(--border)' }}>
+      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.08em', color: 'var(--text-subtle)', textTransform: 'uppercase' }}>{children}</span>
+      <div style={{ flex: 1, height: 1, backgroundColor: 'var(--border)' }} />
+    </div>
+  )
+}
+
 function BlockEditor({
   block,
   index,
@@ -263,19 +277,23 @@ function BlockEditor({
 }) {
   const [endpointId, setEndpointId] = useState<number | null>(block.endpointId)
   const [clientId, setClientId] = useState<number | null>(block.clientId)
-  const [response, setResponse] = useState<{ statusCode: number; responseBody: string; durationMs: number } | null>(
-    block.response as { statusCode: number; responseBody: string; durationMs: number } | null,
+  const [response, setResponse] = useState<{ statusCode: number; responseBody: string; durationMs: number; responseHeaders?: Record<string, string> } | null>(
+    block.response as { statusCode: number; responseBody: string; durationMs: number; responseHeaders?: Record<string, string> } | null,
   )
   const [note, setNote] = useState(block.note)
   const [executing, setExecuting] = useState(false)
   const [showCurl, setShowCurl] = useState(false)
   const [curlCopied, setCurlCopied] = useState(false)
+  const [resTab, setResTab] = useState<'json' | 'raw' | 'headers'>('json')
   const noteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const endpoint = endpoints.find((e) => e.id === endpointId)
   const client = clients.find((c) => c.id === clientId)
   const needsClient = endpoint?.requiresClient !== false
   const canExecute = !!endpointId && (!needsClient || !!clientId)
+
+  const methodColor = endpoint ? (METHOD_BORDER[endpoint.method] ?? 'var(--border)') : 'var(--border)'
+  const statusColor = !response ? 'var(--text-subtle)' : response.statusCode < 300 ? '#10b981' : '#ef4444'
 
   const curlCmd = endpoint
     ? buildCurlCmd(endpoint, company, client ? (client.fieldsData as Record<string, string> ?? {}) : {})
@@ -310,112 +328,155 @@ function BlockEditor({
     navigator.clipboard.writeText(curlCmd).then(() => { setCurlCopied(true); setTimeout(() => setCurlCopied(false), 1500) })
   }
 
-  const prettyResponse = response ? tryPretty(response.responseBody) : null
+  let parsedJson: unknown = null
+  if (response) { try { parsedJson = JSON.parse(response.responseBody) } catch {} }
+
+  const tabStyle = (active: boolean): React.CSSProperties => ({
+    padding: '4px 10px', fontSize: 11, fontWeight: active ? 500 : 400,
+    color: active ? 'var(--text)' : 'var(--text-muted)',
+    background: 'none', border: 'none', borderBottom: active ? '2px solid var(--accent)' : '2px solid transparent',
+    cursor: 'pointer',
+  })
 
   return (
-    <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10 }}>
-      {/* Block header — selectors row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderBottom: '1px solid var(--border-subtle, var(--border))' }}>
-        <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-subtle)', backgroundColor: 'var(--surface-2)', padding: '2px 6px', borderRadius: 4, flexShrink: 0 }}>
-          #{index + 1}
-        </span>
+    <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden', display: 'flex' }}>
+      {/* Left method stripe */}
+      <div style={{ width: 3, backgroundColor: methodColor, flexShrink: 0, transition: 'background 0.2s' }} />
 
-        <EndpointSelect endpoints={endpoints} value={endpointId} onChange={setEndpointId} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {/* ── Header ── */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px 6px' }}>
+          {/* Block number with status color */}
+          <span style={{ fontSize: 10, fontWeight: 700, color: statusColor, backgroundColor: `color-mix(in srgb, ${statusColor} 12%, transparent)`, padding: '2px 7px', borderRadius: 4, flexShrink: 0, transition: 'all 0.2s', fontVariantNumeric: 'tabular-nums' }}>
+            #{index + 1}
+          </span>
 
-        {needsClient && endpointId && (
-          <select
-            value={clientId ?? ''}
-            onChange={(e) => setClientId(e.target.value ? Number(e.target.value) : null)}
-            style={{ padding: '6px 10px', fontSize: 12, borderRadius: 6, border: '1px solid var(--border)', backgroundColor: 'var(--surface-2)', color: clientId ? 'var(--text)' : 'var(--text-subtle)', width: 160, flexShrink: 0 }}
-          >
-            <option value="">Cliente…</option>
-            {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-          </select>
-        )}
+          <EndpointSelect endpoints={endpoints} value={endpointId} onChange={setEndpointId} />
 
-        <button
-          onClick={execute}
-          disabled={!canExecute || executing}
-          style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '6px 12px', borderRadius: 6, border: 'none', backgroundColor: canExecute ? 'var(--accent)' : 'var(--surface-2)', color: canExecute ? 'white' : 'var(--text-subtle)', cursor: canExecute ? 'pointer' : 'not-allowed', fontSize: 12, fontWeight: 500, flexShrink: 0 }}
-        >
-          <Play size={11} />
-          {executing ? 'Executando…' : 'Executar'}
-        </button>
-
-        {curlCmd && (
-          <button
-            onClick={() => setShowCurl((v) => !v)}
-            title="Ver cURL"
-            style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '5px 8px', borderRadius: 5, border: '1px solid var(--border)', backgroundColor: showCurl ? 'var(--surface-2)' : 'transparent', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 11, flexShrink: 0 }}
-          >
-            <Terminal size={11} /> cURL
-          </button>
-        )}
-
-        <button
-          onClick={onDelete}
-          style={{ padding: '5px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', flexShrink: 0, marginLeft: curlCmd ? 0 : 'auto' }}
-          title="Remover bloco"
-        >
-          <Trash2 size={13} />
-        </button>
-      </div>
-
-      {/* Endpoint info bar */}
-      {endpoint && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 14px', backgroundColor: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
-          <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{endpoint.pathTemplate}</span>
-          {endpoint.isModification && (
-            <span style={{ fontSize: 10, color: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.12)', padding: '1px 6px', borderRadius: 3, flexShrink: 0 }}>modificação</span>
+          {needsClient && endpointId && (
+            <select
+              value={clientId ?? ''}
+              onChange={(e) => setClientId(e.target.value ? Number(e.target.value) : null)}
+              style={{ padding: '5px 8px', fontSize: 12, borderRadius: 6, border: '1px solid var(--border)', backgroundColor: 'var(--surface-2)', color: clientId ? 'var(--text)' : 'var(--text-subtle)', width: 150, flexShrink: 0 }}
+            >
+              <option value="">Cliente…</option>
+              {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
           )}
-          {endpoint.notes && (
-            <span style={{ fontSize: 11, color: 'var(--text-subtle)', marginLeft: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
-              💬 {endpoint.notes}
-            </span>
-          )}
-        </div>
-      )}
 
-      {/* cURL */}
-      {showCurl && curlCmd && (
-        <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)', position: 'relative' }}>
-          <pre style={{ margin: 0, fontSize: 11, color: 'var(--text-muted)', backgroundColor: 'var(--surface-2)', borderRadius: 6, padding: '10px 12px', overflowX: 'auto', fontFamily: 'monospace', lineHeight: 1.6 }}>
-            {curlCmd}
-          </pre>
           <button
-            onClick={copyCurl}
-            style={{ position: 'absolute', top: 18, right: 22, display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', fontSize: 10, borderRadius: 4, border: '1px solid var(--border)', backgroundColor: 'var(--surface)', color: curlCopied ? '#10b981' : 'var(--text-muted)', cursor: 'pointer' }}
+            onClick={execute}
+            disabled={!canExecute || executing}
+            style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 12px', borderRadius: 6, border: 'none', backgroundColor: canExecute ? 'var(--accent)' : 'var(--surface-2)', color: canExecute ? 'white' : 'var(--text-subtle)', cursor: canExecute ? 'pointer' : 'not-allowed', fontSize: 12, fontWeight: 500, flexShrink: 0 }}
           >
-            {curlCopied ? <Check size={10} /> : <Copy size={10} />}
-            {curlCopied ? 'Copiado' : 'Copiar'}
+            <Play size={11} />
+            {executing ? 'Executando…' : 'Executar'}
           </button>
-        </div>
-      )}
 
-      {/* Response */}
-      {response && (
-        <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <StatusBadge code={response.statusCode} />
-            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{response.durationMs}ms</span>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
+            {curlCmd && (
+              <button onClick={() => setShowCurl((v) => !v)}
+                style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', borderRadius: 5, border: '1px solid var(--border)', backgroundColor: showCurl ? 'var(--surface-2)' : 'transparent', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 11 }}>
+                <Terminal size={11} /> cURL
+              </button>
+            )}
+            <button onClick={onDelete}
+              style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer' }}
+              title="Remover bloco">
+              <Trash2 size={13} />
+            </button>
           </div>
-          <pre style={{ margin: 0, fontSize: 11, color: 'var(--text)', backgroundColor: 'var(--surface-2)', borderRadius: 6, padding: '10px 12px', overflowX: 'auto', maxHeight: 360, overflowY: 'auto', fontFamily: 'monospace', lineHeight: 1.5 }}>
-            <JsonHighlight code={prettyResponse ?? ''} />
-          </pre>
         </div>
-      )}
 
-      {/* Note */}
-      <div style={{ padding: '10px 14px' }}>
-        <textarea
-          value={note}
-          onChange={(e) => handleNoteChange(e.target.value)}
-          placeholder="Anotação (opcional)…"
-          rows={note ? undefined : 1}
-          style={{ width: '100%', padding: '6px 10px', fontSize: 12, borderRadius: 6, border: '1px solid transparent', backgroundColor: note ? 'var(--surface-2)' : 'transparent', color: 'var(--text)', resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.5, outline: 'none', boxSizing: 'border-box', transition: 'background 0.1s, border-color 0.1s' }}
-          onFocus={(e) => { e.currentTarget.style.backgroundColor = 'var(--surface-2)'; e.currentTarget.style.borderColor = 'var(--border)' }}
-          onBlur={(e) => { if (!note) { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.borderColor = 'transparent' } }}
-        />
+        {/* Path + meta */}
+        {endpoint && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '2px 14px 10px' }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-subtle)' }}>{endpoint.pathTemplate}</span>
+            {endpoint.isModification && <span style={{ fontSize: 10, color: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', padding: '1px 6px', borderRadius: 3 }}>modificação</span>}
+            {endpoint.notes && <span style={{ fontSize: 11, color: 'var(--text-subtle)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>· {endpoint.notes}</span>}
+          </div>
+        )}
+
+        {/* ── REQUEST ── */}
+        {curlCmd && showCurl && (
+          <>
+            <SectionLabel>Request</SectionLabel>
+            <div style={{ padding: '10px 14px', position: 'relative', borderBottom: '1px solid var(--border)' }}>
+              <pre style={{ margin: 0, fontSize: 11, color: 'var(--text-muted)', backgroundColor: 'var(--surface-2)', borderRadius: 6, padding: '10px 12px', overflowX: 'auto', fontFamily: 'monospace', lineHeight: 1.6 }}>
+                {curlCmd}
+              </pre>
+              <button onClick={copyCurl}
+                style={{ position: 'absolute', top: 18, right: 22, display: 'flex', alignItems: 'center', gap: 4, padding: '3px 8px', fontSize: 10, borderRadius: 4, border: '1px solid var(--border)', backgroundColor: 'var(--surface)', color: curlCopied ? '#10b981' : 'var(--text-muted)', cursor: 'pointer' }}>
+                {curlCopied ? <Check size={10} /> : <Copy size={10} />}
+                {curlCopied ? 'Copiado' : 'Copiar'}
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* ── RESPONSE ── */}
+        {response && (
+          <>
+            <SectionLabel>Response</SectionLabel>
+            {/* Status bar + tabs */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 14px 0', borderBottom: '1px solid var(--border)' }}>
+              <StatusBadge code={response.statusCode} />
+              <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{response.durationMs}ms</span>
+              <div style={{ marginLeft: 8, display: 'flex' }}>
+                {(['json', 'raw', 'headers'] as const).map((t) => (
+                  <button key={t} style={tabStyle(resTab === t)} onClick={() => setResTab(t)}>
+                    {t === 'json' ? 'JSON' : t === 'raw' ? 'Raw' : 'Headers'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)' }}>
+              {resTab === 'json' && (
+                <div style={{ backgroundColor: 'var(--surface-2)', borderRadius: 8, padding: '12px 14px', fontFamily: 'monospace', fontSize: 12, lineHeight: 1.7, color: 'var(--json-punct)', maxHeight: 400, overflowY: 'auto' }}>
+                  {parsedJson !== null
+                    ? <JsonTree value={parsedJson} />
+                    : <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: 'var(--text)' }}>{response.responseBody}</pre>
+                  }
+                </div>
+              )}
+              {resTab === 'raw' && (
+                <pre style={{ margin: 0, fontSize: 11, color: 'var(--text)', backgroundColor: 'var(--surface-2)', borderRadius: 6, padding: '10px 12px', overflowX: 'auto', maxHeight: 400, overflowY: 'auto', fontFamily: 'monospace', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                  {response.responseBody}
+                </pre>
+              )}
+              {resTab === 'headers' && (
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                  <tbody>
+                    {Object.entries(response.responseHeaders ?? {}).map(([k, v]) => (
+                      <tr key={k} style={{ borderBottom: '1px solid var(--border)' }}>
+                        <td style={{ padding: '5px 0', fontFamily: 'monospace', color: 'var(--text-muted)', width: '35%', paddingRight: 12 }}>{k}</td>
+                        <td style={{ padding: '5px 0', wordBreak: 'break-all', color: 'var(--text)' }}>{v}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* ── NOTE ── */}
+        <div style={{ display: 'flex', gap: 10, padding: '10px 14px', backgroundColor: note ? 'color-mix(in srgb, var(--accent) 4%, transparent)' : 'transparent', transition: 'background 0.2s' }}>
+          <Pencil size={13} style={{ color: note ? 'var(--accent)' : 'var(--text-subtle)', marginTop: 3, flexShrink: 0 }} />
+          <textarea
+            value={note}
+            onChange={(e) => handleNoteChange(e.target.value)}
+            placeholder="Adicionar anotação…"
+            rows={1}
+            style={{ flex: 1, padding: 0, fontSize: 12, border: 'none', backgroundColor: 'transparent', color: 'var(--text)', resize: 'none', fontFamily: 'inherit', lineHeight: 1.6, outline: 'none' }}
+            onInput={(e) => {
+              const el = e.currentTarget
+              el.style.height = 'auto'
+              el.style.height = el.scrollHeight + 'px'
+            }}
+          />
+        </div>
       </div>
     </div>
   )
