@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { ArrowLeft, Plus, Trash2, Play, Share2, Check, ChevronDown } from 'lucide-react'
 import { addBlock, updateBlock, deleteBlock, renameRecord } from '@/app/actions/records'
@@ -99,20 +100,83 @@ function EndpointSelect({
 }) {
   const [open, setOpen] = useState(false)
   const [q, setQ] = useState('')
-  const ref = useRef<HTMLDivElement>(null)
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
+  const btnRef = useRef<HTMLButtonElement>(null)
   const selected = endpoints.find((e) => e.id === value)
 
   const filtered = endpoints.filter(
     (e) => !q || e.name.toLowerCase().includes(q.toLowerCase()) || e.group.toLowerCase().includes(q.toLowerCase()),
   )
-
   const groups = [...new Set(filtered.filter((e) => e.group).map((e) => e.group))]
   const noGroup = filtered.filter((e) => !e.group)
 
+  const handleOpen = () => {
+    if (!btnRef.current) return
+    const rect = btnRef.current.getBoundingClientRect()
+    setDropdownStyle({
+      position: 'fixed',
+      top: rect.bottom + 4,
+      left: rect.left,
+      width: Math.max(rect.width, 320),
+      zIndex: 9999,
+    })
+    setOpen(true)
+  }
+
+  // Close on scroll
+  useEffect(() => {
+    if (!open) return
+    const close = () => setOpen(false)
+    window.addEventListener('scroll', close, true)
+    return () => window.removeEventListener('scroll', close, true)
+  }, [open])
+
+  const dropdown = open ? (
+    <>
+      <div style={{ position: 'fixed', inset: 0, zIndex: 9998 }} onClick={() => setOpen(false)} />
+      <div style={{ ...dropdownStyle, backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.4)', maxHeight: 300, display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '6px 8px', borderBottom: '1px solid var(--border)' }}>
+          <input
+            autoFocus
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Buscar endpoint…"
+            style={{ width: '100%', padding: '4px 8px', fontSize: 12, borderRadius: 5, border: '1px solid var(--border)', backgroundColor: 'var(--surface-2)', color: 'var(--text)', outline: 'none', boxSizing: 'border-box' }}
+          />
+        </div>
+        <div style={{ overflowY: 'auto', padding: '4px' }}>
+          {groups.map((g) => (
+            <div key={g}>
+              <div style={{ fontSize: 10, color: 'var(--text-subtle)', padding: '4px 8px 2px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{g}</div>
+              {filtered.filter((e) => e.group === g).map((ep) => (
+                <button key={ep.id} onClick={() => { onChange(ep.id); setOpen(false); setQ('') }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', padding: '6px 8px', borderRadius: 5, border: 'none', backgroundColor: ep.id === value ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent', color: ep.id === value ? 'var(--accent)' : 'var(--text)', cursor: 'pointer', fontSize: 12, textAlign: 'left' }}>
+                  <MethodTag method={ep.method} />
+                  <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ep.name}</span>
+                  {ep.id === value && <Check size={11} style={{ flexShrink: 0 }} />}
+                </button>
+              ))}
+            </div>
+          ))}
+          {noGroup.map((ep) => (
+            <button key={ep.id} onClick={() => { onChange(ep.id); setOpen(false); setQ('') }}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', padding: '6px 8px', borderRadius: 5, border: 'none', backgroundColor: ep.id === value ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent', color: ep.id === value ? 'var(--accent)' : 'var(--text)', cursor: 'pointer', fontSize: 12, textAlign: 'left' }}>
+              <MethodTag method={ep.method} />
+              <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ep.name}</span>
+              {ep.id === value && <Check size={11} style={{ flexShrink: 0 }} />}
+            </button>
+          ))}
+          {filtered.length === 0 && <div style={{ padding: '8px', fontSize: 12, color: 'var(--text-subtle)' }}>Nenhum resultado</div>}
+        </div>
+      </div>
+    </>
+  ) : null
+
   return (
-    <div ref={ref} style={{ position: 'relative', flex: 1 }}>
+    <div style={{ flex: 1, position: 'relative' }}>
       <button
-        onClick={() => setOpen((v) => !v)}
+        ref={btnRef}
+        onClick={handleOpen}
         style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', padding: '6px 10px', borderRadius: 6, border: '1px solid var(--border)', backgroundColor: 'var(--surface-2)', color: 'var(--text)', cursor: 'pointer', fontSize: 12, textAlign: 'left' }}
       >
         {selected ? (
@@ -125,49 +189,7 @@ function EndpointSelect({
         )}
         <ChevronDown size={12} style={{ flexShrink: 0, color: 'var(--text-subtle)' }} />
       </button>
-
-      {open && (
-        <>
-          <div style={{ position: 'fixed', inset: 0, zIndex: 10 }} onClick={() => setOpen(false)} />
-          <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, marginTop: 4, backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, zIndex: 11, boxShadow: '0 8px 24px rgba(0,0,0,0.3)', maxHeight: 280, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ padding: '6px 8px', borderBottom: '1px solid var(--border)' }}>
-              <input
-                autoFocus
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Buscar endpoint…"
-                style={{ width: '100%', padding: '4px 8px', fontSize: 12, borderRadius: 5, border: '1px solid var(--border)', backgroundColor: 'var(--surface-2)', color: 'var(--text)', outline: 'none' }}
-              />
-            </div>
-            <div style={{ overflowY: 'auto', padding: '4px 4px' }}>
-              {groups.map((g) => (
-                <div key={g}>
-                  <div style={{ fontSize: 10, color: 'var(--text-subtle)', padding: '4px 8px 2px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{g}</div>
-                  {filtered.filter((e) => e.group === g).map((ep) => (
-                    <button key={ep.id} onClick={() => { onChange(ep.id); setOpen(false); setQ('') }}
-                      style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', padding: '6px 8px', borderRadius: 5, border: 'none', backgroundColor: ep.id === value ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent', color: ep.id === value ? 'var(--accent)' : 'var(--text)', cursor: 'pointer', fontSize: 12, textAlign: 'left' }}>
-                      <MethodTag method={ep.method} />
-                      <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ep.name}</span>
-                      {ep.id === value && <Check size={11} style={{ flexShrink: 0 }} />}
-                    </button>
-                  ))}
-                </div>
-              ))}
-              {noGroup.map((ep) => (
-                <button key={ep.id} onClick={() => { onChange(ep.id); setOpen(false); setQ('') }}
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', padding: '6px 8px', borderRadius: 5, border: 'none', backgroundColor: ep.id === value ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'transparent', color: ep.id === value ? 'var(--accent)' : 'var(--text)', cursor: 'pointer', fontSize: 12, textAlign: 'left' }}>
-                  <MethodTag method={ep.method} />
-                  <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{ep.name}</span>
-                  {ep.id === value && <Check size={11} style={{ flexShrink: 0 }} />}
-                </button>
-              ))}
-              {filtered.length === 0 && (
-                <div style={{ padding: '8px', fontSize: 12, color: 'var(--text-subtle)' }}>Nenhum resultado</div>
-              )}
-            </div>
-          </div>
-        </>
-      )}
+      {typeof document !== 'undefined' && dropdown && createPortal(dropdown, document.body)}
     </div>
   )
 }
