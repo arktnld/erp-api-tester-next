@@ -917,6 +917,7 @@ export function CollectionsClient({
 
   const flatRef = useRef<FlatEndpoint[]>([])
   const isFirstStructureLoad = useRef(true)
+  const isMountedRef = useRef(false)
 
   useEffect(() => {
     flatRef.current = structure ? buildFlat(structure.tree) : []
@@ -946,8 +947,9 @@ export function CollectionsClient({
     }
   }, [structure])
 
-  // Persist active collection
+  // Persist active collection (skip first render — mount effect handles restoration)
   useEffect(() => {
+    if (!isMountedRef.current) return
     if (activeId != null) localStorage.setItem(STORAGE_COL, String(activeId))
   }, [activeId])
 
@@ -972,6 +974,7 @@ export function CollectionsClient({
 
   // Restore saved collection on mount (may differ from server-rendered first collection)
   useEffect(() => {
+    isMountedRef.current = true
     const savedId = localStorage.getItem(STORAGE_COL)
     if (!savedId) return
     const id = parseInt(savedId, 10)
