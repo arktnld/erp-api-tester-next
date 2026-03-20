@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { createRecord, deleteRecord, createCategory } from '@/app/actions/records'
-import { FileText, Plus, Trash2, ChevronRight, FolderOpen, Folder } from 'lucide-react'
+import { FileText, Plus, Trash2, ChevronRight } from 'lucide-react'
 
 type RecordItem = {
   id: number
@@ -67,7 +67,7 @@ function NewRecordModal({
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && submit()}
-            placeholder="Ex: Diagnóstico Arivan"
+            placeholder="Ex: Diagnóstico cliente"
             style={{ padding: '7px 10px', fontSize: 13, borderRadius: 6, border: '1px solid var(--border)', backgroundColor: 'var(--surface-2)', color: 'var(--text)', outline: 'none' }}
           />
         </div>
@@ -129,53 +129,19 @@ function NewRecordModal({
   )
 }
 
-function RecordRow({ rec, onDelete, deletingId }: { rec: RecordItem; onDelete: (e: React.MouseEvent, id: number) => void; deletingId: number | null }) {
-  const router = useRouter()
-  return (
-    <div
-      onClick={() => router.push(`/records/${rec.id}`)}
-      style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', gap: 12 }}
-      onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--border-hover, var(--accent))')}
-      onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
-    >
-      <FileText size={15} style={{ color: 'var(--accent)', flexShrink: 0 }} />
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {rec.name}
-        </div>
-        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-          {rec.company.name} · {rec._count.blocks} bloco{rec._count.blocks !== 1 ? 's' : ''} · {new Date(rec.createdAt).toLocaleDateString('pt-BR')}
-        </div>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <button
-          onClick={(e) => onDelete(e, rec.id)}
-          disabled={deletingId === rec.id}
-          style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', opacity: deletingId === rec.id ? 0.4 : 1 }}
-          title="Deletar"
-        >
-          <Trash2 size={13} />
-        </button>
-        <ChevronRight size={14} style={{ color: 'var(--text-subtle)' }} />
-      </div>
-    </div>
-  )
-}
-
 export function RecordsClient({
   records: initial,
   companies,
-  categories: initialCategories,
+  categories,
 }: {
   records: RecordItem[]
   companies: Company[]
   categories: Category[]
 }) {
   const [records, setRecords] = useState(initial)
-  const [categories, setCategories] = useState(initialCategories)
   const [showNew, setShowNew] = useState(false)
   const [deletingId, setDeletingId] = useState<number | null>(null)
-  const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
+  const [activeFilter, setActiveFilter] = useState<number | null>(null)
   const router = useRouter()
 
   const handleCreate = (id: number) => {
@@ -191,36 +157,24 @@ export function RecordsClient({
     setDeletingId(null)
   }
 
-  const toggleCollapsed = (key: string) => {
-    setCollapsed((prev) => {
-      const next = new Set(prev)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      return next
-    })
-  }
+  const filtered = activeFilter === null
+    ? records
+    : records.filter((r) => r.category?.id === activeFilter)
 
-  // Group records by category
-  const grouped: { key: string; label: string; items: RecordItem[] }[] = []
+  // Only show categories that have records
+  const usedCategories = categories.filter((c) => records.some((r) => r.category?.id === c.id))
 
-  // Categories that have records
-  const usedCategoryIds = new Set(records.map((r) => r.category?.id).filter(Boolean))
-  const usedCategories = categories.filter((c) => usedCategoryIds.has(c.id))
-
-  for (const cat of usedCategories) {
-    grouped.push({
-      key: `cat-${cat.id}`,
-      label: cat.name,
-      items: records.filter((r) => r.category?.id === cat.id),
-    })
-  }
-
-  const uncategorized = records.filter((r) => !r.category)
-  if (uncategorized.length > 0) {
-    grouped.push({ key: 'none', label: 'Sem categoria', items: uncategorized })
-  }
-
-  const isEmpty = records.length === 0
+  const chipStyle = (active: boolean): React.CSSProperties => ({
+    padding: '4px 12px',
+    fontSize: 12,
+    fontWeight: active ? 500 : 400,
+    borderRadius: 20,
+    border: active ? 'none' : '1px solid var(--border)',
+    backgroundColor: active ? 'var(--accent)' : 'transparent',
+    color: active ? 'white' : 'var(--text-muted)',
+    cursor: 'pointer',
+    transition: 'all 0.1s',
+  })
 
   return (
     <>
@@ -234,7 +188,7 @@ export function RecordsClient({
       )}
 
       <div style={{ padding: '24px 28px', maxWidth: 800, margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
           <div>
             <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)', margin: 0 }}>Registros</h1>
             <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '4px 0 0' }}>
@@ -249,45 +203,68 @@ export function RecordsClient({
           </button>
         </div>
 
-        {isEmpty ? (
+        {/* Filter chips */}
+        {usedCategories.length > 0 && (
+          <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
+            <button style={chipStyle(activeFilter === null)} onClick={() => setActiveFilter(null)}>
+              Todos
+            </button>
+            {usedCategories.map((c) => (
+              <button key={c.id} style={chipStyle(activeFilter === c.id)} onClick={() => setActiveFilter(activeFilter === c.id ? null : c.id)}>
+                {c.name}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {records.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
             <FileText size={36} style={{ marginBottom: 12, opacity: 0.3 }} />
             <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 6 }}>Nenhum registro ainda</div>
             <div style={{ fontSize: 13 }}>Crie um registro para documentar e compartilhar testes.</div>
           </div>
+        ) : filtered.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)', fontSize: 13 }}>
+            Nenhum registro nesta categoria.
+          </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {grouped.map(({ key, label, items }) => {
-              const isCollapsed = collapsed.has(key)
-              const isUncategorized = key === 'none'
-              return (
-                <div key={key}>
-                  {/* Category header */}
-                  <button
-                    onClick={() => toggleCollapsed(key)}
-                    style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0', width: '100%' }}
-                  >
-                    {isCollapsed
-                      ? <Folder size={14} style={{ color: isUncategorized ? 'var(--text-subtle)' : 'var(--accent)', flexShrink: 0 }} />
-                      : <FolderOpen size={14} style={{ color: isUncategorized ? 'var(--text-subtle)' : 'var(--accent)', flexShrink: 0 }} />
-                    }
-                    <span style={{ fontSize: 12, fontWeight: 600, color: isUncategorized ? 'var(--text-subtle)' : 'var(--text)', letterSpacing: '0.02em', textTransform: isUncategorized ? undefined : 'uppercase' }}>
-                      {label}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {filtered.map((rec) => (
+              <div
+                key={rec.id}
+                onClick={() => router.push(`/records/${rec.id}`)}
+                style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', gap: 12 }}
+                onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--border-hover, var(--accent))')}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {rec.name}
                     </span>
-                    <span style={{ fontSize: 11, color: 'var(--text-subtle)', marginLeft: 2 }}>({items.length})</span>
-                    <div style={{ flex: 1, height: 1, backgroundColor: 'var(--border)', marginLeft: 8 }} />
-                  </button>
-
-                  {!isCollapsed && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingLeft: 22 }}>
-                      {items.map((rec) => (
-                        <RecordRow key={rec.id} rec={rec} onDelete={handleDelete} deletingId={deletingId} />
-                      ))}
-                    </div>
-                  )}
+                    {rec.category && (
+                      <span style={{ fontSize: 11, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '1px 7px', borderRadius: 10, flexShrink: 0, fontWeight: 500 }}>
+                        {rec.category.name}
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+                    {rec.company.name} · {rec._count.blocks} bloco{rec._count.blocks !== 1 ? 's' : ''} · {new Date(rec.createdAt).toLocaleDateString('pt-BR')}
+                  </div>
                 </div>
-              )
-            })}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <button
+                    onClick={(e) => handleDelete(e, rec.id)}
+                    disabled={deletingId === rec.id}
+                    style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', opacity: deletingId === rec.id ? 0.4 : 1 }}
+                    title="Deletar"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                  <ChevronRight size={14} style={{ color: 'var(--text-subtle)' }} />
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
