@@ -1,0 +1,122 @@
+'use server'
+
+import { prisma } from '@erp/db'
+import { revalidatePath } from 'next/cache'
+
+export async function getRecords() {
+  return prisma.apiRecord.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: {
+      company: { select: { id: true, name: true } },
+      _count: { select: { blocks: true } },
+    },
+  })
+}
+
+export async function getCompaniesForRecord() {
+  return prisma.company.findMany({
+    orderBy: { name: 'asc' },
+    select: { id: true, name: true },
+  })
+}
+
+export async function createRecord(name: string, companyId: number) {
+  const record = await prisma.apiRecord.create({
+    data: { name, companyId },
+    select: { id: true },
+  })
+  revalidatePath('/records')
+  return record
+}
+
+export async function renameRecord(id: number, name: string) {
+  await prisma.apiRecord.update({ where: { id }, data: { name } })
+  revalidatePath('/records')
+  revalidatePath(`/records/${id}`)
+}
+
+export async function deleteRecord(id: number) {
+  await prisma.apiRecord.delete({ where: { id } })
+  revalidatePath('/records')
+}
+
+export async function getRecordForEdit(id: number) {
+  return prisma.apiRecord.findUnique({
+    where: { id },
+    include: {
+      company: {
+        select: {
+          id: true,
+          name: true,
+          baseUrl: true,
+          authType: true,
+          authConfig: true,
+          environments: true,
+          testClients: { orderBy: { name: 'asc' }, select: { id: true, name: true } },
+          erp: {
+            select: {
+              id: true,
+              name: true,
+              endpoints: { orderBy: { sortOrder: 'asc' } },
+            },
+          },
+        },
+      },
+      blocks: { orderBy: { order: 'asc' } },
+    },
+  })
+}
+
+export async function getRecordForView(id: number) {
+  return prisma.apiRecord.findUnique({
+    where: { id },
+    include: {
+      company: { select: { name: true } },
+      blocks: {
+        orderBy: { order: 'asc' },
+        include: {
+          // resolve names for display
+        },
+      },
+    },
+  })
+}
+
+export async function addBlock(recordId: number) {
+  const last = await prisma.recordBlock.findFirst({
+    where: { recordId },
+    orderBy: { order: 'desc' },
+    select: { order: true },
+  })
+  const block = await prisma.recordBlock.create({
+    data: { recordId, order: (last?.order ?? 0) + 1 },
+  })
+  revalidatePath(`/records/${recordId}`)
+  return block
+}
+
+export async function updateBlock(
+  id: number,
+  data: {
+    endpointId?: number | null
+    clientId?: number | null
+    response?: unknown
+    note?: string
+    executedAt?: Date | null
+  },
+) {
+  await prisma.recordBlock.update({ where: { id }, data: data as never })
+}
+
+export async function deleteBlock(id: number, recordId: number) {
+  await prisma.recordBlock.delete({ where: { id } })
+  // Re-order remaining blocks
+  const blocks = await prisma.recordBlock.findMany({
+    where: { recordId },
+    orderBy: { order: 'asc' },
+    select: { id: true },
+  })
+  await Promise.all(
+    blocks.map((b, i) => prisma.recordBlock.update({ where: { id: b.id }, data: { order: i + 1 } })),
+  )
+}

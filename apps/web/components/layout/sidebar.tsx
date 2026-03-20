@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Server, Building2, FlaskConical, History, BookMarked, ListChecks, Settings, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { LayoutDashboard, Server, Building2, FlaskConical, History, BookMarked, ListChecks, Settings, PanelLeftClose, PanelLeftOpen, FileText } from 'lucide-react'
 import { UserButton } from '@clerk/nextjs'
 import { TourButton } from '@/components/ui/tour-button'
 import { useSidebar } from './sidebar-context'
@@ -28,6 +28,7 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
     { href: '/history', label: 'Histórico', icon: History, tourId: 'history' },
     { href: '/playbooks', label: 'Playbooks', icon: ListChecks, tourId: 'playbooks' },
     { href: '/collections', label: 'Collections', icon: BookMarked, tourId: 'collections' },
+    { href: '/records', label: 'Registros', icon: FileText, tourId: 'records' },
     { href: '/settings', label: 'Configurações', icon: Settings, tourId: 'settings' },
   ]
 
