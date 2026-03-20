@@ -364,7 +364,6 @@ function BlockEditor({
       {/* Endpoint info bar */}
       {endpoint && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 14px', backgroundColor: 'var(--surface-2)', borderBottom: '1px solid var(--border)' }}>
-          <MethodTag method={endpoint.method} />
           <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{endpoint.pathTemplate}</span>
           {endpoint.isModification && (
             <span style={{ fontSize: 10, color: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.12)', padding: '1px 6px', borderRadius: 3, flexShrink: 0 }}>modificação</span>
