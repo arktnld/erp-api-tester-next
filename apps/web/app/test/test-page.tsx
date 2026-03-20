@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { MethodBadge } from '@/components/ui/badge'
 import { TestSelectors } from './components/test-selectors'
 import { TestRequest } from './components/test-request'
@@ -48,6 +48,47 @@ export function TestPage({
   const [showCancel, setShowCancel] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
   const cancelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isMountedRef = useRef(false)
+
+  // Restore from localStorage on mount (skip if URL params were provided)
+  useEffect(() => {
+    isMountedRef.current = true
+    if (initialCompanyId || initialEndpointId) return
+    const savedErpId      = localStorage.getItem('test_erpId')
+    const savedCompanyId  = localStorage.getItem('test_companyId')
+    const savedEndpointId = localStorage.getItem('test_endpointId')
+    const savedClientId   = localStorage.getItem('test_clientId')
+    if (savedErpId)      setErpId(parseInt(savedErpId, 10))
+    if (savedCompanyId)  setCompanyId(parseInt(savedCompanyId, 10))
+    if (savedEndpointId) setEndpointId(parseInt(savedEndpointId, 10))
+    if (savedClientId)   setClientId(parseInt(savedClientId, 10))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Persist selections (skip first render to avoid overwriting saved values)
+  useEffect(() => {
+    if (!isMountedRef.current) return
+    if (erpId != null) localStorage.setItem('test_erpId', String(erpId))
+    else localStorage.removeItem('test_erpId')
+  }, [erpId])
+
+  useEffect(() => {
+    if (!isMountedRef.current) return
+    if (companyId != null) localStorage.setItem('test_companyId', String(companyId))
+    else localStorage.removeItem('test_companyId')
+  }, [companyId])
+
+  useEffect(() => {
+    if (!isMountedRef.current) return
+    if (endpointId != null) localStorage.setItem('test_endpointId', String(endpointId))
+    else localStorage.removeItem('test_endpointId')
+  }, [endpointId])
+
+  useEffect(() => {
+    if (!isMountedRef.current) return
+    if (clientId != null) localStorage.setItem('test_clientId', String(clientId))
+    else localStorage.removeItem('test_clientId')
+  }, [clientId])
 
   const erp = erps.find((e) => e.id === erpId)
   const company = erp?.companies.find((c) => c.id === companyId)
