@@ -324,7 +324,8 @@ export function RecordDetailClient({ record: initial }: { record: RecordData }) 
   const nameTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const { company } = initial
-  const { endpoints, testClients: clients } = company
+  const { endpoints } = company.erp
+  const clients = company.testClients
 
   const handleNameChange = (value: string) => {
     setName(value)
