@@ -153,6 +153,7 @@ function EndpointSelect({
   const [q, setQ] = useState('')
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({})
   const btnRef = useRef<HTMLButtonElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const selected = endpoints.find((e) => e.id === value)
 
   const filtered = endpoints.filter(
@@ -174,10 +175,13 @@ function EndpointSelect({
     setOpen(true)
   }
 
-  // Close on scroll
+  // Close on scroll (but not when scrolling inside the dropdown itself)
   useEffect(() => {
     if (!open) return
-    const close = () => setOpen(false)
+    const close = (e: Event) => {
+      if (dropdownRef.current?.contains(e.target as Node)) return
+      setOpen(false)
+    }
     window.addEventListener('scroll', close, true)
     return () => window.removeEventListener('scroll', close, true)
   }, [open])
@@ -195,7 +199,7 @@ function EndpointSelect({
             style={{ width: '100%', padding: '4px 8px', fontSize: 12, borderRadius: 5, border: '1px solid var(--border)', backgroundColor: 'var(--surface-2)', color: 'var(--text)', outline: 'none', boxSizing: 'border-box' }}
           />
         </div>
-        <div style={{ overflowY: 'auto', padding: '4px' }}>
+        <div ref={dropdownRef} style={{ overflowY: 'auto', padding: '4px' }}>
           {groups.map((g) => (
             <div key={g}>
               <div style={{ fontSize: 10, color: 'var(--text-subtle)', padding: '4px 8px 2px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>{g}</div>
