@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { ArrowLeft, Plus, Trash2, Play, Share2, Check, ChevronDown, Copy, Terminal, Pencil } from 'lucide-react'
-import { addBlock, updateBlock, deleteBlock, renameRecord } from '@/app/actions/records'
+import { addBlock, updateBlock, deleteBlock } from '@/app/actions/records'
 import { substitute } from '@/lib/utils'
 import { mergeFields } from '@/lib/fields'
 import { buildAuthHeaders } from '@/lib/auth'
@@ -490,25 +490,13 @@ function BlockEditor({
 // ── Record Detail Client ─────────────────────────────────────────────────────
 
 export function RecordDetailClient({ record: initial }: { record: RecordData }) {
-  const [name, setName] = useState(initial.name)
-  const [editingName, setEditingName] = useState(false)
   const [blocks, setBlocks] = useState<Block[]>(initial.blocks)
   const [addingBlock, setAddingBlock] = useState(false)
   const [copied, setCopied] = useState(false)
-  const nameInputRef = useRef<HTMLInputElement>(null)
-  const nameTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const { company } = initial
   const { endpoints } = company.erp
   const clients = company.testClients
-
-  const handleNameChange = (value: string) => {
-    setName(value)
-    if (nameTimerRef.current) clearTimeout(nameTimerRef.current)
-    nameTimerRef.current = setTimeout(() => {
-      renameRecord(initial.id, value)
-    }, 600)
-  }
 
   const handleAddBlock = async () => {
     setAddingBlock(true)
@@ -551,33 +539,15 @@ export function RecordDetailClient({ record: initial }: { record: RecordData }) 
           <ArrowLeft size={16} />
         </Link>
 
-        {editingName ? (
-          <input
-            ref={nameInputRef}
-            value={name}
-            onChange={(e) => handleNameChange(e.target.value)}
-            onBlur={() => setEditingName(false)}
-            onKeyDown={(e) => e.key === 'Enter' && setEditingName(false)}
-            style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', background: 'none', border: 'none', outline: 'none', flex: 1, borderBottom: '1px solid var(--accent)' }}
-          />
-        ) : (
-          <span
-            onClick={() => { setEditingName(true); setTimeout(() => nameInputRef.current?.focus(), 10) }}
-            style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', cursor: 'text', flex: 1 }}
-            title="Clique para renomear"
-          >
-            {name}
-          </span>
-        )}
+        <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', flex: 1 }}>
+          {company.name}
+        </span>
 
         {initial.category && (
-          <span style={{ fontSize: 11, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '3px 8px', borderRadius: 4, flexShrink: 0, fontWeight: 500 }}>
+          <span style={{ fontSize: 11, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '3px 8px', borderRadius: 10, flexShrink: 0, fontWeight: 500 }}>
             {initial.category.name}
           </span>
         )}
-        <span style={{ fontSize: 12, color: 'var(--text-muted)', backgroundColor: 'var(--surface-2)', padding: '3px 8px', borderRadius: 4, flexShrink: 0 }}>
-          {company.name}
-        </span>
 
         <button
           onClick={handleShare}

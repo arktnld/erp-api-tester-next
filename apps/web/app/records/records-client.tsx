@@ -28,14 +28,13 @@ function NewRecordModal({
   onClose: () => void
   onCreate: (id: number) => void
 }) {
-  const [name, setName] = useState('')
   const [companyId, setCompanyId] = useState<number | ''>(companies[0]?.id ?? '')
   const [categoryId, setCategoryId] = useState<number | 'new' | ''>('')
   const [newCategoryName, setNewCategoryName] = useState('')
   const [isPending, start] = useTransition()
 
   const submit = () => {
-    if (!name.trim() || !companyId) return
+    if (!companyId) return
     start(async () => {
       let resolvedCategoryId: number | null = null
       if (categoryId === 'new' && newCategoryName.trim()) {
@@ -44,7 +43,8 @@ function NewRecordModal({
       } else if (categoryId && categoryId !== 'new') {
         resolvedCategoryId = Number(categoryId)
       }
-      const rec = await createRecord(name.trim(), Number(companyId), resolvedCategoryId)
+      const companyName = companies.find((c) => c.id === Number(companyId))?.name ?? ''
+      const rec = await createRecord(companyName, Number(companyId), resolvedCategoryId)
       onCreate(rec.id)
     })
   }
@@ -59,18 +59,6 @@ function NewRecordModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>Novo registro</div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>Nome</label>
-          <input
-            autoFocus
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && submit()}
-            placeholder="Ex: Diagnóstico cliente"
-            style={{ padding: '7px 10px', fontSize: 13, borderRadius: 6, border: '1px solid var(--border)', backgroundColor: 'var(--surface-2)', color: 'var(--text)', outline: 'none' }}
-          />
-        </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>Empresa</label>
@@ -118,8 +106,8 @@ function NewRecordModal({
           </button>
           <button
             onClick={submit}
-            disabled={!name.trim() || !companyId || isPending || (categoryId === 'new' && !newCategoryName.trim())}
-            style={{ padding: '6px 14px', fontSize: 13, borderRadius: 6, border: 'none', backgroundColor: 'var(--accent)', color: 'white', cursor: 'pointer', opacity: (!name.trim() || !companyId || isPending || (categoryId === 'new' && !newCategoryName.trim())) ? 0.5 : 1 }}
+            disabled={!companyId || isPending || (categoryId === 'new' && !newCategoryName.trim())}
+            style={{ padding: '6px 14px', fontSize: 13, borderRadius: 6, border: 'none', backgroundColor: 'var(--accent)', color: 'white', cursor: 'pointer', opacity: (!companyId || isPending || (categoryId === 'new' && !newCategoryName.trim())) ? 0.5 : 1 }}
           >
             {isPending ? 'Criando…' : 'Criar'}
           </button>
@@ -238,11 +226,18 @@ export function RecordsClient({
                 onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
               >
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {rec.name}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {rec.company.name}
+                    </span>
+                    {rec.category && (
+                      <span style={{ fontSize: 11, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '1px 7px', borderRadius: 10, flexShrink: 0, fontWeight: 500 }}>
+                        {rec.category.name}
+                      </span>
+                    )}
                   </div>
                   <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                    {rec.company.name} · {rec._count.blocks} bloco{rec._count.blocks !== 1 ? 's' : ''} · {new Date(rec.createdAt).toLocaleDateString('pt-BR')}
+                    {rec._count.blocks} bloco{rec._count.blocks !== 1 ? 's' : ''} · {new Date(rec.createdAt).toLocaleDateString('pt-BR')}
                   </div>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
