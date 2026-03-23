@@ -90,7 +90,7 @@ function ResponseBody({ resp }: { resp: BlockResponse }) {
 
   if (cat === 'xml' || cat === 'html') {
     return (
-      <CodeBlock language="xml" customStyle={{ borderRadius: 8, fontSize: 11, backgroundColor: '#161616', lineHeight: 1.7, border: '1px solid #2a2a2a' }} wrapLongLines>
+      <CodeBlock language="xml" customStyle={{ borderRadius: 8, fontSize: 11, backgroundColor: '#161616', lineHeight: 1.7, border: '1px solid #2a2a2a', maxHeight: 400, overflowY: 'auto' }} wrapLongLines>
         {tryPrettyXml(body)}
       </CodeBlock>
     )
@@ -130,7 +130,7 @@ function BlockCard({ block, index }: { block: ViewBlock; index: number }) {
       {/* Number outside the card */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 14, flexShrink: 0, width: 32 }}>
         <span style={{ fontSize: 13, fontWeight: 800, color: statusColor, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
-          {index + 1}
+          #{index + 1}
         </span>
       </div>
 

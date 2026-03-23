@@ -18,7 +18,7 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
   const pathname = usePathname()
   const { collapsed, toggle } = useSidebar()
 
-  if (pathname.startsWith('/sign-in')) return null
+  if (pathname.startsWith('/sign-in') || pathname.endsWith('/view')) return null
 
   const nav = [
     { href: '/', label: 'Home', icon: LayoutDashboard, tourId: 'home' },
