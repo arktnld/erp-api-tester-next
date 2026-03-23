@@ -126,7 +126,15 @@ function BlockCard({ block, index }: { block: ViewBlock; index: number }) {
   const curlCmd = resp ? buildCurl(resp) : null
 
   return (
-    <div style={{ backgroundColor: '#111', border: '1px solid #222', borderRadius: 10, overflow: 'hidden', display: 'flex' }}>
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+      {/* Number outside the card */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 14, flexShrink: 0, width: 32 }}>
+        <span style={{ fontSize: 13, fontWeight: 800, color: statusColor, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+          {index + 1}
+        </span>
+      </div>
+
+    <div style={{ flex: 1, minWidth: 0, backgroundColor: '#111', border: '1px solid #222', borderRadius: 10, overflow: 'hidden', display: 'flex' }}>
       {/* Left stripe */}
       <div style={{ width: 3, backgroundColor: methodColor, flexShrink: 0 }} />
 
@@ -141,10 +149,6 @@ function BlockCard({ block, index }: { block: ViewBlock; index: number }) {
 
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 16px', borderBottom: resp?.statusCode ? '1px solid #222' : 'none' }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: statusColor, backgroundColor: `color-mix(in srgb, ${statusColor} 12%, transparent)`, padding: '2px 7px', borderRadius: 4, flexShrink: 0, fontVariantNumeric: 'tabular-nums' }}>
-            #{index + 1}
-          </span>
-
           {ep ? (
             <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -221,6 +225,7 @@ function BlockCard({ block, index }: { block: ViewBlock; index: number }) {
           </div>
         )}
       </div>
+    </div>
     </div>
   )
 }
