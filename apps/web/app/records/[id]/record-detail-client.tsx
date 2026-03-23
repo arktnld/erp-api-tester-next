@@ -346,9 +346,11 @@ function BlockEditor({
     if (!canExecute || executing) return
     setExecuting(true)
     try {
-      const rawBody = Object.keys(bodyParams).length && endpoint?.bodyTemplate?.trim()
-        ? substitute(endpoint.bodyTemplate, mergeFields({ ...clientFields, ...bodyParams }, company))
-        : undefined
+      const rawBody = bodyParams.__raw__ !== undefined
+        ? bodyParams.__raw__
+        : Object.keys(bodyParams).length && endpoint?.bodyTemplate?.trim()
+          ? substitute(endpoint.bodyTemplate, mergeFields({ ...clientFields, ...bodyParams }, company))
+          : undefined
       const res = await fetch('/api/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -460,8 +462,8 @@ function BlockEditor({
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
             {hasBodyTemplate && (
               <button onClick={() => setShowBody((v) => !v)}
-                style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', borderRadius: 5, border: `1px solid ${missingVars.length > 0 ? '#f59e0b' : 'var(--border)'}`, backgroundColor: showBody ? 'var(--surface-2)' : 'transparent', color: missingVars.length > 0 ? '#f59e0b' : 'var(--text-muted)', cursor: 'pointer', fontSize: 11 }}>
-                Body {missingVars.length > 0 && <span style={{ fontSize: 10, fontWeight: 700 }}>·{missingVars.length}</span>}
+                style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', borderRadius: 5, border: `1px solid ${bodyParams.__raw__ !== undefined ? 'var(--accent)' : 'var(--border)'}`, backgroundColor: showBody ? 'var(--surface-2)' : 'transparent', color: bodyParams.__raw__ !== undefined ? 'var(--accent)' : 'var(--text-muted)', cursor: 'pointer', fontSize: 11 }}>
+                Body{bodyParams.__raw__ !== undefined ? ' ✎' : ''}
               </button>
             )}
             {curlCmd && (
@@ -488,30 +490,23 @@ function BlockEditor({
         )}
 
         {/* ── BODY PARAMS ── */}
-        {hasBodyTemplate && showBody && (
-          <>
-            <SectionLabel>Body</SectionLabel>
-            <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {extractTemplateVars(endpoint!.bodyTemplate).map((varName) => {
-                const fromClient = varName in allBodyFields && !(varName in bodyParams)
-                return (
-                  <div key={varName} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-muted)', minWidth: 140, flexShrink: 0 }}>{`{{${varName}}}`}</span>
-                    <input
-                      value={bodyParams[varName] ?? (fromClient ? String(allBodyFields[varName] ?? '') : '')}
-                      onChange={(e) => setBodyParams((prev) => ({ ...prev, [varName]: e.target.value }))}
-                      placeholder={fromClient ? String(allBodyFields[varName] ?? '') : 'valor…'}
-                      style={{ flex: 1, padding: '4px 8px', fontSize: 12, borderRadius: 5, border: `1px solid ${!(varName in allBodyFields) && !bodyParams[varName] ? 'rgba(245,158,11,0.5)' : 'var(--border)'}`, backgroundColor: 'var(--surface-2)', color: 'var(--text)', outline: 'none' }}
-                    />
-                    {fromClient && !bodyParams[varName] && (
-                      <span style={{ fontSize: 10, color: 'var(--text-subtle)', flexShrink: 0 }}>do cliente</span>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </>
-        )}
+        {hasBodyTemplate && showBody && (() => {
+          const resolved = substitute(endpoint!.bodyTemplate, allBodyFields)
+          const rawVal = bodyParams.__raw__ ?? resolved
+          return (
+            <>
+              <SectionLabel>Body</SectionLabel>
+              <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)' }}>
+                <textarea
+                  value={rawVal}
+                  onChange={(e) => setBodyParams({ __raw__: e.target.value })}
+                  rows={6}
+                  style={{ width: '100%', padding: '8px 10px', fontSize: 11, fontFamily: 'monospace', lineHeight: 1.6, borderRadius: 6, border: '1px solid var(--border)', backgroundColor: 'var(--surface-2)', color: 'var(--text)', resize: 'vertical', outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+            </>
+          )
+        })()}
 
         {/* ── REQUEST ── */}
         {curlCmd && showCurl && (
