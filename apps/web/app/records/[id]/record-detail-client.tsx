@@ -349,6 +349,30 @@ function BlockEditor({
       <div style={{ width: 3, backgroundColor: methodColor, flexShrink: 0, transition: 'background 0.2s' }} />
 
       <div style={{ flex: 1, minWidth: 0 }}>
+        {/* ── NOTE ── */}
+        <div style={{
+          display: 'flex', gap: 8, padding: '8px 14px',
+          backgroundColor: note ? 'rgba(245,158,11,0.08)' : 'transparent',
+          borderBottom: note ? '1px solid rgba(245,158,11,0.2)' : '1px solid transparent',
+          transition: 'background 0.2s, border-color 0.2s',
+        }}>
+          <Pencil size={12} style={{ color: note ? '#f59e0b' : 'var(--text-subtle)', marginTop: 3, flexShrink: 0, transition: 'color 0.2s' }} />
+          <textarea
+            value={note}
+            onChange={(e) => handleNoteChange(e.target.value)}
+            placeholder="Adicionar anotação…"
+            rows={1}
+            style={{ flex: 1, padding: 0, fontSize: 12, border: 'none', backgroundColor: 'transparent', color: note ? '#f59e0b' : 'var(--text)', resize: 'none', fontFamily: 'inherit', lineHeight: 1.6, outline: 'none' }}
+            onInput={(e) => {
+              const el = e.currentTarget
+              el.style.height = 'auto'
+              el.style.height = el.scrollHeight + 'px'
+            }}
+            onFocus={(e) => { e.currentTarget.style.color = 'var(--text)' }}
+            onBlur={(e) => { e.currentTarget.style.color = note ? '#f59e0b' : 'var(--text)' }}
+          />
+        </div>
+
         {/* ── Header ── */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px 6px' }}>
           {/* Block number with status color */}
@@ -466,22 +490,6 @@ function BlockEditor({
           </>
         )}
 
-        {/* ── NOTE ── */}
-        <div style={{ display: 'flex', gap: 10, padding: '10px 14px', backgroundColor: note ? 'color-mix(in srgb, var(--accent) 4%, transparent)' : 'transparent', transition: 'background 0.2s' }}>
-          <Pencil size={13} style={{ color: note ? 'var(--accent)' : 'var(--text-subtle)', marginTop: 3, flexShrink: 0 }} />
-          <textarea
-            value={note}
-            onChange={(e) => handleNoteChange(e.target.value)}
-            placeholder="Adicionar anotação…"
-            rows={1}
-            style={{ flex: 1, padding: 0, fontSize: 12, border: 'none', backgroundColor: 'transparent', color: 'var(--text)', resize: 'none', fontFamily: 'inherit', lineHeight: 1.6, outline: 'none' }}
-            onInput={(e) => {
-              const el = e.currentTarget
-              el.style.height = 'auto'
-              el.style.height = el.scrollHeight + 'px'
-            }}
-          />
-        </div>
       </div>
     </div>
   )
