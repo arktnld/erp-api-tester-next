@@ -9,7 +9,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
 
   useLayoutEffect(() => {
     const el = ref.current
-    if (!el) return
+    if (!el || pathname.endsWith('/view')) return
     el.style.opacity = '0'
     el.style.transform = 'translateY(10px)'
     el.style.transition = 'none'
