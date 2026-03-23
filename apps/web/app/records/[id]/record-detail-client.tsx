@@ -123,12 +123,18 @@ function JsonHighlight({ code }: { code: string }) {
   } catch { return <>{code}</> }
 }
 
+function extractTemplateVars(template: string): string[] {
+  const matches = template.match(/\{\{(\w+)\}\}/g) ?? []
+  return [...new Set(matches.map((m) => m.slice(2, -2)))]
+}
+
 function buildCurlCmd(
   endpoint: Endpoint,
   company: Pick<Company, 'baseUrl' | 'authType' | 'authConfig'>,
   fields: Record<string, string>,
+  extraParams: Record<string, string> = {},
 ): string {
-  const allFields = mergeFields(fields, company)
+  const allFields = mergeFields({ ...fields, ...extraParams }, company)
   const url = `${company.baseUrl}${substitute(endpoint.pathTemplate, allFields)}`
   const parts = [`curl -X ${endpoint.method} '${url}'`]
   const authHeaders = buildAuthHeaders(company)
@@ -304,6 +310,8 @@ function BlockEditor({
   const [note, setNote] = useState(block.note)
   const [executing, setExecuting] = useState(false)
   const [showCurl, setShowCurl] = useState(false)
+  const [showBody, setShowBody] = useState(false)
+  const [bodyParams, setBodyParams] = useState<Record<string, string>>({})
   const [curlCopied, setCurlCopied] = useState(false)
   const [resTab, setResTab] = useState<'json' | 'raw' | 'headers'>('json')
   const noteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -324,18 +332,27 @@ function BlockEditor({
   const methodColor = endpoint ? (METHOD_BORDER[endpoint.method] ?? 'var(--border)') : 'var(--border)'
   const statusColor = !response ? 'var(--text-subtle)' : response.statusCode < 300 ? '#10b981' : '#ef4444'
 
+  const clientFields = client ? (client.fieldsData as Record<string, string> ?? {}) : {}
+  const allBodyFields = mergeFields({ ...clientFields, ...bodyParams }, company)
+  const missingVars = endpoint?.bodyTemplate
+    ? extractTemplateVars(endpoint.bodyTemplate).filter((v) => !(v in allBodyFields) || allBodyFields[v] === '')
+    : []
+  const hasBodyTemplate = !!(endpoint?.bodyTemplate?.trim())
   const curlCmd = endpoint
-    ? buildCurlCmd(endpoint, company, client ? (client.fieldsData as Record<string, string> ?? {}) : {})
+    ? buildCurlCmd(endpoint, company, clientFields, bodyParams)
     : null
 
   const execute = async () => {
     if (!canExecute || executing) return
     setExecuting(true)
     try {
+      const rawBody = Object.keys(bodyParams).length && endpoint?.bodyTemplate?.trim()
+        ? substitute(endpoint.bodyTemplate, mergeFields({ ...clientFields, ...bodyParams }, company))
+        : undefined
       const res = await fetch('/api/execute', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ endpointId, clientId: needsClient ? clientId : null, companyId: company.id }),
+        body: JSON.stringify({ endpointId, clientId: needsClient ? clientId : null, companyId: company.id, ...(rawBody ? { rawBody } : {}) }),
       })
       const data = await res.json()
       setResponse(data)
@@ -354,7 +371,20 @@ function BlockEditor({
 
   const copyCurl = () => {
     if (!curlCmd) return
-    navigator.clipboard.writeText(curlCmd).then(() => { setCurlCopied(true); setTimeout(() => setCurlCopied(false), 1500) })
+    const done = () => { setCurlCopied(true); setTimeout(() => setCurlCopied(false), 1500) }
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(curlCmd).then(done).catch(() => fallbackCopyText(curlCmd, done))
+    } else {
+      fallbackCopyText(curlCmd, done)
+    }
+  }
+
+  const fallbackCopyText = (text: string, cb: () => void) => {
+    const ta = document.createElement('textarea')
+    ta.value = text; ta.style.cssText = 'position:fixed;opacity:0'
+    document.body.appendChild(ta); ta.select()
+    try { document.execCommand('copy') } catch {}
+    document.body.removeChild(ta); cb()
   }
 
   let parsedJson: unknown = null
@@ -428,6 +458,12 @@ function BlockEditor({
           </button>
 
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
+            {hasBodyTemplate && (
+              <button onClick={() => setShowBody((v) => !v)}
+                style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', borderRadius: 5, border: `1px solid ${missingVars.length > 0 ? '#f59e0b' : 'var(--border)'}`, backgroundColor: showBody ? 'var(--surface-2)' : 'transparent', color: missingVars.length > 0 ? '#f59e0b' : 'var(--text-muted)', cursor: 'pointer', fontSize: 11 }}>
+                Body {missingVars.length > 0 && <span style={{ fontSize: 10, fontWeight: 700 }}>·{missingVars.length}</span>}
+              </button>
+            )}
             {curlCmd && (
               <button onClick={() => setShowCurl((v) => !v)}
                 style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', borderRadius: 5, border: '1px solid var(--border)', backgroundColor: showCurl ? 'var(--surface-2)' : 'transparent', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 11 }}>
@@ -449,6 +485,32 @@ function BlockEditor({
             {endpoint.isModification && <span style={{ fontSize: 10, color: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', padding: '1px 6px', borderRadius: 3 }}>modificação</span>}
             {endpoint.notes && <span style={{ fontSize: 11, color: 'var(--text-subtle)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>· {endpoint.notes}</span>}
           </div>
+        )}
+
+        {/* ── BODY PARAMS ── */}
+        {hasBodyTemplate && showBody && (
+          <>
+            <SectionLabel>Body</SectionLabel>
+            <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {extractTemplateVars(endpoint!.bodyTemplate).map((varName) => {
+                const fromClient = varName in allBodyFields && !(varName in bodyParams)
+                return (
+                  <div key={varName} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-muted)', minWidth: 140, flexShrink: 0 }}>{`{{${varName}}}`}</span>
+                    <input
+                      value={bodyParams[varName] ?? (fromClient ? String(allBodyFields[varName] ?? '') : '')}
+                      onChange={(e) => setBodyParams((prev) => ({ ...prev, [varName]: e.target.value }))}
+                      placeholder={fromClient ? String(allBodyFields[varName] ?? '') : 'valor…'}
+                      style={{ flex: 1, padding: '4px 8px', fontSize: 12, borderRadius: 5, border: `1px solid ${!(varName in allBodyFields) && !bodyParams[varName] ? 'rgba(245,158,11,0.5)' : 'var(--border)'}`, backgroundColor: 'var(--surface-2)', color: 'var(--text)', outline: 'none' }}
+                    />
+                    {fromClient && !bodyParams[varName] && (
+                      <span style={{ fontSize: 10, color: 'var(--text-subtle)', flexShrink: 0 }}>do cliente</span>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </>
         )}
 
         {/* ── REQUEST ── */}
