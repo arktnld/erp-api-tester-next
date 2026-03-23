@@ -169,9 +169,14 @@ function EndpointSelect({
   const handleOpen = () => {
     if (!btnRef.current) return
     const rect = btnRef.current.getBoundingClientRect()
+    const dropdownHeight = 300
+    const spaceBelow = window.innerHeight - rect.bottom
+    const openUpward = spaceBelow < dropdownHeight + 8 && rect.top > dropdownHeight
     setDropdownStyle({
       position: 'fixed',
-      top: rect.bottom + 4,
+      ...(openUpward
+        ? { bottom: window.innerHeight - rect.top + 4 }
+        : { top: rect.bottom + 4 }),
       left: rect.left,
       width: Math.max(rect.width, 320),
       zIndex: 9999,
