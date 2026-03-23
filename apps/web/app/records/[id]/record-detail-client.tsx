@@ -302,6 +302,14 @@ function BlockEditor({
   const [curlCopied, setCurlCopied] = useState(false)
   const [resTab, setResTab] = useState<'json' | 'raw' | 'headers'>('json')
   const noteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const noteRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (noteRef.current) {
+      noteRef.current.style.height = 'auto'
+      noteRef.current.style.height = noteRef.current.scrollHeight + 'px'
+    }
+  }, [])
 
   const endpoint = endpoints.find((e) => e.id === endpointId)
   const client = clients.find((c) => c.id === clientId)
@@ -369,6 +377,7 @@ function BlockEditor({
         }}>
           <Pencil size={12} style={{ color: note ? '#f59e0b' : 'var(--text-subtle)', marginTop: 3, flexShrink: 0, transition: 'color 0.2s' }} />
           <textarea
+            ref={noteRef}
             value={note}
             onChange={(e) => handleNoteChange(e.target.value)}
             placeholder="Adicionar anotação…"
