@@ -3,12 +3,15 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { ArrowLeft, Plus, Trash2, Play, Share2, Check, ChevronDown, Copy, Terminal, Pencil } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { ArrowLeft, Plus, Trash2, Play, Share2, Check, ChevronDown, Copy, Terminal, Pencil, Download } from 'lucide-react'
 import { addBlock, updateBlock, deleteBlock } from '@/app/actions/records'
-import { substitute } from '@/lib/utils'
+import { substitute, tryPrettyXml } from '@/lib/utils'
 import { mergeFields } from '@/lib/fields'
 import { buildAuthHeaders } from '@/lib/auth'
 import { JsonTree } from '@/app/test/components/json-tree'
+
+const CodeBlock = dynamic(() => import('@/components/ui/code-block').then(m => ({ default: m.CodeBlock })), { ssr: false })
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -282,9 +285,17 @@ function BlockEditor({
 }) {
   const [endpointId, setEndpointId] = useState<number | null>(block.endpointId)
   const [clientId, setClientId] = useState<number | null>(block.clientId)
-  const [response, setResponse] = useState<{ statusCode: number; responseBody: string; durationMs: number; responseHeaders?: Record<string, string> } | null>(
-    block.response as { statusCode: number; responseBody: string; durationMs: number; responseHeaders?: Record<string, string> } | null,
-  )
+  type BlockResponse = {
+    statusCode: number
+    responseBody: string
+    durationMs: number
+    responseHeaders?: Record<string, string>
+    contentCategory?: string
+    isBinary?: boolean
+    mimeType?: string
+    fileName?: string | null
+  }
+  const [response, setResponse] = useState<BlockResponse | null>(block.response as BlockResponse | null)
   const [note, setNote] = useState(block.note)
   const [executing, setExecuting] = useState(false)
   const [showCurl, setShowCurl] = useState(false)
@@ -461,18 +472,57 @@ function BlockEditor({
             </div>
 
             <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--border)' }}>
-              {resTab === 'json' && (
-                <div style={{ backgroundColor: 'var(--surface-2)', borderRadius: 8, padding: '12px 14px', fontFamily: 'monospace', fontSize: 12, lineHeight: 1.7, color: 'var(--json-punct)', maxHeight: 400, overflowY: 'auto' }}>
-                  {parsedJson !== null
-                    ? <JsonTree value={parsedJson} />
-                    : <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: 'var(--text)' }}>{response.responseBody}</pre>
-                  }
-                </div>
-              )}
+              {resTab === 'json' && (() => {
+                const cat = response.contentCategory
+                const isBin = response.isBinary
+                if (cat === 'image') {
+                  const name = response.fileName ?? `imagem.${response.mimeType?.split('/')[1] ?? 'jpg'}`
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                      <img src={`data:${response.mimeType};base64,${response.responseBody}`} alt={name}
+                        style={{ maxWidth: '100%', maxHeight: 400, objectFit: 'contain', borderRadius: 8, border: '1px solid var(--border)' }} />
+                      <a href={`data:${response.mimeType};base64,${response.responseBody}`} download={name}
+                        style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)', textDecoration: 'none' }}>
+                        <Download size={12} />{name}
+                      </a>
+                    </div>
+                  )
+                }
+                if (isBin) {
+                  const name = response.fileName ?? `download.${response.mimeType?.split('/')[1] ?? 'bin'}`
+                  const sizeKb = (Math.floor(response.responseBody.length * 3 / 4) / 1024).toFixed(1)
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, padding: '16px 0' }}>
+                      <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{response.mimeType} · {sizeKb}KB</span>
+                      <a href={`data:${response.mimeType};base64,${response.responseBody}`} download={name}
+                        style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 16px', fontSize: 13, fontWeight: 500, backgroundColor: 'var(--accent)', color: '#fff', borderRadius: 6, textDecoration: 'none' }}>
+                        <Download size={13} />Baixar {name}
+                      </a>
+                    </div>
+                  )
+                }
+                if (cat === 'xml' || cat === 'html') {
+                  return (
+                    <CodeBlock language="xml" customStyle={{ borderRadius: 8, fontSize: 12, backgroundColor: 'var(--surface-2)', lineHeight: 1.7 }} wrapLongLines>
+                      {tryPrettyXml(response.responseBody)}
+                    </CodeBlock>
+                  )
+                }
+                return (
+                  <div style={{ backgroundColor: 'var(--surface-2)', borderRadius: 8, padding: '12px 14px', fontFamily: 'monospace', fontSize: 12, lineHeight: 1.7, color: 'var(--json-punct)', maxHeight: 400, overflowY: 'auto' }}>
+                    {parsedJson !== null
+                      ? <JsonTree value={parsedJson} />
+                      : <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: 'var(--text)' }}>{response.responseBody}</pre>
+                    }
+                  </div>
+                )
+              })()}
               {resTab === 'raw' && (
-                <pre style={{ margin: 0, fontSize: 11, color: 'var(--text)', backgroundColor: 'var(--surface-2)', borderRadius: 6, padding: '10px 12px', overflowX: 'auto', maxHeight: 400, overflowY: 'auto', fontFamily: 'monospace', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
-                  {response.responseBody}
-                </pre>
+                response.contentCategory === 'image' || response.isBinary
+                  ? <pre style={{ margin: 0, fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace' }}>[conteúdo binário — use a aba JSON para baixar]</pre>
+                  : <pre style={{ margin: 0, fontSize: 11, color: 'var(--text)', backgroundColor: 'var(--surface-2)', borderRadius: 6, padding: '10px 12px', overflowX: 'auto', maxHeight: 400, overflowY: 'auto', fontFamily: 'monospace', lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                      {response.responseBody}
+                    </pre>
               )}
               {resTab === 'headers' && (
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
