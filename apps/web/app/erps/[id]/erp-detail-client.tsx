@@ -341,7 +341,9 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
-                            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, ...provided.draggableProps.style }}
+                            style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, transition: 'border-color 0.15s', ...provided.draggableProps.style }}
+                            onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
+                            onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
                           >
                             <div {...provided.dragHandleProps} style={{ cursor: 'grab', color: 'var(--text-subtle)', display: 'flex', alignItems: 'center' }}>
                               <GripVertical size={16} />

@@ -37,6 +37,9 @@ function SectionHeader({
   disabled?: boolean
   onToggle: () => void
 }) {
+  const completed = !!selectedLabel
+  const isActive = open && !disabled
+
   return (
     <button
       onClick={onToggle}
@@ -44,16 +47,27 @@ function SectionHeader({
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         width: '100%', padding: '7px 8px', borderRadius: 6,
-        background: 'none', border: 'none',
+        background: isActive ? 'rgba(99,102,241,0.06)' : 'none', border: 'none',
         cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.35 : 1,
+        opacity: disabled ? 0.4 : 1,
         userSelect: 'none',
+        transition: 'background 0.1s',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
-        <span style={{ fontSize: 10, color: 'var(--text-subtle)', fontWeight: 600, flexShrink: 0 }}>
-          {number}
-        </span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+        {/* Step circle indicator */}
+        <div style={{
+          width: 18, height: 18, borderRadius: '50%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+          backgroundColor: completed ? 'var(--accent)' : isActive ? 'rgba(99,102,241,0.15)' : 'var(--surface-2)',
+          border: completed ? 'none' : `1.5px solid ${isActive ? 'var(--accent)' : 'var(--border-2)'}`,
+          transition: 'background 0.15s, border-color 0.15s',
+        }}>
+          {completed
+            ? <Check size={10} color="white" />
+            : <span style={{ fontSize: 9, fontWeight: 700, color: isActive ? 'var(--accent)' : 'var(--text-subtle)', lineHeight: 1 }}>{number}</span>
+          }
+        </div>
         {selectedLabel ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
             {selectedExtra}
@@ -62,7 +76,7 @@ function SectionHeader({
             </span>
           </div>
         ) : (
-          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{label}</span>
+          <span style={{ fontSize: 12, color: isActive ? 'var(--text)' : 'var(--text-muted)' }}>{label}</span>
         )}
       </div>
       {open

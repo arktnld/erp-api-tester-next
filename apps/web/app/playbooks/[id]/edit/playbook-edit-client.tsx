@@ -210,9 +210,18 @@ export function PlaybookEditClient({ erps, playbook }: Props) {
           </div>
         </div>
 
-        <Button type="submit" style={{ width: '100%', marginTop: 24 }}>
-          {playbook ? 'Salvar Playbook' : 'Criar Playbook'}
-        </Button>
+        <div style={{
+          position: 'sticky',
+          bottom: 0,
+          backgroundColor: 'var(--background)',
+          borderTop: '1px solid var(--border)',
+          padding: '16px 0',
+          marginTop: 24,
+        }}>
+          <Button type="submit" style={{ width: '100%' }}>
+            {playbook ? 'Salvar Playbook' : 'Criar Playbook'}
+          </Button>
+        </div>
       </form>
     </div>
   )

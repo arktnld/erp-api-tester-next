@@ -151,10 +151,12 @@ export function CompanyDetailClient({ company }: { company: Company }) {
       </div>
 
       {company.testClients.length === 0 ? (
-        <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '40px', textAlign: 'center' }}>
-          <User size={32} color="var(--text-subtle)" style={{ margin: '0 auto 12px' }} />
-          <p style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', marginBottom: 4 }}>Nenhum cliente cadastrado</p>
-          <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+        <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '48px 40px', textAlign: 'center' }}>
+          <div style={{ width: 56, height: 56, borderRadius: 12, border: '1px solid var(--border)', backgroundColor: 'var(--surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+            <User size={24} color="var(--text-muted)" />
+          </div>
+          <p style={{ fontSize: 15, fontWeight: 500, color: 'var(--text)', marginBottom: 6 }}>Nenhum cliente cadastrado</p>
+          <p style={{ fontSize: 13, color: 'var(--text-muted)', maxWidth: 320, margin: '0 auto' }}>
             Clique em &quot;Novo Cliente&quot; para adicionar um cliente de teste.
           </p>
         </div>
@@ -163,7 +165,12 @@ export function CompanyDetailClient({ company }: { company: Company }) {
           {company.testClients.map((client) => {
             const fields = client.fieldsData as unknown as Record<string, string>
             return (
-              <div key={client.id} style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: 16 }}>
+              <div
+                key={client.id}
+                style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: 16, transition: 'border-color 0.15s' }}
+                onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>

@@ -5,8 +5,8 @@
   --background: #0a0a0a;
   --surface: #111111;
   --surface-2: #161616;
-  --border: #1f1f1f;
-  --border-2: #2a2a2a;
+  --border: #252525;
+  --border-2: #333333;
 
   /* Text */
   --text: #ededed;
@@ -115,6 +115,15 @@ input::placeholder, textarea::placeholder {
 .btn-md { height: 36px; padding: 0 16px; font-size: 14px; }
 .btn-lg { height: 44px; padding: 0 20px; font-size: 16px; }
 .btn-icon { height: 32px; width: 32px; padding: 0; }
+
+/* Card hover — used in server components (no JS handlers) */
+.card-hover {
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.card-hover:hover {
+  background-color: var(--surface-2) !important;
+  border-color: var(--border-2) !important;
+}
 
 /* Driver.js tour — theme overrides */
 .driver-popover {

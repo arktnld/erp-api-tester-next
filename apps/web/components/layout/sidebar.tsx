@@ -116,19 +116,33 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
                   justifyContent: collapsed ? 'center' : 'flex-start',
                   gap: collapsed ? 0 : 10,
                   padding: collapsed ? '7px 0' : '7px 10px',
+                  paddingLeft: collapsed ? undefined : active ? 7 : 7,
+                  borderLeft: collapsed ? undefined : active ? '3px solid var(--accent)' : '3px solid transparent',
                   borderRadius: 6,
                   marginBottom: 2,
-                  color: active ? 'var(--text)' : 'var(--text-muted)',
-                  backgroundColor: active ? 'var(--surface-2)' : 'transparent',
+                  color: active ? 'var(--accent)' : 'var(--text-muted)',
+                  backgroundColor: active ? 'rgba(99, 102, 241, 0.1)' : 'transparent',
                   textDecoration: 'none',
                   fontSize: 13,
                   fontWeight: active ? 500 : 400,
-                  transition: 'all 0.1s',
+                  transition: 'background-color 0.1s, color 0.1s, border-color 0.1s',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                 }}
+                onMouseEnter={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'
+                    e.currentTarget.style.color = 'var(--text)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                    e.currentTarget.style.color = 'var(--text-muted)'
+                  }
+                }}
               >
-                <Icon size={15} style={{ flexShrink: 0 }} />
+                <Icon size={15} style={{ flexShrink: 0, color: 'inherit' }} />
                 {!collapsed && label}
               </Link>
             </div>

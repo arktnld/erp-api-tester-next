@@ -39,7 +39,7 @@ export default async function PlaybooksPage() {
               <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>{erpName}</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {items.map((pb) => (
-                  <div key={pb.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8 }}>
+                  <div key={pb.id} className="card-hover" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8 }}>
                     <div style={{ flex: 1 }}>
                       <span style={{ fontWeight: 500, fontSize: 14 }}>{pb.name}</span>
                       <span style={{ marginLeft: 10, fontSize: 12, color: 'var(--text-muted)' }}>{pb._count.steps} step{pb._count.steps !== 1 ? 's' : ''}</span>

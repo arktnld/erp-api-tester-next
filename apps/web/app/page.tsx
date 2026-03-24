@@ -74,6 +74,7 @@ export default async function Dashboard() {
           <Link
             key={href}
             href={href}
+            className="card-hover"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -84,7 +85,6 @@ export default async function Dashboard() {
               borderRadius: 10,
               textDecoration: 'none',
               color: 'var(--text)',
-              transition: 'opacity 0.1s',
             }}
           >
             <Icon size={18} style={{ flexShrink: 0, opacity: 0.7 }} />
