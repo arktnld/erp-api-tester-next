@@ -400,7 +400,15 @@ function BlockEditor({
   })
 
   return (
-    <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden', display: 'flex' }}>
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+      {/* Number outside the card */}
+      <div style={{ paddingTop: 38, flexShrink: 0, width: 32, textAlign: 'right' }}>
+        <span style={{ fontSize: 13, fontWeight: 800, color: statusColor, fontVariantNumeric: 'tabular-nums', transition: 'color 0.2s' }}>
+          #{index + 1}
+        </span>
+      </div>
+
+    <div style={{ flex: 1, minWidth: 0, backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden', display: 'flex' }}>
       {/* Left method stripe */}
       <div style={{ width: 3, backgroundColor: methodColor, flexShrink: 0, transition: 'background 0.2s' }} />
 
@@ -432,10 +440,6 @@ function BlockEditor({
 
         {/* ── Header ── */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px 6px' }}>
-          {/* Block number with status color */}
-          <span style={{ fontSize: 10, fontWeight: 700, color: statusColor, backgroundColor: `color-mix(in srgb, ${statusColor} 12%, transparent)`, padding: '2px 7px', borderRadius: 4, flexShrink: 0, transition: 'all 0.2s', fontVariantNumeric: 'tabular-nums' }}>
-            #{index + 1}
-          </span>
 
           <EndpointSelect endpoints={endpoints} value={endpointId} onChange={setEndpointId} />
 
@@ -574,7 +578,7 @@ function BlockEditor({
                 }
                 if (cat === 'xml' || cat === 'html') {
                   return (
-                    <CodeBlock language="xml" customStyle={{ borderRadius: 8, fontSize: 12, backgroundColor: 'var(--surface-2)', lineHeight: 1.7 }} wrapLongLines>
+                    <CodeBlock language="xml" customStyle={{ borderRadius: 8, fontSize: 12, backgroundColor: 'var(--surface-2)', lineHeight: 1.7, maxHeight: 400, overflowY: 'auto' }} wrapLongLines>
                       {tryPrettyXml(response.responseBody)}
                     </CodeBlock>
                   )
@@ -612,6 +616,7 @@ function BlockEditor({
         )}
 
       </div>
+    </div>
     </div>
   )
 }
