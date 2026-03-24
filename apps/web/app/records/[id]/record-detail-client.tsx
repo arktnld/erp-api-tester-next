@@ -6,6 +6,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { ArrowLeft, Plus, Trash2, Play, Share2, Check, ChevronDown, Copy, Terminal, Pencil, Download } from 'lucide-react'
 import { addBlock, updateBlock, deleteBlock } from '@/app/actions/records'
+import { useRole } from '@/lib/role-context'
 import { substitute, tryPrettyXml } from '@/lib/utils'
 import { mergeFields } from '@/lib/fields'
 import { buildAuthHeaders } from '@/lib/auth'
@@ -286,6 +287,7 @@ function BlockEditor({
   clients,
   company,
   onDelete,
+  canEdit,
 }: {
   block: Block
   index: number
@@ -293,6 +295,7 @@ function BlockEditor({
   clients: TestClient[]
   company: Company
   onDelete: () => void
+  canEdit: boolean
 }) {
   const [endpointId, setEndpointId] = useState<number | null>(block.endpointId)
   const [clientId, setClientId] = useState<number | null>(block.clientId)
@@ -414,29 +417,32 @@ function BlockEditor({
 
       <div style={{ flex: 1, minWidth: 0 }}>
         {/* ── NOTE ── */}
-        <div style={{
-          display: 'flex', gap: 8, padding: '8px 14px',
-          backgroundColor: note ? 'rgba(245,158,11,0.08)' : 'transparent',
-          borderBottom: note ? '1px solid rgba(245,158,11,0.2)' : '1px solid transparent',
-          transition: 'background 0.2s, border-color 0.2s',
-        }}>
-          <Pencil size={12} style={{ color: note ? '#f59e0b' : 'var(--text-subtle)', marginTop: 3, flexShrink: 0, transition: 'color 0.2s' }} />
-          <textarea
-            ref={noteRef}
-            value={note}
-            onChange={(e) => handleNoteChange(e.target.value)}
-            placeholder="Adicionar anotação…"
-            rows={1}
-            style={{ flex: 1, padding: 0, fontSize: 12, border: 'none', backgroundColor: 'transparent', color: note ? '#f59e0b' : 'var(--text)', resize: 'none', fontFamily: 'inherit', lineHeight: 1.6, outline: 'none' }}
-            onInput={(e) => {
-              const el = e.currentTarget
-              el.style.height = 'auto'
-              el.style.height = el.scrollHeight + 'px'
-            }}
-            onFocus={(e) => { e.currentTarget.style.color = 'var(--text)' }}
-            onBlur={(e) => { e.currentTarget.style.color = note ? '#f59e0b' : 'var(--text)' }}
-          />
-        </div>
+        {(canEdit || note) && (
+          <div style={{
+            display: 'flex', gap: 8, padding: '8px 14px',
+            backgroundColor: note ? 'rgba(245,158,11,0.08)' : 'transparent',
+            borderBottom: note ? '1px solid rgba(245,158,11,0.2)' : '1px solid transparent',
+            transition: 'background 0.2s, border-color 0.2s',
+          }}>
+            <Pencil size={12} style={{ color: note ? '#f59e0b' : 'var(--text-subtle)', marginTop: 3, flexShrink: 0, transition: 'color 0.2s' }} />
+            <textarea
+              ref={noteRef}
+              value={note}
+              onChange={(e) => canEdit && handleNoteChange(e.target.value)}
+              placeholder={canEdit ? 'Adicionar anotação…' : ''}
+              readOnly={!canEdit}
+              rows={1}
+              style={{ flex: 1, padding: 0, fontSize: 12, border: 'none', backgroundColor: 'transparent', color: note ? '#f59e0b' : 'var(--text)', resize: 'none', fontFamily: 'inherit', lineHeight: 1.6, outline: 'none', cursor: canEdit ? 'text' : 'default' }}
+              onInput={(e) => {
+                const el = e.currentTarget
+                el.style.height = 'auto'
+                el.style.height = el.scrollHeight + 'px'
+              }}
+              onFocus={(e) => { if (canEdit) e.currentTarget.style.color = 'var(--text)' }}
+              onBlur={(e) => { e.currentTarget.style.color = note ? '#f59e0b' : 'var(--text)' }}
+            />
+          </div>
+        )}
 
         {/* ── Header ── */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px 6px' }}>
@@ -476,11 +482,13 @@ function BlockEditor({
                 <Terminal size={11} /> cURL
               </button>
             )}
-            <button onClick={onDelete}
-              style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer' }}
-              title="Remover bloco">
-              <Trash2 size={13} />
-            </button>
+            {canEdit && (
+              <button onClick={onDelete}
+                style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer' }}
+                title="Remover bloco">
+                <Trash2 size={13} />
+              </button>
+            )}
           </div>
         </div>
 
@@ -627,6 +635,7 @@ export function RecordDetailClient({ record: initial }: { record: RecordData }) 
   const [blocks, setBlocks] = useState<Block[]>(initial.blocks)
   const [addingBlock, setAddingBlock] = useState(false)
   const [copied, setCopied] = useState(false)
+  const { canEdit } = useRole()
 
   const { company } = initial
   const { endpoints } = company.erp
@@ -710,19 +719,22 @@ export function RecordDetailClient({ record: initial }: { record: RecordData }) 
               clients={clients}
               company={company}
               onDelete={() => handleDeleteBlock(block.id)}
+              canEdit={canEdit}
             />
           ))}
 
-          <button
-            onClick={handleAddBlock}
-            disabled={addingBlock}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', borderRadius: 8, border: '1px dashed var(--border)', backgroundColor: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 13, transition: 'border-color 0.1s, color 0.1s' }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)' }}
-          >
-            <Plus size={14} />
-            {addingBlock ? 'Adicionando…' : 'Adicionar bloco'}
-          </button>
+          {canEdit && (
+            <button
+              onClick={handleAddBlock}
+              disabled={addingBlock}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px', borderRadius: 8, border: '1px dashed var(--border)', backgroundColor: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 13, transition: 'border-color 0.1s, color 0.1s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)' }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-muted)' }}
+            >
+              <Plus size={14} />
+              {addingBlock ? 'Adicionando…' : 'Adicionar bloco'}
+            </button>
+          )}
         </div>
       </div>
     </div>

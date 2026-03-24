@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { createRecord, deleteRecord, createCategory } from '@/app/actions/records'
 import { FileText, Plus, Trash2, ChevronRight } from 'lucide-react'
+import { useRole } from '@/lib/role-context'
 
 type RecordItem = {
   id: number
@@ -147,6 +148,7 @@ export function RecordsClient({
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [activeFilter, setActiveFilter] = useState<number | null>(null)
   const router = useRouter()
+  const { canEdit } = useRole()
 
   const handleCreate = (id: number) => {
     setShowNew(false)
@@ -199,12 +201,14 @@ export function RecordsClient({
               Documente sequências de requisições e compartilhe com o time.
             </p>
           </div>
-          <button
-            onClick={() => setShowNew(true)}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', fontSize: 13, borderRadius: 6, border: 'none', backgroundColor: 'var(--accent)', color: 'white', cursor: 'pointer', fontWeight: 500 }}
-          >
-            <Plus size={14} /> Novo registro
-          </button>
+          {canEdit && (
+            <button
+              onClick={() => setShowNew(true)}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', fontSize: 13, borderRadius: 6, border: 'none', backgroundColor: 'var(--accent)', color: 'white', cursor: 'pointer', fontWeight: 500 }}
+            >
+              <Plus size={14} /> Novo registro
+            </button>
+          )}
         </div>
 
         {/* Filter chips */}
@@ -276,14 +280,16 @@ export function RecordsClient({
                               {rec.category.name}
                             </span>
                           )}
-                          <button
-                            onClick={(e) => handleDelete(e, rec.id)}
-                            disabled={deletingId === rec.id}
-                            style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', opacity: deletingId === rec.id ? 0.4 : 1 }}
-                            title="Deletar"
-                          >
-                            <Trash2 size={13} />
-                          </button>
+                          {canEdit && (
+                            <button
+                              onClick={(e) => handleDelete(e, rec.id)}
+                              disabled={deletingId === rec.id}
+                              style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', opacity: deletingId === rec.id ? 0.4 : 1 }}
+                              title="Deletar"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          )}
                           <ChevronRight size={14} style={{ color: 'var(--text-subtle)' }} />
                         </div>
                       </div>
