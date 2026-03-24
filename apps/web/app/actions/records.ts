@@ -22,7 +22,7 @@ export async function getRecords() {
   return prisma.apiRecord.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
-      company: { select: { id: true, name: true } },
+      company: { select: { id: true, name: true, erp: { select: { id: true, name: true } } } },
       category: { select: { id: true, name: true } },
       _count: { select: { blocks: true } },
     },

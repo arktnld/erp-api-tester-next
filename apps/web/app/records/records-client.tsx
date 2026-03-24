@@ -9,7 +9,7 @@ type RecordItem = {
   id: number
   name: string
   createdAt: Date
-  company: { id: number; name: string }
+  company: { id: number; name: string; erp: { id: number; name: string } }
   category: { id: number; name: string } | null
   _count: { blocks: number }
 }
@@ -231,46 +231,71 @@ export function RecordsClient({
           <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)', fontSize: 13 }}>
             Nenhum registro nesta categoria.
           </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {filtered.map((rec) => (
-              <div
-                key={rec.id}
-                onClick={() => router.push(`/records/${rec.id}`)}
-                style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', gap: 12 }}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--border-hover, var(--accent))')}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {rec.company.name}
+        ) : (() => {
+          const groups = Object.values(
+            filtered.reduce<Record<string, { erpName: string; items: RecordItem[] }>>((acc, rec) => {
+              const key = rec.company.erp.name
+              if (!acc[key]) acc[key] = { erpName: key, items: [] }
+              acc[key].items.push(rec)
+              return acc
+            }, {})
+          ).sort((a, b) => a.erpName.localeCompare(b.erpName))
+
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {groups.map((group) => (
+                <div key={group.erpName}>
+                  {/* ERP section header */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', flexShrink: 0 }}>
+                      {group.erpName}
                     </span>
-                    {rec.category && (
-                      <span style={{ fontSize: 11, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '1px 7px', borderRadius: 10, flexShrink: 0, fontWeight: 500 }}>
-                        {rec.category.name}
-                      </span>
-                    )}
+                    <div style={{ flex: 1, height: 1, backgroundColor: 'var(--border)' }} />
                   </div>
-                  <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                    {rec._count.blocks} bloco{rec._count.blocks !== 1 ? 's' : ''} · {new Date(rec.createdAt).toLocaleDateString('pt-BR')}
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {group.items.map((rec) => (
+                      <div
+                        key={rec.id}
+                        onClick={() => router.push(`/records/${rec.id}`)}
+                        style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', gap: 12 }}
+                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
+                      >
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {rec.company.name}
+                            </span>
+                            {rec.category && (
+                              <span style={{ fontSize: 11, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '1px 7px', borderRadius: 10, flexShrink: 0, fontWeight: 500 }}>
+                                {rec.category.name}
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+                            {rec._count.blocks} bloco{rec._count.blocks !== 1 ? 's' : ''} · {new Date(rec.createdAt).toLocaleDateString('pt-BR')}
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <button
+                            onClick={(e) => handleDelete(e, rec.id)}
+                            disabled={deletingId === rec.id}
+                            style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', opacity: deletingId === rec.id ? 0.4 : 1 }}
+                            title="Deletar"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                          <ChevronRight size={14} style={{ color: 'var(--text-subtle)' }} />
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <button
-                    onClick={(e) => handleDelete(e, rec.id)}
-                    disabled={deletingId === rec.id}
-                    style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', opacity: deletingId === rec.id ? 0.4 : 1 }}
-                    title="Deletar"
-                  >
-                    <Trash2 size={13} />
-                  </button>
-                  <ChevronRight size={14} style={{ color: 'var(--text-subtle)' }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )
+        })()}
       </div>
     </>
   )
