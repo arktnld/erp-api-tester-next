@@ -38,7 +38,8 @@ async function fetchTokenInline(
   const params = cfg.params ?? {}
   const resolvedPath = substitute(tokenEndpoint.pathTemplate, params)
   const bodyTemplate = tokenEndpoint.bodyTemplate?.trim() ? substitute(tokenEndpoint.bodyTemplate, params) : null
-  const url = `${environmentUrl ?? company.baseUrl}${resolvedPath}`
+  const base = (environmentUrl ?? company.baseUrl).replace(/\/+$/, '')
+  const url = `${base}${resolvedPath}`
   validatePublicUrl(url)
   const res = await httpFetch(url, tokenEndpoint.method, {}, bodyTemplate)
   if (res.status < 200 || res.status >= 300)
@@ -195,8 +196,17 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
 
   // Pre-auth: token_endpoint — obtain/reuse session token BEFORE substitution so {token} works in paths/bodies
   if (company.authType === 'token_endpoint') {
-    const cfg = (company.authConfig ?? {}) as TokenEndpointConfig
-    // Always inject static params (SYS, PASSWORD, etc.) so they resolve in any template
+    let rawCfg = (company.authConfig ?? {}) as Record<string, unknown>
+    // Handle multi-mode keyed format: { modeId: { tokenEndpointId, params, ... } }
+    const erpModes = getAuthModes((company.erp as { name: string; authTemplate?: unknown }).authTemplate)
+    if (erpModes.length > 0) {
+      const firstModeId = erpModes[0].id
+      if (firstModeId in rawCfg && typeof rawCfg[firstModeId] === 'object' && rawCfg[firstModeId] !== null) {
+        rawCfg = rawCfg[firstModeId] as Record<string, unknown>
+      }
+    }
+    const cfg = rawCfg as TokenEndpointConfig
+    // Always inject static params (CLIENT_ID, PASSWORD, etc.) so they resolve in any template
     Object.assign(allFields, cfg.params ?? {})
     if (endpoint.id !== cfg.tokenEndpointId) {
       // Override TOKEN placeholder with the session token for non-auth endpoints
@@ -219,7 +229,8 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
   for (const [k, v] of Object.entries(rawEndpointHeaders)) endpointHeaders[k] = substitute(v, allFields)
   const authHeaders = modeAuthHeaders ?? buildAuthHeaders(company)
 
-  const url = `${environmentUrl ?? company.baseUrl}${resolvedPath}`
+  const baseUrl = (environmentUrl ?? company.baseUrl).replace(/\/+$/, '')
+  const url = `${baseUrl}${resolvedPath}`
 
   try {
     validatePublicUrl(url)
