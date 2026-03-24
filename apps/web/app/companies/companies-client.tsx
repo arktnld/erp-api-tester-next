@@ -123,7 +123,8 @@ export function CompaniesClient({
         const creds = getModeCredentials(company?.authConfig, mode.id, modeIds)
         const mv: Record<string, string> = {}
         if (mode.type === 'token_endpoint') {
-          mode.fields.forEach((f) => { mv[f.key] = (creds as Record<string, string>)[f.key] ?? f.default ?? '' })
+          const params = (creds as { params?: Record<string, string> }).params ?? creds as Record<string, string>
+          mode.fields.forEach((f) => { mv[f.key] = params[f.key] ?? f.default ?? '' })
         } else {
           mode.fields.forEach((f) => { mv[f.key] = creds[f.key] ?? f.default ?? '' })
         }
