@@ -15,23 +15,39 @@ type RecordItem = {
 }
 
 type Company = { id: number; name: string }
+type Erp = { id: number; name: string; companies: Company[] }
 type Category = { id: number; name: string }
 
+const selectStyle: React.CSSProperties = {
+  padding: '7px 10px', fontSize: 13, borderRadius: 6,
+  border: '1px solid var(--border)', backgroundColor: 'var(--surface-2)',
+  color: 'var(--text)', outline: 'none', width: '100%',
+}
+
 function NewRecordModal({
-  companies,
+  erps,
   categories,
   onClose,
   onCreate,
 }: {
-  companies: Company[]
+  erps: Erp[]
   categories: Category[]
   onClose: () => void
   onCreate: (id: number) => void
 }) {
-  const [companyId, setCompanyId] = useState<number | ''>(companies[0]?.id ?? '')
+  const [erpId, setErpId] = useState<number | ''>(erps[0]?.id ?? '')
+  const [companyId, setCompanyId] = useState<number | ''>(erps[0]?.companies[0]?.id ?? '')
   const [categoryId, setCategoryId] = useState<number | 'new' | ''>('')
   const [newCategoryName, setNewCategoryName] = useState('')
   const [isPending, start] = useTransition()
+
+  const companies = erps.find((e) => e.id === erpId)?.companies ?? []
+
+  const handleErpChange = (id: number) => {
+    setErpId(id)
+    const first = erps.find((e) => e.id === id)?.companies[0]
+    setCompanyId(first?.id ?? '')
+  }
 
   const submit = () => {
     if (!companyId) return
@@ -43,7 +59,8 @@ function NewRecordModal({
       } else if (categoryId && categoryId !== 'new') {
         resolvedCategoryId = Number(categoryId)
       }
-      const companyName = companies.find((c) => c.id === Number(companyId))?.name ?? ''
+      const allCompanies = erps.flatMap((e) => e.companies)
+      const companyName = allCompanies.find((c) => c.id === Number(companyId))?.name ?? ''
       const rec = await createRecord(companyName, Number(companyId), resolvedCategoryId)
       onCreate(rec.id)
     })
@@ -61,15 +78,19 @@ function NewRecordModal({
         <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>Novo registro</div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>ERP</label>
+          <select value={erpId} onChange={(e) => handleErpChange(Number(e.target.value))} style={selectStyle}>
+            {erps.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
+          </select>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           <label style={{ fontSize: 12, color: 'var(--text-muted)' }}>Empresa</label>
-          <select
-            value={companyId}
-            onChange={(e) => setCompanyId(Number(e.target.value))}
-            style={{ padding: '7px 10px', fontSize: 13, borderRadius: 6, border: '1px solid var(--border)', backgroundColor: 'var(--surface-2)', color: 'var(--text)', outline: 'none' }}
-          >
-            {companies.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
+          <select value={companyId} onChange={(e) => setCompanyId(Number(e.target.value))} style={selectStyle} disabled={companies.length === 0}>
+            {companies.length === 0
+              ? <option>Nenhuma empresa neste ERP</option>
+              : companies.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)
+            }
           </select>
         </div>
 
@@ -78,12 +99,10 @@ function NewRecordModal({
           <select
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value === 'new' ? 'new' : e.target.value ? Number(e.target.value) : '')}
-            style={{ padding: '7px 10px', fontSize: 13, borderRadius: 6, border: '1px solid var(--border)', backgroundColor: 'var(--surface-2)', color: 'var(--text)', outline: 'none' }}
+            style={selectStyle}
           >
             <option value="">Sem categoria</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
+            {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             <option value="new">+ Nova categoria…</option>
           </select>
           {categoryId === 'new' && (
@@ -92,16 +111,13 @@ function NewRecordModal({
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               placeholder="Nome da categoria"
-              style={{ padding: '7px 10px', fontSize: 13, borderRadius: 6, border: '1px solid var(--accent)', backgroundColor: 'var(--surface-2)', color: 'var(--text)', outline: 'none' }}
+              style={{ ...selectStyle, border: '1px solid var(--accent)' }}
             />
           )}
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-          <button
-            onClick={onClose}
-            style={{ padding: '6px 14px', fontSize: 13, borderRadius: 6, border: '1px solid var(--border)', backgroundColor: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }}
-          >
+          <button onClick={onClose} style={{ padding: '6px 14px', fontSize: 13, borderRadius: 6, border: '1px solid var(--border)', backgroundColor: 'transparent', color: 'var(--text-muted)', cursor: 'pointer' }}>
             Cancelar
           </button>
           <button
@@ -119,11 +135,11 @@ function NewRecordModal({
 
 export function RecordsClient({
   records: initial,
-  companies,
+  erps,
   categories,
 }: {
   records: RecordItem[]
-  companies: Company[]
+  erps: Erp[]
   categories: Category[]
 }) {
   const [records, setRecords] = useState(initial)
@@ -168,7 +184,7 @@ export function RecordsClient({
     <>
       {showNew && (
         <NewRecordModal
-          companies={companies}
+          erps={erps}
           categories={categories}
           onClose={() => setShowNew(false)}
           onCreate={handleCreate}

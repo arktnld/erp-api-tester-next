@@ -29,10 +29,17 @@ export async function getRecords() {
   })
 }
 
-export async function getCompaniesForRecord() {
-  return prisma.company.findMany({
+export async function getErpsForRecord() {
+  return prisma.eRP.findMany({
     orderBy: { name: 'asc' },
-    select: { id: true, name: true },
+    select: {
+      id: true,
+      name: true,
+      companies: {
+        orderBy: { name: 'asc' },
+        select: { id: true, name: true },
+      },
+    },
   })
 }
 

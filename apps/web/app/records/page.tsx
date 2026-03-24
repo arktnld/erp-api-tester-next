@@ -1,11 +1,11 @@
-import { getRecords, getCompaniesForRecord, getCategories } from '@/app/actions/records'
+import { getRecords, getErpsForRecord, getCategories } from '@/app/actions/records'
 import { RecordsClient } from './records-client'
 
 export default async function RecordsPage() {
-  const [records, companies, categories] = await Promise.all([
+  const [records, erps, categories] = await Promise.all([
     getRecords(),
-    getCompaniesForRecord(),
+    getErpsForRecord(),
     getCategories(),
   ])
-  return <RecordsClient records={records} companies={companies} categories={categories} />
+  return <RecordsClient records={records} erps={erps} categories={categories} />
 }
