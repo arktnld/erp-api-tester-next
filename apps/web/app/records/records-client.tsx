@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { createRecord, deleteRecord, createCategory } from '@/app/actions/records'
-import { FileText, Plus, Trash2, ChevronRight } from 'lucide-react'
+import { FileText, Plus, Trash2, ChevronRight, Pencil } from 'lucide-react'
 import { useRole } from '@/lib/role-context'
 
 type RecordItem = {
@@ -261,7 +261,7 @@ export function RecordsClient({
                     {group.items.map((rec) => (
                       <div
                         key={rec.id}
-                        onClick={() => router.push(`/records/${rec.id}`)}
+                        onClick={() => router.push(`/records/${rec.id}/view`)}
                         style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', gap: 12 }}
                         onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
                         onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
@@ -281,14 +281,23 @@ export function RecordsClient({
                             </span>
                           )}
                           {canEdit && (
-                            <button
-                              onClick={(e) => handleDelete(e, rec.id)}
-                              disabled={deletingId === rec.id}
-                              style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', opacity: deletingId === rec.id ? 0.4 : 1 }}
-                              title="Deletar"
-                            >
-                              <Trash2 size={13} />
-                            </button>
+                            <>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); router.push(`/records/${rec.id}`) }}
+                                style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer' }}
+                                title="Editar"
+                              >
+                                <Pencil size={13} />
+                              </button>
+                              <button
+                                onClick={(e) => handleDelete(e, rec.id)}
+                                disabled={deletingId === rec.id}
+                                style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', opacity: deletingId === rec.id ? 0.4 : 1 }}
+                                title="Deletar"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </>
                           )}
                           <ChevronRight size={14} style={{ color: 'var(--text-subtle)' }} />
                         </div>
