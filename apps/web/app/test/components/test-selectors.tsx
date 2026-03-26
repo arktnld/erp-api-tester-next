@@ -273,8 +273,7 @@ export function TestSelectors({
     const refs = { erp: erpBtnRef, company: companyBtnRef, endpoint: endpointBtnRef, client: clientBtnRef }
     const rect = refs[key].current?.getBoundingClientRect()
     if (rect) {
-      const width = key === 'endpoint' ? 380 : Math.max(rect.width, 240)
-      setDropdownPos({ top: rect.bottom + 4, left: rect.left, width })
+      setDropdownPos({ top: rect.bottom + 4, left: rect.left, width: Math.max(rect.width, 240) })
     }
     setQ(prev => ({ ...prev, [key]: '' }))
     setOpenKey(key)
