@@ -93,10 +93,20 @@ function CopyButton({ value, label }: { value: string; label: string }) {
 
 function AuthCopyButton({ authType, authConfig }: { authType: string; authConfig: unknown }) {
   if (authType === 'none' || !authConfig) return null
-  const config = authConfig as Record<string, unknown>
+  const config = authConfig as Record<string, string>
   if (Object.keys(config).length === 0) return null
-  const json = JSON.stringify(config, null, 2)
-  return <CopyButton value={json} label="Copiar token" />
+
+  let value: string | null = null
+  if (authType === 'bearer' && config.token) {
+    value = config.token
+  } else if (authType === 'basic' && config.username && config.password) {
+    value = btoa(`${config.username}:${config.password}`)
+  } else if (authType === 'api_key' && config.value) {
+    value = config.value
+  }
+
+  if (!value) return null
+  return <CopyButton value={value} label="Copiar token" />
 }
 
 export function CompanyDetailClient({ company }: { company: Company }) {
