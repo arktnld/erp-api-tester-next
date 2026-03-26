@@ -35,7 +35,7 @@ function SectionHeader({
   isOpen: boolean
   disabled?: boolean
   onToggle: () => void
-  buttonRef: React.RefObject<HTMLButtonElement>
+  buttonRef: React.RefObject<HTMLButtonElement | null>
 }) {
   const completed = !!selectedLabel
 
