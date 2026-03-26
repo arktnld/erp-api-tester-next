@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { createPlaybook, updatePlaybook, upsertPlaybookSteps } from '@/lib/actions/playbooks'
 import { formLabel as labelStyle, selectStyle } from '@/lib/styles'
+import { useRole } from '@/lib/role-context'
 
 const CodeEditor = dynamic(() => import('@/components/ui/code-editor').then(m => ({ default: m.CodeEditor })), { ssr: false })
 
@@ -48,8 +49,17 @@ function availableVars(steps: StepForm[], beforeIndex: number): Array<{ field: s
 }
 
 export function PlaybookEditClient({ erps, playbook }: Props) {
+  const { canEdit } = useRole()
   const router = useRouter()
   const [, startTransition] = useTransition()
+
+  if (!canEdit) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)', fontSize: 14 }}>
+        Sem permissão para editar playbooks.
+      </div>
+    )
+  }
 
   const [name, setName] = useState(playbook?.name ?? '')
   const [erpId, setErpId] = useState(playbook?.erpId ?? erps[0]?.id ?? 0)

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useTransition, useMemo } from 'react'
 import { getCollectionStructure, deleteCollection, importCollection } from '@/app/actions/collections'
 import type { CollectionStructure, FolderNode, CollectionEndpoint, FlatEndpoint, CollectionParam } from './lib/parser'
+import { useRole } from '@/lib/role-context'
 import styles from './collections.module.css'
 
 type CollectionMeta = { id: number; name: string; createdAt: Date }
@@ -822,12 +823,14 @@ function CollectionSwitcher({
   onSelect,
   onDelete,
   onImportClick,
+  canEdit,
 }: {
   collections: CollectionMeta[]
   activeId: number | null
   onSelect: (id: number) => void
   onDelete: (id: number) => void
   onImportClick: () => void
+  canEdit: boolean
 }) {
   const [open, setOpen] = useState(false)
   const [deletingId, setDeletingId] = useState<number | null>(null)
@@ -873,20 +876,26 @@ function CollectionSwitcher({
             >
               <span className={styles.colDdCheck}>{c.id === activeId ? '✓' : ''}</span>
               <span className={styles.colDdName}>{c.name}</span>
-              <span
-                className={styles.colDdDel}
-                onClick={(e) => handleDelete(e as unknown as React.MouseEvent, c.id)}
-                title="Deletar"
-                style={{ opacity: deletingId === c.id ? 0.4 : undefined }}
-              >
-                ✕
-              </span>
+              {canEdit && (
+                <span
+                  className={styles.colDdDel}
+                  onClick={(e) => handleDelete(e as unknown as React.MouseEvent, c.id)}
+                  title="Deletar"
+                  style={{ opacity: deletingId === c.id ? 0.4 : undefined }}
+                >
+                  ✕
+                </span>
+              )}
             </button>
           ))}
-          <div className={styles.colDdSep} />
-          <button className={styles.colDdNew} onClick={() => { setOpen(false); onImportClick() }}>
-            <span style={{ fontSize: 14 }}>＋</span> Importar collection
-          </button>
+          {canEdit && (
+            <>
+              <div className={styles.colDdSep} />
+              <button className={styles.colDdNew} onClick={() => { setOpen(false); onImportClick() }}>
+                <span style={{ fontSize: 14 }}>＋</span> Importar collection
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>
@@ -905,6 +914,7 @@ export function CollectionsClient({
   collections: CollectionMeta[]
   initialData: { id: number; name: string; structure: CollectionStructure } | null
 }) {
+  const { canEdit } = useRole()
   const [collections, setCollections] = useState(initialCollections)
   const [activeId, setActiveId] = useState<number | null>(initialData?.id ?? null)
   const [structure, setStructure] = useState<CollectionStructure | null>(initialData?.structure ?? null)
@@ -1043,7 +1053,7 @@ export function CollectionsClient({
         <div className={styles.emptyIcon}>⊞</div>
         <div className={styles.emptyTitle}>Nenhuma collection importada</div>
         <p className={styles.emptyDesc}>Importe uma collection Postman ou OpenAPI para começar a explorar endpoints.</p>
-        <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => setShowImport(true)}>＋ Importar collection</button>
+        {canEdit && <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={() => setShowImport(true)}>＋ Importar collection</button>}
       </div>
     )
   }
@@ -1062,6 +1072,7 @@ export function CollectionsClient({
               onSelect={handleSelect}
               onDelete={handleDelete}
               onImportClick={() => setShowImport(true)}
+              canEdit={canEdit}
             />
             <div className={styles.searchWrap}>
               <span className={styles.searchIcon}>⌕</span>
