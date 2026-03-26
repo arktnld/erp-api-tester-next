@@ -274,9 +274,12 @@ export function ViewContent({
       {/* Blocks */}
       <div style={{ maxWidth: 860, margin: '0 auto', padding: '28px' }}>
         {notes && (
-          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '10px 14px', marginBottom: 20, borderRadius: 8, backgroundColor: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)' }}>
-            <span style={{ fontSize: 12, color: '#6366f1', flexShrink: 0, marginTop: 2 }}>✎</span>
-            <span style={{ fontSize: 13, color: '#6366f1', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{notes}</span>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 16 }}>
+            <div style={{ width: 32, flexShrink: 0 }} />
+            <div style={{ flex: 1, display: 'flex', gap: 8, alignItems: 'flex-start', padding: '10px 14px', borderRadius: 8, backgroundColor: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)' }}>
+              <span style={{ fontSize: 12, color: '#6366f1', flexShrink: 0, marginTop: 2 }}>✎</span>
+              <span style={{ fontSize: 13, color: '#6366f1', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{notes}</span>
+            </div>
           </div>
         )}
         {blocks.length === 0 && (
