@@ -103,6 +103,8 @@ function AuthCopyButton({ authType, authConfig }: { authType: string; authConfig
     value = btoa(`${config.username}:${config.password}`)
   } else if (authType === 'api_key' && config.value) {
     value = config.value
+  } else if (authType === 'token_endpoint' && config.cachedToken) {
+    value = config.cachedToken
   }
 
   if (!value) return null
