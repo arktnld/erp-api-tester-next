@@ -725,19 +725,22 @@ export function RecordDetailClient({ record: initial }: { record: RecordData }) 
 
           {/* General notes */}
           {(canEdit || notes) && (
-            <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '10px 14px', borderRadius: 8, backgroundColor: notes ? 'rgba(99,102,241,0.06)' : 'transparent', border: `1px solid ${notes ? 'rgba(99,102,241,0.2)' : 'var(--border)'}`, transition: 'background-color 0.2s, border-color 0.2s' }}>
-              <Pencil size={12} style={{ color: notes ? '#6366f1' : 'var(--text-subtle)', marginTop: 3, flexShrink: 0, transition: 'color 0.2s' }} />
-              <textarea
-                ref={notesRef}
-                value={notes}
-                onChange={(e) => canEdit && handleNotesChange(e.target.value)}
-                readOnly={!canEdit}
-                placeholder={canEdit ? 'Comentário geral do registro…' : ''}
-                rows={1}
-                style={{ flex: 1, padding: 0, fontSize: 13, border: 'none', backgroundColor: 'transparent', color: notes ? '#6366f1' : 'var(--text)', resize: 'none', fontFamily: 'inherit', lineHeight: 1.6, outline: 'none', cursor: canEdit ? 'text' : 'default', overflow: 'hidden' }}
-                onFocus={(e) => { e.currentTarget.style.color = 'var(--text)' }}
-                onBlur={(e) => { e.currentTarget.style.color = notes ? '#6366f1' : 'var(--text)' }}
-              />
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+              <div style={{ width: 32, flexShrink: 0 }} />
+              <div style={{ flex: 1, display: 'flex', gap: 8, alignItems: 'flex-start', padding: '10px 14px', borderRadius: 8, backgroundColor: notes ? 'rgba(99,102,241,0.06)' : 'transparent', border: `1px solid ${notes ? 'rgba(99,102,241,0.2)' : 'var(--border)'}`, transition: 'background-color 0.2s, border-color 0.2s' }}>
+                <Pencil size={12} style={{ color: notes ? '#6366f1' : 'var(--text-subtle)', marginTop: 3, flexShrink: 0, transition: 'color 0.2s' }} />
+                <textarea
+                  ref={notesRef}
+                  value={notes}
+                  onChange={(e) => canEdit && handleNotesChange(e.target.value)}
+                  readOnly={!canEdit}
+                  placeholder={canEdit ? 'Comentário geral do registro…' : ''}
+                  rows={1}
+                  style={{ flex: 1, padding: 0, fontSize: 13, border: 'none', backgroundColor: 'transparent', color: notes ? '#6366f1' : 'var(--text)', resize: 'none', fontFamily: 'inherit', lineHeight: 1.6, outline: 'none', cursor: canEdit ? 'text' : 'default', overflow: 'hidden' }}
+                  onFocus={(e) => { e.currentTarget.style.color = 'var(--text)' }}
+                  onBlur={(e) => { e.currentTarget.style.color = notes ? '#6366f1' : 'var(--text)' }}
+                />
+              </div>
             </div>
           )}
 
