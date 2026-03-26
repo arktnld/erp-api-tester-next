@@ -461,14 +461,16 @@ function BlockEditor({
             </select>
           )}
 
-          <button
-            onClick={execute}
-            disabled={!canExecute || executing}
-            style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 12px', borderRadius: 6, border: 'none', backgroundColor: canExecute ? 'var(--accent)' : 'var(--surface-2)', color: canExecute ? 'white' : 'var(--text-subtle)', cursor: canExecute ? 'pointer' : 'not-allowed', fontSize: 12, fontWeight: 500, flexShrink: 0 }}
-          >
-            <Play size={11} />
-            {executing ? 'Executando…' : 'Executar'}
-          </button>
+          {canEdit && (
+            <button
+              onClick={execute}
+              disabled={!canExecute || executing}
+              style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '5px 12px', borderRadius: 6, border: 'none', backgroundColor: canExecute ? 'var(--accent)' : 'var(--surface-2)', color: canExecute ? 'white' : 'var(--text-subtle)', cursor: canExecute ? 'pointer' : 'not-allowed', fontSize: 12, fontWeight: 500, flexShrink: 0 }}
+            >
+              <Play size={11} />
+              {executing ? 'Executando…' : 'Executar'}
+            </button>
+          )}
 
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
             {hasBodyTemplate && (

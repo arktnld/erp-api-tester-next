@@ -312,9 +312,11 @@ export function ERPDetailClient({ erp }: { erp: ERP }) {
         <button style={tabStyle(tab === 'fields')} onClick={() => setTab('fields')}>
           Campos do Cliente ({erp.fieldSchemas.length})
         </button>
-        <button style={tabStyle(tab === 'auth')} onClick={() => setTab('auth')}>
-          Autenticação
-        </button>
+        {canEdit && (
+          <button style={tabStyle(tab === 'auth')} onClick={() => setTab('auth')}>
+            Autenticação
+          </button>
+        )}
       </div>
 
       {/* Endpoints Tab */}
