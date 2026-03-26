@@ -273,7 +273,8 @@ export function TestSelectors({
     const refs = { erp: erpBtnRef, company: companyBtnRef, endpoint: endpointBtnRef, client: clientBtnRef }
     const rect = refs[key].current?.getBoundingClientRect()
     if (rect) {
-      setDropdownPos({ top: rect.bottom + 4, left: rect.left, width: Math.max(rect.width, 240) })
+      const width = key === 'endpoint' ? 380 : Math.max(rect.width, 240)
+      setDropdownPos({ top: rect.bottom + 4, left: rect.left, width })
     }
     setQ(prev => ({ ...prev, [key]: '' }))
     setOpenKey(key)
@@ -461,7 +462,7 @@ export function TestSelectors({
           {openKey === 'endpoint' && (
             <>
               <SearchInput value={q.endpoint} onChange={(v) => setQ(prev => ({ ...prev, endpoint: v }))} placeholder="Buscar endpoint..." inputRef={endpointInputRef} />
-              <div style={{ maxHeight: 240, overflowY: 'auto' }}>
+              <div style={{ maxHeight: 360, overflowY: 'auto' }}>
                 <EndpointList
                   endpoints={erp?.endpoints ?? []}
                   selectedId={endpointId}
