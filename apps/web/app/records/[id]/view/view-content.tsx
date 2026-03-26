@@ -235,12 +235,14 @@ export function ViewContent({
   companyName,
   categoryName,
   createdAt,
+  notes,
   blocks,
 }: {
   recordName: string
   companyName: string
   categoryName: string | null
   createdAt: Date
+  notes: string
   blocks: ViewBlock[]
 }) {
   return (
@@ -271,6 +273,12 @@ export function ViewContent({
 
       {/* Blocks */}
       <div style={{ maxWidth: 860, margin: '0 auto', padding: '28px' }}>
+        {notes && (
+          <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '10px 14px', marginBottom: 20, borderRadius: 8, backgroundColor: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)' }}>
+            <span style={{ fontSize: 12, color: '#6366f1', flexShrink: 0, marginTop: 2 }}>✎</span>
+            <span style={{ fontSize: 13, color: '#6366f1', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{notes}</span>
+          </div>
+        )}
         {blocks.length === 0 && (
           <div style={{ textAlign: 'center', padding: '60px', color: '#555', fontSize: 14 }}>
             Este registro ainda não possui blocos.

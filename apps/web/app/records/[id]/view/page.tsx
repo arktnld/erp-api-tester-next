@@ -48,6 +48,7 @@ export default async function RecordViewPage({ params }: { params: Promise<{ id:
       companyName={record.company.name}
       categoryName={record.category?.name ?? null}
       createdAt={record.createdAt}
+      notes={record.notes ?? ''}
       blocks={blocks}
     />
   )
