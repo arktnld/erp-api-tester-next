@@ -1,0 +1,1 @@
+ALTER TABLE "ApiRecord" ADD COLUMN "notes" TEXT NOT NULL DEFAULT '';

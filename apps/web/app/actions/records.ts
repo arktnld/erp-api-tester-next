@@ -58,6 +58,10 @@ export async function renameRecord(id: number, name: string) {
   revalidatePath(`/records/${id}`)
 }
 
+export async function updateRecordNotes(id: number, notes: string) {
+  await prisma.apiRecord.update({ where: { id }, data: { notes } })
+}
+
 export async function moveRecordCategory(id: number, categoryId: number | null) {
   await prisma.apiRecord.update({ where: { id }, data: { categoryId } })
   revalidatePath('/records')

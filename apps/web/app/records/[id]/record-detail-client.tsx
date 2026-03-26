@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { ArrowLeft, Plus, Trash2, Play, Share2, Check, ChevronDown, Copy, Terminal, Pencil, Download } from 'lucide-react'
-import { addBlock, updateBlock, deleteBlock } from '@/app/actions/records'
+import { addBlock, updateBlock, deleteBlock, updateRecordNotes } from '@/app/actions/records'
 import { useRole } from '@/lib/role-context'
 import { substitute, tryPrettyXml } from '@/lib/utils'
 import { mergeFields } from '@/lib/fields'
@@ -57,6 +57,7 @@ type Company = {
 type RecordData = {
   id: number
   name: string
+  notes: string
   createdAt: Date
   company: Company
   category: { id: number; name: string } | null
@@ -635,7 +636,24 @@ export function RecordDetailClient({ record: initial }: { record: RecordData }) 
   const [blocks, setBlocks] = useState<Block[]>(initial.blocks)
   const [addingBlock, setAddingBlock] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [notes, setNotes] = useState(initial.notes ?? '')
+  const notesTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const notesRef = useRef<HTMLTextAreaElement>(null)
   const { canEdit } = useRole()
+
+  useEffect(() => {
+    if (notesRef.current) {
+      notesRef.current.style.height = 'auto'
+      notesRef.current.style.height = notesRef.current.scrollHeight + 'px'
+    }
+  }, [notes])
+
+  const saveNotes = (value: string) => {
+    if (notesTimerRef.current) clearTimeout(notesTimerRef.current)
+    notesTimerRef.current = setTimeout(() => { updateRecordNotes(initial.id, value) }, 600)
+  }
+
+  const handleNotesChange = (value: string) => { setNotes(value); saveNotes(value) }
 
   const { company } = initial
   const { endpoints } = company.erp
@@ -704,6 +722,25 @@ export function RecordDetailClient({ record: initial }: { record: RecordData }) 
       {/* Content */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px 28px' }}>
         <div style={{ maxWidth: 860, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+          {/* General notes */}
+          {(canEdit || notes) && (
+            <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '10px 14px', borderRadius: 8, backgroundColor: notes ? 'rgba(99,102,241,0.06)' : 'transparent', border: `1px solid ${notes ? 'rgba(99,102,241,0.2)' : 'var(--border)'}`, transition: 'background-color 0.2s, border-color 0.2s' }}>
+              <Pencil size={12} style={{ color: notes ? '#6366f1' : 'var(--text-subtle)', marginTop: 3, flexShrink: 0, transition: 'color 0.2s' }} />
+              <textarea
+                ref={notesRef}
+                value={notes}
+                onChange={(e) => canEdit && handleNotesChange(e.target.value)}
+                readOnly={!canEdit}
+                placeholder={canEdit ? 'Comentário geral do registro…' : ''}
+                rows={1}
+                style={{ flex: 1, padding: 0, fontSize: 13, border: 'none', backgroundColor: 'transparent', color: notes ? '#6366f1' : 'var(--text)', resize: 'none', fontFamily: 'inherit', lineHeight: 1.6, outline: 'none', cursor: canEdit ? 'text' : 'default', overflow: 'hidden' }}
+                onFocus={(e) => { e.currentTarget.style.color = 'var(--text)' }}
+                onBlur={(e) => { e.currentTarget.style.color = notes ? '#6366f1' : 'var(--text)' }}
+              />
+            </div>
+          )}
+
           {blocks.length === 0 && (
             <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)', fontSize: 13 }}>
               Adicione o primeiro bloco de requisição abaixo.
