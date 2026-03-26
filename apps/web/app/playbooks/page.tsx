@@ -2,10 +2,8 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = { title: 'Playbooks' }
 
 import Link from 'next/link'
-import { Play } from 'lucide-react'
 import { getPlaybooks } from '@/lib/actions/playbooks'
 import { PageHeader } from '@/components/ui/page-header'
-import { Button } from '@/components/ui/button'
 import { NewPlaybookButton, CreatePlaybookLink, PlaybookEditActions } from './playbooks-actions'
 
 export const dynamic = 'force-dynamic'
@@ -40,17 +38,14 @@ export default async function PlaybooksPage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 {items.map((pb) => (
                   <div key={pb.id} className="card-hover" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8 }}>
-                    <div style={{ flex: 1 }}>
+                    <Link href={`/playbooks/${pb.id}`} style={{ flex: 1, textDecoration: 'none', color: 'inherit' }}>
                       <span style={{ fontWeight: 500, fontSize: 14 }}>{pb.name}</span>
                       <span style={{ marginLeft: 10, fontSize: 12, color: 'var(--text-muted)' }}>{pb._count.steps} step{pb._count.steps !== 1 ? 's' : ''}</span>
                       {pb._count.runs > 0 && (
                         <span style={{ marginLeft: 6, fontSize: 12, color: 'var(--text-subtle)' }}>{pb._count.runs} execuç{pb._count.runs !== 1 ? 'ões' : 'ão'}</span>
                       )}
-                    </div>
+                    </Link>
                     <div style={{ display: 'flex', gap: 4 }}>
-                      <Link href={`/playbooks/${pb.id}/run`}>
-                        <Button variant="ghost" size="sm"><Play size={13} /></Button>
-                      </Link>
                       <PlaybookEditActions id={pb.id} />
                     </div>
                   </div>

@@ -229,6 +229,18 @@ export async function getPlaybookRunByToken(token: string) {
   })
 }
 
+export async function getLastPlaybookRun(playbookId: number) {
+  return prisma.playbookRun.findFirst({
+    where: { playbookId },
+    orderBy: { startedAt: 'desc' },
+    select: {
+      id: true, status: true, startedAt: true, endedAt: true,
+      companyId: true, clientId: true, steps: true,
+      company: { select: { name: true } },
+    },
+  })
+}
+
 export async function generateShareToken(runId: number): Promise<string> {
   'use server'
   const existing = await prisma.playbookRun.findUnique({
