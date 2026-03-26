@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { ChevronDown, ChevronRight, Check, Search } from 'lucide-react'
-// Check still used in ItemList and EndpointItem
+import { ChevronDown, Check, Search } from 'lucide-react'
 import type { ERP, Endpoint, Company, Environment } from '../lib/types'
 
 const METHOD_COLORS: Record<string, string> = {
@@ -27,27 +26,28 @@ function MethodTag({ method }: { method: string }) {
 }
 
 function SectionHeader({
-  number, label, selectedLabel, selectedExtra, open, disabled, onToggle,
+  number, label, selectedLabel, selectedExtra, isOpen, disabled, onToggle, buttonRef,
 }: {
   number: number
   label: string
   selectedLabel?: string
   selectedExtra?: React.ReactNode
-  open: boolean
+  isOpen: boolean
   disabled?: boolean
   onToggle: () => void
+  buttonRef: React.RefObject<HTMLButtonElement>
 }) {
   const completed = !!selectedLabel
-  const isActive = open && !disabled
 
   return (
     <button
+      ref={buttonRef}
       onClick={onToggle}
       disabled={disabled}
       style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         width: '100%', padding: '7px 8px', borderRadius: 6,
-        background: isActive ? 'rgba(99,102,241,0.06)' : 'none', border: 'none',
+        background: isOpen ? 'rgba(99,102,241,0.08)' : 'none', border: 'none',
         cursor: disabled ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.4 : 1,
         userSelect: 'none',
@@ -55,17 +55,16 @@ function SectionHeader({
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-        {/* Step circle indicator */}
         <div style={{
           width: 18, height: 18, borderRadius: '50%',
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          backgroundColor: completed ? 'var(--accent)' : isActive ? 'rgba(99,102,241,0.15)' : 'var(--surface-2)',
-          border: completed ? 'none' : `1.5px solid ${isActive ? 'var(--accent)' : 'var(--border-2)'}`,
+          backgroundColor: completed ? 'var(--accent)' : isOpen ? 'rgba(99,102,241,0.15)' : 'var(--surface-2)',
+          border: completed ? 'none' : `1.5px solid ${isOpen ? 'var(--accent)' : 'var(--border-2)'}`,
           transition: 'background 0.15s, border-color 0.15s',
         }}>
           {completed
             ? <Check size={10} color="white" />
-            : <span style={{ fontSize: 9, fontWeight: 700, color: isActive ? 'var(--accent)' : 'var(--text-subtle)', lineHeight: 1 }}>{number}</span>
+            : <span style={{ fontSize: 9, fontWeight: 700, color: isOpen ? 'var(--accent)' : 'var(--text-subtle)', lineHeight: 1 }}>{number}</span>
           }
         </div>
         {selectedLabel ? (
@@ -76,13 +75,14 @@ function SectionHeader({
             </span>
           </div>
         ) : (
-          <span style={{ fontSize: 12, color: isActive ? 'var(--text)' : 'var(--text-muted)' }}>{label}</span>
+          <span style={{ fontSize: 12, color: isOpen ? 'var(--text)' : 'var(--text-muted)' }}>{label}</span>
         )}
       </div>
-      {open
-        ? <ChevronDown size={12} color="var(--text-subtle)" style={{ flexShrink: 0 }} />
-        : <ChevronRight size={12} color="var(--text-subtle)" style={{ flexShrink: 0 }} />
-      }
+      <ChevronDown
+        size={12}
+        color="var(--text-subtle)"
+        style={{ flexShrink: 0, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}
+      />
     </button>
   )
 }
@@ -132,12 +132,13 @@ function ItemList<T extends { id: number; name: string }>({
               background: active ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'none',
               border: 'none', cursor: 'pointer', textAlign: 'left',
               color: active ? 'var(--accent)' : 'var(--text)', fontSize: 12,
+              transition: 'background 0.08s',
             }}
           >
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
               {renderLabel ? renderLabel(item) : item.name}
             </span>
-            {active && <Check size={11} style={{ flexShrink: 0 }} />}
+            <Check size={11} style={{ flexShrink: 0, opacity: active ? 1 : 0 }} />
           </button>
         )
       })}
@@ -216,11 +217,12 @@ function EndpointItem({ ep, active, onSelect }: { ep: Endpoint; active: boolean;
         background: active ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'none',
         border: 'none', cursor: 'pointer', textAlign: 'left',
         color: active ? 'var(--accent)' : 'var(--text)', fontSize: 12,
+        transition: 'background 0.08s',
       }}
     >
       <MethodTag method={ep.method} />
       <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{ep.name}</span>
-      {active && <Check size={11} style={{ flexShrink: 0 }} />}
+      <Check size={11} style={{ flexShrink: 0, opacity: active ? 1 : 0 }} />
     </button>
   )
 }
@@ -245,49 +247,91 @@ interface TestSelectorsProps {
   onObtainToken: () => void
 }
 
+type OpenKey = 'erp' | 'company' | 'endpoint' | 'client'
+
 export function TestSelectors({
   erps, erpId, companyId, endpointId, clientId, environmentUrl,
   needsClient, erp, company, companyEnvironments, tokenAcquired,
   onErpChange, onCompanyChange, onEndpointChange, onClientChange, onEnvironmentChange, onObtainToken,
 }: TestSelectorsProps) {
-  const [open, setOpen] = useState({ erp: true, company: false, endpoint: false, client: false })
+  const [openKey, setOpenKey] = useState<OpenKey | null>(null)
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 260 })
   const [q, setQ] = useState({ erp: '', company: '', endpoint: '', client: '' })
 
-  const erpRef = useRef<HTMLInputElement>(null)
-  const companyRef = useRef<HTMLInputElement>(null)
-  const endpointRef = useRef<HTMLInputElement>(null)
-  const clientRef = useRef<HTMLInputElement>(null)
+  const erpBtnRef = useRef<HTMLButtonElement>(null)
+  const companyBtnRef = useRef<HTMLButtonElement>(null)
+  const endpointBtnRef = useRef<HTMLButtonElement>(null)
+  const clientBtnRef = useRef<HTMLButtonElement>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
 
-  // Auto-focus search when section opens
-  useEffect(() => { if (open.erp) { setQ(prev => ({ ...prev, erp: '' })); erpRef.current?.focus() } }, [open.erp])
-  useEffect(() => { if (open.company) { setQ(prev => ({ ...prev, company: '' })); companyRef.current?.focus() } }, [open.company])
-  useEffect(() => { if (open.endpoint) { setQ(prev => ({ ...prev, endpoint: '' })); endpointRef.current?.focus() } }, [open.endpoint])
-  useEffect(() => { if (open.client) { setQ(prev => ({ ...prev, client: '' })); clientRef.current?.focus() } }, [open.client])
+  const erpInputRef = useRef<HTMLInputElement>(null)
+  const companyInputRef = useRef<HTMLInputElement>(null)
+  const endpointInputRef = useRef<HTMLInputElement>(null)
+  const clientInputRef = useRef<HTMLInputElement>(null)
+
+  function openSection(key: OpenKey) {
+    const refs = { erp: erpBtnRef, company: companyBtnRef, endpoint: endpointBtnRef, client: clientBtnRef }
+    const rect = refs[key].current?.getBoundingClientRect()
+    if (rect) {
+      setDropdownPos({ top: rect.bottom + 4, left: rect.left, width: Math.max(rect.width, 240) })
+    }
+    setQ(prev => ({ ...prev, [key]: '' }))
+    setOpenKey(key)
+    const inputRefs = { erp: erpInputRef, company: companyInputRef, endpoint: endpointInputRef, client: clientInputRef }
+    setTimeout(() => inputRefs[key].current?.focus(), 30)
+  }
+
+  function closeDropdown() { setOpenKey(null) }
+
+  function toggleSection(key: OpenKey) {
+    if (openKey === key) closeDropdown()
+    else openSection(key)
+  }
+
+  // Open ERP on mount
+  useEffect(() => {
+    openSection('erp')
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Click outside to close
+  useEffect(() => {
+    if (!openKey) return
+    function handleMouseDown(e: MouseEvent) {
+      const target = e.target as Node
+      if (dropdownRef.current?.contains(target)) return
+      if (
+        erpBtnRef.current?.contains(target) ||
+        companyBtnRef.current?.contains(target) ||
+        endpointBtnRef.current?.contains(target) ||
+        clientBtnRef.current?.contains(target)
+      ) return
+      closeDropdown()
+    }
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => document.removeEventListener('mousedown', handleMouseDown)
+  }, [openKey])
 
   function handleErpSelect(id: number) {
     onErpChange(id === erpId ? null : id)
-    if (id !== erpId) setOpen({ erp: false, company: true, endpoint: false, client: false })
-    else setOpen(prev => ({ ...prev, erp: true }))
+    if (id !== erpId) openSection('company')
   }
 
   function handleCompanySelect(id: number) {
     onCompanyChange(id === companyId ? null : id)
-    if (id !== companyId) setOpen(prev => ({ ...prev, company: false, endpoint: true, client: false }))
-    else setOpen(prev => ({ ...prev, company: true }))
+    if (id !== companyId) openSection('endpoint')
   }
 
   function handleEndpointSelect(id: number) {
     onEndpointChange(id === endpointId ? null : id)
-    if (id !== endpointId && needsClient) setOpen(prev => ({ ...prev, endpoint: false, client: true }))
-    else setOpen(prev => ({ ...prev, endpoint: id !== endpointId ? false : true }))
+    if (id !== endpointId && needsClient) openSection('client')
+    else if (id !== endpointId) closeDropdown()
   }
 
   function handleClientSelect(id: number) {
     onClientChange(id === clientId ? null : id)
-    if (id !== clientId) setOpen(prev => ({ ...prev, client: false }))
+    if (id !== clientId) closeDropdown()
   }
-
-  const toggle = (key: keyof typeof open) => setOpen(prev => ({ ...prev, [key]: !prev[key] }))
 
   const selectedEndpoint = erp?.endpoints.find((ep) => ep.id === endpointId)
   const selectedClient = company?.testClients.find((tc) => tc.id === clientId)
@@ -298,66 +342,28 @@ export function TestSelectors({
 
   return (
     <div style={{ width: 260, minWidth: 260, borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
-
-
       <div style={{ padding: '8px 6px', flex: 1 }}>
 
         {/* 1. ERP */}
         <SectionHeader
           number={1} label="ERP"
           selectedLabel={erp?.name}
-          open={open.erp}
-          onToggle={() => toggle('erp')}
+          isOpen={openKey === 'erp'}
+          buttonRef={erpBtnRef}
+          onToggle={() => toggleSection('erp')}
         />
-        {open.erp && (
-          <div style={{ paddingBottom: 6, paddingLeft: 4, paddingRight: 4 }}>
-            <SearchInput value={q.erp} onChange={(v) => setQ(prev => ({ ...prev, erp: v }))} placeholder="Buscar ERP..." inputRef={erpRef} />
-            <div style={{ maxHeight: 160, overflowY: 'auto' }}>
-              <ItemList items={filteredErps} selectedId={erpId} onSelect={handleErpSelect} />
-            </div>
-          </div>
-        )}
 
         {/* 2. Empresa */}
         <SectionHeader
           number={2} label="Empresa"
           selectedLabel={company?.name}
-          open={open.company}
+          isOpen={openKey === 'company'}
           disabled={!erpId}
-          onToggle={() => toggle('company')}
+          buttonRef={companyBtnRef}
+          onToggle={() => toggleSection('company')}
         />
-        {open.company && erpId && (
-          <div style={{ paddingBottom: 6, paddingLeft: 4, paddingRight: 4 }}>
-            <SearchInput value={q.company} onChange={(v) => setQ(prev => ({ ...prev, company: v }))} placeholder="Buscar empresa..." inputRef={companyRef} />
-            <div style={{ maxHeight: 160, overflowY: 'auto' }}>
-              <ItemList items={filteredCompanies} selectedId={companyId} onSelect={handleCompanySelect} />
-            </div>
 
-            {companyEnvironments.length > 0 && companyId && (
-              <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
-                <p style={{ fontSize: 10, color: 'var(--text-subtle)', padding: '0 8px 4px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Ambiente</p>
-                {[{ id: 'prod', name: 'Produção', url: '' }, ...companyEnvironments.map((e) => ({ id: e.name, name: e.name, url: e.url }))].map((env) => (
-                  <button
-                    key={env.id}
-                    onClick={() => onEnvironmentChange(env.url || null)}
-                    style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6,
-                      width: '100%', padding: '6px 8px', borderRadius: 5, fontSize: 12,
-                      background: (environmentUrl ?? '') === env.url ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'none',
-                      border: 'none', cursor: 'pointer', textAlign: 'left',
-                      color: (environmentUrl ?? '') === env.url ? 'var(--accent)' : 'var(--text)',
-                    }}
-                  >
-                    {env.name}
-                    {(environmentUrl ?? '') === env.url && <Check size={11} style={{ flexShrink: 0 }} />}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Token status — always visible when company uses token_endpoint */}
+        {/* Token status */}
         {companyId && company?.authType === 'token_endpoint' && (
           <div style={{ margin: '2px 8px 4px', padding: '7px 10px', borderRadius: 6, border: '1px solid color-mix(in srgb, var(--accent) 25%, transparent)', backgroundColor: 'color-mix(in srgb, var(--accent) 6%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
             {tokenAcquired || (company.authConfig as { cachedToken?: string } | null)?.cachedToken
@@ -377,42 +383,105 @@ export function TestSelectors({
         <SectionHeader
           number={3} label="Endpoint"
           selectedLabel={selectedEndpoint?.name}
-          open={open.endpoint}
+          isOpen={openKey === 'endpoint'}
           disabled={!erpId}
-          onToggle={() => toggle('endpoint')}
+          buttonRef={endpointBtnRef}
+          onToggle={() => toggleSection('endpoint')}
         />
-        {open.endpoint && erpId && (
-          <div style={{ paddingBottom: 6, paddingLeft: 4, paddingRight: 4 }}>
-            <SearchInput value={q.endpoint} onChange={(v) => setQ(prev => ({ ...prev, endpoint: v }))} placeholder="Buscar endpoint..." inputRef={endpointRef} />
-            <div style={{ maxHeight: 200, overflowY: 'auto' }}>
-              <EndpointList
-                endpoints={erp?.endpoints ?? []}
-                selectedId={endpointId}
-                onSelect={handleEndpointSelect}
-                query={q.endpoint}
-              />
-            </div>
-          </div>
-        )}
 
         {/* 4. Cliente de Teste */}
         <SectionHeader
           number={4} label={needsClient ? 'Cliente de Teste' : 'Cliente (não necessário)'}
           selectedLabel={selectedClient?.name}
-          open={open.client}
+          isOpen={openKey === 'client'}
           disabled={!companyId || !needsClient}
-          onToggle={() => toggle('client')}
+          buttonRef={clientBtnRef}
+          onToggle={() => toggleSection('client')}
         />
-        {open.client && companyId && needsClient && (
-          <div style={{ paddingBottom: 6, paddingLeft: 4, paddingRight: 4 }}>
-            <SearchInput value={q.client} onChange={(v) => setQ(prev => ({ ...prev, client: v }))} placeholder="Buscar cliente..." inputRef={clientRef} />
-            <div style={{ maxHeight: 160, overflowY: 'auto' }}>
-              <ItemList items={filteredClients} selectedId={clientId} onSelect={handleClientSelect} />
-            </div>
-          </div>
-        )}
 
       </div>
+
+      {/* Floating dropdown panel */}
+      {openKey && (
+        <div
+          ref={dropdownRef}
+          style={{
+            position: 'fixed',
+            top: dropdownPos.top,
+            left: dropdownPos.left,
+            width: dropdownPos.width,
+            zIndex: 999,
+            backgroundColor: 'var(--surface)',
+            border: '1px solid var(--border-2)',
+            borderRadius: 8,
+            boxShadow: '0 0 0 1px rgba(255,255,255,0.04), 0 4px 16px rgba(0,0,0,.4), 0 16px 48px rgba(0,0,0,.3)',
+            padding: '6px 4px',
+          }}
+        >
+          {openKey === 'erp' && (
+            <>
+              <SearchInput value={q.erp} onChange={(v) => setQ(prev => ({ ...prev, erp: v }))} placeholder="Buscar ERP..." inputRef={erpInputRef} />
+              <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+                <ItemList items={filteredErps} selectedId={erpId} onSelect={handleErpSelect} />
+              </div>
+            </>
+          )}
+
+          {openKey === 'company' && (
+            <>
+              <SearchInput value={q.company} onChange={(v) => setQ(prev => ({ ...prev, company: v }))} placeholder="Buscar empresa..." inputRef={companyInputRef} />
+              <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+                <ItemList items={filteredCompanies} selectedId={companyId} onSelect={handleCompanySelect} />
+              </div>
+              {companyEnvironments.length > 0 && companyId && (
+                <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border)' }}>
+                  <p style={{ fontSize: 10, color: 'var(--text-subtle)', padding: '0 8px 4px', fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Ambiente</p>
+                  {[{ id: 'prod', name: 'Produção', url: '' }, ...companyEnvironments.map((e) => ({ id: e.name, name: e.name, url: e.url }))].map((env) => (
+                    <button
+                      key={env.id}
+                      onClick={() => onEnvironmentChange(env.url || null)}
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 6,
+                        width: '100%', padding: '6px 8px', borderRadius: 5, fontSize: 12,
+                        background: (environmentUrl ?? '') === env.url ? 'color-mix(in srgb, var(--accent) 10%, transparent)' : 'none',
+                        border: 'none', cursor: 'pointer', textAlign: 'left',
+                        color: (environmentUrl ?? '') === env.url ? 'var(--accent)' : 'var(--text)',
+                        transition: 'background 0.08s',
+                      }}
+                    >
+                      {env.name}
+                      <Check size={11} style={{ flexShrink: 0, opacity: (environmentUrl ?? '') === env.url ? 1 : 0 }} />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {openKey === 'endpoint' && (
+            <>
+              <SearchInput value={q.endpoint} onChange={(v) => setQ(prev => ({ ...prev, endpoint: v }))} placeholder="Buscar endpoint..." inputRef={endpointInputRef} />
+              <div style={{ maxHeight: 240, overflowY: 'auto' }}>
+                <EndpointList
+                  endpoints={erp?.endpoints ?? []}
+                  selectedId={endpointId}
+                  onSelect={handleEndpointSelect}
+                  query={q.endpoint}
+                />
+              </div>
+            </>
+          )}
+
+          {openKey === 'client' && (
+            <>
+              <SearchInput value={q.client} onChange={(v) => setQ(prev => ({ ...prev, client: v }))} placeholder="Buscar cliente..." inputRef={clientInputRef} />
+              <div style={{ maxHeight: 200, overflowY: 'auto' }}>
+                <ItemList items={filteredClients} selectedId={clientId} onSelect={handleClientSelect} />
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   )
 }
