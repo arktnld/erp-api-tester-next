@@ -288,11 +288,6 @@ export function TestSelectors({
     else openSection(key)
   }
 
-  // Open ERP on mount
-  useEffect(() => {
-    openSection('erp')
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   // Click outside to close
   useEffect(() => {
