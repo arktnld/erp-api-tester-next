@@ -8,10 +8,11 @@ export function generateCurl(
   endpoint: Endpoint,
   company: Pick<Company, 'baseUrl' | 'authType' | 'authConfig'>,
   fields: Record<string, string>,
-  customBody?: string
+  customBody?: string,
+  customUrl?: string
 ): string {
   const allFields = mergeFields(fields, company)
-  const url = `${company.baseUrl}${substitute(endpoint.pathTemplate, allFields)}`
+  const url = customUrl?.trim() || `${company.baseUrl}${substitute(endpoint.pathTemplate, allFields)}`
   const parts: string[] = [`curl -X ${endpoint.method} '${url}'`]
 
   const authHeaders = buildAuthHeaders(company)

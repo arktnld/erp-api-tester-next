@@ -45,6 +45,7 @@ export function TestPage({
   const [tokenAcquired, setTokenAcquired] = useState<Record<number, boolean>>({})
   const [bodyMode, setBodyMode] = useState<'form' | 'raw'>('form')
   const [rawBody, setRawBody] = useState('')
+  const [customUrl, setCustomUrl] = useState<string | null>(null)
   const [showCancel, setShowCancel] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
   const cancelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -89,6 +90,9 @@ export function TestPage({
     if (clientId != null) localStorage.setItem('test_clientId', String(clientId))
     else localStorage.removeItem('test_clientId')
   }, [clientId])
+
+  // Reset custom URL when any selector changes
+  useEffect(() => { setCustomUrl(null) }, [erpId, companyId, endpointId, clientId, environmentUrl])
 
   const erp = erps.find((e) => e.id === erpId)
   const company = erp?.companies.find((c) => c.id === companyId)
@@ -145,6 +149,7 @@ export function TestPage({
           clientId: needsClient ? clientId : null,
           companyId: !needsClient ? companyId : null,
           environmentUrl: environmentUrl ?? undefined,
+          ...(customUrl ? { customUrl } : {}),
           ...(bodyMode === 'raw' ? { rawBody } : {}),
         }),
         signal: controller.signal,
@@ -196,9 +201,18 @@ export function TestPage({
           ? <MethodBadge method={endpoint.method} />
           : <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-subtle)', padding: '2px 6px', backgroundColor: 'var(--surface-2)', borderRadius: 4 }}>GET</span>
         }
-        <span style={{ fontFamily: 'monospace', fontSize: 12, color: resolvedUrl ? 'var(--text)' : 'var(--text-subtle)', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {resolvedUrl || 'Selecione ERP, empresa e endpoint...'}
-        </span>
+        <input
+          value={customUrl ?? resolvedUrl}
+          onChange={(e) => setCustomUrl(e.target.value)}
+          placeholder="Selecione ERP, empresa e endpoint..."
+          readOnly={!resolvedUrl}
+          style={{
+            fontFamily: 'monospace', fontSize: 12, flex: 1,
+            background: 'none', border: 'none', outline: 'none',
+            color: resolvedUrl ? (customUrl ? 'var(--accent)' : 'var(--text)') : 'var(--text-subtle)',
+            minWidth: 0,
+          }}
+        />
         <button
           onClick={showCancel ? cancel : execute}
           disabled={!loading && !canExecute}
@@ -259,7 +273,7 @@ export function TestPage({
           loading={loading}
           erpName={erp?.name}
           companyName={company?.name}
-          curlString={endpoint && company ? generateCurl(endpoint, { ...company, baseUrl: activeUrl }, allFields, bodyMode === 'raw' ? rawBody : undefined) : undefined}
+          curlString={endpoint && company ? generateCurl(endpoint, { ...company, baseUrl: activeUrl }, allFields, bodyMode === 'raw' ? rawBody : undefined, customUrl ?? undefined) : undefined}
         />
       </div>
 

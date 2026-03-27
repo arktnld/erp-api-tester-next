@@ -60,4 +60,5 @@ export const ExecuteSchema = z.object({
   environmentUrl: z.string().url().optional(),
   rawBody: z.string().optional(),
   inlineFields: z.record(z.string()).optional(),
+  customUrl: z.string().url().optional(),
 })

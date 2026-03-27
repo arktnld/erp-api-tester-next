@@ -59,6 +59,7 @@ export interface ExecuteParams {
   environmentUrl?: string | null
   rawBody?: string | null
   inlineFields?: Record<string, string> | null
+  customUrl?: string | null
   userId?: string
   userEmail?: string
 }
@@ -157,7 +158,7 @@ function httpFetch(
 }
 
 export async function executeRequest(params: ExecuteParams): Promise<ExecuteResult> {
-  const { endpointId, clientId, companyId, environmentUrl, rawBody: customBody, inlineFields, userId, userEmail } = params
+  const { endpointId, clientId, companyId, environmentUrl, rawBody: customBody, inlineFields, customUrl, userId, userEmail } = params
 
   const endpoint = await getEndpoint(endpointId)
 
@@ -230,7 +231,7 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
   const authHeaders = modeAuthHeaders ?? buildAuthHeaders(company)
 
   const baseUrl = (environmentUrl ?? company.baseUrl).replace(/\/+$/, '')
-  const url = `${baseUrl}${resolvedPath}`
+  const url = customUrl?.trim() || `${baseUrl}${resolvedPath}`
 
   try {
     validatePublicUrl(url)
