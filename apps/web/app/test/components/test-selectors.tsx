@@ -54,9 +54,9 @@ function SectionHeader({
         transition: 'background 0.1s',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, minWidth: 0 }}>
         <div style={{
-          width: 18, height: 18, borderRadius: '50%',
+          width: 18, height: 18, borderRadius: '50%', marginTop: 2,
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           backgroundColor: completed ? 'var(--accent)' : isOpen ? 'rgba(99,102,241,0.15)' : 'var(--surface-2)',
           border: completed ? 'none' : `1.5px solid ${isOpen ? 'var(--accent)' : 'var(--border-2)'}`,
