@@ -68,11 +68,14 @@ function SectionHeader({
           }
         </div>
         {selectedLabel ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
-            {selectedExtra}
-            <span style={{ fontSize: 12, color: 'var(--text)', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {selectedLabel}
-            </span>
+          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+            <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-subtle)', lineHeight: 1.2 }}>{label}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
+              {selectedExtra}
+              <span style={{ fontSize: 12, color: 'var(--text)', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {selectedLabel}
+              </span>
+            </div>
           </div>
         ) : (
           <span style={{ fontSize: 12, color: isOpen ? 'var(--text)' : 'var(--text-muted)' }}>{label}</span>
