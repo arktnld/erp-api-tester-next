@@ -254,32 +254,27 @@ export function RecordsClient({
                     onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface-2)')}
                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                   >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>
-                        {rec.company.name}
+                    <span style={{ flex: 1, fontSize: 14, fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {rec.company.name}
+                    </span>
+                    {rec.category && (
+                      <span style={{ fontSize: 11, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '1px 7px', borderRadius: 10, fontWeight: 500, flexShrink: 0 }}>
+                        {rec.category.name}
                       </span>
-                      <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                        {rec._count.blocks} bloco{rec._count.blocks !== 1 ? 's' : ''} · {new Date(rec.createdAt).toLocaleDateString('pt-BR')}
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                      {rec.category && (
-                        <span style={{ fontSize: 11, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '1px 7px', borderRadius: 10, fontWeight: 500 }}>
-                          {rec.category.name}
-                        </span>
-                      )}
-                      {canEdit && (
-                        <button
-                          onClick={(e) => handleDelete(e, rec.id)}
-                          disabled={deletingId === rec.id}
-                          style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', opacity: deletingId === rec.id ? 0.4 : 1 }}
-                          title="Deletar"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      )}
-                      <ChevronRight size={14} style={{ color: 'var(--text-subtle)' }} />
-                    </div>
+                    )}
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)', flexShrink: 0 }}>{rec._count.blocks} bloco{rec._count.blocks !== 1 ? 's' : ''}</span>
+                    <span style={{ fontSize: 12, color: 'var(--text-subtle)', flexShrink: 0 }}>{new Date(rec.createdAt).toLocaleDateString('pt-BR')}</span>
+                    {canEdit && (
+                      <button
+                        onClick={(e) => handleDelete(e, rec.id)}
+                        disabled={deletingId === rec.id}
+                        style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', opacity: deletingId === rec.id ? 0.4 : 1, flexShrink: 0 }}
+                        title="Deletar"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
+                    <ChevronRight size={14} style={{ color: 'var(--text-subtle)', flexShrink: 0 }} />
                   </div>
                 ))}
               </div>
