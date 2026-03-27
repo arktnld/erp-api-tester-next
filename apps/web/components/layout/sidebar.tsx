@@ -118,7 +118,7 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
               </span>
             )
           }
-          const { href, label, icon: Icon, tourId } = item
+          const { href = '', label, icon: Icon, tourId } = item
           const active = pathname === href || (href !== '/' && pathname.startsWith(href))
           return (
             <div key={href} {...(tourId ? { 'data-tour': tourId } : {})}>
