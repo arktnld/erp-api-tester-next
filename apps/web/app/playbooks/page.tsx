@@ -37,9 +37,9 @@ export default async function PlaybooksPage() {
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
                 <th style={{ padding: '8px 16px', textAlign: 'left', fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nome</th>
-                <th style={{ padding: '8px 16px', textAlign: 'left', fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', width: 90 }}>Steps</th>
-                <th style={{ padding: '8px 16px', textAlign: 'left', fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', width: 120 }}>Execuções</th>
-                <th style={{ width: 80 }} />
+                <th style={{ padding: '8px 16px', textAlign: 'left', fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Steps</th>
+                <th style={{ padding: '8px 16px', textAlign: 'left', fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Execuções</th>
+                <th style={{ padding: '8px 16px' }} />
               </tr>
             </thead>
             <tbody>
