@@ -191,13 +191,7 @@ export function CompaniesClient({
             style={{ width: '100%', padding: '6px 10px', fontSize: 13, background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 6, color: 'var(--text)', outline: 'none' }}
           />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', padding: '8px 16px', borderBottom: '1px solid var(--border)', gap: 12 }}>
-          <span style={{ flex: 1, fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nome</span>
-          <span style={{ flex: 2, fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>URL</span>
-          <span style={{ flexShrink: 0, fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Clientes</span>
-          {canEdit && <div style={{ width: 64, flexShrink: 0 }} />}
-        </div>
-        {grouped.size === 0 ? (
+{grouped.size === 0 ? (
           <p style={{ padding: '24px', textAlign: 'center', color: 'var(--text-subtle)', fontSize: 13 }}>Nenhuma empresa encontrada.</p>
         ) : (
           [...grouped.entries()].map(([erpName, group]) => (
