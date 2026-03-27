@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { Pencil } from 'lucide-react'
 import { MethodBadge } from '@/components/ui/badge'
 import { TestSelectors } from './components/test-selectors'
 import { TestRequest } from './components/test-request'
@@ -46,6 +47,7 @@ export function TestPage({
   const [bodyMode, setBodyMode] = useState<'form' | 'raw'>('form')
   const [rawBody, setRawBody] = useState('')
   const [customUrl, setCustomUrl] = useState<string | null>(null)
+  const [editingUrl, setEditingUrl] = useState(false)
   const [showCancel, setShowCancel] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
   const cancelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -91,8 +93,8 @@ export function TestPage({
     else localStorage.removeItem('test_clientId')
   }, [clientId])
 
-  // Reset custom URL when any selector changes
-  useEffect(() => { setCustomUrl(null) }, [erpId, companyId, endpointId, clientId, environmentUrl])
+  // Reset custom URL + editing mode when any selector changes
+  useEffect(() => { setCustomUrl(null); setEditingUrl(false) }, [erpId, companyId, endpointId, clientId, environmentUrl])
 
   const erp = erps.find((e) => e.id === erpId)
   const company = erp?.companies.find((c) => c.id === companyId)
@@ -201,18 +203,36 @@ export function TestPage({
           ? <MethodBadge method={endpoint.method} />
           : <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-subtle)', padding: '2px 6px', backgroundColor: 'var(--surface-2)', borderRadius: 4 }}>GET</span>
         }
-        <input
-          value={customUrl ?? resolvedUrl}
-          onChange={(e) => setCustomUrl(e.target.value)}
-          placeholder="Selecione ERP, empresa e endpoint..."
-          readOnly={!resolvedUrl}
-          style={{
-            fontFamily: 'monospace', fontSize: 12, flex: 1,
-            background: 'none', border: 'none', outline: 'none',
-            color: resolvedUrl ? (customUrl ? 'var(--accent)' : 'var(--text)') : 'var(--text-subtle)',
-            minWidth: 0,
-          }}
-        />
+        {editingUrl ? (
+          <input
+            autoFocus
+            value={customUrl ?? resolvedUrl}
+            onChange={(e) => setCustomUrl(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') setEditingUrl(false)
+              if (e.key === 'Escape') { setCustomUrl(null); setEditingUrl(false) }
+            }}
+            onBlur={() => setEditingUrl(false)}
+            style={{
+              fontFamily: 'monospace', fontSize: 12, flex: 1,
+              background: 'none', border: 'none', outline: 'none',
+              color: 'var(--text)', minWidth: 0,
+            }}
+          />
+        ) : (
+          <span style={{ fontFamily: 'monospace', fontSize: 12, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: resolvedUrl ? (customUrl ? 'var(--accent)' : 'var(--text)') : 'var(--text-subtle)' }}>
+            {customUrl ?? resolvedUrl || 'Selecione ERP, empresa e endpoint...'}
+          </span>
+        )}
+        {resolvedUrl && (
+          <button
+            onClick={() => { if (!editingUrl) setCustomUrl(customUrl ?? resolvedUrl); setEditingUrl(v => !v) }}
+            title={editingUrl ? 'Fechar edição' : 'Editar URL'}
+            style={{ display: 'flex', alignItems: 'center', padding: '3px 5px', background: 'none', border: 'none', cursor: 'pointer', color: customUrl ? 'var(--accent)' : 'var(--text-muted)', borderRadius: 4, flexShrink: 0 }}
+          >
+            <Pencil size={13} />
+          </button>
+        )}
         <button
           onClick={showCancel ? cancel : execute}
           disabled={!loading && !canExecute}
