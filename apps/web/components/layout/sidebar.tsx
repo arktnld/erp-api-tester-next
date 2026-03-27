@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Server, Building2, FlaskConical, History, BookMarked, ListChecks, Settings, PanelLeftClose, PanelLeftOpen, FileText } from 'lucide-react'
+import { Server, Building2, FlaskConical, History, BookMarked, ListChecks, Settings, PanelLeftClose, PanelLeftOpen, FileText } from 'lucide-react'
 import { UserButton } from '@clerk/nextjs'
 import { TourButton } from '@/components/ui/tour-button'
 import { useSidebar } from './sidebar-context'
@@ -21,14 +21,17 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
   if (pathname.startsWith('/sign-in') || pathname.endsWith('/view')) return null
 
   const nav = [
-    { href: '/', label: 'Home', icon: LayoutDashboard, tourId: 'home' },
+    { type: 'section', label: 'API' },
     { href: '/test', label: 'Testar API', icon: FlaskConical, tourId: 'test' },
+    { href: '/playbooks', label: 'Fluxos', icon: ListChecks, tourId: 'playbooks' },
+    { href: '/records', label: 'Registros', icon: FileText, tourId: 'records' },
+    { type: 'section', label: 'Dados' },
     { href: '/erps', label: 'ERPs', icon: Server, tourId: 'erps' },
     { href: '/companies', label: 'Empresas', icon: Building2, tourId: 'companies' },
+    { type: 'section', label: 'Info' },
     { href: '/history', label: 'Histórico', icon: History, tourId: 'history' },
-    { href: '/playbooks', label: 'Playbooks', icon: ListChecks, tourId: 'playbooks' },
-    { href: '/collections', label: 'Collections', icon: BookMarked, tourId: 'collections' },
-    { href: '/records', label: 'Registros', icon: FileText, tourId: 'records' },
+    { href: '/collections', label: 'Documentação', icon: BookMarked, tourId: 'collections' },
+    { type: 'spacer' },
     { href: '/settings', label: 'Configurações', icon: Settings, tourId: 'settings' },
   ]
 
@@ -102,8 +105,20 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
       </div>
 
       {/* Nav */}
-      <div data-tour="nav" style={{ flex: 1, overflowY: 'auto', padding: '8px 8px', overflowX: 'hidden' }}>
-        {nav.map(({ href, label, icon: Icon, tourId }) => {
+      <div data-tour="nav" style={{ flex: 1, overflowY: 'auto', padding: '8px 8px', overflowX: 'hidden', display: 'flex', flexDirection: 'column' }}>
+        {nav.map((item, i) => {
+          if (item.type === 'spacer') {
+            return <div key={i} style={{ flex: 1 }} />
+          }
+          if (item.type === 'section') {
+            if (collapsed) return null
+            return (
+              <span key={i} style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--text-subtle)', padding: '16px 10px 4px', userSelect: 'none' }}>
+                {item.label}
+              </span>
+            )
+          }
+          const { href, label, icon: Icon, tourId } = item
           const active = pathname === href || (href !== '/' && pathname.startsWith(href))
           return (
             <div key={href} {...(tourId ? { 'data-tour': tourId } : {})}>
@@ -116,7 +131,7 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
                   justifyContent: collapsed ? 'center' : 'flex-start',
                   gap: collapsed ? 0 : 10,
                   padding: collapsed ? '7px 0' : '7px 10px',
-                  paddingLeft: collapsed ? undefined : active ? 7 : 7,
+                  paddingLeft: collapsed ? undefined : 7,
                   borderLeft: collapsed ? undefined : active ? '3px solid var(--accent)' : '3px solid transparent',
                   borderRadius: 6,
                   marginBottom: 2,
