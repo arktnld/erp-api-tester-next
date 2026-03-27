@@ -13,7 +13,7 @@ export default async function Dashboard() {
   const count = await prisma.eRP.count()
   if (count === 0) redirect('/setup')
 
-  const [recentHistory, companies, erpCount, endpointCount, playbookCount, historyCount] =
+  const [recentHistory, companies, erpCount, endpointCount, playbookCount, historyCount, recordCount] =
     await Promise.all([
       prisma.requestHistory.findMany({
         orderBy: { createdAt: 'desc' },
@@ -41,6 +41,7 @@ export default async function Dashboard() {
       prisma.endpoint.count(),
       prisma.playbook.count(),
       prisma.requestHistory.count(),
+      prisma.apiRecord.count(),
     ])
 
   const stats = [
@@ -48,6 +49,7 @@ export default async function Dashboard() {
     { label: 'Endpoints', value: endpointCount },
     { label: 'Empresas', value: companies.length },
     { label: 'Fluxos', value: playbookCount },
+    { label: 'Registros', value: recordCount },
     { label: 'Requests', value: historyCount },
   ]
 
@@ -58,7 +60,7 @@ return (
         <h1 style={{ fontSize: 20, fontWeight: 600 }}>Início</h1>
       </div>
       <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 28 }}>
-        Acesso rápido e visão geral do sistema
+        Visão geral do sistema
       </p>
 
 {/* Stats */}
