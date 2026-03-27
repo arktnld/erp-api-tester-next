@@ -2,10 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Server, Building2, FlaskConical, History, BookMarked, ListChecks, Settings, PanelLeftClose, PanelLeftOpen, FileText } from 'lucide-react'
+import { Server, Building2, FlaskConical, History, BookMarked, ListChecks, Settings, PanelLeftClose, PanelLeftOpen, FileText, type LucideIcon } from 'lucide-react'
 import { UserButton } from '@clerk/nextjs'
 import { TourButton } from '@/components/ui/tour-button'
 import { useSidebar } from './sidebar-context'
+
+type NavItem =
+  | { type: 'section'; label: string }
+  | { type: 'spacer' }
+  | { href: string; label: string; icon: LucideIcon; tourId: string }
 
 type SidebarERP = {
   id: number
@@ -20,7 +25,7 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
 
   if (pathname.startsWith('/sign-in') || pathname.endsWith('/view')) return null
 
-  const nav = [
+  const nav: NavItem[] = [
     { type: 'section', label: 'API' },
     { href: '/test', label: 'Testar API', icon: FlaskConical, tourId: 'test' },
     { href: '/playbooks', label: 'Fluxos', icon: ListChecks, tourId: 'playbooks' },
@@ -118,7 +123,7 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
               </span>
             )
           }
-          const { href = '', label, icon: Icon, tourId } = item
+          const { href, label, icon: Icon, tourId } = item as { href: string; label: string; icon: LucideIcon; tourId: string }
           const active = pathname === href || (href !== '/' && pathname.startsWith(href))
           return (
             <div key={href} {...(tourId ? { 'data-tour': tourId } : {})}>
