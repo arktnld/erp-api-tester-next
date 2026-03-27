@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@erp/db'
 import { MethodBadge, StatusBadge } from '@/components/ui/badge'
-import { RotateCcw, Building2, FlaskConical, ListChecks, History, BookOpen } from 'lucide-react'
+import { RotateCcw, Building2 } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -51,14 +51,7 @@ export default async function Dashboard() {
     { label: 'Requests', value: historyCount },
   ]
 
-  const quickActions = [
-    { href: '/test', label: 'Testar API', desc: 'Disparar requisições', icon: FlaskConical },
-    { href: '/playbooks', label: 'Fluxos', desc: 'Sequências encadeadas', icon: ListChecks },
-    { href: '/history', label: 'Histórico', desc: 'Todas as requisições', icon: History },
-    { href: '/collections', label: 'Documentação', desc: 'Explorar endpoints', icon: BookOpen },
-  ]
-
-  return (
+return (
     <div style={{ padding: '32px 40px' }}>
       {/* Header */}
       <div style={{ marginBottom: 4 }}>
@@ -68,35 +61,7 @@ export default async function Dashboard() {
         Acesso rápido e visão geral do sistema
       </p>
 
-      {/* Quick actions */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginBottom: 28 }}>
-        {quickActions.map(({ href, label, desc, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className="card-hover"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 12,
-              padding: '14px 16px',
-              backgroundColor: 'var(--surface)',
-              border: '1px solid var(--border)',
-              borderRadius: 10,
-              textDecoration: 'none',
-              color: 'var(--text)',
-            }}
-          >
-            <Icon size={18} style={{ flexShrink: 0, opacity: 0.7 }} />
-            <div>
-              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 1 }}>{label}</p>
-              <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>{desc}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      {/* Stats */}
+{/* Stats */}
       <div style={{ display: 'flex', gap: 10, marginBottom: 28 }}>
         {stats.map(({ label, value }) => (
           <div
