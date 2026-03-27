@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 export const metadata: Metadata = { title: 'Fluxos' }
 
+import { Fragment } from 'react'
 import Link from 'next/link'
 import { getPlaybooks } from '@/lib/actions/playbooks'
 import { PageHeader } from '@/components/ui/page-header'
@@ -32,29 +33,47 @@ export default async function PlaybooksPage() {
             <CreatePlaybookLink />
           </div>
         ) : (
-          Array.from(byErp.values()).map(({ erpName, items }) => (
-            <div key={erpName}>
-              <div style={{ padding: '8px 16px', backgroundColor: 'var(--surface-2)', borderBottom: '1px solid var(--border)', fontSize: 11, fontWeight: 600, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                {erpName}
-              </div>
-              {items.map((pb, i) => (
-                <div key={pb.id} className="card-hover" style={{ display: 'flex', alignItems: 'center', padding: '10px 16px', borderBottom: i < items.length - 1 ? '1px solid var(--border)' : undefined, gap: 12 }}>
-                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                    <Link href={`/playbooks/${pb.id}`} style={{ textDecoration: 'none', color: 'var(--text)', fontWeight: 500, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {pb.name}
-                    </Link>
-                    <span style={{ fontSize: 12, color: 'var(--text-muted)', flexShrink: 0 }}>{pb._count.steps} step{pb._count.steps !== 1 ? 's' : ''}</span>
-                    {pb._count.runs > 0 && (
-                      <span style={{ fontSize: 12, color: 'var(--text-subtle)', flexShrink: 0 }}>{pb._count.runs} execuç{pb._count.runs !== 1 ? 'ões' : 'ão'}</span>
-                    )}
-                  </div>
-                  <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
-                    <PlaybookEditActions id={pb.id} />
-                  </div>
-                </div>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                <th style={{ padding: '8px 16px', textAlign: 'left', fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nome</th>
+                <th style={{ padding: '8px 16px', textAlign: 'left', fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', width: 90 }}>Steps</th>
+                <th style={{ padding: '8px 16px', textAlign: 'left', fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', width: 120 }}>Execuções</th>
+                <th style={{ width: 80 }} />
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from(byErp.values()).map(({ erpName, items }) => (
+                <Fragment key={erpName}>
+                  <tr>
+                    <td colSpan={4} style={{ padding: '8px 16px', backgroundColor: 'var(--surface-2)', borderBottom: '1px solid var(--border)', fontSize: 11, fontWeight: 600, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      {erpName}
+                    </td>
+                  </tr>
+                  {items.map((pb, i) => (
+                    <tr key={pb.id} className="card-hover" style={{ borderBottom: i < items.length - 1 ? '1px solid var(--border)' : undefined }}>
+                      <td style={{ padding: '10px 16px' }}>
+                        <Link href={`/playbooks/${pb.id}`} style={{ textDecoration: 'none', color: 'var(--text)', fontWeight: 500, fontSize: 14 }}>
+                          {pb.name}
+                        </Link>
+                      </td>
+                      <td style={{ padding: '10px 16px', fontSize: 13, color: 'var(--text-muted)' }}>
+                        {pb._count.steps} step{pb._count.steps !== 1 ? 's' : ''}
+                      </td>
+                      <td style={{ padding: '10px 16px', fontSize: 13, color: 'var(--text-subtle)' }}>
+                        {pb._count.runs > 0 ? `${pb._count.runs} execuç${pb._count.runs !== 1 ? 'ões' : 'ão'}` : '–'}
+                      </td>
+                      <td style={{ padding: '10px 16px' }}>
+                        <div style={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
+                          <PlaybookEditActions id={pb.id} />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </Fragment>
               ))}
-            </div>
-          ))
+            </tbody>
+          </table>
         )}
       </div>
     </div>

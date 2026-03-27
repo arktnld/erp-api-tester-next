@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, Fragment } from 'react'
 import { useRouter } from 'next/navigation'
 import { createRecord, deleteRecord, createCategory } from '@/app/actions/records'
 import { FileText, Plus, Trash2, ChevronRight } from 'lucide-react'
@@ -241,48 +241,63 @@ export function RecordsClient({
               Nenhum registro nesta categoria.
             </div>
           ) : (
-            groups.map((group) => (
-              <div key={group.erpName}>
-                <div style={{ padding: '8px 16px', backgroundColor: 'var(--surface-2)', borderBottom: '1px solid var(--border)', fontSize: 11, fontWeight: 600, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  {group.erpName}
-                </div>
-                {group.items.map((rec, i) => (
-                  <div
-                    key={rec.id}
-                    onClick={() => router.push(`/records/${rec.id}`)}
-                    style={{ display: 'flex', alignItems: 'center', padding: '10px 16px', borderBottom: i < group.items.length - 1 ? '1px solid var(--border)' : undefined, gap: 12, cursor: 'pointer' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface-2)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                  >
-                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                      <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {rec.company.name}
-                      </span>
-                      <span style={{ fontSize: 12, color: 'var(--text-muted)', flexShrink: 0 }}>{rec._count.blocks} bloco{rec._count.blocks !== 1 ? 's' : ''}</span>
-                      <span style={{ fontSize: 12, color: 'var(--text-subtle)', flexShrink: 0 }}>{new Date(rec.createdAt).toLocaleDateString('pt-BR')}</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                      {rec.category && (
-                        <span style={{ fontSize: 11, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '1px 7px', borderRadius: 10, fontWeight: 500 }}>
-                          {rec.category.name}
-                        </span>
-                      )}
-                      {canEdit && (
-                        <button
-                          onClick={(e) => handleDelete(e, rec.id)}
-                          disabled={deletingId === rec.id}
-                          style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', opacity: deletingId === rec.id ? 0.4 : 1 }}
-                          title="Deletar"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      )}
-                      <ChevronRight size={14} style={{ color: 'var(--text-subtle)' }} />
-                    </div>
-                  </div>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  <th style={{ padding: '8px 16px', textAlign: 'left', fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nome</th>
+                  <th style={{ padding: '8px 16px', textAlign: 'left', fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', width: 90 }}>Blocos</th>
+                  <th style={{ padding: '8px 16px', textAlign: 'left', fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', width: 110 }}>Data</th>
+                  <th style={{ padding: '8px 16px', textAlign: 'left', fontSize: 11, fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', width: 130 }}>Categoria</th>
+                  <th style={{ width: 70 }} />
+                </tr>
+              </thead>
+              <tbody>
+                {groups.map((group) => (
+                  <Fragment key={group.erpName}>
+                    <tr>
+                      <td colSpan={5} style={{ padding: '8px 16px', backgroundColor: 'var(--surface-2)', borderBottom: '1px solid var(--border)', fontSize: 11, fontWeight: 600, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        {group.erpName}
+                      </td>
+                    </tr>
+                    {group.items.map((rec, i) => (
+                      <tr
+                        key={rec.id}
+                        onClick={() => router.push(`/records/${rec.id}`)}
+                        style={{ borderBottom: i < group.items.length - 1 ? '1px solid var(--border)' : undefined, cursor: 'pointer' }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface-2)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                      >
+                        <td style={{ padding: '10px 16px', fontSize: 14, fontWeight: 500, color: 'var(--text)' }}>{rec.company.name}</td>
+                        <td style={{ padding: '10px 16px', fontSize: 13, color: 'var(--text-muted)' }}>{rec._count.blocks} bloco{rec._count.blocks !== 1 ? 's' : ''}</td>
+                        <td style={{ padding: '10px 16px', fontSize: 13, color: 'var(--text-subtle)' }}>{new Date(rec.createdAt).toLocaleDateString('pt-BR')}</td>
+                        <td style={{ padding: '10px 16px' }}>
+                          {rec.category && (
+                            <span style={{ fontSize: 11, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '1px 7px', borderRadius: 10, fontWeight: 500 }}>
+                              {rec.category.name}
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: '10px 16px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
+                            {canEdit && (
+                              <button
+                                onClick={(e) => handleDelete(e, rec.id)}
+                                disabled={deletingId === rec.id}
+                                style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', opacity: deletingId === rec.id ? 0.4 : 1 }}
+                                title="Deletar"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            )}
+                            <ChevronRight size={14} style={{ color: 'var(--text-subtle)' }} />
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </Fragment>
                 ))}
-              </div>
-            ))
+              </tbody>
+            </table>
           )}
         </div>
       </div>
