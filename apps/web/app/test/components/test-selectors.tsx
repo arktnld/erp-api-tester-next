@@ -54,7 +54,7 @@ function SectionHeader({
         transition: 'background 0.1s',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, flex: 1 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
         <div style={{
           width: 18, height: 18, borderRadius: '50%',
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
@@ -67,23 +67,21 @@ function SectionHeader({
             : <span style={{ fontSize: 9, fontWeight: 700, color: isOpen ? 'var(--accent)' : 'var(--text-subtle)', lineHeight: 1 }}>{number}</span>
           }
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0, flex: 1 }}>
-          {selectedExtra}
-          <span style={{ fontSize: 12, fontWeight: selectedLabel ? 500 : 400, color: selectedLabel ? 'var(--text)' : 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
-            {selectedLabel ?? label}
-          </span>
+        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, textAlign: 'left' }}>
+          <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-subtle)', lineHeight: 1.2 }}>{label}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
+            {selectedExtra}
+            <span style={{ fontSize: 12, fontWeight: selectedLabel ? 500 : 400, color: selectedLabel ? 'var(--text)' : 'var(--text-subtle)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {selectedLabel ?? 'Selecionar...'}
+            </span>
+          </div>
         </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-        {selectedLabel && (
-          <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-subtle)' }}>{label}</span>
-        )}
-        <ChevronDown
-          size={12}
-          color="var(--text-subtle)"
-          style={{ transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}
-        />
-      </div>
+      <ChevronDown
+        size={12}
+        color="var(--text-subtle)"
+        style={{ flexShrink: 0, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}
+      />
     </button>
   )
 }
