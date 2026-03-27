@@ -32,29 +32,27 @@ export default async function PlaybooksPage() {
             <CreatePlaybookLink />
           </div>
         ) : (
-          <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 24 }}>
-            {Array.from(byErp.values()).map(({ erpName, items }) => (
-              <div key={erpName}>
-                <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>{erpName}</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {items.map((pb) => (
-                    <div key={pb.id} className="card-hover" style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', border: '1px solid var(--border)', borderRadius: 8 }}>
-                      <Link href={`/playbooks/${pb.id}`} style={{ flex: 1, textDecoration: 'none', color: 'inherit' }}>
-                        <span style={{ fontWeight: 500, fontSize: 14 }}>{pb.name}</span>
-                        <span style={{ marginLeft: 10, fontSize: 12, color: 'var(--text-muted)' }}>{pb._count.steps} step{pb._count.steps !== 1 ? 's' : ''}</span>
-                        {pb._count.runs > 0 && (
-                          <span style={{ marginLeft: 6, fontSize: 12, color: 'var(--text-subtle)' }}>{pb._count.runs} execuç{pb._count.runs !== 1 ? 'ões' : 'ão'}</span>
-                        )}
-                      </Link>
-                      <div style={{ display: 'flex', gap: 4 }}>
-                        <PlaybookEditActions id={pb.id} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+          Array.from(byErp.values()).map(({ erpName, items }) => (
+            <div key={erpName}>
+              <div style={{ padding: '8px 16px', backgroundColor: 'var(--surface-2)', borderBottom: '1px solid var(--border)', fontSize: 11, fontWeight: 600, color: 'var(--text-subtle)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {erpName}
               </div>
-            ))}
-          </div>
+              {items.map((pb, i) => (
+                <div key={pb.id} className="card-hover" style={{ display: 'flex', alignItems: 'center', padding: '10px 16px', borderBottom: i < items.length - 1 ? '1px solid var(--border)' : undefined, gap: 12 }}>
+                  <Link href={`/playbooks/${pb.id}`} style={{ flex: 1, textDecoration: 'none', color: 'var(--text)', fontWeight: 500, fontSize: 14 }}>
+                    {pb.name}
+                  </Link>
+                  <span style={{ fontSize: 12, color: 'var(--text-muted)', flexShrink: 0 }}>{pb._count.steps} step{pb._count.steps !== 1 ? 's' : ''}</span>
+                  {pb._count.runs > 0 && (
+                    <span style={{ fontSize: 12, color: 'var(--text-subtle)', flexShrink: 0, marginLeft: 8 }}>{pb._count.runs} execuç{pb._count.runs !== 1 ? 'ões' : 'ão'}</span>
+                  )}
+                  <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
+                    <PlaybookEditActions id={pb.id} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))
         )}
       </div>
     </div>
