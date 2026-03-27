@@ -203,36 +203,38 @@ export function TestPage({
           ? <MethodBadge method={endpoint.method} />
           : <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-subtle)', padding: '2px 6px', backgroundColor: 'var(--surface-2)', borderRadius: 4 }}>GET</span>
         }
-        {editingUrl ? (
-          <input
-            autoFocus
-            value={customUrl ?? resolvedUrl}
-            onChange={(e) => setCustomUrl(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') setEditingUrl(false)
-              if (e.key === 'Escape') { setCustomUrl(null); setEditingUrl(false) }
-            }}
-            onBlur={() => setEditingUrl(false)}
-            style={{
-              fontFamily: 'monospace', fontSize: 12, flex: 1,
-              background: 'none', border: 'none', outline: 'none',
-              color: 'var(--text)', minWidth: 0,
-            }}
-          />
-        ) : (
-          <span style={{ fontFamily: 'monospace', fontSize: 12, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: resolvedUrl ? (customUrl ? 'var(--accent)' : 'var(--text)') : 'var(--text-subtle)' }}>
-            {(customUrl ?? resolvedUrl) || 'Selecione ERP, empresa e endpoint...'}
-          </span>
-        )}
-        {resolvedUrl && (
-          <button
-            onClick={() => { if (!editingUrl) setCustomUrl(customUrl ?? resolvedUrl); setEditingUrl(v => !v) }}
-            title={editingUrl ? 'Fechar edição' : 'Editar URL'}
-            style={{ display: 'flex', alignItems: 'center', padding: '3px 5px', background: 'none', border: 'none', cursor: 'pointer', color: customUrl ? 'var(--accent)' : 'var(--text-muted)', borderRadius: 4, flexShrink: 0 }}
-          >
-            <Pencil size={13} />
-          </button>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, flex: 1, minWidth: 0 }}>
+          {editingUrl ? (
+            <input
+              autoFocus
+              value={customUrl ?? resolvedUrl}
+              onChange={(e) => setCustomUrl(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') setEditingUrl(false)
+                if (e.key === 'Escape') { setCustomUrl(null); setEditingUrl(false) }
+              }}
+              onBlur={() => setEditingUrl(false)}
+              style={{
+                fontFamily: 'monospace', fontSize: 12, flex: 1,
+                background: 'none', border: 'none', outline: 'none',
+                color: 'var(--text)', minWidth: 0,
+              }}
+            />
+          ) : (
+            <span style={{ fontFamily: 'monospace', fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: resolvedUrl ? (customUrl ? 'var(--accent)' : 'var(--text)') : 'var(--text-subtle)' }}>
+              {(customUrl ?? resolvedUrl) || 'Selecione ERP, empresa e endpoint...'}
+            </span>
+          )}
+          {resolvedUrl && (
+            <button
+              onClick={() => { if (!editingUrl) setCustomUrl(customUrl ?? resolvedUrl); setEditingUrl(v => !v) }}
+              title={editingUrl ? 'Fechar edição' : 'Editar URL'}
+              style={{ display: 'flex', alignItems: 'center', padding: '3px 5px', background: 'none', border: 'none', cursor: 'pointer', color: customUrl ? 'var(--accent)' : 'var(--text-muted)', borderRadius: 4, flexShrink: 0 }}
+            >
+              <Pencil size={13} />
+            </button>
+          )}
+        </div>
         <button
           onClick={showCancel ? cancel : execute}
           disabled={!loading && !canExecute}
