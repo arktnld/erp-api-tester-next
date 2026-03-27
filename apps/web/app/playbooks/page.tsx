@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-export const metadata: Metadata = { title: 'Playbooks' }
+export const metadata: Metadata = { title: 'Fluxos' }
 
 import Link from 'next/link'
 import { getPlaybooks } from '@/lib/actions/playbooks'
@@ -20,7 +20,7 @@ export default async function PlaybooksPage() {
   return (
     <div style={{ padding: '32px 40px' }}>
       <PageHeader
-        title="Playbooks"
+        title="Fluxos"
         description="Sequências de requisições com encadeamento de respostas"
         action={<NewPlaybookButton />}
       />

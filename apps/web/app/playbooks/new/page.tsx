@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-export const metadata: Metadata = { title: 'Novo Playbook' }
+export const metadata: Metadata = { title: 'Novo Fluxo' }
 
 import { prisma } from '@erp/db'
 import { PlaybookEditClient } from '../[id]/edit/playbook-edit-client'

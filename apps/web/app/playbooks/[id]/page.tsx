@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-export const metadata: Metadata = { title: 'Playbook' }
+export const metadata: Metadata = { title: 'Fluxo' }
 
 import { prisma } from '@erp/db'
 import { notFound } from 'next/navigation'

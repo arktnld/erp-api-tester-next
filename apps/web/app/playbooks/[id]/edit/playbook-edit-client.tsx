@@ -108,7 +108,7 @@ export function PlaybookEditClient({ erps, playbook }: Props) {
   return (
     <div style={{ padding: '32px 40px', maxWidth: 720, margin: '0 auto' }}>
       <Link href="/playbooks" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--text-muted)', fontSize: 13, textDecoration: 'none', marginBottom: 20 }}>
-        <ChevronLeft size={14} /> Playbooks
+        <ChevronLeft size={14} /> Fluxos
       </Link>
 
       <h1 style={{ fontSize: 20, fontWeight: 600, marginBottom: 28 }}>{playbook ? 'Editar Playbook' : 'Novo Playbook'}</h1>

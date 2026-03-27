@@ -47,7 +47,7 @@ export default async function RunResultPage({ params }: { params: Promise<{ runI
   return (
     <div style={{ padding: '32px 40px', maxWidth: 800 }}>
       <Link href="/playbooks" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--text-muted)', fontSize: 13, textDecoration: 'none', marginBottom: 20 }}>
-        <ChevronLeft size={14} /> Playbooks
+        <ChevronLeft size={14} /> Fluxos
       </Link>
       <RunResultClient run={{ ...run, steps }} clientFields={clientFields} clientName={clientName} />
     </div>
