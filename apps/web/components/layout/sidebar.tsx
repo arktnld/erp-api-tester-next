@@ -10,7 +10,7 @@ import { useSidebar } from './sidebar-context'
 type NavItem =
   | { type: 'section'; label: string }
   | { type: 'spacer' }
-  | { href: string; label: string; icon: LucideIcon; tourId: string }
+  | { type: 'link'; href: string; label: string; icon: LucideIcon; tourId: string }
 
 type SidebarERP = {
   id: number
@@ -27,17 +27,17 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
 
   const nav: NavItem[] = [
     { type: 'section', label: 'API' },
-    { href: '/test', label: 'Testar API', icon: FlaskConical, tourId: 'test' },
-    { href: '/playbooks', label: 'Fluxos', icon: ListChecks, tourId: 'playbooks' },
-    { href: '/records', label: 'Registros', icon: FileText, tourId: 'records' },
+    { type: 'link', href: '/test', label: 'Testar API', icon: FlaskConical, tourId: 'test' },
+    { type: 'link', href: '/playbooks', label: 'Fluxos', icon: ListChecks, tourId: 'playbooks' },
+    { type: 'link', href: '/records', label: 'Registros', icon: FileText, tourId: 'records' },
     { type: 'section', label: 'Dados' },
-    { href: '/erps', label: 'ERPs', icon: Server, tourId: 'erps' },
-    { href: '/companies', label: 'Empresas', icon: Building2, tourId: 'companies' },
+    { type: 'link', href: '/erps', label: 'ERPs', icon: Server, tourId: 'erps' },
+    { type: 'link', href: '/companies', label: 'Empresas', icon: Building2, tourId: 'companies' },
     { type: 'section', label: 'Info' },
-    { href: '/history', label: 'Histórico', icon: History, tourId: 'history' },
-    { href: '/collections', label: 'Documentação', icon: BookMarked, tourId: 'collections' },
+    { type: 'link', href: '/history', label: 'Histórico', icon: History, tourId: 'history' },
+    { type: 'link', href: '/collections', label: 'Documentação', icon: BookMarked, tourId: 'collections' },
     { type: 'spacer' },
-    { href: '/settings', label: 'Configurações', icon: Settings, tourId: 'settings' },
+    { type: 'link', href: '/settings', label: 'Configurações', icon: Settings, tourId: 'settings' },
   ]
 
   const W = collapsed ? 56 : 220
@@ -123,7 +123,7 @@ export function Sidebar({ erps: _erps }: { erps: SidebarERP[] }) {
               </span>
             )
           }
-          const { href, label, icon: Icon, tourId } = item as { href: string; label: string; icon: LucideIcon; tourId: string }
+          const { href, label, icon: Icon, tourId } = item
           const active = pathname === href || (href !== '/' && pathname.startsWith(href))
           return (
             <div key={href} {...(tourId ? { 'data-tour': tourId } : {})}>
