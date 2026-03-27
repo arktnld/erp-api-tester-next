@@ -221,7 +221,7 @@ export function TestPage({
           />
         ) : (
           <span style={{ fontFamily: 'monospace', fontSize: 12, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: resolvedUrl ? (customUrl ? 'var(--accent)' : 'var(--text)') : 'var(--text-subtle)' }}>
-            {customUrl ?? resolvedUrl || 'Selecione ERP, empresa e endpoint...'}
+            {(customUrl ?? resolvedUrl) || 'Selecione ERP, empresa e endpoint...'}
           </span>
         )}
         {resolvedUrl && (
