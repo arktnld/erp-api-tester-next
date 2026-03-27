@@ -67,19 +67,15 @@ function SectionHeader({
             : <span style={{ fontSize: 9, fontWeight: 700, color: isOpen ? 'var(--accent)' : 'var(--text-subtle)', lineHeight: 1 }}>{number}</span>
           }
         </div>
-        {selectedLabel ? (
-          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-            <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-subtle)', lineHeight: 1.2 }}>{label}</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
-              {selectedExtra}
-              <span style={{ fontSize: 12, color: 'var(--text)', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {selectedLabel}
-              </span>
-            </div>
+        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          <span style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-subtle)', lineHeight: 1.2 }}>{label}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
+            {selectedExtra}
+            <span style={{ fontSize: 12, fontWeight: selectedLabel ? 500 : 400, color: selectedLabel ? 'var(--text)' : 'var(--text-subtle)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {selectedLabel ?? 'Selecionar...'}
+            </span>
           </div>
-        ) : (
-          <span style={{ fontSize: 12, color: isOpen ? 'var(--text)' : 'var(--text-muted)' }}>{label}</span>
-        )}
+        </div>
       </div>
       <ChevronDown
         size={12}
