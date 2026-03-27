@@ -203,7 +203,7 @@ export function TestPage({
           ? <MethodBadge method={endpoint.method} />
           : <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-subtle)', padding: '2px 6px', backgroundColor: 'var(--surface-2)', borderRadius: 4 }}>GET</span>
         }
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, flex: 1, minWidth: 0 }}>
+        <div style={{ position: 'relative', flex: 1, minWidth: 0 }}>
           {editingUrl ? (
             <input
               autoFocus
@@ -215,13 +215,13 @@ export function TestPage({
               }}
               onBlur={() => setEditingUrl(false)}
               style={{
-                fontFamily: 'monospace', fontSize: 12, flex: 1,
+                fontFamily: 'monospace', fontSize: 12, width: '100%',
                 background: 'none', border: 'none', outline: 'none',
-                color: 'var(--text)', minWidth: 0,
+                color: 'var(--text)', paddingRight: 24,
               }}
             />
           ) : (
-            <span style={{ fontFamily: 'monospace', fontSize: 12, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: resolvedUrl ? (customUrl ? 'var(--accent)' : 'var(--text)') : 'var(--text-subtle)' }}>
+            <span style={{ fontFamily: 'monospace', fontSize: 12, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: resolvedUrl ? (customUrl ? 'var(--accent)' : 'var(--text)') : 'var(--text-subtle)', paddingRight: resolvedUrl ? 24 : 0 }}>
               {(customUrl ?? resolvedUrl) || 'Selecione ERP, empresa e endpoint...'}
             </span>
           )}
@@ -229,7 +229,7 @@ export function TestPage({
             <button
               onClick={() => { if (!editingUrl) setCustomUrl(customUrl ?? resolvedUrl); setEditingUrl(v => !v) }}
               title={editingUrl ? 'Fechar edição' : 'Editar URL'}
-              style={{ display: 'flex', alignItems: 'center', padding: '3px 5px', background: 'none', border: 'none', cursor: 'pointer', color: customUrl ? 'var(--accent)' : 'var(--text-muted)', borderRadius: 4, flexShrink: 0 }}
+              style={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', padding: '2px 4px', background: 'none', border: 'none', cursor: 'pointer', color: customUrl ? 'var(--accent)' : 'var(--text-muted)', borderRadius: 4 }}
             >
               <Pencil size={13} />
             </button>
