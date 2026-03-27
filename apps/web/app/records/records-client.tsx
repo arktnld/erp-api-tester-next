@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createRecord, deleteRecord, createCategory } from '@/app/actions/records'
 import { FileText, Plus, Trash2, ChevronRight } from 'lucide-react'
 import { useRole } from '@/lib/role-context'
+import { PageHeader } from '@/components/ui/page-header'
 
 type RecordItem = {
   id: number
@@ -193,113 +194,111 @@ export function RecordsClient({
         />
       )}
 
-      <div style={{ padding: '24px 28px', maxWidth: 800, margin: '0 auto' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
-          <div>
-            <h1 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)', margin: 0 }}>Registros</h1>
-            <p style={{ fontSize: 13, color: 'var(--text-muted)', margin: '4px 0 0' }}>
-              Documente sequências de requisições e compartilhe com o time.
-            </p>
-          </div>
-          {canEdit && (
-            <button
-              onClick={() => setShowNew(true)}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', fontSize: 13, borderRadius: 6, border: 'none', backgroundColor: 'var(--accent)', color: 'white', cursor: 'pointer', fontWeight: 500 }}
-            >
-              <Plus size={14} /> Novo registro
-            </button>
-          )}
-        </div>
-
-        {/* Filter chips */}
-        {usedCategories.length > 0 && (
-          <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
-            <button style={chipStyle(activeFilter === null)} onClick={() => setActiveFilter(null)}>
-              Todos
-            </button>
-            {usedCategories.map((c) => (
-              <button key={c.id} style={chipStyle(activeFilter === c.id)} onClick={() => setActiveFilter(activeFilter === c.id ? null : c.id)}>
-                {c.name}
+      <div style={{ padding: '32px 40px' }}>
+        <PageHeader
+          title="Registros"
+          description="Documente sequências de requisições e compartilhe com o time."
+          action={
+            canEdit ? (
+              <button
+                onClick={() => setShowNew(true)}
+                style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', fontSize: 13, borderRadius: 6, border: 'none', backgroundColor: 'var(--accent)', color: 'white', cursor: 'pointer', fontWeight: 500 }}
+              >
+                <Plus size={14} /> Novo registro
               </button>
-            ))}
-          </div>
-        )}
+            ) : undefined
+          }
+        />
 
-        {records.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--text-muted)' }}>
-            <FileText size={36} style={{ marginBottom: 12, opacity: 0.3 }} />
-            <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 6 }}>Nenhum registro ainda</div>
-            <div style={{ fontSize: 13 }}>Crie um registro para documentar e compartilhar testes.</div>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)', fontSize: 13 }}>
-            Nenhum registro nesta categoria.
-          </div>
-        ) : (() => {
-          const groups = Object.values(
-            filtered.reduce<Record<string, { erpName: string; items: RecordItem[] }>>((acc, rec) => {
-              const key = rec.company.erp.name
-              if (!acc[key]) acc[key] = { erpName: key, items: [] }
-              acc[key].items.push(rec)
-              return acc
-            }, {})
-          ).sort((a, b) => a.erpName.localeCompare(b.erpName))
-
-          return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              {groups.map((group) => (
-                <div key={group.erpName}>
-                  {/* ERP section header */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', flexShrink: 0 }}>
-                      {group.erpName}
-                    </span>
-                    <div style={{ flex: 1, height: 1, backgroundColor: 'var(--border)' }} />
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {group.items.map((rec) => (
-                      <div
-                        key={rec.id}
-                        onClick={() => router.push(`/records/${rec.id}`)}
-                        style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', gap: 12 }}
-                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
-                        onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
-                      >
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>
-                            {rec.company.name}
-                          </span>
-                          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                            {rec._count.blocks} bloco{rec._count.blocks !== 1 ? 's' : ''} · {new Date(rec.createdAt).toLocaleDateString('pt-BR')}
-                          </div>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                          {rec.category && (
-                            <span style={{ fontSize: 11, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '1px 7px', borderRadius: 10, fontWeight: 500 }}>
-                              {rec.category.name}
-                            </span>
-                          )}
-                          {canEdit && (
-                            <button
-                              onClick={(e) => handleDelete(e, rec.id)}
-                              disabled={deletingId === rec.id}
-                              style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', opacity: deletingId === rec.id ? 0.4 : 1 }}
-                              title="Deletar"
-                            >
-                              <Trash2 size={13} />
-                            </button>
-                          )}
-                          <ChevronRight size={14} style={{ color: 'var(--text-subtle)' }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+        <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, overflow: 'hidden' }}>
+          {usedCategories.length > 0 && (
+            <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)', display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              <button style={chipStyle(activeFilter === null)} onClick={() => setActiveFilter(null)}>
+                Todos
+              </button>
+              {usedCategories.map((c) => (
+                <button key={c.id} style={chipStyle(activeFilter === c.id)} onClick={() => setActiveFilter(activeFilter === c.id ? null : c.id)}>
+                  {c.name}
+                </button>
               ))}
             </div>
-          )
-        })()}
+          )}
+
+          {records.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
+              <FileText size={36} style={{ marginBottom: 12, opacity: 0.3 }} />
+              <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 6 }}>Nenhum registro ainda</div>
+              <div style={{ fontSize: 13 }}>Crie um registro para documentar e compartilhar testes.</div>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)', fontSize: 13 }}>
+              Nenhum registro nesta categoria.
+            </div>
+          ) : (() => {
+            const groups = Object.values(
+              filtered.reduce<Record<string, { erpName: string; items: RecordItem[] }>>((acc, rec) => {
+                const key = rec.company.erp.name
+                if (!acc[key]) acc[key] = { erpName: key, items: [] }
+                acc[key].items.push(rec)
+                return acc
+              }, {})
+            ).sort((a, b) => a.erpName.localeCompare(b.erpName))
+
+            return (
+              <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+                {groups.map((group) => (
+                  <div key={group.erpName}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', flexShrink: 0 }}>
+                        {group.erpName}
+                      </span>
+                      <div style={{ flex: 1, height: 1, backgroundColor: 'var(--border)' }} />
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {group.items.map((rec) => (
+                        <div
+                          key={rec.id}
+                          onClick={() => router.push(`/records/${rec.id}`)}
+                          style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', gap: 12 }}
+                          onMouseEnter={(e) => (e.currentTarget.style.borderColor = 'var(--accent)')}
+                          onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
+                        >
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>
+                              {rec.company.name}
+                            </span>
+                            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+                              {rec._count.blocks} bloco{rec._count.blocks !== 1 ? 's' : ''} · {new Date(rec.createdAt).toLocaleDateString('pt-BR')}
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                            {rec.category && (
+                              <span style={{ fontSize: 11, color: 'var(--accent)', backgroundColor: 'color-mix(in srgb, var(--accent) 10%, transparent)', padding: '1px 7px', borderRadius: 10, fontWeight: 500 }}>
+                                {rec.category.name}
+                              </span>
+                            )}
+                            {canEdit && (
+                              <button
+                                onClick={(e) => handleDelete(e, rec.id)}
+                                disabled={deletingId === rec.id}
+                                style={{ padding: '4px 6px', borderRadius: 5, border: 'none', backgroundColor: 'transparent', color: 'var(--text-subtle)', cursor: 'pointer', opacity: deletingId === rec.id ? 0.4 : 1 }}
+                                title="Deletar"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            )}
+                            <ChevronRight size={14} style={{ color: 'var(--text-subtle)' }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
+          })()}
+        </div>
       </div>
     </>
   )
