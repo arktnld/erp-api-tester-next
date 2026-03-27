@@ -3,6 +3,7 @@ export const metadata: Metadata = { title: 'Fluxos' }
 
 import { Fragment } from 'react'
 import Link from 'next/link'
+import { ChevronRight } from 'lucide-react'
 import { getPlaybooks } from '@/lib/actions/playbooks'
 import { PageHeader } from '@/components/ui/page-header'
 import { NewPlaybookButton, CreatePlaybookLink, PlaybookEditActions } from './playbooks-actions'
@@ -53,8 +54,9 @@ export default async function PlaybooksPage() {
                   {items.map((pb, i) => (
                     <tr key={pb.id} className="card-hover" style={{ borderBottom: i < items.length - 1 ? '1px solid var(--border)' : undefined }}>
                       <td style={{ padding: '10px 16px' }}>
-                        <Link href={`/playbooks/${pb.id}`} style={{ textDecoration: 'none', color: 'var(--text)', fontWeight: 500, fontSize: 14 }}>
+                        <Link href={`/playbooks/${pb.id}`} style={{ textDecoration: 'none', color: 'var(--text)', fontWeight: 500, fontSize: 14, display: 'flex', alignItems: 'center', gap: 4 }}>
                           {pb.name}
+                          <ChevronRight size={13} color="var(--text-subtle)" />
                         </Link>
                       </td>
                       <td style={{ padding: '10px 16px', fontSize: 13, color: 'var(--text-muted)' }}>

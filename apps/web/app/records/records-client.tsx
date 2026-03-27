@@ -267,7 +267,12 @@ export function RecordsClient({
                         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--surface-2)')}
                         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
                       >
-                        <td style={{ padding: '10px 16px', fontSize: 14, fontWeight: 500, color: 'var(--text)' }}>{rec.company.name}</td>
+                        <td style={{ padding: '10px 16px', fontSize: 14, fontWeight: 500, color: 'var(--text)' }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            {rec.company.name}
+                            <ChevronRight size={13} color="var(--text-subtle)" />
+                          </span>
+                        </td>
                         <td style={{ padding: '10px 16px', fontSize: 13, color: 'var(--text-muted)' }}>{rec._count.blocks} bloco{rec._count.blocks !== 1 ? 's' : ''}</td>
                         <td style={{ padding: '10px 16px', fontSize: 13, color: 'var(--text-subtle)' }}>{new Date(rec.createdAt).toLocaleDateString('pt-BR')}</td>
                         <td style={{ padding: '10px 16px' }}>
