@@ -5,7 +5,7 @@ import { HelpCircle } from 'lucide-react'
 import { Button } from './button'
 import 'driver.js/dist/driver.css'
 
-const TOUR_KEY = 'tour-seen-v2'
+const TOUR_KEY = 'tour-seen-v3'
 
 const steps = [
   {
@@ -22,10 +22,17 @@ const steps = [
     },
   },
   {
-    element: '[data-tour="chat"]',
+    element: '[data-tour="playbooks"]',
     popover: {
-      title: 'Chat IA',
-      description: 'Converse com a IA para tirar dúvidas sobre endpoints, gerar payloads de teste ou interpretar respostas. Cole um curl e ela importa o endpoint automaticamente.',
+      title: 'Fluxos',
+      description: 'Crie sequências automatizadas de requisições para testar fluxos completos — por exemplo: autenticar → buscar cliente → criar pedido.',
+    },
+  },
+  {
+    element: '[data-tour="records"]',
+    popover: {
+      title: 'Registros',
+      description: 'Documente sequências de requisições e compartilhe com o time. Útil para registrar testes importantes e resultados.',
     },
   },
   {
@@ -50,31 +57,24 @@ const steps = [
     },
   },
   {
-    element: '[data-tour="playbooks"]',
+    element: '[data-tour="collections"]',
     popover: {
-      title: 'Playbooks',
-      description: 'Crie sequências automatizadas de requisições para testar fluxos completos — por exemplo: autenticar → buscar cliente → criar pedido.',
-    },
-  },
-  {
-    element: '[data-tour="docs"]',
-    popover: {
-      title: 'Como usar',
-      description: 'Documentação interna com exemplos e guias para cada funcionalidade da ferramenta.',
+      title: 'Documentação',
+      description: 'Explore todos os endpoints disponíveis com exemplos de payload e resposta para cada ERP cadastrado.',
     },
   },
   {
     element: '[data-tour="settings"]',
     popover: {
       title: 'Configurações',
-      description: 'Configure as chaves de API para o Chat IA (Anthropic, OpenAI, Gemini), alterne o tema e gerencie os usuários da ferramenta.',
+      description: 'Gerencie os usuários da ferramenta e ajuste as configurações gerais do sistema.',
     },
   },
   {
     element: '[data-tour="footer"]',
     popover: {
       title: 'Atalhos',
-      description: 'Acesse sua conta pelo avatar, altere o tema pelo ícone de sol/lua, e reabra este tour pelo ícone de ?. Dica: use Ctrl+K para busca rápida por endpoint + empresa.',
+      description: 'Acesse sua conta pelo avatar e reabra este tour pelo ícone de ?. Dica: use Ctrl+K para busca rápida por endpoint + empresa.',
     },
   },
 ]

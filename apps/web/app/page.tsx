@@ -47,19 +47,19 @@ export default async function Dashboard() {
     { label: 'ERPs', value: erpCount },
     { label: 'Endpoints', value: endpointCount },
     { label: 'Empresas', value: companies.length },
-    { label: 'Playbooks', value: playbookCount },
+    { label: 'Fluxos', value: playbookCount },
     { label: 'Requests', value: historyCount },
   ]
 
   const quickActions = [
     { href: '/test', label: 'Testar API', desc: 'Disparar requisições', icon: FlaskConical },
-    { href: '/playbooks', label: 'Playbooks', desc: 'Fluxos automatizados', icon: ListChecks },
+    { href: '/playbooks', label: 'Fluxos', desc: 'Sequências encadeadas', icon: ListChecks },
     { href: '/history', label: 'Histórico', desc: 'Todas as requisições', icon: History },
-    { href: '/collections', label: 'Collections', desc: 'Explorar endpoints', icon: BookOpen },
+    { href: '/collections', label: 'Documentação', desc: 'Explorar endpoints', icon: BookOpen },
   ]
 
   return (
-    <div style={{ padding: '32px 40px', maxWidth: 960 }}>
+    <div style={{ padding: '32px 40px' }}>
       {/* Header */}
       <div style={{ marginBottom: 4 }}>
         <h1 style={{ fontSize: 20, fontWeight: 600 }}>Início</h1>
