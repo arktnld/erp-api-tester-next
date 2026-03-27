@@ -39,13 +39,15 @@ export default async function PlaybooksPage() {
               </div>
               {items.map((pb, i) => (
                 <div key={pb.id} className="card-hover" style={{ display: 'flex', alignItems: 'center', padding: '10px 16px', borderBottom: i < items.length - 1 ? '1px solid var(--border)' : undefined, gap: 12 }}>
-                  <Link href={`/playbooks/${pb.id}`} style={{ flex: 1, textDecoration: 'none', color: 'var(--text)', fontWeight: 500, fontSize: 14 }}>
-                    {pb.name}
-                  </Link>
-                  <span style={{ fontSize: 12, color: 'var(--text-muted)', flexShrink: 0 }}>{pb._count.steps} step{pb._count.steps !== 1 ? 's' : ''}</span>
-                  {pb._count.runs > 0 && (
-                    <span style={{ fontSize: 12, color: 'var(--text-subtle)', flexShrink: 0, marginLeft: 8 }}>{pb._count.runs} execuç{pb._count.runs !== 1 ? 'ões' : 'ão'}</span>
-                  )}
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                    <Link href={`/playbooks/${pb.id}`} style={{ textDecoration: 'none', color: 'var(--text)', fontWeight: 500, fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {pb.name}
+                    </Link>
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)', flexShrink: 0 }}>{pb._count.steps} step{pb._count.steps !== 1 ? 's' : ''}</span>
+                    {pb._count.runs > 0 && (
+                      <span style={{ fontSize: 12, color: 'var(--text-subtle)', flexShrink: 0 }}>{pb._count.runs} execuç{pb._count.runs !== 1 ? 'ões' : 'ão'}</span>
+                    )}
+                  </div>
                   <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
                     <PlaybookEditActions id={pb.id} />
                   </div>
