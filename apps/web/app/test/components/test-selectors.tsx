@@ -322,8 +322,12 @@ export function TestSelectors({
 
   function handleEndpointSelect(id: number) {
     onEndpointChange(id === endpointId ? null : id)
-    if (id !== endpointId && needsClient) openSection('client')
-    else if (id !== endpointId) closeDropdown()
+    if (id !== endpointId) {
+      const newEndpoint = erp?.endpoints.find(ep => ep.id === id)
+      const newNeedsClient = newEndpoint?.requiresClient !== false
+      if (newNeedsClient) openSection('client')
+      else closeDropdown()
+    }
   }
 
   function handleClientSelect(id: number) {
