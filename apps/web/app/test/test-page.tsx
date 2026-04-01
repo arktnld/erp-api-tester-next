@@ -1,14 +1,29 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { Pencil } from 'lucide-react'
 import { MethodBadge } from '@/components/ui/badge'
 import { TestSelectors } from './components/test-selectors'
 import { TestRequest } from './components/test-request'
 import { TestResponse } from './components/test-response'
+import { SessionStrip } from './components/session-strip'
+import type { SessionInfo } from './components/session-strip'
 import { substitute, generateCurl, findErpIdForCompany } from './lib/utils'
 import { mergeFields } from '@/lib/fields'
 import type { ERP, Environment, ExecuteResponse } from './lib/types'
+
+type Session = {
+  id: string
+  erpId: number | null
+  companyId: number | null
+  endpointId: number | null
+  clientId: number | null
+  environmentUrl: string | null
+  customUrl: string | null
+  bodyMode: 'form' | 'raw'
+  rawBody: string
+  response: ExecuteResponse | null
+}
 
 function detectLanguage(headersJson: string): 'json' | 'xml' | 'text' {
   try {
@@ -52,6 +67,22 @@ export function TestPage({
   const abortRef = useRef<AbortController | null>(null)
   const cancelTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isMountedRef = useRef(false)
+  const isRestoringRef = useRef(false)
+  const sessionCounterRef = useRef(2)
+
+  const [sessions, setSessions] = useState<Session[]>([{
+    id: 's1',
+    erpId: initialCompanyId ? findErpIdForCompany(erps, initialCompanyId) : null,
+    companyId: initialCompanyId ?? null,
+    endpointId: initialEndpointId ?? null,
+    clientId: initialClientId ?? null,
+    environmentUrl: null,
+    customUrl: null,
+    bodyMode: 'form',
+    rawBody: '',
+    response: null,
+  }])
+  const [activeSessionId, setActiveSessionId] = useState('s1')
 
   // Restore from localStorage on mount (skip if URL params were provided)
   useEffect(() => {
@@ -93,8 +124,90 @@ export function TestPage({
     else localStorage.removeItem('test_clientId')
   }, [clientId])
 
-  // Reset custom URL + editing mode when any selector changes
-  useEffect(() => { setCustomUrl(null); setEditingUrl(false) }, [erpId, companyId, endpointId, clientId, environmentUrl])
+  // Reset custom URL + editing mode when any selector changes (skip during session restore)
+  useEffect(() => {
+    if (isRestoringRef.current) return
+    setCustomUrl(null)
+    setEditingUrl(false)
+  }, [erpId, companyId, endpointId, clientId, environmentUrl])
+
+  // Sync active session response to sessions array for strip display
+  useEffect(() => {
+    setSessions(prev => prev.map(s => s.id === activeSessionId ? { ...s, response } : s))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [response])
+
+  const captureCurrentSession = useCallback((): Session => ({
+    id: activeSessionId,
+    erpId, companyId, endpointId, clientId,
+    environmentUrl, customUrl, bodyMode, rawBody, response,
+  }), [activeSessionId, erpId, companyId, endpointId, clientId, environmentUrl, customUrl, bodyMode, rawBody, response])
+
+  const restoreSession = useCallback((target: Session) => {
+    isRestoringRef.current = true
+    setErpId(target.erpId)
+    setCompanyId(target.companyId)
+    setEndpointId(target.endpointId)
+    setClientId(target.clientId)
+    setEnvironmentUrl(target.environmentUrl)
+    setCustomUrl(target.customUrl)
+    setBodyMode(target.bodyMode)
+    setRawBody(target.rawBody)
+    setResponse(target.response)
+    setActiveSessionId(target.id)
+    setTimeout(() => { isRestoringRef.current = false }, 0)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const switchSession = useCallback((id: string) => {
+    setSessions(prev => {
+      const target = prev.find(s => s.id === id)
+      if (!target || id === activeSessionId) return prev
+      const updated = prev.map(s => s.id === activeSessionId ? captureCurrentSession() : s)
+      restoreSession(target)
+      return updated
+    })
+  }, [activeSessionId, captureCurrentSession, restoreSession])
+
+  const createSession = useCallback(() => {
+    const newId = `s${sessionCounterRef.current++}`
+    const blank: Session = {
+      id: newId, erpId: null, companyId: null, endpointId: null, clientId: null,
+      environmentUrl: null, customUrl: null, bodyMode: 'form', rawBody: '', response: null,
+    }
+    setSessions(prev => [...prev.map(s => s.id === activeSessionId ? captureCurrentSession() : s), blank])
+    restoreSession(blank)
+  }, [activeSessionId, captureCurrentSession, restoreSession])
+
+  const closeSession = useCallback((id: string) => {
+    setSessions(prev => {
+      if (prev.length <= 1) return prev
+      const idx = prev.findIndex(s => s.id === id)
+      if (idx === -1) return prev
+      const next = prev.filter(s => s.id !== id)
+      if (id === activeSessionId) {
+        const target = next[Math.min(idx, next.length - 1)]
+        restoreSession(target)
+      }
+      return next
+    })
+  }, [activeSessionId, restoreSession])
+
+  const sessionInfos: SessionInfo[] = sessions.map(s => {
+    const sErp = erps.find(e => e.id === (s.id === activeSessionId ? erpId : s.erpId))
+    const sEndpointId = s.id === activeSessionId ? endpointId : s.endpointId
+    const sEndpoint = sErp?.endpoints.find(ep => ep.id === sEndpointId)
+    const sResponse = s.id === activeSessionId ? response : s.response
+    return {
+      id: s.id,
+      endpointName: sEndpoint?.name ?? null,
+      endpointMethod: sEndpoint?.method ?? null,
+      statusCode: sResponse?.statusCode ?? null,
+      durationMs: sResponse?.durationMs ?? null,
+      isActive: s.id === activeSessionId,
+      isLoading: s.id === activeSessionId && loading,
+    }
+  })
 
   const erp = erps.find((e) => e.id === erpId)
   const company = erp?.companies.find((c) => c.id === companyId)
@@ -294,6 +407,12 @@ export function TestPage({
           erpName={erp?.name}
           companyName={company?.name}
           curlString={endpoint && company ? generateCurl(endpoint, { ...company, baseUrl: activeUrl }, allFields, bodyMode === 'raw' ? rawBody : undefined, customUrl ?? undefined) : undefined}
+        />
+        <SessionStrip
+          sessions={sessionInfos}
+          onSwitch={switchSession}
+          onCreate={createSession}
+          onClose={closeSession}
         />
       </div>
 
