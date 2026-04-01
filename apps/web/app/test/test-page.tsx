@@ -84,10 +84,39 @@ export function TestPage({
   }])
   const [activeSessionId, setActiveSessionId] = useState('s1')
 
-  // Restore from localStorage on mount (skip if URL params were provided)
+  // Restore sessions from localStorage on mount (skip if URL params were provided)
   useEffect(() => {
     isMountedRef.current = true
     if (initialCompanyId || initialEndpointId) return
+
+    try {
+      const raw = localStorage.getItem('test_sessions')
+      if (raw) {
+        const saved = JSON.parse(raw) as Session[]
+        if (Array.isArray(saved) && saved.length > 0) {
+          const savedActiveId = localStorage.getItem('test_activeSessionId') ?? saved[0].id
+          const target = saved.find(s => s.id === savedActiveId) ?? saved[0]
+          // Restore session counter to avoid ID collisions
+          const maxNum = saved.reduce((m, s) => Math.max(m, parseInt(s.id.replace('s', ''), 10) || 0), 0)
+          sessionCounterRef.current = maxNum + 1
+          setSessions(saved)
+          isRestoringRef.current = true
+          setErpId(target.erpId)
+          setCompanyId(target.companyId)
+          setEndpointId(target.endpointId)
+          setClientId(target.clientId)
+          setEnvironmentUrl(target.environmentUrl)
+          setCustomUrl(target.customUrl)
+          setBodyMode(target.bodyMode)
+          setRawBody(target.rawBody)
+          setActiveSessionId(target.id)
+          setTimeout(() => { isRestoringRef.current = false }, 0)
+          return
+        }
+      }
+    } catch { /* invalid JSON, fall through */ }
+
+    // Legacy fallback: individual keys (migration)
     const savedErpId      = localStorage.getItem('test_erpId')
     const savedCompanyId  = localStorage.getItem('test_companyId')
     const savedEndpointId = localStorage.getItem('test_endpointId')
@@ -99,30 +128,18 @@ export function TestPage({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Persist selections (skip first render to avoid overwriting saved values)
+  // Persist sessions (without response bodies to avoid storage quota issues)
   useEffect(() => {
     if (!isMountedRef.current) return
-    if (erpId != null) localStorage.setItem('test_erpId', String(erpId))
-    else localStorage.removeItem('test_erpId')
-  }, [erpId])
-
-  useEffect(() => {
-    if (!isMountedRef.current) return
-    if (companyId != null) localStorage.setItem('test_companyId', String(companyId))
-    else localStorage.removeItem('test_companyId')
-  }, [companyId])
-
-  useEffect(() => {
-    if (!isMountedRef.current) return
-    if (endpointId != null) localStorage.setItem('test_endpointId', String(endpointId))
-    else localStorage.removeItem('test_endpointId')
-  }, [endpointId])
-
-  useEffect(() => {
-    if (!isMountedRef.current) return
-    if (clientId != null) localStorage.setItem('test_clientId', String(clientId))
-    else localStorage.removeItem('test_clientId')
-  }, [clientId])
+    const toSave = sessions.map(s =>
+      s.id === activeSessionId
+        ? { ...s, erpId, companyId, endpointId, clientId, environmentUrl, customUrl, bodyMode, rawBody, response: null }
+        : { ...s, response: null }
+    )
+    localStorage.setItem('test_sessions', JSON.stringify(toSave))
+    localStorage.setItem('test_activeSessionId', activeSessionId)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessions, activeSessionId, erpId, companyId, endpointId, clientId, environmentUrl, customUrl, bodyMode, rawBody])
 
   // Reset custom URL + editing mode when any selector changes (skip during session restore)
   useEffect(() => {
