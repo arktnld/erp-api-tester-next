@@ -34,6 +34,15 @@ export async function deleteCollection(id: number) {
   await prisma.postmanCollection.delete({ where: { id } })
 }
 
+export async function getCollectionRawJson(id: number) {
+  const col = await prisma.postmanCollection.findUnique({
+    where: { id },
+    select: { name: true, rawJson: true },
+  })
+  if (!col || !col.rawJson) return null
+  return { name: col.name, rawJson: col.rawJson }
+}
+
 export async function importCollection(name: string, rawJson: unknown) {
   const created = await prisma.postmanCollection.create({
     data: { name, rawJson: rawJson as never, context: '', systemPrompt: '' },

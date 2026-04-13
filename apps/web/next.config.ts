@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['@prisma/client', '@erp/db'],
   experimental: {
     serverActions: {
-      bodySizeLimit: '10mb',
+      bodySizeLimit: '20mb',
     },
   },
   async headers() {

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback, useTransition, useMemo } from 'react'
-import { getCollectionStructure, deleteCollection, importCollection } from '@/app/actions/collections'
+import { getCollectionStructure, deleteCollection, importCollection, getCollectionRawJson } from '@/app/actions/collections'
 import type { CollectionStructure, FolderNode, CollectionEndpoint, FlatEndpoint, CollectionParam } from './lib/parser'
 import { useRole } from '@/lib/role-context'
 import styles from './collections.module.css'
@@ -750,6 +750,11 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
 
   const doImport = () => {
     setError('')
+    const sizeMb = new Blob([text]).size / (1024 * 1024)
+    if (sizeMb > 19) {
+      setError(`Arquivo muito grande (${sizeMb.toFixed(1)} MB). Limite: 20 MB.`)
+      return
+    }
     let parsed: unknown
     try { parsed = JSON.parse(text) } catch { setError('JSON inválido'); return }
     startTransition(async () => {
@@ -757,7 +762,11 @@ function ImportModal({ onClose, onImported }: { onClose: () => void; onImported:
         const created = await importCollection(collName.trim() || 'Collection', parsed)
         onImported(created.id, created.name)
       } catch (e) {
-        setError('Erro ao importar: ' + String(e))
+        const msg = String(e)
+        if (msg.includes('Body exceeded') || msg.includes('too large'))
+          setError(`Arquivo muito grande (${sizeMb.toFixed(1)} MB). Limite do servidor excedido.`)
+        else
+          setError('Erro ao importar: ' + msg)
       }
     })
   }
@@ -834,6 +843,7 @@ function CollectionSwitcher({
 }) {
   const [open, setOpen] = useState(false)
   const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [downloadingId, setDownloadingId] = useState<number | null>(null)
   const ref = useRef<HTMLDivElement>(null)
   const active = collections.find((c) => c.id === activeId)
 
@@ -851,6 +861,24 @@ function CollectionSwitcher({
     await deleteCollection(id)
     onDelete(id)
     setDeletingId(null)
+  }
+
+  const handleDownload = async (e: React.MouseEvent, id: number) => {
+    e.stopPropagation()
+    setDownloadingId(id)
+    try {
+      const data = await getCollectionRawJson(id)
+      if (!data?.rawJson) return
+      const blob = new Blob([JSON.stringify(data.rawJson, null, 2)], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${data.name.replace(/[^a-zA-Z0-9_-]/g, '_')}.json`
+      a.click()
+      URL.revokeObjectURL(url)
+    } finally {
+      setDownloadingId(null)
+    }
   }
 
   return (
@@ -876,6 +904,14 @@ function CollectionSwitcher({
             >
               <span className={styles.colDdCheck}>{c.id === activeId ? '✓' : ''}</span>
               <span className={styles.colDdName}>{c.name}</span>
+              <span
+                className={styles.colDdDel}
+                onClick={(e) => handleDownload(e as unknown as React.MouseEvent, c.id)}
+                title="Baixar JSON"
+                style={{ opacity: downloadingId === c.id ? 0.4 : undefined, marginRight: canEdit ? 2 : 0 }}
+              >
+                ↓
+              </span>
               {canEdit && (
                 <span
                   className={styles.colDdDel}
