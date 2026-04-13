@@ -3,8 +3,8 @@ import type { NextConfig } from 'next'
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   serverExternalPackages: ['@prisma/client', '@erp/db'],
-  middlewareClientMaxBodySize: '20mb',
   experimental: {
+    middlewareClientMaxBodySize: '20mb',
     serverActions: {
       bodySizeLimit: '20mb',
     },
