@@ -84,19 +84,13 @@ export function UsersSection({ users: initialUsers }: { users: UserRow[] }) {
 
   return (
     <>
-      <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
-        <colgroup>
-          <col style={{ width: '22%' }} />
-          <col style={{ width: '33%' }} />
-          <col style={{ width: '25%' }} />
-          <col style={{ width: '20%' }} />
-        </colgroup>
+      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ borderBottom: '1px solid var(--border)', fontSize: 12, color: 'var(--text-muted)' }}>
-            <th style={{ textAlign: 'left', padding: '8px', fontWeight: 500 }}>Nome</th>
-            <th style={{ textAlign: 'left', padding: '8px', fontWeight: 500 }}>Email</th>
-            <th style={{ textAlign: 'left', padding: '8px', fontWeight: 500 }}>Papel</th>
-            <th style={{ textAlign: 'right', padding: '8px', fontWeight: 500 }}>Ações</th>
+            <th style={{ textAlign: 'left', padding: '8px 12px 8px 0', fontWeight: 500 }}>Nome</th>
+            <th style={{ textAlign: 'left', padding: '8px 12px', fontWeight: 500 }}>Email</th>
+            <th style={{ textAlign: 'left', padding: '8px 12px', fontWeight: 500, whiteSpace: 'nowrap' }}>Papel</th>
+            <th style={{ textAlign: 'right', padding: '8px 0 8px 12px', fontWeight: 500, whiteSpace: 'nowrap' }}>Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -104,12 +98,12 @@ export function UsersSection({ users: initialUsers }: { users: UserRow[] }) {
             const isSelf = user.id === currentUserId
             return (
               <tr key={user.id} style={{ borderBottom: '1px solid var(--border)' }}>
-                <td style={{ padding: '10px 8px', fontSize: 13 }}>{user.name}</td>
-                <td style={{ padding: '10px 8px', fontSize: 13, color: 'var(--text-muted)', wordBreak: 'break-all' }}>{user.email}</td>
-                <td style={{ padding: '10px 8px' }}>
+                <td style={{ padding: '10px 12px 10px 0', fontSize: 13, whiteSpace: 'nowrap' }}>{user.name}</td>
+                <td style={{ padding: '10px 12px', fontSize: 13, color: 'var(--text-muted)' }}>{user.email}</td>
+                <td style={{ padding: '10px 12px', whiteSpace: 'nowrap' }}>
                   {isSelf ? <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{user.role}</span> : <RoleSelect userId={user.id} currentRole={user.role} />}
                 </td>
-                <td style={{ padding: '10px 8px', textAlign: 'right' }}>
+                <td style={{ padding: '10px 0 10px 12px', textAlign: 'right', whiteSpace: 'nowrap' }}>
                   {!isSelf && (
                     <div style={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
                       <Button variant="ghost" size="sm" onClick={() => openEditName(user)} title="Editar nome">
