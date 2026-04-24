@@ -1,9 +1,13 @@
 'use client'
 
+import { useState } from 'react'
 import { SignIn } from '@clerk/nextjs'
 import { LoginParticles } from './login-particles'
+import { LoginMesh } from './login-mesh'
 
 export function SignInClient() {
+  const [variant] = useState(() => Math.random() < 0.5 ? 'particles' : 'mesh')
+
   return (
     <div
       style={{
@@ -17,7 +21,7 @@ export function SignInClient() {
         position: 'relative',
       }}
     >
-      <LoginParticles />
+      {variant === 'particles' ? <LoginParticles /> : <LoginMesh />}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 2, position: 'relative', zIndex: 1 }}>
         <span style={{ fontFamily: 'monospace', fontSize: 26, fontWeight: 900, letterSpacing: '-0.03em', color: '#6366f1' }}>/ERP</span>
