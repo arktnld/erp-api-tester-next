@@ -23,3 +23,25 @@ export async function listUsers() {
     role: (u.publicMetadata?.role ?? 'viewer') as Role,
   }))
 }
+
+export async function updateUserName(userId: string, firstName: string, lastName: string) {
+  await requireAdmin()
+  const client = await clerkClient()
+  await client.users.updateUser(userId, { firstName, lastName })
+  revalidatePath('/settings')
+}
+
+export async function updateUserPassword(userId: string, password: string) {
+  await requireAdmin()
+  if (password.length < 8) throw new Error('Senha deve ter no mínimo 8 caracteres')
+  const client = await clerkClient()
+  await client.users.updateUser(userId, { password })
+  revalidatePath('/settings')
+}
+
+export async function deleteUser(userId: string) {
+  await requireAdmin()
+  const client = await clerkClient()
+  await client.users.deleteUser(userId)
+  revalidatePath('/settings')
+}
