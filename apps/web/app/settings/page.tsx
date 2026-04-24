@@ -19,7 +19,7 @@ export default async function SettingsPage() {
   const settings = await getSettings()
 
   return (
-    <div style={{ padding: 32, maxWidth: 640 }}>
+    <div style={{ padding: 32, maxWidth: 900 }}>
       <h1 style={{ fontSize: 20, fontWeight: 600, marginBottom: 32 }}>Configurações</h1>
 
       {/* Aparência */}

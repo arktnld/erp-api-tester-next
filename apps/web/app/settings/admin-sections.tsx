@@ -34,7 +34,7 @@ export function AdminSections({ settings }: { settings: Settings }) {
     <>
       <section>
         <h2 style={sectionTitle}>Usuários</h2>
-        <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '4px 16px', overflowX: 'auto' }}>
+        <div style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, padding: '4px 16px' }}>
           <UsersSection users={users} />
         </div>
       </section>
