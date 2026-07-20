@@ -103,8 +103,10 @@ function AuthCopyButton({ authType, authConfig }: { authType: string; authConfig
     value = btoa(`${config.username}:${config.password}`)
   } else if (authType === 'api_key' && config.value) {
     value = config.value
-  } else if (authType === 'token_endpoint' && config.cachedToken) {
-    value = config.cachedToken
+  } else if (authType === 'token_endpoint') {
+    // Multi-grant ERPs nest the cache under the mode id, so look one level down too
+    const nested = Object.values(config).filter((v) => v && typeof v === 'object') as { cachedToken?: string }[]
+    value = config.cachedToken ?? nested.find((c) => c.cachedToken)?.cachedToken ?? null
   }
 
   if (!value) return null

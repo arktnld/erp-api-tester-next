@@ -132,7 +132,11 @@ export function CompaniesClient({
       })
       setModeValues(vals)
       setAuthType(modes[0].type)
-      setTokenEpId(''); setTokenPath('token'); setTokenParams({}); setAuthConfig('{}')
+      setTokenEpId(''); setTokenPath('token'); setTokenParams({})
+      // Keep the existing config as the raw fallback: if the ERP ends up with no
+      // modes at submit time, the save path writes this value back instead of
+      // wiping the credentials with '{}'.
+      setAuthConfig(company?.authConfig ? JSON.stringify(company.authConfig) : '{}')
     } else if (company?.authType === 'token_endpoint' && company?.authConfig) {
       const cfg = company.authConfig as { tokenEndpointId?: number; tokenPath?: string; params?: Record<string, string> }
       setTokenEpId(String(cfg.tokenEndpointId ?? ''))
@@ -379,7 +383,9 @@ export function CompaniesClient({
                         </span>
                         <span style={{ fontSize: 11, color: 'var(--text-subtle)' }}>{mode.type}</span>
                         {mode.type === 'token_endpoint' && (() => {
-                          const isCached = modes.length === 1 && sheet.company?.authType === 'token_endpoint' && (sheet.company.authConfig as { cachedToken?: string } | null)?.cachedToken
+                          // Per-mode lookup: a multi-grant ERP caches one token per mode
+                          const modeCfg = getModeCredentials(sheet.company?.authConfig, mode.id, modes.map((m) => m.id)) as { cachedToken?: string }
+                          const isCached = sheet.company?.authType === 'token_endpoint' && !!modeCfg.cachedToken
                           return isCached ? <span style={{ fontSize: 11, color: '#10b981' }}>🟢 Token em cache</span> : null
                         })()}
                       </div>

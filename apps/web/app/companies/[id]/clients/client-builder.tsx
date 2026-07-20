@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { createTestClient, updateTestClient } from '@/lib/actions/test-clients'
 import { formLabel as labelStyle } from '@/lib/styles'
+import { getAuthModes, pickModeConfig } from '@/lib/auth'
 import { useClientAutoFill } from './use-client-auto-fill'
 
 type FieldSchema = {
@@ -30,6 +31,7 @@ type Endpoint = {
 type ERP = {
   id: number
   name: string
+  authTemplate: unknown
   fieldSchemas: FieldSchema[]
   endpoints: Endpoint[]
 }
@@ -53,7 +55,14 @@ export function ClientBuilder({ company, client }: { company: Company; client?: 
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
-  const tokenCfg = company.authType === 'token_endpoint' ? (company.authConfig as TokenEndpointConfig) : null
+  // Multi-grant ERPs key the config by mode id, so read it through the active mode
+  const tokenCfg =
+    company.authType === 'token_endpoint'
+      ? (pickModeConfig(
+          company.authConfig,
+          getAuthModes(company.erp.authTemplate).map((m) => m.id)
+        ) as TokenEndpointConfig)
+      : null
   const [tokenValid, setTokenValid] = useState(!!(tokenCfg?.cachedToken))
   const [tokenLoading, setTokenLoading] = useState(false)
   const [tokenError, setTokenError] = useState('')

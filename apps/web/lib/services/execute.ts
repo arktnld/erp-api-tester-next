@@ -1,6 +1,6 @@
 import { substitute } from '@/lib/utils'
 import { validatePublicUrl } from '@/lib/security'
-import { buildAuthHeaders, buildAuthHeadersForMode, getAuthModes, getModeCredentials } from '@/lib/auth'
+import { buildAuthHeaders, buildAuthHeadersForMode, getAuthModes, getModeCredentials, pickModeConfig, withTokenCache } from '@/lib/auth'
 import { mergeFields } from '@/lib/fields'
 import { getEndpoint } from '@/lib/repo/endpoints'
 import { getCompanyWithAuth, getTestClientWithCompany, saveTokenCache } from '@/lib/repo/companies'
@@ -30,8 +30,9 @@ function extractByPath(obj: unknown, path: string): string | null {
 }
 
 async function fetchTokenInline(
-  company: { id: number; baseUrl: string },
+  company: { id: number; baseUrl: string; authConfig: unknown },
   cfg: TokenEndpointConfig,
+  modeIds: string[],
   environmentUrl: string | null
 ): Promise<string> {
   const tokenEndpoint = await getEndpoint(cfg.tokenEndpointId)
@@ -41,14 +42,19 @@ async function fetchTokenInline(
   const base = (environmentUrl ?? company.baseUrl).replace(/\/+$/, '')
   const url = `${base}${resolvedPath}`
   validatePublicUrl(url)
-  const res = await httpFetch(url, tokenEndpoint.method, {}, bodyTemplate)
+  // The token endpoint's own headers matter: OAuth2 servers reject a
+  // client_credentials body without Content-Type: x-www-form-urlencoded.
+  const tokenHeaders: Record<string, string> = {}
+  const rawTokenHeaders = JSON.parse(tokenEndpoint.headers || '{}') as Record<string, string>
+  for (const [k, v] of Object.entries(rawTokenHeaders)) tokenHeaders[k] = substitute(v, params)
+  const res = await httpFetch(url, tokenEndpoint.method, tokenHeaders, bodyTemplate)
   if (res.status < 200 || res.status >= 300)
     throw new Error(`Auth falhou: HTTP ${res.status} — ${res.body.slice(0, 200)}`)
   let json: unknown
   try { json = JSON.parse(res.body) } catch { throw new Error(`Auth: resposta não é JSON — ${res.body.slice(0, 200)}`) }
   const token = extractByPath(json, cfg.tokenPath ?? 'token')
   if (!token) throw new Error(`Token não encontrado em "${cfg.tokenPath}"`)
-  await saveTokenCache(company.id, { ...cfg, cachedToken: token, cachedAt: Date.now() })
+  await saveTokenCache(company.id, withTokenCache(company.authConfig, modeIds, { cachedToken: token, cachedAt: Date.now() }))
   return token
 }
 
@@ -197,21 +203,16 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
 
   // Pre-auth: token_endpoint — obtain/reuse session token BEFORE substitution so {token} works in paths/bodies
   if (company.authType === 'token_endpoint') {
-    let rawCfg = (company.authConfig ?? {}) as Record<string, unknown>
     // Handle multi-mode keyed format: { modeId: { tokenEndpointId, params, ... } }
     const erpModes = getAuthModes((company.erp as { name: string; authTemplate?: unknown }).authTemplate)
-    if (erpModes.length > 0) {
-      const firstModeId = erpModes[0].id
-      if (firstModeId in rawCfg && typeof rawCfg[firstModeId] === 'object' && rawCfg[firstModeId] !== null) {
-        rawCfg = rawCfg[firstModeId] as Record<string, unknown>
-      }
-    }
+    const modeIds = erpModes.map((m) => m.id)
+    const rawCfg = pickModeConfig(company.authConfig ?? {}, modeIds)
     const cfg = rawCfg as TokenEndpointConfig
     // Always inject static params (CLIENT_ID, PASSWORD, etc.) so they resolve in any template
     Object.assign(allFields, cfg.params ?? {})
     if (endpoint.id !== cfg.tokenEndpointId) {
       // Override TOKEN placeholder with the session token for non-auth endpoints
-      const token = cfg.cachedToken ?? await fetchTokenInline(company, cfg, environmentUrl ?? null)
+      const token = cfg.cachedToken ?? await fetchTokenInline(company, cfg, modeIds, environmentUrl ?? null)
       allFields['token'] = token
       allFields['TOKEN'] = token
     }
@@ -276,11 +277,14 @@ export async function executeRequest(params: ExecuteParams): Promise<ExecuteResu
 
   // Auto-save token when the token endpoint itself was just executed successfully
   if (company.authType === 'token_endpoint' && statusCode >= 200 && statusCode < 300) {
-    const cfg = (company.authConfig ?? {}) as TokenEndpointConfig
+    const modeIds = getAuthModes((company.erp as { name: string; authTemplate?: unknown }).authTemplate).map((m) => m.id)
+    const cfg = pickModeConfig(company.authConfig ?? {}, modeIds) as TokenEndpointConfig
     if (endpoint.id === cfg.tokenEndpointId) {
       try {
         const token = extractByPath(JSON.parse(responseBody), cfg.tokenPath ?? 'token')
-        if (token) await saveTokenCache(company.id, { ...cfg, cachedToken: token, cachedAt: Date.now() })
+        if (token) {
+          await saveTokenCache(company.id, withTokenCache(company.authConfig, modeIds, { cachedToken: token, cachedAt: Date.now() }))
+        }
       } catch { /* ignore */ }
     }
   }

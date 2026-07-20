@@ -24,7 +24,56 @@ export function getModeCredentials(
   const cfg = authConfig as Record<string, unknown>
   const isNewFormat = modeIds.some((id) => id in cfg && typeof cfg[id] === 'object' && cfg[id] !== null)
   if (isNewFormat) return (cfg[modeId] ?? {}) as Record<string, string>
+  // Legacy flat format ({ token, app }) predates multi-mode: it holds credentials
+  // for the first mode only. Returning it for every mode leaks the wrong fields
+  // (e.g. body_fields creds answering a 'basic' mode lookup).
+  if (modeIds.length > 0 && modeId !== modeIds[0]) return {}
   return cfg as Record<string, string>
+}
+
+export function hasFilledCredentials(modeConfig: unknown): boolean {
+  if (!modeConfig || typeof modeConfig !== 'object') return false
+  const cfg = modeConfig as Record<string, unknown>
+  // token_endpoint modes nest their credentials under `params`
+  const values = cfg.params && typeof cfg.params === 'object' ? cfg.params : cfg
+  return Object.values(values as Record<string, unknown>).some((v) => typeof v === 'string' && v.trim() !== '')
+}
+
+/**
+ * Which key of a keyed authConfig ({ modeId: { ... } }) holds the active config,
+ * or null when the config is the legacy flat format. The form writes every
+ * declared mode, so "first mode wins" would pick blank credentials whenever a
+ * company authenticates through a later mode (e.g. Voalle's password grant vs
+ * client_credentials) — the filled one wins instead.
+ */
+function resolveModeKey(cfg: Record<string, unknown>, modeIds: string[]): string | null {
+  const chosen = modeIds.find((id) => hasFilledCredentials(cfg[id])) ?? modeIds[0]
+  if (chosen == null) return null
+  const nested = cfg[chosen]
+  return nested && typeof nested === 'object' ? chosen : null
+}
+
+/** Credentials of the active auth mode. Legacy flat configs are returned as-is. */
+export function pickModeConfig(authConfig: unknown, modeIds: string[]): Record<string, unknown> {
+  if (!authConfig || typeof authConfig !== 'object') return {}
+  const cfg = authConfig as Record<string, unknown>
+  const key = resolveModeKey(cfg, modeIds)
+  return key ? (cfg[key] as Record<string, unknown>) : cfg
+}
+
+/**
+ * Merges a patch (cached token, timestamp) into the active mode and returns the
+ * FULL authConfig, so persisting it never clobbers the other modes' credentials.
+ */
+export function withTokenCache(
+  authConfig: unknown,
+  modeIds: string[],
+  patch: Record<string, unknown>
+): Record<string, unknown> {
+  const cfg = (authConfig && typeof authConfig === 'object' ? authConfig : {}) as Record<string, unknown>
+  const key = resolveModeKey(cfg, modeIds)
+  if (!key) return { ...cfg, ...patch }
+  return { ...cfg, [key]: { ...(cfg[key] as Record<string, unknown>), ...patch } }
 }
 
 export function buildAuthHeadersForMode(modeType: string, creds: Record<string, string>): Record<string, string> {
