@@ -276,8 +276,11 @@ async function main() {
         erpId: erp.id,
         baseUrl: co.baseUrl,
         authType: 'token_endpoint',
-        authConfig: '{}',
-        environments: JSON.stringify([{ name: 'Produção', url: co.baseUrl }]),
+        // authConfig/environments são campos Json: passar o VALOR (objeto/array),
+        // nunca uma string JSON — senão o Prisma duplo-encoda e o front quebra
+        // ao fazer environments.map (string não tem .map).
+        authConfig: {},
+        environments: [{ name: 'Produção', url: co.baseUrl }],
         notes: `Fluxo de auth: ${co.grant}. Preencher credenciais na UI (modo "${co.grant}").`,
       },
     })
