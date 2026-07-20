@@ -5,6 +5,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { tryPrettyJson } from '../lib/utils'
 import { sectionLabel } from '@/lib/styles'
+import { HeaderValue } from './header-value'
 import type { EditorLanguage } from '@/components/ui/code-editor'
 
 const CodeBlock = dynamic(() => import('@/components/ui/code-block').then(m => ({ default: m.CodeBlock })), { ssr: false })
@@ -92,7 +93,7 @@ export function TestRequest({ response, resolvedBody, bodyMode, rawBody, editorL
                 {Object.entries(response.requestHeaders ?? {}).map(([k, v]) => (
                   <tr key={k} style={{ borderBottom: '1px solid var(--border)' }}>
                     <td style={{ padding: '5px 0', fontFamily: 'monospace', fontSize: 12, color: 'var(--text-muted)', width: '40%', paddingRight: 12 }}>{k}</td>
-                    <td style={{ padding: '5px 0', fontFamily: 'monospace', fontSize: 12, wordBreak: 'break-all' }}>{maskHeaderValue(k, v)}</td>
+                    <td style={{ padding: '5px 0', fontSize: 12 }}><HeaderValue value={maskHeaderValue(k, v)} /></td>
                   </tr>
                 ))}
               </tbody>

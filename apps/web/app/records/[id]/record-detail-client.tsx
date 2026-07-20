@@ -11,6 +11,7 @@ import { substitute, tryPrettyXml } from '@/lib/utils'
 import { mergeFields } from '@/lib/fields'
 import { buildAuthHeaders } from '@/lib/auth'
 import { JsonTree } from '@/app/test/components/json-tree'
+import { HeaderValue } from '@/app/test/components/header-value'
 
 const CodeBlock = dynamic(() => import('@/components/ui/code-block').then(m => ({ default: m.CodeBlock })), { ssr: false })
 
@@ -615,8 +616,8 @@ function BlockEditor({
                   <tbody>
                     {Object.entries(response.responseHeaders ?? {}).map(([k, v]) => (
                       <tr key={k} style={{ borderBottom: '1px solid var(--border)' }}>
-                        <td style={{ padding: '5px 0', fontFamily: 'monospace', color: 'var(--text-muted)', width: '35%', paddingRight: 12 }}>{k}</td>
-                        <td style={{ padding: '5px 0', wordBreak: 'break-all', color: 'var(--text)' }}>{v}</td>
+                        <td style={{ padding: '5px 0', fontFamily: 'monospace', color: 'var(--text-muted)', width: '35%', paddingRight: 12, verticalAlign: 'top' }}>{k}</td>
+                        <td style={{ padding: '5px 0' }}><HeaderValue value={String(v)} /></td>
                       </tr>
                     ))}
                   </tbody>

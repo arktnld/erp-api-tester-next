@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Play, Loader2, Download, MoreHorizontal, Copy, Check, Terminal, Image as ImageIcon } from 'lucide-react'
 import { StatusBadge } from '@/components/ui/badge'
 import { JsonTree } from './json-tree'
+import { HeaderValue } from './header-value'
 import { tryPrettyJson, tryPrettyXml } from '@/lib/utils'
 import type { ExecuteResponse, ExportData } from '../lib/types'
 import { ExportCard } from './export-card'
@@ -286,8 +287,8 @@ export function TestResponse({ response, loading, erpName = '', companyName = ''
             <tbody>
               {Object.entries(response.responseHeaders).map(([k, v]) => (
                 <tr key={k} style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td style={{ padding: '6px 0', fontFamily: 'monospace', fontSize: 12, color: 'var(--text-muted)', width: '40%', paddingRight: 12 }}>{k}</td>
-                  <td style={{ padding: '6px 0', fontFamily: 'monospace', fontSize: 12, wordBreak: 'break-all' }}>{v}</td>
+                  <td style={{ padding: '6px 0', fontFamily: 'monospace', fontSize: 12, color: 'var(--text-muted)', width: '40%', paddingRight: 12, verticalAlign: 'top' }}>{k}</td>
+                  <td style={{ padding: '6px 0', fontSize: 12 }}><HeaderValue value={v} /></td>
                 </tr>
               ))}
             </tbody>
