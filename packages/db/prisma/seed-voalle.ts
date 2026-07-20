@@ -61,10 +61,12 @@ const DATA_ENDPOINTS: EndpointSeed[] = [
   {
     name: 'Clientes (getclient)',
     method: 'GET',
-    pathTemplate: `:45715${DATA}/getclient?page={page}&pageSize={pageSize}`,
+    // page/pageSize são fixos: não são campos de cliente, então não têm origem
+    // na substituição — deixar {page} literal faz o servidor devolver 0 registros.
+    pathTemplate: `:45715${DATA}/getclient?page=1&pageSize=1000`,
     headers: BEARER_JSON,
     group: 'Leitura',
-    notes: 'Listagem paginada. Retorna data[]: id, name, cpf_cnpj, status, email, phone.',
+    notes: 'Listagem paginada (page=1, pageSize=1000). Retorna data[]: id, name, cpf_cnpj, status, email, phone.',
   },
   {
     name: 'Contratos (contract/getpaged)',
@@ -154,8 +156,6 @@ const FIELD_SCHEMAS = [
   { fieldName: 'cliente_id', label: 'ID do Cliente' },
   { fieldName: 'id_contrato', label: 'ID do Contrato' },
   { fieldName: 'id_titulo', label: 'ID do Título' },
-  { fieldName: 'page', label: 'Página' },
-  { fieldName: 'pageSize', label: 'Tamanho da página' },
 ]
 
 const COMPANIES = [
