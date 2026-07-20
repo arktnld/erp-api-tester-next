@@ -10,6 +10,7 @@ import { SessionStrip } from './components/session-strip'
 import type { SessionInfo } from './components/session-strip'
 import { substitute, generateCurl, findErpIdForCompany } from './lib/utils'
 import { mergeFields } from '@/lib/fields'
+import { getAuthModes, pickModeConfig } from '@/lib/auth'
 import type { ERP, Environment, ExecuteResponse } from './lib/types'
 
 type Session = {
@@ -304,7 +305,10 @@ export function TestPage({
 
   const obtainToken = async () => {
     if (!companyId) return
-    const cfg = company?.authConfig as { tokenEndpointId?: number } | null
+    // Multi-grant ERPs key the config by mode id, so the token endpoint id lives
+    // inside the active mode, not at the top level (flat single-mode ERPs).
+    const modeIds = getAuthModes(erp?.authTemplate).map((m) => m.id)
+    const cfg = pickModeConfig(company?.authConfig, modeIds) as { tokenEndpointId?: number }
     if (!cfg?.tokenEndpointId) return
     setLoading(true)
     try {

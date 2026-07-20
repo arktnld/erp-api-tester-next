@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildAuthHeaders, buildAuthBodyFields, getModeCredentials, pickModeConfig, withTokenCache } from './auth'
+import { buildAuthHeaders, buildAuthBodyFields, getModeCredentials, pickModeConfig, withTokenCache, hasCachedToken } from './auth'
 
 const bearer     = { authType: 'bearer',        authConfig: { token: 'tok123' } }
 const apiKey     = { authType: 'api_key',        authConfig: { header: 'X-Key', value: 'abc' } }
@@ -178,5 +178,30 @@ describe('withTokenCache', () => {
 
   it('null config → just the patch', () => {
     expect(withTokenCache(null, modeIds, patch)).toEqual(patch)
+  })
+})
+
+describe('hasCachedToken', () => {
+  it('flat single-mode config with a token → true', () => {
+    expect(hasCachedToken({ tokenEndpointId: 1, cachedToken: 'tok' })).toBe(true)
+  })
+
+  it('keyed config with a token nested in a mode → true', () => {
+    expect(hasCachedToken({ client_credentials: { params: {}, cachedToken: 'tok' }, password: { params: {} } })).toBe(true)
+  })
+
+  it('no token anywhere → false', () => {
+    expect(hasCachedToken({ client_credentials: { params: { CLIENT_ID: 'x' } }, password: { params: {} } })).toBe(false)
+    expect(hasCachedToken({ tokenEndpointId: 1 })).toBe(false)
+  })
+
+  it('empty-string token → false', () => {
+    expect(hasCachedToken({ cachedToken: '' })).toBe(false)
+    expect(hasCachedToken({ mode: { cachedToken: '' } })).toBe(false)
+  })
+
+  it('null or non-object → false', () => {
+    expect(hasCachedToken(null)).toBe(false)
+    expect(hasCachedToken('tok')).toBe(false)
   })
 })

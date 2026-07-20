@@ -76,6 +76,16 @@ export function withTokenCache(
   return { ...cfg, [key]: { ...(cfg[key] as Record<string, unknown>), ...patch } }
 }
 
+/** True if a token is cached, whether flat (single-mode) or nested under a mode. */
+export function hasCachedToken(authConfig: unknown): boolean {
+  if (!authConfig || typeof authConfig !== 'object') return false
+  const cfg = authConfig as Record<string, unknown>
+  if (typeof cfg.cachedToken === 'string' && cfg.cachedToken !== '') return true
+  return Object.values(cfg).some(
+    (v) => v && typeof v === 'object' && typeof (v as Record<string, unknown>).cachedToken === 'string' && (v as Record<string, unknown>).cachedToken !== ''
+  )
+}
+
 export function buildAuthHeadersForMode(modeType: string, creds: Record<string, string>): Record<string, string> {
   switch (modeType) {
     case 'bearer':

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { ChevronDown, Check, Search } from 'lucide-react'
 import type { ERP, Endpoint, Company, Environment } from '../lib/types'
+import { hasCachedToken } from '@/lib/auth'
 
 const METHOD_COLORS: Record<string, string> = {
   GET: 'var(--method-get)',
@@ -364,7 +365,7 @@ export function TestSelectors({
         {/* Token status */}
         {companyId && company?.authType === 'token_endpoint' && (
           <div style={{ margin: '2px 8px 4px', padding: '7px 10px', borderRadius: 6, border: '1px solid color-mix(in srgb, var(--accent) 25%, transparent)', backgroundColor: 'color-mix(in srgb, var(--accent) 6%, transparent)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-            {tokenAcquired || (company.authConfig as { cachedToken?: string } | null)?.cachedToken
+            {tokenAcquired || hasCachedToken(company.authConfig)
               ? <span style={{ fontSize: 11, color: '#10b981', fontWeight: 500 }}>🟢 Token válido</span>
               : <span style={{ fontSize: 11, color: 'var(--text-subtle)', fontWeight: 500 }}>🔑 Sem token em cache</span>
             }

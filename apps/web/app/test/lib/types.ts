@@ -26,6 +26,7 @@ export type Company = {
 export type ERP = {
   id: number
   name: string
+  authTemplate: unknown
   endpoints: Endpoint[]
   companies: Company[]
 }
